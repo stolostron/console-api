@@ -1,0 +1,38 @@
+{
+  "name": "hcm-ui-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./server.js --exec babel-node",
+    "shrinkwrap:clean": "del-cli node_modules npm-shrinkwrap.json && npm install --no-optional && npm prune && npm shrinkwrap",
+    "lint": "eslint --ext ,.js .",
+    "lint:fix": "eslint --ext .jsx,.js --fix ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.ibm.com:IBMPrivateCloud/hcm-ui-api.git"
+  },
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": "8.9.4",
+    "npm": "5.6.0"
+  },
+  "dependencies": {
+    "apollo-server-express": "^1.3.5",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "graphql": "^0.13.2",
+    "graphql-tools": "^2.24.0",
+    "mongodb": "^3.0.7"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "del-cli": "^1.1.0",
+    "eslint": "^4.19.1",
+    "nodemon": "^1.17.3"
+  }
+}
