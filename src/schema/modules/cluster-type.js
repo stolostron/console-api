@@ -1,6 +1,5 @@
 import { clusters } from '../../datasource/hcm';
 
-
 export const typeDef = `
 type Cluster {
     uid: String
@@ -8,9 +7,7 @@ type Cluster {
 `;
 
 export const clusterResolver = {
-    Query: {
-        clusters: async () => {
-            return await clusters()
-        }
-    }
+  Query: {
+    clusters: async () => clusters(),
+  },
 };

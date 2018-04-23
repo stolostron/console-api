@@ -1,7 +1,7 @@
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import bodyParser from 'body-parser';
-import { schema } from './src/schema/index';
+import schema from './src/schema/index';
 
 const GRAPHQL_PORT = 4000;
 
@@ -11,7 +11,4 @@ graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 graphQLServer.listen(GRAPHQL_PORT, () =>
-  console.log(
-    `GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql`
-  )
-);
+  console.log(`GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql`));

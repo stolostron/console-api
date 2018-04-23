@@ -1,6 +1,5 @@
 import { resource, relationship } from '../../datasource/mongodb';
 
-
 export const typeDef = `
 type Resource {
     uid: String
@@ -16,21 +15,15 @@ type Relationship {
 `;
 
 export const topologyResolver = {
-    Query: {
-        resource: async (root, args) => {
-            const result = await resource(args)
-            return result[0]
-        },
-        resources: async () => {
-            return await resource({})
-        },
-        relationships: async () => {
-            return await relationship({})
-        }
+  Query: {
+    resource: async (root, args) => {
+      const result = await resource(args);
+      return result[0];
     },
-    Resource: {
-        relationships: async (resource) => {
-            return await relationship({from: resource.uid})
-        }
-    }
+    resources: async () => resource({}),
+    relationships: async () => relationship({}),
+  },
+  Resource: {
+    relationships: async res => relationship({ from: res.uid }),
+  },
 };
