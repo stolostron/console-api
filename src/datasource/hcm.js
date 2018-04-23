@@ -1,27 +1,18 @@
 import request from 'requestretry';
+import config from '../../config';
+import { getWorkID } from './lib/hcm-client';
+
+const hcmUrl = config.get('hcmUrl');
 
 export const clusters = async () => {
-  console.log('xxx');
   const options = {
-    url: 'http://9.42.80.212:31699/api/v1alpha1/clusters',
+    url: `${hcmUrl}/api/v1alpha1/clusters`,
     json: {},
     method: 'GET',
   };
   const result = await request(options).then(res => res.body);
-  console.log(JSON.parse(result.RetString));
-
-  return JSON.parse(result.RetString);
+  const clustersJSON = JSON.parse(result.RetString).Result;
+  return Object.values(clustersJSON);
 };
 
-export const pods = async () => {
-  console.log('xxx');
-  const options = {
-    url: 'http://9.42.80.212:31699/api/v1alpha1/clusters',
-    json: {},
-    method: 'GET',
-  };
-  const result = await request(options).then(res => res.body);
-  console.log(JSON.parse(result.RetString));
-
-  return JSON.parse(result.RetString);
-};
+export const pods = () => getWorkID('pods');

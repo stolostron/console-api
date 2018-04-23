@@ -2,15 +2,15 @@ import { resource, relationship } from '../../datasource/mongodb';
 
 export const typeDef = `
 type Resource {
-    uid: String
-    type: String 
-    name: String
-    relationships: [Relationship]
+  uid: String
+  type: String 
+  name: String
+  relationships: [Relationship]
 }
 type Relationship {
-    type: String
-    to: Resource
-    from: Resource
+  type: String
+  to: Resource
+  from: Resource
 }
 `;
 

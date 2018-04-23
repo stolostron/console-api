@@ -7,10 +7,11 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-const async = require('async');
-const log4js = require('log4js');
-const config = require('../../../config');
-const logger = log4js.getLogger('hcm-client');
+import request from 'requestretry';
+import _ from 'lodash';
+import config from '../../../config';
+
+const hcmUrl = config.get('hcmUrl');
 
 const HCM_POLL_INTERVAL = config.get('hcmPollInterval') || 200;
 const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;
@@ -48,87 +49,64 @@ const getOptions = (overrides) => {
   return Object.assign({}, defaults, overrides);
 };
 
-exports.get = (req, cb) => {
-  const options = httpUtil.getOptions(req, `${config.get('hcmUrl')}${req.path.substr(4)}`); // TODO: Handle /hcm prefix better
-  options.method = 'GET';
-  options.json = req.body;
-  doRequest(options, cb);
-};
+const transformResource = (clusterName, resource, resourceName) => ({
+  ...resource,
+  name: resourceName,
+  cluster: clusterName,
+});
 
-exports.getWorkID = (req, res, next) => {
-  const url = `${config.get('hcmUrl')}/api/v1alpha1/work`;
-  const options = httpUtil.getOptions(req, url);
-  options.method = 'POST';
+const transform = (clusterName, resources) =>
+  _.reduce(resources, (transformed, resource, resourceName) => {
+    transformed.push(transformResource(clusterName, resource, resourceName));
+    return transformed;
+  }, []);
+
+const clustersToItems = clusterData =>
+  _.reduce(clusterData, (accum, { Results: resources }, clusterName) => {
+    // Transform all resources for the cluster
+    transform(clusterName, resources)
+      .forEach(resource => accum.push(resource));
+
+    return accum;
+  }, []);
+
+exports.getWorkID = async (type) => {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    method: 'POST',
+  };
   // TODO: Allow users to pass a query string to filter the results
   // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
-  options.json = getOptions({ Resource: req.params.type });
-
-  request(options, null, [200, 201, 202], (err, hcmRes) => {
-    if (err) { return res.status(err.statusCode || 500).send(err.details); }
-
-    req.workID = hcmRes.body.RetString;
-    next();
-  }, logger);
-};
-
-exports.poll = (req, res) => {
+  options.json = getOptions({ Resource: type });
+  const result = await request(options).then(res => res.body);
+  const workID = result.RetString;
   let intervalID;
-  let timeout;
-
-  if (!req.workID) {
-    return res.status(400).send('WorkID is not defined');
-  }
-
-  async.race([
-    (cb) => {
-      timeout = setTimeout(() => {
-        clearInterval(intervalID);
-        const error = new Error('Manager request timed out');
-        error.statusCode = 408;
-        error.details = error.message;
-        cb(error, null);
-      }, HCM_POLL_TIMEOUT);
-    },
-    (cb) => {
-      const url = `${config.get('hcmUrl')}/api/v1alpha1/work/${req.workID}`;
-      const options = httpUtil.getOptions(req, url);
-      options.method = 'GET';
-
-      intervalID = setInterval(() => {
-        request(options, null, [200, 201, 202], (err, hcmRes) => {
-          if (err) {
-            clearInterval(intervalID);
-            clearTimeout(timeout);
-            return cb(err);
-          }
-          const hcmBody = JSON.parse(JSON.parse(hcmRes.body).RetString);
-          if (hcmBody.Result.Completed) {
-            clearInterval(intervalID);
-            clearTimeout(timeout);
-            cb(null, hcmBody.Result.Results);
-          }
-        }, logger);
-      }, HCM_POLL_INTERVAL);
-    },
-  ], (err, result) => {
-    if (err) { return res.status(err.statusCode || 500).send(err.details); }
-    res.json(result);
+  const timeout = new Promise((resolve, reject) => {
+    const id = setTimeout(() => {
+      clearInterval(intervalID);
+      clearTimeout(id);
+      reject(new Error('Manager request timed out'));
+    }, HCM_POLL_TIMEOUT);
   });
+  const poll = new Promise((resolve, reject) => {
+    const pollOptions = {
+      url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
+      method: 'GET',
+    };
+
+    intervalID = setInterval(async () => {
+      const workResult = await request(pollOptions).then(res => res.body).catch(e => reject(e));
+      const hcmBody = JSON.parse(JSON.parse(workResult).RetString);
+      if (hcmBody.Result.Completed) {
+        clearInterval(intervalID);
+        clearTimeout(timeout);
+        const items = clustersToItems(hcmBody.Result.Results);
+        resolve(items);
+      }
+    }, HCM_POLL_INTERVAL);
+  });
+  return Promise.race([
+    timeout,
+    poll,
+  ]).then(res => res).catch(e => console.log(e));
 };
-
-exports.post = (req, cb) => {
-  const options = httpUtil.getOptions(req, `${config.get('hcmUrl')}${req.path}`);
-  options.method = 'POST';
-  options.json = req.body;
-  doRequest(options, cb);
-};
-
-function doRequest(options, cb) {
-  request(options, null, [200, 201, 202], (err, res) => {
-    if (err) {
-      return cb(err, null);
-    }
-
-    cb(err, res.body);
-  }, logger);
-}
