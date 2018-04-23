@@ -2,10 +2,13 @@ import { resource, relationship } from '../../datasource/mongodb';
 
 export const typeDef = `
 type Resource {
-  uid: String
-  type: String 
-  name: String
-  relationships: [Relationship]
+    cluster: String
+    name: String
+    namespace: String
+    relationships: [Relationship]
+    topology: String
+    type: String
+    uid: String
 }
 type Relationship {
   type: String
