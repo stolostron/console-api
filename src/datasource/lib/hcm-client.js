@@ -111,7 +111,6 @@ export async function getWork(type) {
         clearInterval(intervalID);
         clearTimeout(timeout);
         const items = clustersToItems(hcmBody.Result.Results);
-        // console.log(items);
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);
@@ -119,5 +118,5 @@ export async function getWork(type) {
   return Promise.race([
     timeout,
     poll,
-  ]).then(res => res).catch(e => console.log(e));
+  ]);
 }
