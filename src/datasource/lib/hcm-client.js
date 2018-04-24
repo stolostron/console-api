@@ -70,7 +70,18 @@ const clustersToItems = clusterData =>
     return accum;
   }, []);
 
-exports.getWork = async (type) => {
+export async function getClusters() {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/clusters`,
+    json: {},
+    method: 'GET',
+  };
+  const result = await request(options).then(res => res.body);
+  const clustersJSON = JSON.parse(result.RetString).Result;
+  return Object.values(clustersJSON);
+}
+
+export async function getWork(type) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/work`,
     method: 'POST',
@@ -93,7 +104,6 @@ exports.getWork = async (type) => {
       url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
       method: 'GET',
     };
-
     intervalID = setInterval(async () => {
       const workResult = await request(pollOptions).then(res => res.body).catch(e => reject(e));
       const hcmBody = JSON.parse(JSON.parse(workResult).RetString);
@@ -110,4 +120,4 @@ exports.getWork = async (type) => {
     timeout,
     poll,
   ]).then(res => res).catch(e => console.log(e));
-};
+}
