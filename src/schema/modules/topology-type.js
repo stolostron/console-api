@@ -10,6 +10,7 @@ type Resource {
     type: String
     uid: String
 }
+
 type Relationship {
   type: String
   to: Resource

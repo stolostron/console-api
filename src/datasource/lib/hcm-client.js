@@ -18,34 +18,32 @@ const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;
 
 const mergeOpts = (defaultOpts, ...overrides) => Object.assign({}, defaultOpts, ...overrides);
 
-const getOptions = (...overrides) => {
-  const defaults = {
-    SrcClusters: {
-      Names: null,
-      Labels: null,
-      Status: null,
-    },
-    DstClusters: {
-      Names: ['*'],
-      Labels: null,
-      Status: ['healthy'],
-    },
-    ClientID: '',
-    UUID: '',
-    Operation: 'get',
-    Work: {
-      Names: '',
-      Namespaces: '',
-      Status: '',
-      Labels: '',
-      Image: '',
-    },
-    Timestamp: new Date(),
-    NextRequest: null,
-  };
-
-  return Object.assign({}, defaults, ...overrides);
+const workDefaults = {
+  SrcClusters: {
+    Names: null,
+    Labels: null,
+    Status: null,
+  },
+  DstClusters: {
+    Names: ['*'],
+    Labels: null,
+    Status: ['healthy'],
+  },
+  ClientID: '',
+  UUID: '',
+  Operation: 'get',
+  Work: {
+    Names: '',
+    Namespaces: '',
+    Status: '',
+    Labels: '',
+    Image: '',
+  },
+  Timestamp: new Date(),
+  NextRequest: null,
 };
+
+const getWorkOptions = mergeOpts.bind(null, workDefaults);
 
 const transformResource = (clusterName, resource, resourceName) => ({
   ...resource,
@@ -86,16 +84,10 @@ export async function getClusters() {
   return Object.values(clustersJSON);
 }
 
-export async function getWork(type) {
-  const options = {
-    url: `${hcmUrl}/api/v1alpha1/work`,
-    method: 'POST',
-  };
-  // TODO: Allow users to pass a query string to filter the results
-  // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
-  options.json = getOptions({ Resource: type });
-  const result = await request(options).then(res => res.body);
+export async function pollWork(httpOptions) {
+  const result = await request(httpOptions).then(res => res.body);
   const workID = result.RetString;
+
   let intervalID;
   const timeout = new Promise((resolve, reject) => {
     const id = setTimeout(() => {
@@ -104,6 +96,7 @@ export async function getWork(type) {
       reject(new Error('Manager request timed out'));
     }, HCM_POLL_TIMEOUT);
   });
+
   const poll = new Promise((resolve, reject) => {
     const pollOptions = {
       url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
@@ -123,9 +116,44 @@ export async function getWork(type) {
     }, HCM_POLL_INTERVAL);
   });
 
-  return Promise.race([timeout, poll])
-    .then(res => res)
-    .catch(e => console.error(e));
+  return Promise.race([timeout, poll]);
+}
+
+export async function getWork(type) {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    method: 'POST',
+    json: getWorkOptions({ Resource: type }),
+  };
+  // TODO: Allow users to pass a query string to filter the results
+  // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
+  return pollWork(options);
+}
+
+export function installHelmChart({
+  ChartName, Version, ReleaseName, Namespace, URL, Values,
+}, opts) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    method: 'POST',
+    json: getWorkOptions(
+      {
+        Resource: 'helmrels',
+        Operation: 'install',
+        Work: {
+          ChartName,
+          Version,
+          ReleaseName,
+          Namespace,
+          URL,
+          Values,
+        },
+      },
+      opts,
+    ),
+  };
+
+  return pollWork(httpOptions);
 }
 
 export async function search(type, name, opts = {}) {

@@ -20,6 +20,10 @@ type Query {
   nodes: [Node]
   pvs: [PV]
 }
+# Root Mutation
+type Mutation {
+  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
+}
 `;
 
 export const resolver = merge(

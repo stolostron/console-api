@@ -1,16 +1,57 @@
-import { charts } from '../../datasource/hcm';
+import { installHelmChart, charts } from '../../datasource/hcm';
 
 export const typeDef = `
+input InstallHelmChartInput {
+  ChartName: String
+  Version: String
+  ReleaseName: String
+  Namespace: String
+  URL: String
+}
+
 type HelmChart {
   RepoName: String
   Name: String
   Version: String
   URLs: [String]
 }
+
+type HelmChartResponse {
+  ChartName: String
+  ChartVersion: String
+  HDetails: HelmChartDetails
+  HelmName: String
+  Namespace: String
+  Status: String
+  Version: String
+  name: String
+  cluster: String
+}
+
+type HelmChartDetails {
+  Description: String
+  FirstDeployed: Time
+  Images: [ImageDetails]
+  LastDeployed: Time
+  Manifest: String
+}
+
+type Time {
+  nanos: Int
+  seconds: Int
+}
+
+type ImageDetails {
+  ImageName: String,
+  ImagePullPolicy: String
+}
 `;
 
 export const helmChartResolver = {
   Query: {
     charts,
+  },
+  Mutation: {
+    installHelmChart: (root, { input }) => installHelmChart(input),
   },
 };

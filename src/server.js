@@ -8,9 +8,7 @@ import helmet from 'helmet';
 import schema from './schema/index';
 import config from '../config';
 
-
 const logger = log4js.getLogger('server');
-
 
 const log4jsConfig = process.env.LOG4JS_CONFIG ? JSON.parse(process.env.LOG4JS_CONFIG) : undefined;
 log4js.configure(log4jsConfig || 'config/log4js.json');
@@ -21,10 +19,12 @@ const graphQLServer = express();
 graphQLServer.use('*', helmet());
 
 if (process.env.NODE_ENV === 'production') {
-  graphQLServer.use('*', cors()); // temp solution
-  graphQLServer.use('*', morgan('combined', {
-    skip: (req, res) => res.statusCode < 400,
-  }));
+  graphQLServer.use(
+    '*',
+    morgan('combined', {
+      skip: (req, res) => res.statusCode < 400,
+    }),
+  );
 } else {
   graphQLServer.use('*', cors());
   graphQLServer.use('*', morgan('dev'));
