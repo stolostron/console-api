@@ -70,7 +70,7 @@ const clustersToItems = clusterData =>
     return accum;
   }, []);
 
-exports.getWorkID = async (type) => {
+exports.getWork = async (type) => {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/work`,
     method: 'POST',
@@ -101,6 +101,7 @@ exports.getWorkID = async (type) => {
         clearInterval(intervalID);
         clearTimeout(timeout);
         const items = clustersToItems(hcmBody.Result.Results);
+        console.log(items);
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);

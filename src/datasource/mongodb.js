@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import config from '../../config';
 
 const resourceSchema = Schema({
   uid: String,
@@ -20,11 +21,11 @@ const relationshipSchema = Schema({
 
 const Relationship = mongoose.model('Relationship', relationshipSchema);
 
-const mongoURI = 'mongodb://localhost:27017/weave';
+const mongoURI = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
 
 mongoose.connect(mongoURI);
 
 const resource = (query, options) => Resource.find(query, null, options);
-const relationship = (query, options) => Relationship.find(query, null, { populate: 'to from' });
+const relationship = query => Relationship.find(query, null, { populate: 'to from' });
 
 export { resource, relationship };

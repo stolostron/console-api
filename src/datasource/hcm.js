@@ -1,6 +1,6 @@
 import request from 'requestretry';
 import config from '../../config';
-import { getWorkID } from './lib/hcm-client';
+import { getWork } from './lib/hcm-client';
 
 const hcmUrl = config.get('hcmUrl');
 
@@ -15,4 +15,6 @@ export const clusters = async () => {
   return Object.values(clustersJSON);
 };
 
-export const pods = () => getWorkID('pods');
+export const pods = () => getWork('pods');
+export const nodes = () => getWork('nodes');
+export const pvs = () => getWork('pvs');

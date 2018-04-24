@@ -1,6 +1,7 @@
 {
     "httpPort": 4000,
     "hcmUrl": "",
+    "mongodbUrl": "",
     "hcmPollInterval": 500,
     "hcmPollTimeout": 5000
 }

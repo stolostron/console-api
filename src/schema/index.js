@@ -3,6 +3,8 @@ import * as query from './modules/query';
 import * as toplogyType from './modules/topology-type';
 import * as clusterType from './modules/cluster-type';
 import * as podType from './modules/pod-type';
+import * as nodeType from './modules/node-type';
+import * as pvType from './modules/pv-type';
 
 
 const modules = [
@@ -10,6 +12,8 @@ const modules = [
   toplogyType,
   clusterType,
   podType,
+  nodeType,
+  pvType,
 ];
 
 const mainDefs = [
