@@ -16,7 +16,9 @@ const hcmUrl = config.get('hcmUrl');
 const HCM_POLL_INTERVAL = config.get('hcmPollInterval') || 200;
 const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;
 
-const getOptions = (overrides) => {
+const mergeOpts = (defaultOpts, ...overrides) => Object.assign({}, defaultOpts, ...overrides);
+
+const getOptions = (...overrides) => {
   const defaults = {
     SrcClusters: {
       Names: null,
@@ -24,13 +26,9 @@ const getOptions = (overrides) => {
       Status: null,
     },
     DstClusters: {
-      Names: [
-        '*',
-      ],
+      Names: ['*'],
       Labels: null,
-      Status: [
-        'healthy',
-      ],
+      Status: ['healthy'],
     },
     ClientID: '',
     UUID: '',
@@ -46,7 +44,7 @@ const getOptions = (overrides) => {
     NextRequest: null,
   };
 
-  return Object.assign({}, defaults, overrides);
+  return Object.assign({}, defaults, ...overrides);
 };
 
 const transformResource = (clusterName, resource, resourceName) => ({
@@ -56,19 +54,26 @@ const transformResource = (clusterName, resource, resourceName) => ({
 });
 
 const transform = (clusterName, resources) =>
-  _.reduce(resources, (transformed, resource, resourceName) => {
-    transformed.push(transformResource(clusterName, resource, resourceName));
-    return transformed;
-  }, []);
+  _.reduce(
+    resources,
+    (transformed, resource, resourceName) => {
+      transformed.push(transformResource(clusterName, resource, resourceName));
+      return transformed;
+    },
+    [],
+  );
 
 const clustersToItems = clusterData =>
-  _.reduce(clusterData, (accum, { Results: resources }, clusterName) => {
-    // Transform all resources for the cluster
-    transform(clusterName, resources)
-      .forEach(resource => accum.push(resource));
+  _.reduce(
+    clusterData,
+    (accum, { Results: resources }, clusterName) => {
+      // Transform all resources for the cluster
+      transform(clusterName, resources).forEach(resource => accum.push(resource));
 
-    return accum;
-  }, []);
+      return accum;
+    },
+    [],
+  );
 
 export async function getClusters() {
   const options = {
@@ -105,7 +110,9 @@ export async function getWork(type) {
       method: 'GET',
     };
     intervalID = setInterval(async () => {
-      const workResult = await request(pollOptions).then(res => res.body).catch(e => reject(e));
+      const workResult = await request(pollOptions)
+        .then(res => res.body)
+        .catch(e => reject(e));
       const hcmBody = JSON.parse(JSON.parse(workResult).RetString);
       if (hcmBody.Result.Completed) {
         clearInterval(intervalID);
@@ -115,8 +122,35 @@ export async function getWork(type) {
       }
     }, HCM_POLL_INTERVAL);
   });
-  return Promise.race([
-    timeout,
-    poll,
-  ]);
+
+  return Promise.race([timeout, poll])
+    .then(res => res)
+    .catch(e => console.error(e));
+}
+
+export async function search(type, name, opts = {}) {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/${type}/${name}`,
+    json: mergeOpts(
+      {
+        Names: ['*'],
+        Labels: null,
+        Status: ['healthy'],
+        User: '',
+        Resource: 'repo',
+        Operation: 'search',
+        ID: 'default',
+        Action: {
+          Name: 'default',
+          URL: '',
+        },
+      },
+      opts,
+    ),
+    method: 'GET',
+  };
+
+  const result = await request(options).then(res => res.body);
+  const charts = JSON.parse(result.RetString).Result;
+  return Object.values(charts);
 }
