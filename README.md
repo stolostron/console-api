@@ -5,7 +5,14 @@
 ```
 hcmUrl
 ```
-2. Start the server
+2. Start the dev server
 ```
-npm start[:production]
+npm i
+npm start
+```
+3. Start the production server
+```
+npm i
+npm run build
+npm run start:production
 ```

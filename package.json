@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/server.js --exec babel-node",
-    "start:production": "cross-env NODE_ENV=production babel-node ./src/server.js",
+    "start:production": "cross-env NODE_ENV=production node  ./build/server.js",
+    "build-server": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-server",
+    "clean": "rm -rf build && mkdir build",
     "shrinkwrap:clean": "del-cli node_modules npm-shrinkwrap.json && npm install --no-optional && npm prune && npm shrinkwrap",
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix ."
