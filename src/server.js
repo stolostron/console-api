@@ -21,6 +21,7 @@ const graphQLServer = express();
 graphQLServer.use('*', helmet());
 
 if (process.env.NODE_ENV === 'production') {
+  graphQLServer.use('*', cors()); // temp solution
   graphQLServer.use('*', morgan('combined', {
     skip: (req, res) => res.statusCode < 400,
   }));
