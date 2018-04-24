@@ -101,7 +101,7 @@ exports.getWork = async (type) => {
         clearInterval(intervalID);
         clearTimeout(timeout);
         const items = clustersToItems(hcmBody.Result.Results);
-        console.log(items);
+        // console.log(items);
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);

@@ -14,5 +14,7 @@ graphQLServer.use('*', cors({ origin: 'http://localhost:3000' }));
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
-graphQLServer.listen(GRAPHQL_PORT, () =>
-  console.log(`GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql`));
+graphQLServer.listen(GRAPHQL_PORT, () => {
+  console.log(`HCM UI API is now running on http://localhost:${GRAPHQL_PORT}/graphql`)
+  console.log(`GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql`)
+});
