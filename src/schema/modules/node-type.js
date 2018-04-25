@@ -5,6 +5,12 @@ type Node {
   NodeName: String
   name: String
   cluster: String
+  NodeDetails: NodeDetails
+}
+type NodeDetails {
+  Status: String
+  OSImage: String
+  Cpu: String
 }
 `;
 
