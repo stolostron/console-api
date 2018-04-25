@@ -6,8 +6,9 @@ import * as podType from './modules/pod-type';
 import * as nodeType from './modules/node-type';
 import * as pvType from './modules/pv-type';
 import * as chartType from './modules/helmchart-type';
+import * as repoType from './modules/helmrepo-type';
 
-const modules = [query, chartType, toplogyType, clusterType, podType, nodeType, pvType];
+const modules = [query, chartType, repoType, toplogyType, clusterType, podType, nodeType, pvType];
 
 const mainDefs = [
   `schema {

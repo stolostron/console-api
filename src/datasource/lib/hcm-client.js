@@ -156,6 +156,20 @@ export function installHelmChart({
   return pollWork(httpOptions);
 }
 
+export async function setRepo({ Name, URL }) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/repo`,
+    method: 'POST',
+    json: getWorkOptions({
+      Resource: 'repo',
+      Operation: 'set',
+      Action: { Name, URL },
+    }),
+  };
+  const result = await request(httpOptions).then(res => res.body);
+  return JSON.parse(result.RetString).Result;
+}
+
 export async function search(type, name, opts = {}) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/${type}/${name}`,
