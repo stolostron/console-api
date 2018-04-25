@@ -1,4 +1,5 @@
 {
+  "contextPath": "/hcmuiapi",
   "httpPort": 4000,
   "hcmUrl": "",
   "mongodbUrl": "",
