@@ -25,6 +25,7 @@ if (process.env.NODE_ENV === 'production') {
       skip: (req, res) => res.statusCode < 400,
     }),
   );
+  graphQLServer.use('*', cors()); // temp solution
 } else {
   graphQLServer.use('*', cors());
   graphQLServer.use('*', morgan('dev'));
