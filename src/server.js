@@ -1,7 +1,6 @@
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import bodyParser from 'body-parser';
-import cors from 'cors';
 import log4js from 'log4js';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -27,7 +26,6 @@ if (process.env.NODE_ENV === 'production') {
     }),
   );
 } else {
-  graphQLServer.use('*', cors());
   graphQLServer.use('*', morgan('dev'));
 }
 
