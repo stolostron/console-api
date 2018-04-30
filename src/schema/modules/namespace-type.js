@@ -7,22 +7,18 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { clusters } from '../../datasource/hcm';
+import { namespaces } from '../../datasource/hcm';
 
 export const typeDef = `
-type Cluster {
-  ClusterName: String
-  ClusterEndpoint: String
+type Namespace {
+  name: String
+  cluster: String
   Status: String
-  TotalNodes: Int
-  TotalDeployments: Int
-  TotalPods: Int
-  TotalServices: Int
 }
 `;
 
-export const clusterResolver = {
+export const namespaceResolver = {
   Query: {
-    clusters,
+    namespaces,
   },
 };

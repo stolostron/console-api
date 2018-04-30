@@ -7,22 +7,24 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { clusters } from '../../datasource/hcm';
+import { releases } from '../../datasource/hcm';
 
 export const typeDef = `
-type Cluster {
-  ClusterName: String
-  ClusterEndpoint: String
+type HelmRel {
+  ChartName: String
+  ChartVersion: String
+  HDetails: HelmChartDetails
+  HelmName: String
+  Namespace: String
   Status: String
-  TotalNodes: Int
-  TotalDeployments: Int
-  TotalPods: Int
-  TotalServices: Int
+  Version: Int
+  name: String
+  cluster: String
 }
 `;
 
-export const clusterResolver = {
+export const helmRelResolver = {
   Query: {
-    clusters,
+    releases,
   },
 };

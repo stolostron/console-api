@@ -1,9 +1,20 @@
+/** *****************************************************************************
+ * Licensed Materials - Property of IBM
+ * (c) Copyright IBM Corporation 2018. All Rights Reserved.
+ *
+ * Note to U.S. Government Users Restricted Rights:
+ * Use, duplication or disclosure restricted by GSA ADP Schedule
+ * Contract with IBM Corp.
+ ****************************************************************************** */
+
 import { merge } from 'lodash';
 import { topologyResolver } from './topology-type';
 import { clusterResolver } from './cluster-type';
 import { podResolver } from './pod-type';
 import { nodeResolver } from './node-type';
 import { pvResolver } from './pv-type';
+import { namespaceResolver } from './namespace-type';
+import { helmRelResolver } from './helmrel-type';
 import { helmChartResolver } from './helmchart-type';
 import { helmRepoResolver } from './helmrepo-type';
 
@@ -21,6 +32,8 @@ type Query {
   nodes: [Node]
   pods: [Pod]
   pvs: [PV]
+  namespaces: [Namespace]
+  releases: [HelmRel]
 }
 
 # Root Mutation
@@ -37,5 +50,7 @@ export const resolver = merge(
   nodeResolver,
   podResolver,
   pvResolver,
+  namespaceResolver,
+  helmRelResolver,
   topologyResolver,
 );
