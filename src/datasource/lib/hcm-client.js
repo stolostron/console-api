@@ -199,11 +199,5 @@ export async function search(type, name, opts = {}) {
 export async function charts(type, name, opts) {
   const helmCharts = await search(type, name, opts);
 
-  return Object.values(helmCharts)
-    // Temp Fix for HCM Api Problem - issue #8643
-    .map((chart) => {
-      const [RepoName, Name] = chart.Name.split('/');
-
-      return Object.assign(chart, { Name, RepoName });
-    });
+  return _.sortBy(Object.values(helmCharts), chart => chart.Name);
 }
