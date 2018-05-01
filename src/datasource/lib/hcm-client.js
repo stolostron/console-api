@@ -193,6 +193,17 @@ export async function search(type, name, opts = {}) {
   };
 
   const result = await request(options).then(res => res.body);
-  const charts = JSON.parse(result.RetString).Result;
-  return Object.values(charts);
+  return JSON.parse(result.RetString).Result;
+}
+
+export async function charts(type, name, opts) {
+  const helmCharts = await search(type, name, opts);
+
+  return Object.values(helmCharts)
+    // Temp Fix for HCM Api Problem - issue #8643
+    .map((chart) => {
+      const [RepoName, Name] = chart.Name.split('/');
+
+      return Object.assign(chart, { Name, RepoName });
+    });
 }

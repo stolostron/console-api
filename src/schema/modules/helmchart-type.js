@@ -57,9 +57,7 @@ type ImageDetails {
 `;
 
 export const helmChartResolver = {
-  Query: {
-    charts,
-  },
+  Query: { charts },
   Mutation: {
     installHelmChart: (root, { input }) => installHelmChart(input),
   },

@@ -15,6 +15,6 @@ export const nodes = () => hcmClient.getWork('nodes');
 export const pvs = () => hcmClient.getWork('pvs');
 export const namespaces = () => hcmClient.getWork('namespaces');
 export const releases = () => hcmClient.getWork('helmrels');
-export const charts = () => hcmClient.search('repo', 'default');
+export const charts = () => hcmClient.charts('repo', 'default');
 
 export { installHelmChart, setRepo } from './lib/hcm-client';
