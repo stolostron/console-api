@@ -10,6 +10,7 @@
 import * as hcmClient from './lib/hcm-client';
 
 export const clusters = () => hcmClient.getClusters();
+export const repos = () => hcmClient.getRepos();
 export const pods = () => hcmClient.getWork('pods');
 export const nodes = () => hcmClient.getWork('nodes');
 export const pvs = () => hcmClient.getWork('pvs');

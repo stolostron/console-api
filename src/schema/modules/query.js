@@ -25,6 +25,7 @@ type Query {
   relationships: [Relationship]
   resource(uid: String): Resource
   resources: [Resource]
+  repos: [HelmRepo]
 
   # HCM resources
   charts: [HelmChart]

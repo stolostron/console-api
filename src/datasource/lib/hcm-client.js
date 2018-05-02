@@ -84,6 +84,20 @@ export async function getClusters() {
   return Object.values(clustersJSON);
 }
 
+export async function getRepos() {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/repo/*`,
+    json: {
+      Resource: 'repo',
+      Operation: 'get',
+    },
+    method: 'GET',
+  };
+  const result = await request(options).then(res => res.body);
+  const reposJSON = JSON.parse(result.RetString).Result;
+  return Object.values(reposJSON);
+}
+
 export async function pollWork(httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
   const workID = result.RetString;
