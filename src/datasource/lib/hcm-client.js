@@ -95,7 +95,7 @@ export async function getRepos() {
   };
   const result = await request(options).then(res => res.body);
   const reposJSON = JSON.parse(result.RetString).Result;
-  return Object.values(reposJSON);
+  return reposJSON ? Object.values(reposJSON) : [];
 }
 
 export async function pollWork(httpOptions) {
@@ -212,6 +212,8 @@ export async function search(type, name, opts = {}) {
 
 export async function charts(type, name, opts) {
   const helmCharts = await search(type, name, opts);
-
-  return _.sortBy(Object.values(helmCharts), chart => chart.Name);
+  if (helmCharts) {
+    return _.sortBy(Object.values(helmCharts), chart => chart.Name);
+  }
+  return [];
 }
