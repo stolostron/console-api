@@ -7,6 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import * as hcmClient from './lib/hcm-client';
 
 export const clusters = () => hcmClient.getClusters();
@@ -16,6 +17,13 @@ export const nodes = () => hcmClient.getWork('nodes');
 export const pvs = () => hcmClient.getWork('pvs');
 export const namespaces = () => hcmClient.getWork('namespaces');
 export const releases = () => hcmClient.getWork('helmrels');
-export const charts = () => hcmClient.charts('repo', 'default');
+
+export const charts = async () => {
+  const helmRepos = await hcmClient.getRepos();
+  const catalog = await Promise.all(helmRepos.map(repo => hcmClient.search('repo', repo.Name)));
+
+  const helmCharts = _.flatten(catalog.map(chart => Object.values(chart)));
+  return _.sortBy(helmCharts, chart => `${chart.RepoName}/${chart.Name}`);
+};
 
 export { installHelmChart, setRepo } from './lib/hcm-client';
