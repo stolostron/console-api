@@ -95,7 +95,7 @@ export async function getRepos() {
   };
   const result = await request(options).then(res => res.body);
   const reposJSON = JSON.parse(result.RetString).Result;
-  return Object.values(reposJSON);
+  return reposJSON ? Object.values(reposJSON) : [];
 }
 
 export async function pollWork(httpOptions) {
@@ -145,7 +145,7 @@ export async function getWork(type) {
 }
 
 export function installHelmChart({
-  ChartName, Version, ReleaseName, Namespace, URL, Values,
+  RepoName, ChartName, Version, ReleaseName, Namespace, URL, Values,
 }, opts) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/work`,
@@ -155,6 +155,7 @@ export function installHelmChart({
         Resource: 'helmrels',
         Operation: 'install',
         Work: {
+          RepoName,
           ChartName,
           Version,
           ReleaseName,
@@ -195,9 +196,9 @@ export async function search(type, name, opts = {}) {
         User: '',
         Resource: 'repo',
         Operation: 'search',
-        ID: 'default',
+        ID: name,
         Action: {
-          Name: 'default',
+          Name: name,
           URL: '',
         },
       },
@@ -208,10 +209,4 @@ export async function search(type, name, opts = {}) {
 
   const result = await request(options).then(res => res.body);
   return JSON.parse(result.RetString).Result;
-}
-
-export async function charts(type, name, opts) {
-  const helmCharts = await search(type, name, opts);
-
-  return _.sortBy(Object.values(helmCharts), chart => chart.Name);
 }

@@ -11,8 +11,9 @@ import { installHelmChart, charts } from '../../datasource/hcm';
 
 export const typeDef = `
 input InstallHelmChartInput {
-  ChartName: String
+  ChartName: String!
   Version: String
+  RepoName: String!
   ReleaseName: String
   Namespace: String
   URL: String
