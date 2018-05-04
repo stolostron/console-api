@@ -1,4 +1,4 @@
-# hcm-ui-api[![Build Status](https://travis.ibm.com/IBMPrivateCloud/hcm-ui-api.svg?token=FQtRyxd2oucrshZSEEqZ&branch=master)](https://travis.ibm.com/IBMPrivateCloud/hcm-ui-api)
+# hcm-ui-api[![Build Status](https://travis.ibm.com/IBMPrivateCloud/hcm-ui-api-bk.svg?token=FQtRyxd2oucrshZSEEqZ&branch=master)](https://travis.ibm.com/IBMPrivateCloud/hcm-ui-api-bk)
 
 ## Running
 1. The folloing environment variables need to be set.
