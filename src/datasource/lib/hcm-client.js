@@ -7,9 +7,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import request from 'requestretry';
 import _ from 'lodash';
+import request from './request';
 import config from '../../../config';
+import { GenericError } from './errors';
 
 const hcmUrl = config.get('hcmUrl');
 
@@ -80,8 +81,15 @@ export async function getClusters() {
     method: 'GET',
   };
   const result = await request(options).then(res => res.body);
-  const clustersJSON = JSON.parse(result.RetString).Result;
-  return Object.values(clustersJSON);
+
+  if (result.Error) {
+    throw new GenericError({ data: result.Error });
+  }
+  if (result.RetString) {
+    const clustersJSON = JSON.parse(result.RetString).Result;
+    return clustersJSON ? Object.values(clustersJSON) : [];
+  }
+  return [];
 }
 
 export async function getRepos() {
@@ -100,6 +108,9 @@ export async function getRepos() {
 
 export async function pollWork(httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
+  if (result.Error) {
+    throw new GenericError({ data: result.Error });
+  }
   const workID = result.RetString;
 
   let intervalID;
@@ -111,16 +122,15 @@ export async function pollWork(httpOptions) {
     }, HCM_POLL_TIMEOUT);
   });
 
-  const poll = new Promise((resolve, reject) => {
+  const poll = new Promise((resolve) => {
     const pollOptions = {
       url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
       method: 'GET',
     };
     intervalID = setInterval(async () => {
       const workResult = await request(pollOptions)
-        .then(res => res.body)
-        .catch(e => reject(e));
-      const hcmBody = JSON.parse(JSON.parse(workResult).RetString);
+        .then(res => res.body);
+      const hcmBody = JSON.parse(workResult.RetString);
       if (hcmBody.Result.Completed) {
         clearInterval(intervalID);
         clearTimeout(timeout);
@@ -129,7 +139,6 @@ export async function pollWork(httpOptions) {
       }
     }, HCM_POLL_INTERVAL);
   });
-
   return Promise.race([timeout, poll]);
 }
 

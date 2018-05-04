@@ -9,6 +9,7 @@
 
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { formatError } from 'apollo-errors';
 import bodyParser from 'body-parser';
 import log4js from 'log4js';
 import morgan from 'morgan';
@@ -38,7 +39,7 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use('*', morgan('dev'));
 }
 
-graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress({ schema }));
+graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress({ formatError, schema }));
 graphQLServer.use(`${CONTEXT_PATH}/graphiql`, graphiqlExpress({ endpointURL: `${CONTEXT_PATH}/graphql` }));
 
 graphQLServer.listen(GRAPHQL_PORT, () => {
