@@ -15,7 +15,9 @@ export const repos = () => hcmClient.getRepos();
 export const pods = () => hcmClient.getWork('pods');
 export const nodes = () => hcmClient.getWork('nodes');
 export const pvs = () => hcmClient.getWork('pvs');
-export const namespaces = () => hcmClient.getWork('namespaces');
+export const namespaces = () => hcmClient.getWork('namespaces', {
+  Work: { Namespaces: '', Status: 'all', Labels: '' },
+});
 export const releases = () => hcmClient.getWork('helmrels');
 
 export const charts = async () => {

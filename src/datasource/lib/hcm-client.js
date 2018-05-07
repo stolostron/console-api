@@ -20,28 +20,18 @@ const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;
 const mergeOpts = (defaultOpts, ...overrides) => Object.assign({}, defaultOpts, ...overrides);
 
 const workDefaults = {
-  SrcClusters: {
-    Names: null,
-    Labels: null,
-    Status: null,
-  },
-  DstClusters: {
-    Names: ['*'],
-    Labels: null,
-    Status: ['healthy'],
-  },
+  SrcClusters: { Names: null, Labels: null, Status: null },
+  DstClusters: { Names: ['*'], Labels: null, Status: ['healthy'] },
   ClientID: '',
+  Dryrun: false,
+  Completed: false,
   UUID: '',
   Operation: 'get',
-  Work: {
-    Names: '',
-    Namespaces: '',
-    Status: '',
-    Labels: '',
-    Image: '',
-  },
+  Work: { Namespaces: '', Status: 'healthy', Labels: '' },
   Timestamp: new Date(),
   NextRequest: null,
+  FinishedRequest: null,
+  Description: '',
 };
 
 const getWorkOptions = mergeOpts.bind(null, workDefaults);
@@ -142,11 +132,11 @@ export async function pollWork(httpOptions) {
   return Promise.race([timeout, poll]);
 }
 
-export async function getWork(type) {
+export async function getWork(type, opts) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/work`,
     method: 'POST',
-    json: getWorkOptions({ Resource: type }),
+    json: getWorkOptions({ Resource: type }, opts),
   };
   // TODO: Allow users to pass a query string to filter the results
   // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
