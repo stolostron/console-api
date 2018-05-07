@@ -17,6 +17,10 @@ const hcmUrl = config.get('hcmUrl');
 const HCM_POLL_INTERVAL = config.get('hcmPollInterval') || 200;
 const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;
 
+export const timeout = ms => new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('Request Timed Out')), ms);
+});
+
 const mergeOpts = (defaultOpts, ...overrides) => Object.assign({}, defaultOpts, ...overrides);
 
 const workDefaults = {
@@ -104,7 +108,7 @@ export async function pollWork(httpOptions) {
   const workID = result.RetString;
 
   let intervalID;
-  const timeout = new Promise((resolve, reject) => {
+  const timeoutPromise = new Promise((resolve, reject) => {
     const id = setTimeout(() => {
       clearInterval(intervalID);
       clearTimeout(id);
@@ -123,13 +127,14 @@ export async function pollWork(httpOptions) {
       const hcmBody = JSON.parse(workResult.RetString);
       if (hcmBody.Result.Completed) {
         clearInterval(intervalID);
-        clearTimeout(timeout);
+        clearTimeout(timeoutPromise);
         const items = clustersToItems(hcmBody.Result.Results);
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);
   });
-  return Promise.race([timeout, poll]);
+
+  return Promise.race([timeoutPromise, poll]);
 }
 
 export async function getWork(type, opts) {
@@ -206,6 +211,6 @@ export async function search(type, name, opts = {}) {
     method: 'GET',
   };
 
-  const result = await request(options).then(res => res.body);
-  return JSON.parse(result.RetString).Result;
+  return Promise.race([request(options)
+    .then(res => JSON.parse(res.body.RetString).Result), timeout(HCM_POLL_TIMEOUT)]);
 }
