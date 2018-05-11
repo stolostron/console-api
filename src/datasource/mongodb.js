@@ -32,7 +32,31 @@ const Relationship = mongoose.model('Relationship', relationshipSchema);
 
 const mongoURI = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
 
-mongoose.connect(mongoURI);
+const wait = ms => new Promise((resolve) => {
+  setTimeout(() => resolve(), ms);
+});
+
+(async () => {
+  let retries = 100;
+  while (retries) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await mongoose.connect(mongoURI);
+      console.error('Mongo Connection Succesful');
+      break;
+    } catch (e) {
+      retries -= 1;
+      if (!retries) {
+        console.log(new Error(`Mongo connection failed with: ${e.message}`));
+        process.exit(1);
+      }
+
+      console.error(`Mongo connection failed with: ${e.message}, ${retries} retries remaining`);
+      // eslint-disable-next-line no-await-in-loop
+      await wait(1000);
+    }
+  }
+})();
 
 const resource = (query, options) => Resource.find(query, null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
