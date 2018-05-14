@@ -35,8 +35,7 @@ type Query {
   pods: [Pod]
   pvs: [PV]
   releases: [HelmRel]
-  # WIP. The topology field isn't ready to be used yet.
-  topology(filters: Filter): Topology
+  topology(filter: Filter): Topology
   # All resource types available for filtering.
   resourceTypes: [String]
 }

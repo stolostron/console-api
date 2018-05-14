@@ -61,10 +61,5 @@ const wait = ms => new Promise((resolve) => {
 const resource = (query, options) => Resource.find(query, null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
 
-const topology = (query, options) => ({
-  resources: Resource.find(query, null, options),
-  // TODO: Jorge: Filter relationships to only the ones that apply to the selected resources.
-  relationships: Relationship.find({}, null, { populate: 'to from' }),
-});
 
-export { resource, relationship, topology };
+export { resource, relationship };
