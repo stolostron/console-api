@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { resource, relationship } from '../../datasource/mongodb';
+import { resource, relationship, topology } from '../../datasource/mongodb';
 
 export const typeDef = `
 type Resource {
@@ -25,6 +25,18 @@ type Relationship {
   to: Resource
   from: Resource
 }
+
+type Topology {
+  resources: [Resource]
+  relationships: [Relationship]
+}
+
+input Filter {
+  cluster: [String]
+  label: [String]
+  namespace: [String]
+  type: [String]
+}
 `;
 
 export const topologyResolver = {
@@ -33,8 +45,20 @@ export const topologyResolver = {
       const result = await resource(args);
       return result[0];
     },
-    resources: async () => resource({}),
+    resources: async (root, args = {}) => {
+      const query = {};
+      if (args.filter) {
+        Object.keys(args.filter).forEach((filterType) => {
+          query[filterType] = { $in: args.filter[filterType] };
+        });
+      }
+      return resource(query);
+    },
     relationships: async () => relationship({}),
+    topology: async (root, args) => topology(args),
+
+    // TODO: Jorge: Infer resourceTypes from current topology.
+    resourceTypes: () => ['cluster', 'container', 'daemonset', 'deployment', 'host', 'internet', 'pod', 'service', 'statefulset'],
   },
   Resource: {
     relationships: async res => relationship({ from: res.uid }),

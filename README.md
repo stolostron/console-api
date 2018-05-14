@@ -4,6 +4,7 @@
 1. The folloing environment variables need to be set.
 ```
 hcmUrl
+mongodbUrl
 ```
 2. Start the dev server
 ```

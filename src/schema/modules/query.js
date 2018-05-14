@@ -23,18 +23,22 @@ export const typeDef = `
 type Query {
   # weave resources
   relationships: [Relationship]
-  resource(uid: String): Resource
-  resources: [Resource]
+  resource(uid: String!): Resource
+  resources(filter: Filter): [Resource]
   repos: [HelmRepo]
 
   # HCM resources
   charts: [HelmChart]
   clusters: [Cluster]
+  namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
   pvs: [PV]
-  namespaces: [Namespace]
   releases: [HelmRel]
+  # WIP. The topology field isn't ready to be used yet.
+  topology(filters: Filter): Topology
+  # All resource types available for filtering.
+  resourceTypes: [String]
 }
 
 # Root Mutation
