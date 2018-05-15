@@ -58,7 +58,29 @@ const wait = ms => new Promise((resolve) => {
   }
 })();
 
-const resource = (query, options) => Resource.find(query, null, options);
+/**
+ * Creates a DB query from the resource filters.
+ */
+function getResourceQuery(args) {
+  if (args.filter) {
+    const filters = [];
+    Object.keys(args.filter).forEach((filterType) => {
+      if (typeof args.filter[filterType] === 'string') {
+        filters.push({ [filterType]: args.filter[filterType] });
+      } else if (args.filter[filterType] && args.filter[filterType][0]) {
+        filters.push({ [filterType]: { $in: args.filter[filterType] } });
+      }
+    });
+
+    if (filters.length > 0) {
+      return { $and: filters };
+    }
+  }
+
+  return {};
+}
+
+const resource = (args, options) => Resource.find(getResourceQuery(args), null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
 
 

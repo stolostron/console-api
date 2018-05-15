@@ -39,30 +39,17 @@ input Filter {
 }
 `;
 
+
 export const topologyResolver = {
   Query: {
     resource: async (root, args) => {
       const result = await resource(args);
       return result[0];
     },
-    resources: async (root, args = {}) => {
-      const query = {};
-      if (args.filter) {
-        Object.keys(args.filter).forEach((filterType) => {
-          query[filterType] = { $in: args.filter[filterType] };
-        });
-      }
-      return resource(query);
-    },
+    resources: async (root, args = {}) => resource(args),
     relationships: async () => relationship({}),
     topology: async (root, args) => {
-      const query = {};
-      if (args.filter) {
-        Object.keys(args.filter).forEach((filterType) => {
-          query[filterType] = { $in: args.filter[filterType] };
-        });
-      }
-      const resources = await resource(query);
+      const resources = await resource(args);
 
       const resourceFilter = {
         $and: [
