@@ -65,8 +65,10 @@ function getResourceQuery(args) {
   if (args.filter) {
     const filters = [];
     Object.keys(args.filter).forEach((filterType) => {
-      if (typeof args.filter[filterType] === 'string') {
-        filters.push({ [filterType]: args.filter[filterType] });
+      if (filterType === 'label') {
+        filters.push({
+          $or: args.filter[filterType].map(f => ({ labels: f })),
+        });
       } else if (args.filter[filterType] && args.filter[filterType][0]) {
         filters.push({ [filterType]: { $in: args.filter[filterType] } });
       }
@@ -80,8 +82,10 @@ function getResourceQuery(args) {
   return {};
 }
 
+
+const label = () => Resource.distinct('labels');
 const resource = (args, options) => Resource.find(getResourceQuery(args), null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
+const type = () => Resource.distinct('type');
 
-
-export { resource, relationship };
+export { label, resource, relationship, type };

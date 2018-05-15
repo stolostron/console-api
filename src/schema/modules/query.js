@@ -30,6 +30,7 @@ type Query {
   # HCM resources
   charts: [HelmChart]
   clusters: [Cluster]
+  labels: [Label]
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
