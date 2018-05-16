@@ -14,9 +14,18 @@ input InstallHelmChartInput {
   ChartName: String!
   Version: String
   RepoName: String!
+  DstClusters: DestinationClusters
   ReleaseName: String
   Namespace: String
   URL: String
+}
+
+input DestinationClusters {
+  Names: [String],
+  Labels: [String],
+  Status: [String],
+  SortBy: String,
+  TargetNum: Int
 }
 
 type HelmChart {

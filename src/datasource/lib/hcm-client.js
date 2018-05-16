@@ -149,27 +149,24 @@ export async function getWork(type, opts) {
 }
 
 export function installHelmChart({
-  RepoName, ChartName, Version, ReleaseName, Namespace, URL, Values,
+  RepoName, ChartName, DstClusters, Version, ReleaseName, Namespace, URL, Values,
 }, opts) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/work`,
     method: 'POST',
-    json: getWorkOptions(
-      {
-        Resource: 'helmrels',
-        Operation: 'install',
-        Work: {
-          RepoName,
-          ChartName,
-          Version,
-          ReleaseName,
-          Namespace,
-          URL,
-          Values,
-        },
+    json: getWorkOptions({
+      Resource: 'helmrels',
+      Operation: 'install',
+      Work: {
+        ChartName: `${RepoName}/${ChartName}`,
+        DstClusters,
+        Namespace,
+        ReleaseName,
+        URL,
+        Values,
+        Version,
       },
-      opts,
-    ),
+    }, opts),
   };
 
   return pollWork(httpOptions);
