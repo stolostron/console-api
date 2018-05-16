@@ -65,12 +65,14 @@ function getResourceQuery(args) {
   if (args.filter) {
     const filters = [];
     Object.keys(args.filter).forEach((filterType) => {
-      if (filterType === 'label') {
-        filters.push({
-          $or: args.filter[filterType].map(f => ({ labels: f })),
-        });
-      } else if (args.filter[filterType] && args.filter[filterType][0]) {
-        filters.push({ [filterType]: { $in: args.filter[filterType] } });
+      if (args.filter[filterType] && args.filter[filterType][0]) {
+        if (filterType === 'label') {
+          filters.push({
+            $or: args.filter[filterType].map(f => ({ labels: f })),
+          });
+        } else {
+          filters.push({ [filterType]: { $in: args.filter[filterType] } });
+        }
       }
     });
 
