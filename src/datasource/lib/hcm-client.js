@@ -157,9 +157,9 @@ export function installHelmChart({
     json: getWorkOptions({
       Resource: 'helmrels',
       Operation: 'install',
+      DstClusters,
       Work: {
         ChartName: `${RepoName}/${ChartName}`,
-        DstClusters,
         Namespace,
         ReleaseName,
         URL,
