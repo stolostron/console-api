@@ -10,6 +10,7 @@
 import _ from 'lodash';
 import request from './request';
 import config from '../../../config';
+import getToken from './util';
 import { GenericError } from './errors';
 
 const hcmUrl = config.get('hcmUrl');
@@ -68,14 +69,16 @@ const clustersToItems = clusterData =>
     [],
   );
 
-export async function getClusters() {
+export async function getClusters(req) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/clusters`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     json: {},
     method: 'GET',
   };
   const result = await request(options).then(res => res.body);
-
   if (result.Error) {
     throw new GenericError({ data: result.Error });
   }
@@ -86,9 +89,12 @@ export async function getClusters() {
   return [];
 }
 
-export async function getRepos() {
+export async function getRepos(req) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/repo/*`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     json: {
       Resource: 'repo',
       Operation: 'get',
@@ -100,7 +106,7 @@ export async function getRepos() {
   return reposJSON ? Object.values(reposJSON) : [];
 }
 
-export async function pollWork(httpOptions) {
+export async function pollWork(req, httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
   if (result.Error) {
     throw new GenericError({ data: result.Error });
@@ -116,9 +122,12 @@ export async function pollWork(httpOptions) {
     }, HCM_POLL_TIMEOUT);
   });
 
-  const poll = new Promise((resolve) => {
+  const poll = new Promise(async (resolve) => {
     const pollOptions = {
       url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
+      headers: {
+        Authorization: await getToken(req),
+      },
       method: 'GET',
     };
     intervalID = setInterval(async () => {
@@ -137,18 +146,21 @@ export async function pollWork(httpOptions) {
   return Promise.race([timeoutPromise, poll]);
 }
 
-export async function getWork(type, opts) {
+export async function getWork(req, type, opts) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/work`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     method: 'POST',
     json: getWorkOptions({ Resource: type }, opts),
   };
   // TODO: Allow users to pass a query string to filter the results
   // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
-  return pollWork(options);
+  return pollWork(req, options);
 }
 
-export function installHelmChart({
+export function installHelmChart(req, {
   RepoName, ChartName, DstClusters, Version, ReleaseName, Namespace, URL, Values,
 }, opts) {
   const httpOptions = {
@@ -169,12 +181,15 @@ export function installHelmChart({
     }, opts),
   };
 
-  return pollWork(httpOptions);
+  return pollWork(req, httpOptions);
 }
 
-export async function setRepo({ Name, URL }) {
+export async function setRepo(req, { Name, URL }) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/repo`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     method: 'POST',
     json: getWorkOptions({
       Resource: 'repo',
@@ -186,9 +201,12 @@ export async function setRepo({ Name, URL }) {
   return JSON.parse(result.RetString).Result;
 }
 
-export async function search(type, name, opts = {}) {
+export async function search(req, type, name, opts = {}) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/${type}/${name}`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     json: mergeOpts(
       {
         Names: ['*'],

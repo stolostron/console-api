@@ -26,6 +26,6 @@ export const helmRepoResolver = {
     repos,
   },
   Mutation: {
-    setHelmRepo: (root, { input }) => setRepo(input),
+    setHelmRepo: (root, { input }, req) => setRepo(req, input),
   },
 };

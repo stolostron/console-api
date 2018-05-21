@@ -15,5 +15,9 @@ export const GenericError = createError('GenericError', {
 });
 
 export const NetworkError = createError('NetworkError', {
-  message: 'A network error error has occurred', // TODO: NLS
+  message: 'A network error has occurred', // TODO: NLS
+});
+
+export const IDTokenError = createError('IDTokenError', {
+  message: 'A IDTokenError error has occurred', // TODO: NLS
 });

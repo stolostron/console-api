@@ -9,11 +9,13 @@
 
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { formatError } from 'apollo-errors';
+import { formatError as formatApolloError } from 'apollo-errors';
 import bodyParser from 'body-parser';
+import { ui as inspect } from '@icp/security-middleware';
 import log4js from 'log4js';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import schema from './schema/index';
 import config from '../config';
 
@@ -28,6 +30,8 @@ const CONTEXT_PATH = config.get('contextPath');
 const graphQLServer = express();
 graphQLServer.use('*', helmet());
 
+graphQLServer.use(cookieParser());
+
 if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(
     '*',
@@ -35,12 +39,18 @@ if (process.env.NODE_ENV === 'production') {
       skip: (req, res) => res.statusCode < 400,
     }),
   );
+  graphQLServer.use(inspect);
 } else {
   graphQLServer.use('*', morgan('dev'));
+  // enable graphiql only for local dev
+  graphQLServer.use(`${CONTEXT_PATH}/graphiql`, graphiqlExpress({ endpointURL: `${CONTEXT_PATH}/graphql` }));
 }
+const formatError = (error) => {
+  logger.error(error);
+  return formatApolloError(error);
+};
 
-graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress({ formatError, schema }));
-graphQLServer.use(`${CONTEXT_PATH}/graphiql`, graphiqlExpress({ endpointURL: `${CONTEXT_PATH}/graphql` }));
+graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress(req => ({ formatError, schema, context: req })));
 
 graphQLServer.listen(GRAPHQL_PORT, () => {
   logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] started.`);

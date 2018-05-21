@@ -6,6 +6,8 @@
 ```
 hcmUrl
 mongodbUrl
+PLATFORM_IDENTITY_PROVIDER_URL
+ARTIFACTORY_PWD - You can get this value from: https://ibm.ent.box.com/notes/287638278960
 ```
 2. Start the dev server
 ```

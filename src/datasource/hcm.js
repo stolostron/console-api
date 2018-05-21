@@ -10,21 +10,21 @@
 import _ from 'lodash';
 import * as hcmClient from './lib/hcm-client';
 
-export const clusters = () => hcmClient.getClusters();
-export const repos = () => hcmClient.getRepos();
-export const pods = () => hcmClient.getWork('pods');
-export const nodes = () => hcmClient.getWork('nodes', {
+export const clusters = (obj, args, req) => hcmClient.getClusters(req);
+export const repos = (obj, args, req) => hcmClient.getRepos(req);
+export const pods = (obj, args, req) => hcmClient.getWork(req, 'pods');
+export const nodes = (obj, args, req) => hcmClient.getWork(req, 'nodes', {
   Work: { Namespaces: '', Status: '', Labels: '' },
 });
-export const pvs = () => hcmClient.getWork('pvs');
-export const namespaces = () => hcmClient.getWork('namespaces', {
+export const pvs = (obj, args, req) => hcmClient.getWork(req, 'pvs');
+export const namespaces = (obj, args, req) => hcmClient.getWork(req, 'namespaces', {
   Work: { Namespaces: '', Status: 'all', Labels: '' },
 });
-export const releases = () => hcmClient.getWork('helmrels');
+export const releases = (obj, args, req) => hcmClient.getWork(req, 'helmrels');
 
-export const charts = async () => {
-  const helmRepos = await hcmClient.getRepos();
-  const catalog = await Promise.all(helmRepos.map(repo => hcmClient.search('repo', repo.Name)));
+export const charts = async (obj, args, req) => {
+  const helmRepos = await hcmClient.getRepos(req);
+  const catalog = await Promise.all(helmRepos.map(repo => hcmClient.search(req, 'repo', repo.Name)));
 
   const helmCharts = _.flatten(catalog.map(chart => Object.values(chart)));
   return _.sortBy(helmCharts, chart => `${chart.RepoName}/${chart.Name}`);

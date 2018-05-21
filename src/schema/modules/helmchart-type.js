@@ -69,6 +69,6 @@ type ImageDetails {
 export const helmChartResolver = {
   Query: { charts },
   Mutation: {
-    installHelmChart: (root, { input }) => installHelmChart(input),
+    installHelmChart: (root, { input }, req) => installHelmChart(req, input),
   },
 };
