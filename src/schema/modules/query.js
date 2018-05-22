@@ -37,6 +37,7 @@ type Query {
   pvs: [PV]
   releases: [HelmRel]
   topology(filter: Filter): Topology
+
   # All resource types available for filtering.
   resourceTypes: [String]
 }
@@ -44,6 +45,7 @@ type Query {
 # Root Mutation
 type Mutation {
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
+  deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }
 `;

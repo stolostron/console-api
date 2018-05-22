@@ -21,10 +21,10 @@ input InstallHelmChartInput {
 }
 
 input DestinationClusters {
-  Names: [String],
-  Labels: [String],
-  Status: [String],
-  SortBy: String,
+  Names: [String]
+  Labels: [String]
+  Status: [String]
+  SortBy: String
   TargetNum: Int
 }
 
@@ -38,6 +38,8 @@ type HelmChart {
 type HelmChartResponse {
   ChartName: String
   ChartVersion: String
+  code: Int
+  message: String
   HDetails: HelmChartDetails
   HelmName: String
   Namespace: String

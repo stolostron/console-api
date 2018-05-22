@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { releases } from '../../datasource/hcm';
+import { releases, deleteHelmRelease } from '../../datasource/hcm';
 
 export const typeDef = `
 type HelmRel {
@@ -21,10 +21,22 @@ type HelmRel {
   name: String
   cluster: String
 }
+
+input DeleteHelmReleaseInput {
+  Names: String!
+  Namespaces: String
+  ChartName: String
+  Version: String
+  RepoName: String
+  DstClusters: DestinationClusters
+}
 `;
 
 export const helmRelResolver = {
   Query: {
     releases,
+  },
+  Mutation: {
+    deleteHelmRelease: (root, { input }, req) => deleteHelmRelease(req, input),
   },
 };

@@ -62,7 +62,11 @@ const clustersToItems = clusterData =>
     clusterData,
     (accum, { Results: resources }, clusterName) => {
       // Transform all resources for the cluster
-      transform(clusterName, resources).forEach(resource => accum.push(resource));
+      if (resources.code) {
+        accum.push(resources);
+      } else {
+        transform(clusterName, resources).forEach(resource => accum.push(resource));
+      }
 
       return accum;
     },
@@ -176,6 +180,28 @@ export function installHelmChart(req, {
         ReleaseName,
         URL,
         Values,
+        Version,
+      },
+    }, opts),
+  };
+
+  return pollWork(req, httpOptions);
+}
+
+export function deleteHelmRelease(req, {
+  ChartName, DstClusters, Names, Namespaces, RepoName, Version,
+}, opts) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    method: 'POST',
+    json: getWorkOptions({
+      Resource: 'helmrels',
+      Operation: 'delete',
+      DstClusters,
+      Work: {
+        ChartName: RepoName && ChartName && `${RepoName}/${ChartName}`,
+        Names,
+        Namespaces,
         Version,
       },
     }, opts),
