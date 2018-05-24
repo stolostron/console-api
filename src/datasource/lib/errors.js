@@ -18,6 +18,6 @@ export const NetworkError = createError('NetworkError', {
   message: 'A network error has occurred', // TODO: NLS
 });
 
-export const IDTokenError = createError('IDTokenError', {
-  message: 'A IDTokenError error has occurred', // TODO: NLS
+export const AuthenticationError = createError('AuthenticationError', {
+  message: 'An AuthenticationError error has occurred', // TODO: NLS
 });

@@ -122,7 +122,7 @@ export async function pollWork(req, httpOptions) {
     const id = setTimeout(() => {
       clearInterval(intervalID);
       clearTimeout(id);
-      reject(new Error('Manager request timed out'));
+      reject(new GenericError({ data: { error: 'Manager request timed out' } }));
     }, HCM_POLL_TIMEOUT);
   });
 
@@ -142,7 +142,6 @@ export async function pollWork(req, httpOptions) {
         clearInterval(intervalID);
         clearTimeout(timeoutPromise);
         const items = clustersToItems(hcmBody.Result.Results);
-        console.log(JSON.stringify(items, null, 2));
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);

@@ -9,9 +9,9 @@
 
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { formatError as formatApolloError } from 'apollo-errors';
+import { isInstance as isApolloErrorInstance, formatError as formatApolloError } from 'apollo-errors';
 import bodyParser from 'body-parser';
-import { ui as inspect } from '@icp/security-middleware';
+import { app as inspect } from '@icp/security-middleware';
 import log4js from 'log4js';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -30,8 +30,6 @@ const CONTEXT_PATH = config.get('contextPath');
 const graphQLServer = express();
 graphQLServer.use('*', helmet());
 
-graphQLServer.use(cookieParser());
-
 if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(
     '*',
@@ -39,14 +37,20 @@ if (process.env.NODE_ENV === 'production') {
       skip: (req, res) => res.statusCode < 400,
     }),
   );
-  graphQLServer.use(inspect);
+  logger.info('Authentication enabled');
+  graphQLServer.use(cookieParser(), inspect);
 } else {
   graphQLServer.use('*', morgan('dev'));
-  // enable graphiql only for local dev
+  // disable security check and enable graphiql only for local dev
+  graphQLServer.use(cookieParser());
   graphQLServer.use(`${CONTEXT_PATH}/graphiql`, graphiqlExpress({ endpointURL: `${CONTEXT_PATH}/graphql` }));
 }
+
 const formatError = (error) => {
-  logger.error(error);
+  const { originalError } = error;
+  if (isApolloErrorInstance(originalError)) {
+    logger.error(JSON.stringify(error.originalError, null, 2));
+  }
   return formatApolloError(error);
 };
 
