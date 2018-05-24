@@ -164,11 +164,14 @@ export async function getWork(req, type, opts) {
   return pollWork(req, options);
 }
 
-export function installHelmChart(req, {
+export async function installHelmChart(req, {
   RepoName, ChartName, DstClusters, Version, ReleaseName, Namespace, URL, Values,
 }, opts) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/work`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     method: 'POST',
     json: getWorkOptions({
       Resource: 'helmrels',
@@ -188,11 +191,14 @@ export function installHelmChart(req, {
   return pollWork(req, httpOptions);
 }
 
-export function deleteHelmRelease(req, {
+export async function deleteHelmRelease(req, {
   ChartName, DstClusters, Names, Namespaces, RepoName, Version,
 }, opts) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/work`,
+    headers: {
+      Authorization: await getToken(req),
+    },
     method: 'POST',
     json: getWorkOptions({
       Resource: 'helmrels',
