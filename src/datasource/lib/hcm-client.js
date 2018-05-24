@@ -32,7 +32,7 @@ const workDefaults = {
   Completed: false,
   UUID: '',
   Operation: 'get',
-  Work: { Namespaces: '', Status: 'healthy', Labels: '' },
+  Work: { Namespaces: '', Status: '', Labels: '' },
   Timestamp: new Date(),
   NextRequest: null,
   FinishedRequest: null,
@@ -142,6 +142,7 @@ export async function pollWork(req, httpOptions) {
         clearInterval(intervalID);
         clearTimeout(timeoutPromise);
         const items = clustersToItems(hcmBody.Result.Results);
+        console.log(JSON.stringify(items, null, 2));
         resolve(items);
       }
     }, HCM_POLL_INTERVAL);

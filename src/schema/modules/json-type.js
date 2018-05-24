@@ -7,25 +7,12 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { pods } from '../../datasource/hcm';
+import GraphQLJSON from 'graphql-type-json';
 
 export const typeDef = `
-type Pod {
-  Namespace: String
-  PodName: String
-  name: String
-  cluster: String
-  PDetails: PDetails
-  State: Boolean
-}
-type PDetails {
-  Node: String
-  Labels: JSON
-}
+scalar JSON
 `;
 
-export const podResolver = {
-  Query: {
-    pods,
-  },
+export const jsonResolver = {
+  JSON: GraphQLJSON,
 };

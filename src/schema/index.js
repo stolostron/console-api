@@ -9,6 +9,7 @@
 
 import { makeExecutableSchema } from 'graphql-tools';
 import * as query from './modules/query';
+import * as jsonType from './modules/json-type';
 import * as toplogyType from './modules/topology-type';
 import * as clusterType from './modules/cluster-type';
 import * as labelType from './modules/label-type';
@@ -20,8 +21,8 @@ import * as releaseType from './modules/helmrel-type';
 import * as chartType from './modules/helmchart-type';
 import * as repoType from './modules/helmrepo-type';
 
-const modules = [query, releaseType, chartType, labelType, repoType, toplogyType, clusterType,
-  podType, nodeType, pvType, namespaceType];
+const modules = [query, jsonType, releaseType, chartType, labelType, repoType, toplogyType,
+  clusterType, podType, nodeType, pvType, namespaceType];
 
 const mainDefs = [
   `schema {

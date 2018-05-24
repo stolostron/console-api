@@ -20,14 +20,7 @@ type NodeDetails {
   Status: String
   OSImage: String
   Cpu: String
-  Labels: Labels
-}
-type Labels {
-  management: String
-  master: String
-  proxy: String
-  role: String
-  va: String
+  Labels: JSON
 }
 `;
 
