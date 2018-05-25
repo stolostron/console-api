@@ -13,8 +13,12 @@ export const typeDef = `
 type Cluster {
   ClusterName: String
   ClusterEndpoint: String
+  Labels: JSON
   Status: String
   TotalNodes: Int
+  TotalStorage: String
+  TotalCpus: Int
+  TotalMemory: String
   TotalDeployments: Int
   TotalPods: Int
   TotalServices: Int
