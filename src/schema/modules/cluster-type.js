@@ -11,17 +11,20 @@ import { clusters } from '../../datasource/hcm';
 
 export const typeDef = `
 type Cluster {
-  ClusterName: String
+  AgentEndpoint: String
   ClusterEndpoint: String
+  ClusterName: String
+  Conflict: Boolean
   Labels: JSON
+  ProxyEndpoint: String
   Status: String
-  TotalNodes: Int
-  TotalStorage: String
   TotalCpus: Int
-  TotalMemory: String
   TotalDeployments: Int
+  TotalMemory: String
+  TotalNodes: Int
   TotalPods: Int
   TotalServices: Int
+  TotalStorage: String
 }
 `;
 
