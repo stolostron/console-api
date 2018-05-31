@@ -8,6 +8,7 @@
  ****************************************************************************** */
 
 import { label, resource, relationship, type } from '../../datasource/mongodb';
+import { getTopology } from '../../datasource/hcm';
 
 export const typeDef = `
 type Resource {
@@ -31,6 +32,27 @@ type Relationship {
 type Topology {
   resources: [Resource]
   relationships: [Relationship]
+}
+
+type HCMTopoNode {
+  Name: String
+  Labels: JSON
+  Properties: JSON
+  NodeKind: String
+  PodSelector: String
+}
+
+type HCMTopoRel {
+  RelName: String
+  SrcNode: HCMTopoNode
+  DstNode: HCMTopoNode
+  Type: String
+  Properties: JSON
+}
+
+type HCMTopology {
+  Nodes: [HCMTopoNode]
+  Rels: [HCMTopoRel]
 }
 
 input LabelInput {
@@ -70,6 +92,7 @@ export const topologyResolver = {
       return { resources, relationships };
     },
 
+    hcmTopology: getTopology,
     labels: async () => label(),
     resourceTypes: async () => type(),
   },

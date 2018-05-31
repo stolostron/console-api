@@ -93,6 +93,41 @@ export async function getClusters(req) {
   return [];
 }
 
+export async function getTopology(obj, args, req) {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/topology`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    json: Object.assign({
+      Names: null,
+      Labels: null,
+      Status: ['healthy'],
+      SortBy: '',
+      TargetNum: -1,
+      User: '',
+      Resource: 'topology',
+      Operation: 'get',
+      ID: '',
+      ManagerOnly: true,
+      Action: {
+        Names: '*',
+        Namespaces: '',
+        NodeKind: 'ApplicationService',
+        UpdateDashboard: false,
+        Dryrun: false,
+        TargetTemplate: false,
+      },
+    }, args),
+    method: 'GET',
+  };
+
+  const result = await request(options).then(res => res.body);
+  const resultJSON = JSON.parse(result.RetString).Result;
+
+  return resultJSON;
+}
+
 export async function getRepos(req) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/repo/*`,

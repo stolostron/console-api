@@ -36,7 +36,11 @@ type Query {
   pods: [Pod]
   pvs: [PV]
   releases: [HelmRel]
+  # Topology from mongodb/weave
   topology(filter: Filter): Topology
+
+  # Instance Topology from hcmm
+  hcmTopology: HCMTopology
 
   # All resource types available for filtering.
   resourceTypes: [String]

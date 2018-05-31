@@ -30,4 +30,4 @@ export const charts = async (obj, args, req) => {
   return _.sortBy(helmCharts, chart => `${chart.RepoName}/${chart.Name}`);
 };
 
-export { deleteHelmRelease, installHelmChart, setRepo } from './lib/hcm-client';
+export { getTopology, deleteHelmRelease, installHelmChart, setRepo } from './lib/hcm-client';
