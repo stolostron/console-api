@@ -251,6 +251,26 @@ export async function deleteHelmRelease(req, {
   return pollWork(req, httpOptions);
 }
 
+export async function deleteHelmRepository(req, { Name, URL }) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/repo/${Name}`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'DELETE',
+    json: getWorkOptions({
+      Resource: 'repo',
+      Operation: 'delete',
+      Action: {
+        Name,
+        URL,
+      },
+    }),
+  };
+  const result = await request(httpOptions).then(res => res.body);
+  return JSON.parse(result.RetString).Result;
+}
+
 export async function setRepo(req, { Name, URL }) {
   const httpOptions = {
     url: `${hcmUrl}/api/v1alpha1/repo`,

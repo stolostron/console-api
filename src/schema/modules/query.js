@@ -50,6 +50,7 @@ type Query {
 type Mutation {
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
+  deleteHelmRepository(input: DeleteHelmRepositoryInput): HelmRepo
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }
 `;
