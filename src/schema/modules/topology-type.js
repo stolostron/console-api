@@ -19,6 +19,7 @@ type Resource {
     topology: String
     type: String
     uid: String
+    id: String
 }
 
 type Relationship {
