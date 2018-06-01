@@ -17,6 +17,7 @@ type Node {
   NodeDetails: NodeDetails
 }
 type NodeDetails {
+  Arch: String
   Status: String
   OSImage: String
   Cpu: String
