@@ -77,7 +77,7 @@ function getResourceQuery(args) {
     });
 
     if (filters.length > 0) {
-      return { $and: filters };
+      return { $or: [{ $and: filters }, { type: 'cluster' }] };
     }
   }
 
@@ -88,6 +88,10 @@ function getResourceQuery(args) {
 const label = () => Resource.distinct('labels');
 const resource = (args, options) => Resource.find(getResourceQuery(args), null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
-const type = () => Resource.distinct('type');
+const type = async () => {
+  const types = await Resource.distinct('type');
 
+  // Remove internet and cluster types because these aren't filterable types.
+  return types.filter(t => t !== 'internet' && t !== 'cluster');
+};
 export { label, resource, relationship, type };
