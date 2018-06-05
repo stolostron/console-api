@@ -12,6 +12,7 @@ import * as hcmClient from './lib/hcm-client';
 
 export const clusters = (obj, args, req) => hcmClient.getClusters(req);
 export const repos = (obj, args, req) => hcmClient.getRepos(req);
+export const applications = (obj, args, req) => hcmClient.getApplications(req);
 export const pods = (obj, args, req) => hcmClient.getWork(req, 'pods');
 export const nodes = (obj, args, req) => hcmClient.getWork(req, 'nodes', {
   Work: { Namespaces: '', Status: '', Labels: '' },

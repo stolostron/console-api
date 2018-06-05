@@ -73,6 +73,36 @@ const clustersToItems = clusterData =>
     [],
   );
 
+/**
+ * Retrieve applications data.
+ *
+ * CLI:  htmlct get applications
+ */
+export async function getApplications(req) {
+  const options = {
+    url: `${hcmUrl}/api/v1alpha1/applications`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    json: {},
+    method: 'GET',
+  };
+  const result = await request(options).then(res => res.body);
+  if (result.Error) {
+    throw new GenericError({ data: result.Error });
+  }
+  if (result.RetString) {
+    const applicationsJSON = JSON.parse(result.RetString).Result;
+    return applicationsJSON ? Object.values(applicationsJSON) : [];
+  }
+  return [];
+}
+
+/**
+ * Retrieve clusters data.
+ *
+ * CLI:  htmlct get clusters
+ */
 export async function getClusters(req) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/clusters`,
@@ -93,6 +123,11 @@ export async function getClusters(req) {
   return [];
 }
 
+/**
+ * Retrieve topology data.
+ *
+ * CLI:  htmlct get topology
+ */
 export async function getTopology(obj, args, req) {
   const options = {
     url: `${hcmUrl}/api/v1alpha1/topology`,
@@ -123,9 +158,14 @@ export async function getTopology(obj, args, req) {
   };
 
   const result = await request(options).then(res => res.body);
-  const resultJSON = JSON.parse(result.RetString).Result;
-
-  return resultJSON;
+  if (result.Error) {
+    throw new GenericError({ data: result.Error });
+  }
+  if (result.RetString) {
+    const resultJSON = JSON.parse(result.RetString).Result;
+    return resultJSON || [];
+  }
+  return [];
 }
 
 export async function getRepos(req) {

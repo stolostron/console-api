@@ -9,6 +9,7 @@
 
 import { merge } from 'lodash';
 import { topologyResolver } from './topology-type';
+import { applicationResolver } from './application-type';
 import { clusterResolver } from './cluster-type';
 import { podResolver } from './pod-type';
 import { nodeResolver } from './node-type';
@@ -28,6 +29,7 @@ type Query {
   repos: [HelmRepo]
 
   # HCM resources
+  applications: [Application]
   charts: [HelmChart]
   clusters: [Cluster]
   labels: [Label]
@@ -56,13 +58,14 @@ type Mutation {
 `;
 
 export const resolver = merge(
+  applicationResolver,
   clusterResolver,
   helmChartResolver,
   helmRepoResolver,
+  helmRelResolver,
   nodeResolver,
   podResolver,
   pvResolver,
   namespaceResolver,
-  helmRelResolver,
   topologyResolver,
 );
