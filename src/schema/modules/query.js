@@ -11,6 +11,7 @@ import { merge } from 'lodash';
 import { topologyResolver } from './topology-type';
 import { applicationResolver } from './application-type';
 import { clusterResolver } from './cluster-type';
+import { dashboardResolver } from './dashboard-type';
 import { podResolver } from './pod-type';
 import { nodeResolver } from './node-type';
 import { pvResolver } from './pv-type';
@@ -32,12 +33,14 @@ type Query {
   applications: [Application]
   charts: [HelmChart]
   clusters: [Cluster]
+  dashboard: [DashboardItem]
   labels: [Label]
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
   pvs: [PV]
   releases: [HelmRel]
+
   # Topology from mongodb/weave
   topology(filter: Filter): Topology
 
@@ -60,6 +63,7 @@ type Mutation {
 export const resolver = merge(
   applicationResolver,
   clusterResolver,
+  dashboardResolver,
   helmChartResolver,
   helmRepoResolver,
   helmRelResolver,

@@ -12,6 +12,7 @@ import * as query from './modules/query';
 import * as jsonType from './modules/json-type';
 import * as toplogyType from './modules/topology-type';
 import * as applicationType from './modules/application-type';
+import * as dashboardType from './modules/dashboard-type';
 import * as clusterType from './modules/cluster-type';
 import * as labelType from './modules/label-type';
 import * as podType from './modules/pod-type';
@@ -23,7 +24,7 @@ import * as chartType from './modules/helmchart-type';
 import * as repoType from './modules/helmrepo-type';
 
 const modules = [query, jsonType, releaseType, chartType, labelType, repoType, toplogyType,
-  applicationType, clusterType, podType, nodeType, pvType, namespaceType];
+  dashboardType, applicationType, clusterType, podType, nodeType, pvType, namespaceType];
 
 const mainDefs = [
   `schema {
