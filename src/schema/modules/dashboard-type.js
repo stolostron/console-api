@@ -75,13 +75,15 @@ const getDashboardCard = async ({
     const rawData = await query(null, null, req);
 
     const cardData = rawData.reduce((accum, curr) => {
-      switch (curr[statusField]) {
+      const status = _.get(curr, statusField, 'Status').toLowerCase();
+
+      switch (status) {
         case 'failed':
           accum.critical += 1;
           break;
 
         case 'healthy':
-        case 'DEPLOYED':
+        case 'deployed':
           accum.healthy += 1;
           break;
 
