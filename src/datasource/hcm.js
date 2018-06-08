@@ -21,7 +21,9 @@ export const pvs = (obj, args, req) => hcmClient.getWork(req, 'pvs');
 export const namespaces = (obj, args, req) => hcmClient.getWork(req, 'namespaces', {
   Work: { Namespaces: '', Status: 'all', Labels: '' },
 });
-export const releases = (obj, args, req) => hcmClient.getWork(req, 'helmrels');
+export const releases = (obj, args, req) => hcmClient.getWork(req, 'helmrels', {
+  Work: { Namespaces: '', Status: ['DEPLOYED', 'FAILED'], Labels: '' },
+});
 
 export const charts = async (obj, args, req) => {
   const helmRepos = await hcmClient.getRepos(req);
