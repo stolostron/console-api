@@ -12,12 +12,15 @@ import { clusters } from '../../datasource/hcm';
 export const typeDef = `
 type Cluster {
   AgentEndpoint: String
+  CPURequestsFraction: Float
   ClusterEndpoint: String
   ClusterName: String
   Conflict: Boolean
   Labels: JSON
+  MemoryRequestsFraction: Float
   ProxyEndpoint: String
   Status: String
+  StorageUsageFraction: Float
   TotalCpus: Int
   TotalDeployments: Int
   TotalMemory: String
