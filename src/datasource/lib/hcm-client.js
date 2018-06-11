@@ -84,7 +84,11 @@ export async function getApplications(req) {
     headers: {
       Authorization: await getToken(req),
     },
-    json: {},
+    json: {
+      Action: {
+        Names: '*',
+      },
+    },
     method: 'GET',
   };
   const result = await request(options).then(res => res.body);

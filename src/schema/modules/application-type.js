@@ -10,12 +10,21 @@
 import { applications } from '../../datasource/hcm';
 
 export const typeDef = `
+# HCM Application
 type Application {
-  Annotations: JSON
-  Components: [String]
-  Dependencies: [String]
-  Labels: JSON
   Name: String
+  Annotations: JSON
+  Labels: JSON
+  Components: [AppNode]
+  Dependencies: [AppNode]
+}
+
+# HCM Application Node (AppNode)
+type AppNode {
+  Name: String
+  Cluster: String
+  Kind: String
+  Status: String
 }
 `;
 
