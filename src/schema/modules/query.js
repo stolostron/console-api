@@ -21,34 +21,63 @@ import { helmChartResolver } from './helmchart-type';
 import { helmRepoResolver } from './helmrepo-type';
 
 export const typeDef = `
+# **Hybrid Cluster Manager**
+#
 # Root Query
-type Query {
-  # weave resources
-  relationships: [Relationship]
-  resource(uid: String!): Resource
-  resources(filter: Filter): [Resource]
-  repos: [HelmRepo]
-
-  # HCM resources
+type Query {  
+  # List applications registered in HCM.
   applications: [Application]
+
+  # List helm charts.
   charts: [HelmChart]
+
+  # List clusters registered in HCM.
   clusters: [Cluster]
+
+  # Gather the data needed to populate the dashboard.
   dashboard: DashboardData
+
+  # List labels from all clusters registered in HCM.
   labels: [Label]
+
+  # List namespaces from all clusters registered in HCM.
   namespaces: [Namespace]
+
+  # List nodes from all clusters registered in HCM.
   nodes: [Node]
+
+  # List pods from all clusters registered in HCM.
   pods: [Pod]
+
+  # List persistent volumes from all clusters registered in HCM.
   pvs: [PV]
+
+  # List Helm releases from all clusters registered in HCM.
   releases: [HelmRel]
 
-  # Topology from mongodb/weave
+  # List Helm repositories registered in HCM.
+  repos: [HelmRepo]
+
+
+  # List all relationships (weave/mongodb)
+  relationships: [Relationship]
+
+  # Get the resource matching the given uid. (weave/mongodb)
+  resource(uid: String!): Resource
+
+  # List all resource types available for filtering. (weave/mongodb)
+  resourceTypes: [String]
+
+  # List resources matching the given filter. (weave/mongodb)
+  resources(filter: Filter): [Resource]
+
+  # Get the topology (weave/mongodb)
   topology(filter: Filter): Topology
 
-  # Instance Topology from hcmm
+  # Get the Instance Topology from HCM
   hcmTopology: HCMTopology
 
-  # All resource types available for filtering.
-  resourceTypes: [String]
+
 }
 
 # Root Mutation
