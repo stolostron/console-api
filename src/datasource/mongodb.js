@@ -61,22 +61,34 @@ const wait = ms => new Promise((resolve) => {
 /**
  * Creates a DB query from the resource filters.
  */
-function getResourceQuery(args) {
+async function getResourceQuery(args) {
   if (args.filter) {
     const filters = [];
+
+    // Special case for filtering by cluster.
+    // The filter object receives the cluster names to filter, but need to use the mongo doc id
+    // in the search query.
+    if (args.filter.cluster && args.filter.cluster[0]) {
+      const clusterDocs = await Resource.find({ type: 'cluster' });
+      filters.push({
+        cluster: { $in: args.filter.cluster.map(f => clusterDocs.find(c => c.name === f).id) },
+      });
+    }
+
     Object.keys(args.filter).forEach((filterType) => {
       if (args.filter[filterType] && args.filter[filterType][0]) {
         if (filterType === 'label') {
           filters.push({
             $or: args.filter[filterType].map(f => ({ labels: f })),
           });
-        } else {
+        } else if (filterType !== 'cluster') { // Cluster is a special type, handled above.
           filters.push({ [filterType]: { $in: args.filter[filterType] } });
         }
       }
     });
 
     if (filters.length > 0) {
+      // Always include the nodes of type 'cluster' in the result.
       return { $or: [{ $and: filters }, { type: 'cluster' }] };
     }
   }
@@ -86,7 +98,8 @@ function getResourceQuery(args) {
 
 
 const label = () => Resource.distinct('labels');
-const resource = (args, options) => Resource.find(getResourceQuery(args), null, options);
+const resource = async (args, options) =>
+  Resource.find(await getResourceQuery(args), null, options);
 const relationship = query => Relationship.find(query, null, { populate: 'to from' });
 const type = async () => {
   const types = await Resource.distinct('type');
