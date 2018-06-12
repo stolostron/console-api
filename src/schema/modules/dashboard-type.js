@@ -8,7 +8,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { clusters, releases } from '../../datasource/hcm';
+import { clusters, releases, pods } from '../../datasource/hcm';
 
 export const typeDef = `
   type TableRow {
@@ -68,18 +68,24 @@ const sortCards = dashboardCards => _.sortBy(dashboardCards, [(card) => {
 }]);
 
 const genericStatus = (resource) => {
-  switch (resource.Status.toLowerCase()) {
-    case 'failed':
-      return 'critical';
+  if (resource.Status) {
+    switch (resource.Status.toLowerCase()) {
+      case 'failed':
+        return 'critical';
 
-    // TODO: Return warning status - 06/11/18 09:35:53 sidney.wijngaarde1@ibm.com
+      // TODO: Return warning status - 06/11/18 09:35:53 sidney.wijngaarde1@ibm.com
 
-    case 'healthy':
-    case 'deployed':
-      return 'healthy';
+      case 'healthy':
+      case 'deployed':
+        return 'healthy';
 
-    default:
-      return 'critical';
+      default:
+        return 'critical';
+    }
+  } else if (resource.State != null) {
+    return resource.State ? 'healthy' : 'critical';
+  } else {
+    return 'critical';
   }
 };
 
@@ -182,6 +188,13 @@ const transformRelease = (release, status) => ({
   status,
 });
 
+const transformPod = (pod, status) => ({
+  link: '',
+  percentage: 0,
+  resourceName: pod.name,
+  status,
+});
+
 const transformPercentage = field => (cluster, status) => ({
   link: cluster.Labels.clusterip,
   percentage: Math.round(cluster[field]),
@@ -229,6 +242,13 @@ export const dashboardResolver = {
             { name: 'helm releases', transform: transformRelease },
           ],
           query: releases,
+          req,
+        }),
+        getDashboardItems({
+          cards: [
+            { name: 'pods', transform: transformPod },
+          ],
+          query: pods,
           req,
         }),
       ]);
