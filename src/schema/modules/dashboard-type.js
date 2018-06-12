@@ -133,7 +133,7 @@ function getDashboardPieChart({
     accum.data = (transform(curr, stat, accum.data));
     return accum;
   }, {
-    data: {},
+    data: { healthy: 0, warning: 0, critical: 0 },
   });
   const result = [];
   // dirty code for supporting Carbon data schema
