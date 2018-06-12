@@ -18,13 +18,26 @@ export const typeDef = `
     percentage: Int
   }
 
-  type DashboardItem {
+  type DashboardCardItem {
     name: String
     healthy: Int
     critical: Int
     warning: Int
     table: [TableRow]
     error: String
+  } 
+  
+  type DashboardChartItem {
+    name: String
+    # return something looks like [ [[value1, value2, value3], title1] , [[valueA, valueB, valueC], title2] ]
+    # issue created against Carbon: https://github.com/carbon-design-system/carbon-addons-data-viz-react/issues/112
+    data: [[String]]
+    error: String
+  }
+  
+  type DashboardData {
+    cardItems: [DashboardCardItem]
+    pieChartItems: [DashboardChartItem]
   }
 `;
 
@@ -106,14 +119,54 @@ function getDashboardCard({
   return cardData;
 }
 
-async function getDashboardCards({ query, req, cards }) {
+function getDashboardPieChart({
+  name, rawData, transform, status = genericStatus,
+}) {
+  const chartData = rawData.reduce((accum, curr) => {
+    const stat = status(curr);
+    accum.data = (transform(curr, stat, accum.data));
+    return accum;
+  }, {
+    data: {},
+  });
+  const result = [];
+  // dirty code for supporting Carbon data schema
+  // issue created against Carbon: https://github.com/carbon-design-system/carbon-addons-data-viz-react/issues/112
+  // update this part once Carbon fixed the issue
+  Object.keys(chartData.data).forEach((key) => {
+    const tempResult = [];
+    tempResult.push(key);
+    tempResult.push(chartData.data[key].toString());
+    result.push(tempResult);
+  });
+  return { name, data: result };
+}
+
+async function getDashboardItems({
+  query, req, cards = [], pieCharts = [],
+}) {
   try {
     const rawData = await query(null, null, req);
-    return cards.map(card => getDashboardCard({ rawData, ...card }));
+    const cardsMap = cards.map(card => getDashboardCard({ rawData, ...card }));
+    const pieChartsItems = pieCharts.map(chart => getDashboardPieChart({ rawData, ...chart }));
+    return {
+      cardsMap,
+      pieChartsItems,
+    };
   } catch (error) {
     return cards.map(() => ({ error }));
   }
 }
+
+const transformTotalCluster = (curr, status, currentData) => {
+  const currentMap = currentData;
+  if (Object.prototype.hasOwnProperty.call(currentMap, status)) {
+    currentMap[status] += 1;
+  } else {
+    currentMap[status] = 1;
+  }
+  return currentMap;
+};
 
 const transformCluster = (cluster, status) => ({
   link: cluster.Labels.clusterip,
@@ -139,8 +192,8 @@ const transformPercentage = field => (cluster, status) => ({
 export const dashboardResolver = {
   Query: {
     dashboard: async (root, args, req) => {
-      const dashboardCards = await Promise.all([
-        getDashboardCards({
+      const dashboardItems = await Promise.all([
+        getDashboardItems({
           cards: [
             {
               name: 'clusters',
@@ -162,10 +215,16 @@ export const dashboardResolver = {
               status: percentageStatus('StorageUsageFraction'),
             },
           ],
+          pieCharts: [
+            {
+              name: 'totalClusterHealth',
+              transform: transformTotalCluster,
+            },
+          ],
           query: clusters,
           req,
         }),
-        getDashboardCards({
+        getDashboardItems({
           cards: [
             { name: 'helm releases', transform: transformRelease },
           ],
@@ -173,8 +232,16 @@ export const dashboardResolver = {
           req,
         }),
       ]);
-
-      return sortCards(_.flatten(dashboardCards));
+      let allCards = [];
+      let pieChartItems = [];
+      dashboardItems.forEach((result) => {
+        allCards = [...result.cardsMap, ...allCards];
+        pieChartItems = [...result.pieChartsItems, ...pieChartItems];
+      });
+      return {
+        cardItems: sortCards(_.flatten(allCards)),
+        pieChartItems,
+      };
     },
   },
 };

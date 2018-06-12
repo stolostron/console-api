@@ -33,7 +33,7 @@ type Query {
   applications: [Application]
   charts: [HelmChart]
   clusters: [Cluster]
-  dashboard: [DashboardItem]
+  dashboard: DashboardData
   labels: [Label]
   namespaces: [Namespace]
   nodes: [Node]
