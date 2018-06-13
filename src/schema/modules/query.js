@@ -82,9 +82,14 @@ type Query {
 
 # Root Mutation
 type Mutation {
-  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
+  # Generate the application dashboard in Grafana.
+  #
+  # \`hcmctl describe applications -n appName\`
+  createDashboard(appName: String!): String
+
   deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
   deleteHelmRepository(input: DeleteHelmRepositoryInput): HelmRepo
+  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }
 `;

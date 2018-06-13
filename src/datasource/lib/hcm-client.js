@@ -360,3 +360,34 @@ export async function search(req, type, name, opts = {}) {
   return Promise.race([request(options)
     .then(res => JSON.parse(res.body.RetString).Result), timeout(HCM_POLL_TIMEOUT)]);
 }
+
+
+/**
+ * Creates a Grafana Dashboard for the given application.
+ *
+ * CLI:
+ *    hcmctl describe applications -n appName
+ *
+ * @param {*}       req     HTTP request object
+ * @param {String}  appName Application for which we'll generate the Grafana dashboard.
+ *
+ * @return URL to the generated Grafana dashboard.
+ */
+export async function createDashboard(req, appName) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/applications`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'PUT',
+    json: {
+      Resource: 'applications',
+      Operation: 'describe',
+      Action: {
+        Names: appName,
+      },
+    },
+  };
+  const result = await request(httpOptions).then(res => res.body);
+  return JSON.parse(result.RetString).Result;
+}

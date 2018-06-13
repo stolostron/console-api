@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { applications } from '../../datasource/hcm';
+import { createDashboard, applications } from '../../datasource/hcm';
 
 export const typeDef = `
 # HCM Application
@@ -17,6 +17,8 @@ type Application {
   Labels: JSON
   Components: [AppNode]
   Dependencies: [AppNode]
+  # URL to Grafana Dashboard.
+  Dashboard: String
 }
 
 # HCM Application Node (AppNode)
@@ -31,5 +33,8 @@ type AppNode {
 export const applicationResolver = {
   Query: {
     applications,
+  },
+  Mutation: {
+    createDashboard: (root, { appName }, req) => createDashboard(req, appName),
   },
 };

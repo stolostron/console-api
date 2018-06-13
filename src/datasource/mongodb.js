@@ -42,16 +42,16 @@ const wait = ms => new Promise((resolve) => {
     try {
       // eslint-disable-next-line no-await-in-loop
       await mongoose.connect(mongoURI);
-      console.error('Mongo Connection Succesful');
+      console.error('Mongo Connection Succesful'); // eslint-disable-line no-console
       break;
     } catch (e) {
       retries -= 1;
       if (!retries) {
-        console.log(new Error(`Mongo connection failed with: ${e.message}`));
+        console.log(new Error(`Mongo connection failed with: ${e.message}`)); // eslint-disable-line no-console
         process.exit(1);
       }
 
-      console.error(`Mongo connection failed with: ${e.message}, ${retries} retries remaining`);
+      console.error(`Mongo connection failed with: ${e.message}, ${retries} retries remaining`); // eslint-disable-line no-console
       // eslint-disable-next-line no-await-in-loop
       await wait(1000);
     }
