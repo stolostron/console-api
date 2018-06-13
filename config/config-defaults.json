@@ -4,5 +4,5 @@
   "hcmUrl": "",
   "mongodbUrl": "",
   "hcmPollInterval": 200,
-  "hcmPollTimeout": 10000
+  "hcmPollTimeout": 30000
 }
