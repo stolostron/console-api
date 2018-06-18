@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { createDashboard, applications } from '../../datasource/hcm';
+import { applications, createDashboard, deleteApplication, deployApplication, undeployApplication } from '../../datasource/hcm';
 
 export const typeDef = `
 # HCM Application
@@ -36,5 +36,8 @@ export const applicationResolver = {
   },
   Mutation: {
     createDashboard: (root, { appName }, req) => createDashboard(req, appName),
+    deleteApplication: (root, { appName }, req) => deleteApplication(req, appName),
+    deployApplication: (root, { appName }, req) => deployApplication(req, appName),
+    undeployApplication: (root, { appName }, req) => undeployApplication(req, appName),
   },
 };

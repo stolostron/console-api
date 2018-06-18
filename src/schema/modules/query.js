@@ -87,10 +87,25 @@ type Mutation {
   # \`hcmctl describe applications -n appName\`
   createDashboard(appName: String!): String
 
+  # Delete application.
+  #
+  # \`hcmctl delete applications -n appName\`
+  deleteApplication(appName: String!): JSON
+
+  # Deploy application.
+  #
+  # \`hcmctl deploy applications -n appName\`
+  deployApplication(appName: String!): JSON
+
   deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
   deleteHelmRepository(input: DeleteHelmRepositoryInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
+
+  # Undeploy application.
+  #
+  # \`hcmctl undeploy applications -n appName\`
+  undeployApplication(appName: String!): JSON
 }
 `;
 

@@ -189,7 +189,7 @@ export async function getRepos(req) {
   return reposJSON ? Object.values(reposJSON) : [];
 }
 
-export async function pollWork(req, httpOptions) {
+async function pollWork(req, httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
   if (result.Error) {
     throw new GenericError({ data: result.Error });
@@ -205,7 +205,7 @@ export async function pollWork(req, httpOptions) {
     }, HCM_POLL_TIMEOUT);
   });
 
-  const poll = new Promise(async (resolve) => {
+  const poll = new Promise(async (resolve, reject) => {
     const pollOptions = {
       url: `${hcmUrl}/api/v1alpha1/work/${workID}`,
       headers: {
@@ -220,8 +220,15 @@ export async function pollWork(req, httpOptions) {
       if (hcmBody.Result.Completed) {
         clearInterval(intervalID);
         clearTimeout(timeoutPromise);
-        const items = clustersToItems(hcmBody.Result.Results);
-        resolve(items);
+
+        const res = hcmBody.Result.Results;
+        // TODO: Need a better error handler. May need to enhance the API to return an error field.
+        if (res.code || res.message) {
+          reject(res);
+        } else {
+          const items = clustersToItems(res);
+          resolve(items);
+        }
       }
     }, HCM_POLL_INTERVAL);
   });
@@ -390,4 +397,88 @@ export async function createDashboard(req, appName) {
   };
   const result = await request(httpOptions).then(res => res.body);
   return JSON.parse(result.RetString).Result;
+}
+
+/**
+ * Deletes and application
+ *
+ * CLI:
+ *    hcmctl delete applications -n appName
+ *
+ * @param {*}       req     HTTP request object
+ * @param {String}  appName Name of a registered application.
+ *
+ */
+export async function deleteApplication(req, appName) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/applications`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'PUT',
+    json: {
+      Resource: 'applications',
+      Operation: 'delete',
+      Action: {
+        Names: appName,
+      },
+    },
+  };
+  const result = await request(httpOptions).then(res => res.body);
+  return JSON.parse(result.RetString).Result;
+}
+
+
+/**
+ * Deploy an application.
+ *
+ * CLI:
+ *    hcmctl deploy applications -n appName
+ *
+ * @param {*}       req     HTTP request object
+ * @param {String}  appName Name of a registered application.
+ */
+export async function deployApplication(req, appName) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'POST',
+    json: {
+      Resource: 'applications',
+      Operation: 'deploy',
+      Work: {
+        Names: appName,
+      },
+    },
+  };
+  return pollWork(req, httpOptions);
+}
+
+/**
+ * Undeploy an application.
+ *
+ * CLI:
+ *    hcmctl undeploy applications -n appName
+ *
+ * @param {*}       req     HTTP request object
+ * @param {String}  appName Name of a registered application.
+ */
+export async function undeployApplication(req, appName) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/work`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'POST',
+    json: {
+      Resource: 'applications',
+      Operation: 'undeploy',
+      Work: {
+        Names: appName,
+      },
+    },
+  };
+  return pollWork(req, httpOptions);
 }

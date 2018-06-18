@@ -35,9 +35,12 @@ export const charts = async (obj, args, req) => {
 
 export {
   createDashboard,
+  deleteApplication,
   deleteHelmRelease,
   deleteHelmRepository,
+  deployApplication,
   getTopology,
   installHelmChart,
   setRepo,
+  undeployApplication,
 } from './lib/hcm-client';
