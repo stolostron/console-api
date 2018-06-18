@@ -16,6 +16,8 @@ import log4js from 'log4js';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import https from 'https';
+import fs from 'fs';
 import schema from './schema/index';
 import config from '../config';
 
@@ -56,8 +58,15 @@ const formatError = (error) => {
 
 graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress(req => ({ formatError, schema, context: req })));
 
-graphQLServer.listen(GRAPHQL_PORT, () => {
+const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/hcmuiapi.key', 'utf8');
+const certificate = fs.readFileSync(process.env.serverCert || './sslcert/hcmuiapi.crt', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+const server = https.createServer(credentials, graphQLServer);
+
+server.listen(GRAPHQL_PORT, () => {
   logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] started.`);
-  logger.info(`HCM UI API is now running on http://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
-  logger.info(`GraphiQL is now running on http://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
+  logger.info(`HCM UI API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info(`GraphiQL is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
+  }
 });
