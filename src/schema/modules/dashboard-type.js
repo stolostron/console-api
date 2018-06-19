@@ -254,10 +254,16 @@ export const dashboardResolver = {
       ]);
       let allCards = [];
       let pieChartItems = [];
-      dashboardItems.forEach((result) => {
-        allCards = [...result.cardsMap, ...allCards];
-        pieChartItems = [...result.pieChartsItems, ...pieChartItems];
-      });
+      if (dashboardItems && dashboardItems.length > 0) {
+        dashboardItems.forEach((result) => {
+          if (result.cardsMap && result.cardsMap.length > 0) {
+            allCards = [...result.cardsMap, ...allCards];
+          }
+          if (result.pieChartsItems && result.pieChartsItems.length > 0) {
+            pieChartItems = [...result.pieChartsItems, ...pieChartItems];
+          }
+        });
+      }
       return {
         cardItems: sortCards(_.flatten(allCards)),
         pieChartItems,
