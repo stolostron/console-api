@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { label, resource, relationship, type } from '../../datasource/mongodb';
+import { label, resource, type } from '../../datasource/mongodb';
 import { getTopology } from '../../datasource/hcm';
 
 export const typeDef = `
@@ -68,7 +68,6 @@ input Filter {
 }
 `;
 
-
 export const topologyResolver = {
   Query: {
     resource: async (root, args) => {
@@ -76,18 +75,34 @@ export const topologyResolver = {
       return result[0];
     },
     resources: async (root, args = {}) => resource(args),
-    relationships: async () => relationship({}),
+    relationships: async () => {
+      const resources = await resource({});
+      return resources.reduce((accum, res) => {
+        if (res.relationships && res.relationships.length) {
+          res.relationships.forEach((outgoing) => {
+            accum.push({ type: 'calls', from: res, to: outgoing });
+          });
+        }
+
+        return accum;
+      }, []);
+    },
     topology: async (root, args) => {
       const resources = await resource(args);
 
-      const resourceFilter = {
-        $and: [
-          { to: { $in: resources } },
-          { from: { $in: resources } },
-        ],
-      };
+      const resourceUids = new Set(resources.map(res => res.uid));
 
-      const relationships = await relationship(resourceFilter);
+      const relationships = resources.reduce((accum, res) => {
+        if (res.relationships && res.relationships.length) {
+          res.relationships.forEach((outgoing) => {
+            if (resourceUids.has(outgoing.uid)) {
+              accum.push({ type: 'calls', from: res, to: outgoing });
+            }
+          });
+        }
+
+        return accum;
+      }, []);
 
       return { resources, relationships };
     },
@@ -95,8 +110,5 @@ export const topologyResolver = {
     hcmTopology: getTopology,
     labels: async () => label(),
     resourceTypes: async () => type(),
-  },
-  Resource: {
-    relationships: async res => relationship({ from: res.uid }),
   },
 };

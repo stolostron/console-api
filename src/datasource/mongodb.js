@@ -10,25 +10,28 @@
 import mongoose, { Schema } from 'mongoose';
 import config from '../../config';
 
-const resourceSchema = Schema({
-  uid: String,
+const relationshipSchema = Schema({
   cluster: { type: Schema.ObjectId, ref: 'Resource' },
+  labels: [{ name: String, value: String }],
   name: String,
   namespace: String,
   topology: String,
   type: String,
+  uid: String,
+});
+
+const resourceSchema = Schema({
+  cluster: { type: Schema.ObjectId, ref: 'Resource' },
+  labels: [{ name: String, value: String }],
+  name: String,
+  namespace: String,
+  relationships: [relationshipSchema],
+  topology: String,
+  type: String,
+  uid: String,
 });
 
 const Resource = mongoose.model('Resource', resourceSchema);
-
-const relationshipSchema = Schema({
-  cluster: { type: Schema.ObjectId, ref: 'Resource' },
-  type: String,
-  to: { type: Schema.ObjectId, ref: 'Resource' },
-  from: { type: Schema.ObjectId, ref: 'Resource' },
-});
-
-const Relationship = mongoose.model('Relationship', relationshipSchema);
 
 const mongoURI = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
 
@@ -100,11 +103,10 @@ async function getResourceQuery(args) {
 const label = () => Resource.distinct('labels');
 const resource = async (args, options) =>
   Resource.find(await getResourceQuery(args), null, options);
-const relationship = query => Relationship.find(query, null, { populate: 'to from' });
 const type = async () => {
   const types = await Resource.distinct('type');
 
   // Remove internet and cluster types because these aren't filterable types.
   return types.filter(t => t !== 'internet' && t !== 'cluster');
 };
-export { label, resource, relationship, type };
+export { label, resource, type };
