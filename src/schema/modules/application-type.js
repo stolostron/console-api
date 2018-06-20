@@ -19,6 +19,7 @@ type Application {
   Dependencies: [AppNode]
   # URL to Grafana Dashboard.
   Dashboard: String
+  Status: String
 }
 
 # HCM Application Node (AppNode)
