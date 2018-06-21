@@ -74,6 +74,18 @@ const clustersToItems = clusterData =>
   );
 
 /**
+ * Helper method to process the request and parse the response.
+ */
+async function processRequest(httpOptions) {
+  const result = await request(httpOptions).then(res => res.body);
+  if (result.Error) {
+    throw new GenericError({ data: result.Error });
+  }
+  return JSON.parse(result.RetString).Result;
+}
+
+
+/**
  * Retrieve applications data.
  *
  * CLI:  htmlct get applications
@@ -318,8 +330,7 @@ export async function deleteHelmRepository(req, { Name, URL }) {
       },
     }),
   };
-  const result = await request(httpOptions).then(res => res.body);
-  return JSON.parse(result.RetString).Result;
+  return processRequest(httpOptions);
 }
 
 export async function setRepo(req, { Name, URL }) {
@@ -335,8 +346,7 @@ export async function setRepo(req, { Name, URL }) {
       Action: { Name, URL },
     }),
   };
-  const result = await request(httpOptions).then(res => res.body);
-  return JSON.parse(result.RetString).Result;
+  return processRequest(httpOptions);
 }
 
 export async function search(req, type, name, opts = {}) {
@@ -370,6 +380,34 @@ export async function search(req, type, name, opts = {}) {
 
 
 /**
+ * Registers an application
+ *
+ * CLI:
+ *    hcmctl register applications -f <fileName>
+ *
+ * @param {*}       req   HTTP request object
+ * @param {Base64}  yaml  Base64 encoded yaml file contents
+ *
+ */
+export async function registerApplication(req, yaml) {
+  const httpOptions = {
+    url: `${hcmUrl}/api/v1alpha1/applications`,
+    headers: {
+      Authorization: await getToken(req),
+    },
+    method: 'PUT',
+    json: {
+      Resource: 'applications',
+      Operation: 'register',
+      Action: {
+        Content: yaml,
+      },
+    },
+  };
+  return processRequest(httpOptions);
+}
+
+/**
  * Creates a Grafana Dashboard for the given application.
  *
  * CLI:
@@ -395,12 +433,11 @@ export async function createDashboard(req, appName) {
       },
     },
   };
-  const result = await request(httpOptions).then(res => res.body);
-  return JSON.parse(result.RetString).Result;
+  return processRequest(httpOptions);
 }
 
 /**
- * Deletes and application
+ * Deletes an application
  *
  * CLI:
  *    hcmctl delete applications -n appName
@@ -424,8 +461,7 @@ export async function deleteApplication(req, appName) {
       },
     },
   };
-  const result = await request(httpOptions).then(res => res.body);
-  return JSON.parse(result.RetString).Result;
+  return processRequest(httpOptions);
 }
 
 

@@ -41,6 +41,7 @@ export {
   deployApplication,
   getTopology,
   installHelmChart,
+  registerApplication,
   setRepo,
   undeployApplication,
 } from './lib/hcm-client';

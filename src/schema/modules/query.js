@@ -106,6 +106,13 @@ type Mutation {
   #
   # \`hcmctl undeploy applications -n appName\`
   undeployApplication(appName: String!): JSON
+
+  # Register application.
+  #
+  # Must pass yaml content as a Base64 enccoded string.
+  #
+  # \`hcmctl register applications -f <fileName>\`
+  registerApplication(yaml: String!): JSON
 }
 `;
 
