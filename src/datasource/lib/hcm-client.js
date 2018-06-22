@@ -13,7 +13,7 @@ import config from '../../../config';
 import getToken from './util';
 import { GenericError } from './errors';
 
-const hcmUrl = config.get('hcmUrl');
+const hcmUrl = config.get('hcmUrl') || 'http://localhost:8080';
 
 const HCM_POLL_INTERVAL = config.get('hcmPollInterval') || 200;
 const HCM_POLL_TIMEOUT = config.get('hcmPollTimeout') || 10000;

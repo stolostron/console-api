@@ -21,6 +21,10 @@ services:
   - docker
 
 before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - make init
+  - make log:init
   - source travis-env.sh
   - make docker-login
 
@@ -50,3 +54,7 @@ after_success:
           fi
         fi
       fi
+  - make log:pass
+
+after_failure: 
+  - make log:fail

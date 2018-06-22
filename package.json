@@ -13,7 +13,7 @@
     "shrinkwrap:clean": "del-cli node_modules npm-shrinkwrap.json && npm install --no-optional && npm prune && npm shrinkwrap",
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix .",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "cross-env NODE_ENV=development jest --silent"
   },
   "repository": {
     "type": "git",
@@ -55,6 +55,8 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
+    "jest": "^23.1.0",
+    "nock": "^9.3.3",
     "nodemon": "^1.17.3"
   }
 }
