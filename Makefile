@@ -66,9 +66,6 @@ push: check-env app-version
 
 .PHONY: test
 test:
-	npm install \
-	jest@23.1.0 \
-	nock@9.3.3
 ifeq ($(UNIT_TESTS), TRUE)
 	if [ ! -d "test-output" ]; then \
 		mkdir test-output; \
