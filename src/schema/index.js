@@ -35,7 +35,7 @@ const mainDefs = [
 
 const resolvers = modules.map(m => m.resolver).filter(res => !!res);
 
-const typeDefs = mainDefs.concat(modules.map(m => m.typeDef).filter(res => !!res));
+export const typeDefs = mainDefs.concat(modules.map(m => m.typeDef).filter(res => !!res));
 
 const schema = makeExecutableSchema({
   typeDefs,

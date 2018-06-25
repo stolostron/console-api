@@ -8,7 +8,6 @@
  ****************************************************************************** */
 
 import mongoose, { Schema } from 'mongoose';
-import config from '../../config';
 
 const relationshipSchema = Schema({
   cluster: { type: Schema.ObjectId, ref: 'Resource' },
@@ -33,19 +32,21 @@ const resourceSchema = Schema({
 
 const Resource = mongoose.model('Resource', resourceSchema);
 
-const mongoURI = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
-
 const wait = ms => new Promise((resolve) => {
   setTimeout(() => resolve(), ms);
 });
 
-(async () => {
-  let retries = 100;
+export async function connect(mongoURI, numRetries = 100) {
+  if (mongoose.connection.readyState) {
+    return mongoose.connection;
+  }
+
+  let retries = numRetries;
   while (retries) {
     try {
       // eslint-disable-next-line no-await-in-loop
       await mongoose.connect(mongoURI);
-      console.error('Mongo Connection Succesful'); // eslint-disable-line no-console
+      console.log('Mongo Connection Succesful'); // eslint-disable-line no-console
       break;
     } catch (e) {
       retries -= 1;
@@ -59,7 +60,9 @@ const wait = ms => new Promise((resolve) => {
       await wait(1000);
     }
   }
-})();
+
+  return mongoose.connection;
+}
 
 /**
  * Creates a DB query from the resource filters.

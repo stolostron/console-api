@@ -20,6 +20,7 @@ import https from 'https';
 import fs from 'fs';
 import schema from './schema/index';
 import config from '../config';
+import { connect as mongoConnect } from './datasource/mongodb';
 
 const logger = log4js.getLogger('server');
 
@@ -61,6 +62,7 @@ graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress(r
 const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/hcmuiapi.key', 'utf8');
 const certificate = fs.readFileSync(process.env.serverCert || './sslcert/hcmuiapi.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
+mongoConnect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
 const server = https.createServer(credentials, graphQLServer);
 
 server.listen(GRAPHQL_PORT, () => {
