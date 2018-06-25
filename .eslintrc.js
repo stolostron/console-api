@@ -1,5 +1,6 @@
 module.exports = {
-  "extends": "airbnb-base",
+  "plugins": ["jest"],
+  "extends": ["plugin:jest/recommended", "airbnb-base"],
   "rules": {
     "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["accum"] }]
   }
