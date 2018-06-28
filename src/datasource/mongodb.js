@@ -109,7 +109,7 @@ const resource = async (args, options) =>
 const type = async () => {
   const types = await Resource.distinct('type');
 
-  // Remove internet and cluster types because these aren't filterable types.
-  return types.filter(t => t !== 'internet' && t !== 'cluster');
+  // Exclude cluster, internet, and unmanaged types because these aren't valid filterable types.
+  return types.filter(t => t !== 'cluster' && t !== 'internet' && t !== 'unmanaged');
 };
 export { label, resource, type };
