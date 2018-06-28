@@ -84,7 +84,6 @@ async function processRequest(httpOptions) {
   return JSON.parse(result.RetString).Result;
 }
 
-
 /**
  * Retrieve applications data.
  *
@@ -110,31 +109,6 @@ export async function getApplications(req) {
   if (result.RetString) {
     const applicationsJSON = JSON.parse(result.RetString).Result;
     return applicationsJSON ? Object.values(applicationsJSON) : [];
-  }
-  return [];
-}
-
-/**
- * Retrieve clusters data.
- *
- * CLI:  htmlct get clusters
- */
-export async function getClusters(req) {
-  const options = {
-    url: `${hcmUrl}/api/v1alpha1/clusters`,
-    headers: {
-      Authorization: await getToken(req),
-    },
-    json: {},
-    method: 'GET',
-  };
-  const result = await request(options).then(res => res.body);
-  if (result.Error) {
-    throw new GenericError({ data: result.Error });
-  }
-  if (result.RetString) {
-    const clustersJSON = JSON.parse(result.RetString).Result;
-    return clustersJSON ? Object.values(clustersJSON) : [];
   }
   return [];
 }

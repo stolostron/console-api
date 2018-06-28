@@ -10,22 +10,25 @@
 import _ from 'lodash';
 import * as hcmClient from './lib/hcm-client';
 
-export const clusters = (obj, args, req) => hcmClient.getClusters(req);
-export const repos = (obj, args, req) => hcmClient.getRepos(req);
-export const applications = (obj, args, req) => hcmClient.getApplications(req);
-export const pods = (obj, args, req) => hcmClient.getWork(req, 'pods');
-export const nodes = (obj, args, req) => hcmClient.getWork(req, 'nodes', {
+export const clusters = async (obj, args, { hcmConnector, req }) => {
+  const response = await hcmConnector.processRequest(req, '/api/v1alpha1/clusters');
+  return response ? Object.values(response) : [];
+};
+export const repos = (obj, args, { req }) => hcmClient.getRepos(req);
+export const applications = (obj, args, { req }) => hcmClient.getApplications(req);
+export const pods = (obj, args, { req }) => hcmClient.getWork(req, 'pods');
+export const nodes = (obj, args, { req }) => hcmClient.getWork(req, 'nodes', {
   Work: { Namespaces: '', Status: '', Labels: '' },
 });
-export const pvs = (obj, args, req) => hcmClient.getWork(req, 'pvs');
-export const namespaces = (obj, args, req) => hcmClient.getWork(req, 'namespaces', {
+export const pvs = (obj, args, { req }) => hcmClient.getWork(req, 'pvs');
+export const namespaces = (obj, args, { req }) => hcmClient.getWork(req, 'namespaces', {
   Work: { Namespaces: '', Status: 'all', Labels: '' },
 });
-export const releases = (obj, args, req) => hcmClient.getWork(req, 'helmrels', {
+export const releases = (obj, args, { req }) => hcmClient.getWork(req, 'helmrels', {
   Work: { Namespaces: '', Status: ['DEPLOYED', 'FAILED'], Labels: '' },
 });
 
-export const charts = async (obj, args, req) => {
+export const charts = async (obj, args, { req }) => {
   const helmRepos = await hcmClient.getRepos(req);
   const catalog = await Promise.all(helmRepos.map(repo => hcmClient.search(req, 'repo', repo.Name)));
 

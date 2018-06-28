@@ -27,9 +27,6 @@ const jestConfig = {
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
   ],
-  testMatch: [
-    '<rootDir>/test/jest/**/*.test.js?(x)',
-  ],
   testEnvironment: 'node',
 };
 
