@@ -24,6 +24,14 @@ const jestConfig = {
     'lcov',
     'text',
   ],
+  coverageThreshold: {
+    global: {
+      branches: 2,
+      functions: 2,
+      lines: 2,
+      statements: 2,
+    },
+  },
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
   ],

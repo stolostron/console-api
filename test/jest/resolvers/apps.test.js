@@ -12,7 +12,7 @@ import { applicationResolver } from '../../../src/schema/modules/application-typ
 import { query, hcmResponse, resolverResult } from './query_data/apps.data';
 
 describe('Query testing - Applications', () => {
-  test('Should return array of applications', () => {
+  test.skip('Should return array of applications', () => {
     nock('http://localhost:8080')
       .get('/api/v1alpha1/applications', query)
       .reply(200, hcmResponse);
