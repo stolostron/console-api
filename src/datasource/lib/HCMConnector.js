@@ -47,12 +47,15 @@ const clustersToItems = clusterData =>
 
 export default class HCMConnector {
   constructor({
-    hcmUrl, pollInterval, pollTimeout, requestLib,
-  }) {
+    hcmUrl = config.get('hcmUrl'),
+    pollInterval = config.get('hcmPollInterval'),
+    pollTimeout = config.get('hcmPollTimeout'),
+    requestLib = request,
+  } = {}) {
     this.hcmUrl = hcmUrl;
     this.pollInterval = pollInterval;
     this.pollTimeout = pollTimeout;
-    this.request = requestLib || request;
+    this.request = requestLib;
 
     this.tokenCache = lru({
       max: 1000,
