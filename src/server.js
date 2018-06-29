@@ -20,7 +20,7 @@ import https from 'https';
 import fs from 'fs';
 import schema from './schema/index';
 import config from '../config';
-import HCMConnector from '../src/datasource/lib/HCMConnector';
+import HCMConnector from './datasource/lib/HCMConnector';
 import { label, resource, type, connect as mongoConnect } from './datasource/mongodb';
 
 const logger = log4js.getLogger('server');
