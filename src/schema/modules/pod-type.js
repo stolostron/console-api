@@ -26,6 +26,6 @@ type PDetails {
 
 export const podResolver = {
   Query: {
-    pods,
+    pods: async (root, args = { filter: {} }, req) => pods(root, args, req),
   },
 };

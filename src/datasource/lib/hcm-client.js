@@ -32,7 +32,9 @@ const workDefaults = {
   Completed: false,
   UUID: '',
   Operation: 'get',
-  Work: { Namespaces: '', Status: '', Labels: '' },
+  Work: {
+    Namespaces: '', Status: '', Labels: '', Names: '',
+  },
   Timestamp: new Date(),
   NextRequest: null,
   FinishedRequest: null,
@@ -231,8 +233,6 @@ export async function getWork(req, type, opts) {
     method: 'POST',
     json: getWorkOptions({ Resource: type }, opts),
   };
-  // TODO: Allow users to pass a query string to filter the results
-  // 04/06/18 10:48:55 sidney.wijngaarde1@ibm.com
   return pollWork(req, options);
 }
 

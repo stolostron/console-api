@@ -34,7 +34,7 @@ input DeleteHelmReleaseInput {
 
 export const helmRelResolver = {
   Query: {
-    releases,
+    releases: async (root, args = { filter: {} }, req) => releases(root, args, req),
   },
   Mutation: {
     deleteHelmRelease: (root, { input }, req) => deleteHelmRelease(req, input),

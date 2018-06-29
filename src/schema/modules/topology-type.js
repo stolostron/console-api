@@ -59,13 +59,6 @@ input LabelInput {
   name: String
   value: String
 }
-
-input Filter {
-  cluster: [String]
-  label: [LabelInput]
-  namespace: [String]
-  type: [String]
-}
 `;
 
 export const topologyResolver = {

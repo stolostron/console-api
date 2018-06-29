@@ -116,13 +116,13 @@ export default class HCMConnector {
     return `Bearer ${idToken}`;
   }
 
-  async processRequest(req, path, ...httpOverrides) {
+  async processRequest(req, path, opt, ...httpOverrides) {
     const opts = _.merge({
       url: `${this.hcmUrl}${path}`,
       headers: {
         Authorization: await this.getToken(req),
       },
-      json: {},
+      json: opt,
       method: 'GET',
     }, ...httpOverrides);
     const { body } = await this.request(opts);

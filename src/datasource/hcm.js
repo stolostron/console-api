@@ -9,11 +9,13 @@
 
 import _ from 'lodash';
 import * as hcmClient from './lib/hcm-client';
+import { transformFilters } from '../schema/modules/filter-type';
 
 export const clusters = async (obj, args, { hcmConnector, req }) => {
   const response = await hcmConnector.processRequest(
     req,
     '/api/v1alpha1/clusters',
+    transformFilters(args),
   );
   return response ? Object.values(response) : [];
 };
@@ -36,7 +38,7 @@ export const applications = async (obj, args, { hcmConnector, req }) => {
   return response ? Object.values(response) : [];
 };
 
-export const pods = (obj, args, { req }) => hcmClient.getWork(req, 'pods');
+export const pods = (obj, args, { req }) => hcmClient.getWork(req, 'pods', { DstClusters: transformFilters(args) });
 export const nodes = (obj, args, { req }) => hcmClient.getWork(req, 'nodes', {
   Work: { Namespaces: '', Status: '', Labels: '' },
 });
@@ -45,7 +47,7 @@ export const namespaces = (obj, args, { req }) => hcmClient.getWork(req, 'namesp
   Work: { Namespaces: '', Status: 'all', Labels: '' },
 });
 export const releases = (obj, args, { req }) => hcmClient.getWork(req, 'helmrels', {
-  Work: { Namespaces: '', Status: ['DEPLOYED', 'FAILED'], Labels: '' },
+  Work: { Namespaces: '', Status: ['DEPLOYED', 'FAILED'], Labels: '' }, DstClusters: transformFilters(args),
 });
 
 export const charts = async (obj, args, { req }) => {

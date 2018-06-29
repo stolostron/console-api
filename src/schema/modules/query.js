@@ -19,6 +19,7 @@ import { namespaceResolver } from './namespace-type';
 import { helmRelResolver } from './helmrel-type';
 import { helmChartResolver } from './helmchart-type';
 import { helmRepoResolver } from './helmrepo-type';
+import { filtersResolver } from './filter-type';
 
 export const typeDef = `
 # **Hybrid Cluster Manager**
@@ -32,10 +33,13 @@ type Query {
   charts: [HelmChart]
 
   # List clusters registered in HCM.
-  clusters: [Cluster]
+  clusters(filter: Filter): [Cluster]
 
   # Gather the data needed to populate the dashboard.
   dashboard: DashboardData
+
+  # List filters registered in HCM.
+  filters: Filters
 
   # List labels from all clusters registered in HCM.
   labels: [Label]
@@ -47,13 +51,13 @@ type Query {
   nodes: [Node]
 
   # List pods from all clusters registered in HCM.
-  pods: [Pod]
+  pods(filter: Filter): [Pod]
 
   # List persistent volumes from all clusters registered in HCM.
   pvs: [PV]
 
   # List Helm releases from all clusters registered in HCM.
-  releases: [HelmRel]
+  releases(filter: Filter): [HelmRel]
 
   # List Helm repositories registered in HCM.
   repos: [HelmRepo]
@@ -120,6 +124,7 @@ export const resolver = merge(
   applicationResolver,
   clusterResolver,
   dashboardResolver,
+  filtersResolver,
   helmChartResolver,
   helmRepoResolver,
   helmRelResolver,

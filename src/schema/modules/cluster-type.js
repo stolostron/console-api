@@ -33,6 +33,6 @@ type Cluster {
 
 export const clusterResolver = {
   Query: {
-    clusters,
+    clusters: async (root, args = { filter: {} }, req) => clusters(root, args, req),
   },
 };
