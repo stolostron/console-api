@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Helm Repository Resolver Correctly resolves helm repos query 1`] = `
+Array [
+  Object {
+    "Name": "default",
+    "URL": "http://9.42.80.212:8878",
+  },
+]
+`;
