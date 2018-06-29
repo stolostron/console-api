@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HCMConnector processRequest returns parsed response if JSON.parse succeeds 1`] = `
+Object {
+  "test": Array [
+    "values",
+    "for",
+    "testing",
+  ],
+}
+`;
+
+exports[`HCMConnector processRequest throws GenericError if network error occurs 1`] = `[GenericError: A generic error has occurred]`;
