@@ -20,23 +20,8 @@ export const clusters = async (obj, args, { hcmConnector, req }) => {
   return response ? Object.values(response) : [];
 };
 
-export const repos = async (obj, args, { hcmConnector, req }) => {
-  const response = await hcmConnector.processRequest(
-    req,
-    '/api/v1alpha1/repos/*',
-    { json: { Resource: 'repo', Operation: 'get' } },
-  );
-  return response ? Object.values(response) : [];
-};
-
-export const applications = async (obj, args, { hcmConnector, req }) => {
-  const response = await hcmConnector.processRequest(
-    req,
-    '/api/v1alpha1/applications',
-    { json: { Action: { Names: '*' } } },
-  );
-  return response ? Object.values(response) : [];
-};
+export const repos = (obj, args, { req }) => hcmClient.getRepos(req);
+export const applications = (obj, args, { req }) => hcmClient.getApplications(req);
 
 export const pods = (obj, args, { req }) => hcmClient.getWork(req, 'pods', { DstClusters: transformFilters(args) });
 export const nodes = (obj, args, { req }) => hcmClient.getWork(req, 'nodes', {

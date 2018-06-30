@@ -43,10 +43,10 @@ export const applicationResolver = {
     applications,
   },
   Mutation: {
-    createDashboard: (root, { appName }, req) => createDashboard(req, appName),
-    deleteApplication: (root, { appName }, req) => deleteApplication(req, appName),
-    deployApplication: (root, { appName }, req) => deployApplication(req, appName),
-    undeployApplication: (root, { appName }, req) => undeployApplication(req, appName),
-    registerApplication: (root, { yaml }, req) => registerApplication(req, yaml),
+    createDashboard: (root, { appName }, { req }) => createDashboard(req, appName),
+    deleteApplication: (root, { appName }, { req }) => deleteApplication(req, appName),
+    deployApplication: (root, { appName }, { req }) => deployApplication(req, appName),
+    undeployApplication: (root, { appName }, { req }) => undeployApplication(req, appName),
+    registerApplication: (root, { yaml }, { req }) => registerApplication(req, yaml),
   },
 };

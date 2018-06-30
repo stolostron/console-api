@@ -31,7 +31,7 @@ export const helmRepoResolver = {
     repos,
   },
   Mutation: {
-    setHelmRepo: (root, { input }, req) => setRepo(req, input),
-    deleteHelmRepository: (root, { input }, req) => deleteHelmRepository(req, input),
+    setHelmRepo: (root, { input }, { req }) => setRepo(req, input),
+    deleteHelmRepository: (root, { input }, { req }) => deleteHelmRepository(req, input),
   },
 };
