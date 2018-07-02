@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { namespaces } from '../../datasource/hcm';
-
 export const typeDef = `
 type Namespace {
   name: String
@@ -19,6 +17,10 @@ type Namespace {
 
 export const namespaceResolver = {
   Query: {
-    namespaces,
+    namespaces: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'namespaces', {
+      json: {
+        Work: { Status: 'all' },
+      },
+    }),
   },
 };

@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { clusters } from '../../datasource/hcm';
+import { transformFilters } from './filter-type';
 
 export const typeDef = `
 type Cluster {
@@ -33,6 +33,9 @@ type Cluster {
 
 export const clusterResolver = {
   Query: {
-    clusters: async (root, args = { filter: {} }, req) => clusters(root, args, req),
+    clusters: async (root, args = { filter: {} }, { hcmConnector, req }) => {
+      const response = await hcmConnector.processRequest(req, '/api/v1alpha1/clusters', transformFilters(args));
+      return response ? Object.values(response) : [];
+    },
   },
 };

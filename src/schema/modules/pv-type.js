@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { pvs } from '../../datasource/hcm';
-
 export const typeDef = `
 type PV {
   PVName: String
@@ -25,6 +23,6 @@ type PVDetails {
 
 export const pvResolver = {
   Query: {
-    pvs,
+    pvs: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'pvs'),
   },
 };

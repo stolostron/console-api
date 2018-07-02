@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { setRepo, repos, deleteHelmRepository } from '../../datasource/hcm';
+import { setRepo, deleteHelmRepository } from '../../datasource/hcm';
 
 export const typeDef = `
 input HelmRepoInput {
@@ -28,7 +28,10 @@ input DeleteHelmRepositoryInput {
 
 export const helmRepoResolver = {
   Query: {
-    repos,
+    repos: async (root, args, { req, hcmConnector }) => {
+      const response = await hcmConnector.processRequest(req, '/api/v1alpha1/repo/*', { Resource: 'repo', Operation: 'get' });
+      return response ? Object.values(response) : [];
+    },
   },
   Mutation: {
     setHelmRepo: (root, { input }, { req }) => setRepo(req, input),

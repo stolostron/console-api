@@ -8,7 +8,6 @@
  ****************************************************************************** */
 
 import { label, resource, type } from '../../datasource/mongodb';
-import { getTopology } from '../../datasource/hcm';
 
 export const typeDef = `
 type Resource {
@@ -100,7 +99,27 @@ export const topologyResolver = {
       return { resources, relationships };
     },
 
-    hcmTopology: getTopology,
+    hcmTopology: async (root, args, { req, hcmConnector }) => {
+      const result = await hcmConnector.processRequest(req, '/api/v1alpha1/topology', {
+        SortBy: '',
+        TargetNum: -1,
+        User: '',
+        Resource: 'topology',
+        Operation: 'get',
+        ID: '',
+        ManagerOnly: true,
+        Action: {
+          Names: '*',
+          Namespaces: '',
+          NodeKind: 'ApplicationService',
+          UpdateDashboard: false,
+          Dryrun: false,
+          TargetTemplate: false,
+        },
+      });
+
+      return result ? Object.values(result) : [];
+    },
     labels: async () => label(),
     resourceTypes: async () => type(),
   },

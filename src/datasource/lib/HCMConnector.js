@@ -172,11 +172,29 @@ export default class HCMConnector {
 
   async pollWork(req, ...httpOverrides) {
     const workID = await this.processRequest(req, '/api/v1alpha1/work', { method: 'POST' }, ...httpOverrides);
-    return Promise.race([this.timeout(), this.poll(req, workID)]);
+    return Promise.race([this.poll(req, workID), this.timeout()]);
   }
 
   async getWork(req, type, opts) {
     const result = await this.pollWork(req, { json: { Resource: type } }, this.workDefaults, opts);
     return clustersToItems(result);
+  }
+
+  async search(req, type, name, ...httpOverrides) {
+    const requestPromise = this.processRequest(req, `/api/v1alpha1/${type}/${name}`, {
+      Names: ['*'],
+      Labels: null,
+      Status: ['healthy'],
+      User: '',
+      Resource: 'repo',
+      Operation: 'search',
+      ID: name,
+      Action: {
+        Name: name,
+        URL: '',
+      },
+    }, ...httpOverrides);
+
+    return Promise.race([requestPromise, this.timeout()]);
   }
 }

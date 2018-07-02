@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { pods } from '../../datasource/hcm';
+import { transformFilters } from './filter-type';
 
 export const typeDef = `
 type Pod {
@@ -26,6 +26,6 @@ type PDetails {
 
 export const podResolver = {
   Query: {
-    pods: async (root, args = { filter: {} }, req) => pods(root, args, req),
+    pods: (obj, args = { filter: {} }, { req, hcmConnector }) => hcmConnector.getWork(req, 'pods', { DstClusters: transformFilters(args) }),
   },
 };

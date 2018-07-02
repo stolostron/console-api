@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { nodes } from '../../datasource/hcm';
-
 export const typeDef = `
 type Node {
   NodeName: String
@@ -16,6 +14,7 @@ type Node {
   cluster: String
   NodeDetails: NodeDetails
 }
+
 type NodeDetails {
   Arch: String
   Status: String
@@ -27,6 +26,6 @@ type NodeDetails {
 
 export const nodeResolver = {
   Query: {
-    nodes,
+    nodes: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'nodes'),
   },
 };

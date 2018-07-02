@@ -7,7 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { installHelmChart, charts } from '../../datasource/hcm';
+import _ from 'lodash';
+import { installHelmChart } from '../../datasource/hcm';
 
 export const typeDef = `
 input InstallHelmChartInput {
@@ -69,7 +70,17 @@ type ImageDetails {
 `;
 
 export const helmChartResolver = {
-  Query: { charts },
+  Query: {
+    charts: async (root, args, { req, hcmConnector }) => {
+      const response = await hcmConnector.processRequest(req, '/api/v1alpha1/repo/*', { Resource: 'repo', Operation: 'get' });
+      const helmRepos = response ? Object.values(response) : [];
+
+      const catalog = await Promise.all(helmRepos.map(repo => hcmConnector.search(req, 'repo', repo.Name)));
+
+      const helmCharts = _.flatten(catalog.map(chart => Object.values(chart)));
+      return _.sortBy(helmCharts, chart => `${chart.RepoName}/${chart.Name}`);
+    },
+  },
   Mutation: {
     installHelmChart: (root, { input }, { req }) => installHelmChart(req, input),
   },

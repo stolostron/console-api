@@ -8,7 +8,6 @@
  ****************************************************************************** */
 
 import {
-  applications,
   createDashboard,
   deleteApplication,
   deployApplication,
@@ -40,7 +39,10 @@ type AppNode {
 
 export const applicationResolver = {
   Query: {
-    applications,
+    applications: async (root, args, { req, hcmConnector }) => {
+      const result = await hcmConnector.processRequest(req, '/api/v1alpha1/applications', { Action: { Names: '*' } });
+      return result ? Object.values(result) : [];
+    },
   },
   Mutation: {
     createDashboard: (root, { appName }, { req }) => createDashboard(req, appName),

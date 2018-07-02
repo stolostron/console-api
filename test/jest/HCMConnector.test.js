@@ -80,4 +80,15 @@ describe('HCMConnector', () => {
       await expect(timeoutConnector.pollWork(mockRequest)).rejects.toMatchSnapshot();
     });
   });
+
+  describe('getWork', () => {
+    test('correctly transforms data from poll work', async () => {
+      const mockRequestLibPoll = jest.fn()
+        .mockReturnValueOnce(workIdResponse)
+        .mockReturnValueOnce(pollCompleteResponse);
+
+      const pollConnector = new HCMConnector({ requestLib: mockRequestLibPoll });
+      await expect(pollConnector.getWork(mockRequest, 'node')).resolves.toMatchSnapshot();
+    });
+  });
 });
