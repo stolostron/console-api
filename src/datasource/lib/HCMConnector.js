@@ -125,6 +125,7 @@ export default class HCMConnector {
       json: opt,
       method: 'GET',
     }, ...httpOverrides);
+
     const { body } = await this.request(opts);
     if (body.Error) {
       throw new GenericError({ data: body.Error });
@@ -141,58 +142,37 @@ export default class HCMConnector {
   }
 
   timeout() {
-    let timeoutID;
-    const timeoutPromise = new Promise((resolve, reject) => {
-      timeoutID = setTimeout(reject, this.pollTimeout, new GenericError({ data: { error: 'Manager request timed out' } }));
+    return new Promise((resolve, reject) => {
+      setTimeout(reject, this.pollTimeout, new GenericError({ data: { error: 'Manager request timed out' } }));
     });
-
-    return { timeoutID, timeoutPromise };
   }
 
   poll(req, workID) {
-    let intervalID;
-
-    const pollPromise = new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const intervalID =
       // eslint-disable-next-line consistent-return
-      intervalID = setInterval(async () => {
-        const { Completed, Results } = await this.processRequest(req, `/api/v1alpha1/work/${workID}`, { method: 'GET' });
-        if (Completed) {
-          if (Results.code || Results.message) {
-            return reject(Results);
-          }
+      setInterval(async () => {
+        try {
+          const { Completed, Results } = await this.processRequest(req, `/api/v1alpha1/work/${workID}`);
+          if (Completed) {
+            clearInterval(intervalID);
+            if (Results.code || Results.message) {
+              return reject(Results);
+            }
 
-          resolve(Results);
+            resolve(Results);
+          }
+        } catch (err) {
+          clearInterval(intervalID);
+          reject(err);
         }
       }, this.pollInterval);
     });
-
-    return { intervalID, pollPromise };
   }
 
   async pollWork(req, ...httpOverrides) {
-    let err;
-    let result;
-
     const workID = await this.processRequest(req, '/api/v1alpha1/work', { method: 'POST' }, ...httpOverrides);
-
-    const { timeoutID, timeoutPromise } = this.timeout();
-    const { intervalID, pollPromise } = this.poll(req, workID);
-
-    try {
-      result = await Promise.race([timeoutPromise, pollPromise]);
-    } catch (error) {
-      err = error;
-    }
-
-    // Clear interval/timeout in all cases - node doesn't have finally block
-    clearInterval(intervalID);
-    clearTimeout(timeoutID);
-
-    if (err) {
-      throw err;
-    }
-
-    return result;
+    return Promise.race([this.timeout(), this.poll(req, workID)]);
   }
 
   async getWork(req, type, opts) {

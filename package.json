@@ -13,7 +13,7 @@
     "shrinkwrap:clean": "del-cli node_modules npm-shrinkwrap.json && npm install --no-optional && npm prune && npm shrinkwrap",
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix .",
-    "test": "cross-env NODE_ENV=development jest"
+    "test": "cross-env NODE_ENV=development jest --forceExit"
   },
   "repository": {
     "type": "git",
