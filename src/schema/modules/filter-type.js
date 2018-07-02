@@ -82,9 +82,11 @@ export const filtersResolver = {
         if (element.Labels) {
           Object.entries(element.Labels).forEach(([key, value]) => {
             const name = `${key}=${value}`;
-            clusterLabels = [...new Set([...clusterLabels, {
-              id: name, name, type: 'clusterLabel', key, value,
-            }])];
+            if (!clusterLabels.find(n => n.name === name)) {
+              clusterLabels = [...new Set([...clusterLabels, {
+                id: name, name, type: 'clusterLabel', key, value,
+              }])];
+            }
           });
         }
         if (element.ClusterName) {
