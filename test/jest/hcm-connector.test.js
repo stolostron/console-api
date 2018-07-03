@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import HCMConnector from '../../src/datasource/lib/HCMConnector';
+import HCMConnector from '../../src/datasource/lib/hcm-connector';
 
 describe('HCMConnector', () => {
   const errorResponse = {

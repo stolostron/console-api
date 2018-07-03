@@ -8,7 +8,7 @@
  ****************************************************************************** */
 
 import { clusterResolver } from '../../../src/schema/modules/cluster-type';
-import HCMConnector from '../../../src/datasource/lib/HCMConnector';
+import HCMConnector from '../../../src/datasource/lib/hcm-connector';
 
 describe('Cluster Resolver', () => {
   test('correctly resolves query', async () => {

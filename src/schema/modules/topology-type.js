@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { label, resource, type } from '../../datasource/mongodb';
-
 export const typeDef = `
 type Resource {
     cluster: String
@@ -54,6 +52,11 @@ type HCMTopology {
   Rels: [HCMTopoRel]
 }
 
+type Label {
+  name: String
+  value: String
+}
+
 input LabelInput {
   name: String
   value: String
@@ -62,13 +65,13 @@ input LabelInput {
 
 export const topologyResolver = {
   Query: {
-    resource: async (root, args) => {
-      const result = await resource(args);
+    resource: async (root, args, { mongoConnector }) => {
+      const result = await mongoConnector.resource(args);
       return result[0];
     },
-    resources: async (root, args = {}) => resource(args),
-    relationships: async () => {
-      const resources = await resource({});
+    resources: async (root, args = {}, { mongoConnector }) => mongoConnector.resource(args),
+    relationships: async (root, args, { mongoConnector }) => {
+      const resources = await mongoConnector.resource({});
       return resources.reduce((accum, res) => {
         if (res.relationships && res.relationships.length) {
           res.relationships.forEach((outgoing) => {
@@ -79,8 +82,8 @@ export const topologyResolver = {
         return accum;
       }, []);
     },
-    topology: async (root, args) => {
-      const resources = await resource(args);
+    topology: async (root, args, { mongoConnector }) => {
+      const resources = await mongoConnector.resource(args);
 
       const resourceUids = new Set(resources.map(res => res.uid));
 
@@ -120,7 +123,7 @@ export const topologyResolver = {
 
       return result ? Object.values(result) : [];
     },
-    labels: async () => label(),
-    resourceTypes: async () => type(),
+    labels: async (root, args, { mongoConnector }) => mongoConnector.label(),
+    resourceTypes: async (root, args, { mongoConnector }) => mongoConnector.type(),
   },
 };

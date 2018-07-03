@@ -20,8 +20,8 @@ import https from 'https';
 import fs from 'fs';
 import schema from './schema/index';
 import config from '../config';
-import HCMConnector from './datasource/lib/HCMConnector';
-import { label, resource, type, connect as mongoConnect } from './datasource/mongodb';
+import HCMConnector from './datasource/lib/hcm-connector';
+import MongoConnector from './datasource/lib/mongo-connector';
 
 const logger = log4js.getLogger('server');
 
@@ -59,38 +59,37 @@ const formatError = (error) => {
 };
 
 
-(async () => {
-  const mongoConnection = await mongoConnect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
-  graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress(async req => ({
+const getProductionOptions = async (req) => {
+  const mongoConnector = new MongoConnector();
+  const hcmConnector = new HCMConnector({
+    hcmUrl: config.get('hcmUrl') || 'http://localhost:8080',
+    pollInterval: config.get('hcmPollInterval') || 200,
+    pollTimeout: config.get('hcmPollTimeout') || 10000,
+  });
+
+  await mongoConnector.connect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
+  return {
     formatError,
     schema,
     context: {
       req,
-      hcmConnector: new HCMConnector({
-        hcmUrl: config.get('hcmUrl') || 'http://localhost:8080',
-        pollInterval: config.get('hcmPollInterval') || 200,
-        pollTimeout: config.get('hcmPollTimeout') || 10000,
-      }),
-      mongo: {
-        connection: mongoConnection,
-        label,
-        resource,
-        type,
-      },
+      hcmConnector,
+      mongoConnector,
     },
+  };
+};
+
+graphQLServer.use(`${CONTEXT_PATH}/graphql`, bodyParser.json(), graphqlExpress(getProductionOptions));
+
+const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/hcmuiapi.key', 'utf8');
+const certificate = fs.readFileSync(process.env.serverCert || './sslcert/hcmuiapi.crt', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+const server = https.createServer(credentials, graphQLServer);
+
+server.listen(GRAPHQL_PORT, () => {
+  logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] started.`);
+  logger.info(`HCM UI API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info(`GraphiQL is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
   }
-  )));
-
-  const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/hcmuiapi.key', 'utf8');
-  const certificate = fs.readFileSync(process.env.serverCert || './sslcert/hcmuiapi.crt', 'utf8');
-  const credentials = { key: privateKey, cert: certificate };
-  const server = https.createServer(credentials, graphQLServer);
-
-  server.listen(GRAPHQL_PORT, () => {
-    logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] started.`);
-    logger.info(`HCM UI API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
-    if (process.env.NODE_ENV !== 'production') {
-      logger.info(`GraphiQL is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
-    }
-  });
-})();
+});
