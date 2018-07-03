@@ -117,7 +117,7 @@ export default class MongoConnector {
     return this.Resource.find(query, null, options);
   }
 
-  async types() {
+  async type() {
     const types = await this.Resource.distinct('type');
     // Exclude cluster, internet, and unmanaged types because these aren't valid filterable types.
     return types.filter(t => t !== 'cluster' && t !== 'internet' && t !== 'unmanaged');
