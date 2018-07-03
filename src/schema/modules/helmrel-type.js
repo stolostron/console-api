@@ -37,7 +37,7 @@ export const helmRelResolver = {
   Query: {
     releases: (root, args = { filter: {} }, { req, hcmConnector }) => hcmConnector.getWork(req, 'helmrels', {
       Work: { Status: ['DEPLOYED', 'FAILED'] }, DstClusters: transformFilters(args),
-    }),
+    }, true),
   },
   Mutation: {
     deleteHelmRelease: (root, { input }, { req }) => deleteHelmRelease(req, input),

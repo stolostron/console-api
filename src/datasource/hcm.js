@@ -8,13 +8,8 @@
  ****************************************************************************** */
 
 export {
-  createDashboard,
-  deleteApplication,
   deleteHelmRelease,
   deleteHelmRepository,
-  deployApplication,
   installHelmChart,
-  registerApplication,
   setRepo,
-  undeployApplication,
 } from './lib/hcm-client';

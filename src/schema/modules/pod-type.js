@@ -26,6 +26,6 @@ type PDetails {
 
 export const podResolver = {
   Query: {
-    pods: (obj, args = { filter: {} }, { req, hcmConnector }) => hcmConnector.getWork(req, 'pods', { DstClusters: transformFilters(args) }),
+    pods: (obj, args = { filter: {} }, { req, hcmConnector }) => hcmConnector.getWork(req, 'pods', { DstClusters: transformFilters(args) }, true),
   },
 };

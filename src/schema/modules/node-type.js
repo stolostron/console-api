@@ -26,6 +26,6 @@ type NodeDetails {
 
 export const nodeResolver = {
   Query: {
-    nodes: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'nodes'),
+    nodes: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'nodes', {}, true),
   },
 };

@@ -7,14 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import {
-  createDashboard,
-  deleteApplication,
-  deployApplication,
-  undeployApplication,
-  registerApplication,
-} from '../../datasource/hcm';
-
 export const typeDef = `
 # HCM Application
 type Application {
@@ -45,10 +37,59 @@ export const applicationResolver = {
     },
   },
   Mutation: {
-    createDashboard: (root, { appName }, { req }) => createDashboard(req, appName),
-    deleteApplication: (root, { appName }, { req }) => deleteApplication(req, appName),
-    deployApplication: (root, { appName }, { req }) => deployApplication(req, appName),
-    undeployApplication: (root, { appName }, { req }) => undeployApplication(req, appName),
-    registerApplication: (root, { yaml }, { req }) => registerApplication(req, yaml),
+    createDashboard: async (root, { appName }, { req, hcmConnector }) => {
+      const result = await hcmConnector.processRequest(req, '/api/v1alpha1/applications', {
+        Resource: 'applications',
+        Operation: 'describe',
+        Action: {
+          Names: appName,
+        },
+      }, { method: 'PUT' });
+      return result;
+    },
+    deleteApplication: async (root, { appName }, { req, hcmConnector }) => {
+      const result = await hcmConnector.processRequest(req, '/api/v1alpha1/applications', {
+        Resource: 'applications',
+        Operation: 'delete',
+        Action: {
+          Names: appName,
+        },
+      }, { method: 'PUT' });
+      return result;
+    },
+    deployApplication: async (root, { appName }, { req, hcmConnector }) => {
+      const result = await hcmConnector.getWork(req, 'applications', {
+        method: 'POST',
+        json: {
+          Operation: 'deploy',
+          Work: {
+            Names: appName,
+          },
+        },
+      });
+      return result;
+    },
+    undeployApplication: async (root, { appName }, { req, hcmConnector }) => {
+      const result = await hcmConnector.getWork(req, 'applications', {
+        method: 'POST',
+        json: {
+          Operation: 'undeploy',
+          Work: {
+            Names: appName,
+          },
+        },
+      });
+      return result;
+    },
+    registerApplication: async (root, { yaml }, { req, hcmConnector }) => {
+      const result = await hcmConnector.processRequest(req, '/api/v1alpha1/applications', {
+        Resource: 'applications',
+        Operation: 'register',
+        Action: {
+          Content: yaml,
+        },
+      }, { method: 'PUT' });
+      return result;
+    },
   },
 };

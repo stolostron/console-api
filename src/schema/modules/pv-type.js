@@ -23,6 +23,6 @@ type PVDetails {
 
 export const pvResolver = {
   Query: {
-    pvs: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'pvs'),
+    pvs: (obj, args, { req, hcmConnector }) => hcmConnector.getWork(req, 'pvs', {}, true),
   },
 };

@@ -21,6 +21,6 @@ export const namespaceResolver = {
       json: {
         Work: { Status: 'all' },
       },
-    }),
+    }, true),
   },
 };
