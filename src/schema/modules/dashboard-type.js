@@ -8,7 +8,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { clusters, releases, pods } from '../../datasource/hcm';
+import { transformFilters } from './filter-type';
 
 export const typeDef = `
   type TableRow {
@@ -149,10 +149,10 @@ function getDashboardPieChart({
 }
 
 async function getDashboardItems({
-  query, req, cards = [], pieCharts = [],
+  query, cards = [], pieCharts = [],
 }) {
   try {
-    const rawData = await query(null, null, req);
+    const rawData = await query();
     const cardsMap = cards.map(card => getDashboardCard({ rawData, ...card }));
     const pieChartsItems = pieCharts.map(chart => getDashboardPieChart({ rawData, ...chart }));
     return {
@@ -204,7 +204,7 @@ const transformPercentage = field => (cluster, status) => ({
 
 export const dashboardResolver = {
   Query: {
-    dashboard: async (root, args, req) => {
+    dashboard: async (root, args, { req, hcmConnector }) => {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
@@ -234,22 +234,23 @@ export const dashboardResolver = {
               transform: transformTotalCluster,
             },
           ],
-          query: clusters,
-          req,
+          query: () =>
+            hcmConnector.processRequest(req, '/api/v1alpha1/clusters', transformFilters({ filter: {} }))
+              .then(res => Object.values(res)),
         }),
         getDashboardItems({
           cards: [
             { name: 'helm releases', transform: transformRelease },
           ],
-          query: releases,
-          req,
+          query: () => hcmConnector.getWork(req, 'helmrels', {
+            Work: { Status: ['DEPLOYED', 'FAILED'] },
+          }),
         }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod },
           ],
-          query: pods,
-          req,
+          query: () => hcmConnector.getWork(req, 'pods'),
         }),
       ]);
       let allCards = [];
