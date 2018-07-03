@@ -7,9 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { clusters } from '../../datasource/hcm';
-
-
 export const typeDef = `
 type Filters {
   clusterLabels: [FilterItem]
@@ -37,7 +34,7 @@ input Filter {
   label: [LabelInput]
   namespace: [String]
   type: [String]
-  
+
   # used by cluster/pods/healm releases
   # combined with cluster labels and cluster names
   resourceFilter: [FilterItemInput]
@@ -74,10 +71,11 @@ export const transformFilters = (input) => {
 
 export const filtersResolver = {
   Query: {
-    filters: async (root, args, req) => {
+    filters: async (root, args, { req, hcmConnector }) => {
       let clusterLabels = [];
       let clusterNames = [];
-      const result = await clusters(null, null, req);
+      let result = await hcmConnector.processRequest(req, '/api/v1alpha1/clusters', transformFilters(args));
+      result = result ? Object.values(result) : [];
       result.forEach((element) => {
         if (element.Labels) {
           Object.entries(element.Labels).forEach(([key, value]) => {
