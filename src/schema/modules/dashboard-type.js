@@ -244,13 +244,13 @@ export const dashboardResolver = {
           ],
           query: () => hcmConnector.getWork(req, 'helmrels', {
             Work: { Status: ['DEPLOYED', 'FAILED'] },
-          }),
+          }, true),
         }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod },
           ],
-          query: () => hcmConnector.getWork(req, 'pods'),
+          query: () => hcmConnector.getWork(req, 'pods', {}, true),
         }),
       ]);
       let allCards = [];
