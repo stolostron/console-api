@@ -28,6 +28,7 @@ type Cluster {
   TotalPods: Int
   TotalServices: Int
   TotalStorage: String
+  TotalReadyNodes: Int
 }
 `;
 
