@@ -176,7 +176,12 @@ export default class HCMConnector {
   }
 
   async getWork(req, type, opts, workDefs) {
-    const workDefaults = workDefs ? this.workDefaults : {};
+    let workDefaults = {};
+    if (typeof workDefs === 'boolean' && workDefs) {
+      workDefaults = { ...this.workDefaults };
+    } else {
+      workDefaults = _.merge(this.workDefaults, { json: workDefs });
+    }
     const result = await this.pollWork(req, { json: { Resource: type } }, workDefaults, opts);
     return clustersToItems(result);
   }
