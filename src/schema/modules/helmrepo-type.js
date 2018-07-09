@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { setRepo, deleteHelmRepository } from '../../datasource/hcm';
-
 export const typeDef = `
 input HelmRepoInput {
   Name: String
@@ -34,7 +32,21 @@ export const helmRepoResolver = {
     },
   },
   Mutation: {
-    setHelmRepo: (root, { input }, { req }) => setRepo(req, input),
-    deleteHelmRepository: (root, { input }, { req }) => deleteHelmRepository(req, input),
+    setHelmRepo: (root, { input }, { req, hcmConnector }) => {
+      const response = hcmConnector.processRequest(req, '/api/v1alpha1/repo', {
+        Resource: 'repo',
+        Operation: 'set',
+        Action: input,
+      }, { method: 'POST' });
+      return response;
+    },
+    deleteHelmRepository: (root, { input }, { req, hcmConnector }) => {
+      const response = hcmConnector.processRequest(req, `/api/v1alpha1/repo/${input.Name}`, {
+        Resource: 'repo',
+        Operation: 'delete',
+        Action: input,
+      }, { method: 'DELETE' });
+      return response;
+    },
   },
 };

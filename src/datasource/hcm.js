@@ -9,7 +9,5 @@
 
 export {
   deleteHelmRelease,
-  deleteHelmRepository,
   installHelmChart,
-  setRepo,
 } from './lib/hcm-client';

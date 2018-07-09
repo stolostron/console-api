@@ -75,16 +75,16 @@ const clustersToItems = clusterData =>
     [],
   );
 
-/**
- * Helper method to process the request and parse the response.
- */
-async function processRequest(httpOptions) {
-  const result = await request(httpOptions).then(res => res.body);
-  if (result.Error) {
-    throw new GenericError({ data: result.Error });
-  }
-  return JSON.parse(result.RetString).Result;
-}
+// /**
+//  * Helper method to process the request and parse the response.
+//  */
+// async function processRequest(httpOptions) {
+//   const result = await request(httpOptions).then(res => res.body);
+//   if (result.Error) {
+//     throw new GenericError({ data: result.Error });
+//   }
+//   return JSON.parse(result.RetString).Result;
+// }
 
 async function pollWork(req, httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
@@ -195,41 +195,6 @@ export async function deleteHelmRelease(req, {
   };
 
   return pollWork(req, httpOptions);
-}
-
-export async function deleteHelmRepository(req, { Name, URL }) {
-  const httpOptions = {
-    url: `${hcmUrl}/api/v1alpha1/repo/${Name}`,
-    headers: {
-      Authorization: await getToken(req),
-    },
-    method: 'DELETE',
-    json: getWorkOptions({
-      Resource: 'repo',
-      Operation: 'delete',
-      Action: {
-        Name,
-        URL,
-      },
-    }),
-  };
-  return processRequest(httpOptions);
-}
-
-export async function setRepo(req, { Name, URL }) {
-  const httpOptions = {
-    url: `${hcmUrl}/api/v1alpha1/repo`,
-    headers: {
-      Authorization: await getToken(req),
-    },
-    method: 'POST',
-    json: getWorkOptions({
-      Resource: 'repo',
-      Operation: 'set',
-      Action: { Name, URL },
-    }),
-  };
-  return processRequest(httpOptions);
 }
 
 export async function search(req, type, name, opts = {}) {
