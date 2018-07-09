@@ -27,6 +27,7 @@ before_install:
   - make log:init
   - source travis-env.sh
   - make docker-login
+  - chmod +x copyright-check.sh
 
 install:
   - make install
@@ -35,6 +36,7 @@ before_script:
   - make test
 
 script:
+  - make copyright-check
   - make image
 
 after_success:

@@ -30,6 +30,10 @@ ifndef GITHUB_TOKEN
 	exit 1
 endif
 
+.PHONY: copyright-check
+copyright-check:
+	./copyright-check.sh
+
 lint:
 	npm run lint
 
