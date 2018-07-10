@@ -72,7 +72,7 @@ export default class HCMConnector {
         Completed: false,
         UUID: '',
         Operation: 'get',
-        Work: { Namespaces: '', Status: '', Labels: '' },
+        Work: { Namespaces: '', Status: '', Labels: null },
         Timestamp: new Date(),
         NextRequest: null,
         FinishedRequest: null,

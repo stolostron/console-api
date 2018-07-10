@@ -33,7 +33,7 @@ const workDefaults = {
   UUID: '',
   Operation: 'get',
   Work: {
-    Namespaces: '', Status: '', Labels: '', Names: '',
+    Namespaces: '', Status: '', Labels: null, Names: '',
   },
   Timestamp: new Date(),
   NextRequest: null,
