@@ -58,5 +58,12 @@ after_success:
       fi
   - make log:pass
 
-after_failure: 
+after_failure:
   - make log:fail
+
+notifications:
+  slack:
+    secure: eaVst90jDSComa6ciuoXLdSdbU52mvBvZIkFLNDr4ngG9eVvA/RPPsoVuOaM8QhoZ8G70mk5sl+7qSdQ3cX0pyRsQZWtG2Vtsh00CQQ1e//ggI9c4XtXF92byQXT77RPLmN29bjzEdZ4wiZ/8iM9iM3u/VfAaamRyUgBuQq7WolqJl5Sgl1Bwlx4i4WMTEovwbCPghZUzHNhpa0aw+Pbq8e6IRTtiws9zRCSlZotZnAAxlc0kB4nUOZAi0fAmpZz/9S4QAyiIte/4jQMKG/Oarb5XOlb2la/788RrPXOHCdSvjWl0Da0eKhTtai/0N8e0dJvbXU2TGMrn/WK5vLFvGMn7zzokNhnxjQP3ZH9uRIx2qHMJa51LM0xzbtUJusgXB2gaqCUKTN2Np9tFf10xW9Owy+hD+NZuOa7Es/xigtbO0sUw4gG/wp4W4KwsqokYDwVA82hOhMunsoVOosWUREhj/+VaKAKX/NU1X39+NcTwVM7OGpbxhDZyrdIQ75CfVFpMeD9ld4lPRYOJnktu5XEc/DrxErr5YJfoCHJ+MH9a4d4xowKXyksPPgQ9jy/bKeQbxJ+UKIN88iLqr/VTblNFYqXJQgN4hU9fUGiJZLqO8MtLLzUVG8m+r966POKZmdV+Cl6c9PqopqpKwQVHYPb/Pc0Q3aWtb9XrgtpskM=
+    on_pull_requests: false
+    on_success: change
+    on_failure: always
