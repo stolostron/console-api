@@ -7,7 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { deleteHelmRelease } from '../../datasource/hcm';
 import { transformFilters } from './filter-type';
 
 export const typeDef = `
@@ -40,6 +39,21 @@ export const helmRelResolver = {
     }),
   },
   Mutation: {
-    deleteHelmRelease: (root, { input }, { req }) => deleteHelmRelease(req, input),
+    deleteHelmRelease: (root, { input }, { req, hcmConnector }) => {
+      const response = hcmConnector.getWork(req, 'helmrels', {
+        method: 'POST',
+        json: {
+          Operation: 'delete',
+          DstClusters: input.DstClusters,
+          Work: {
+            ChartName: input.RepoName && input.ChartName && `${input.RepoName}/${input.ChartName}`,
+            Names: input.Names,
+            Namespaces: input.Namespaces,
+            Version: input.Version,
+          },
+        },
+      }, true);
+      return response;
+    },
   },
 };

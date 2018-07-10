@@ -1,0 +1,117 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Helm releases Resolver Correctly resolves delete helm release mutation 1`] = `
+Array [
+  Object {
+    "ChartName": "hcm-demoaccessories",
+    "ChartVersion": "0.1.0",
+    "HDetails": Object {
+      "Description": "Deletion complete",
+      "FirstDeployed": Object {
+        "nanos": 622670210,
+        "seconds": 1531236349,
+      },
+      "Images": Array [
+        Object {
+          "ImageName": "neo4j:latest",
+          "ImagePullPolicy": "IfNotPresent",
+        },
+        Object {
+          "ImageName": "neo4j:latest",
+          "ImagePullPolicy": "IfNotPresent",
+        },
+      ],
+      "LastDeployed": Object {
+        "nanos": 622670210,
+        "seconds": 1531236349,
+      },
+      "Values": "consul:
+  enabled: false
+instancedb:
+  enabled: true
+promethues:
+  enabled: false
+templatedb:
+  enabled: true
+",
+    },
+    "HelmName": "mouthy-catfish",
+    "Namespace": "default",
+    "Status": "DELETED",
+    "Version": 1,
+    "cluster": "crucial-owl",
+    "name": "mouthy-catfish",
+  },
+  Object {
+    "code": 2,
+    "message": "release: \\"mouthy-catfish\\" not found",
+  },
+]
+`;
+
+exports[`Helm releases Resolver Correctly resolves helm releases query 1`] = `
+Array [
+  Object {
+    "ChartName": "auth-apikeys",
+    "ChartVersion": "1.0.0",
+    "HDetails": Object {
+      "Description": "Install complete",
+      "FirstDeployed": Object {
+        "nanos": 822620669,
+        "seconds": 1526328996,
+      },
+      "Images": Array [
+        Object {
+          "ImageName": "registry.ng.bluemix.net/mdelder/iam-token-service:1.0.0",
+          "ImagePullPolicy": "IfNotPresent",
+        },
+      ],
+      "LastDeployed": Object {
+        "nanos": 822620669,
+        "seconds": 1526328996,
+      },
+      "Values": "auth_apikeys:
+  config:
+    disable-access-log: \\"true\\"
+  extraArgs: {}
+  hostNetwork: false
+  hostPort: true
+  image:
+    pullPolicy: IfNotPresent
+    repository: registry.ng.bluemix.net/mdelder/iam-token-service
+    tag: 1.0.0
+  name: auth-apikeys
+  namespace: kube-system
+  nodeSelector:
+    role: master
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  tolerations:
+  - effect: NoSchedule
+    key: dedicated
+    operator: Exists
+  - key: CriticalAddonsOnly
+    operator: Exists
+iamTokenService:
+  extraArgs: {}
+  name: iam-token-service
+  namespace: kube-system
+  pod: auth-apikeys
+  sessionAffinity: ClientIP
+  type: ClusterIP
+",
+    },
+    "HelmName": "auth-apikeys",
+    "Namespace": "kube-system",
+    "Status": "DEPLOYED",
+    "Version": 1,
+    "cluster": "crucial-owl",
+    "name": "auth-apikeys",
+  },
+]
+`;

@@ -66,7 +66,7 @@ export const applicationResolver = {
             Names: appName,
           },
         },
-      });
+      }, false);
       return result;
     },
     undeployApplication: async (root, { appName }, { req, hcmConnector }) => {
@@ -78,7 +78,7 @@ export const applicationResolver = {
             Names: appName,
           },
         },
-      });
+      }, false);
       return result;
     },
     registerApplication: async (root, { yaml }, { req, hcmConnector }) => {

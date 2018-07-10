@@ -8,7 +8,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { installHelmChart } from '../../datasource/hcm';
 
 export const typeDef = `
 input InstallHelmChartInput {
@@ -82,6 +81,23 @@ export const helmChartResolver = {
     },
   },
   Mutation: {
-    installHelmChart: (root, { input }, { req }) => installHelmChart(req, input),
+    installHelmChart: (root, { input }, { req, hcmConnector }) => {
+      const response = hcmConnector.getWork(req, 'helmrels', {
+        method: 'POST',
+        json: {
+          Operation: 'install',
+          DstClusters: input.DstClusters,
+          Work: {
+            ChartName: `${input.RepoName}/${input.ChartName}`,
+            Namespace: input.Namespace,
+            ReleaseName: input.ReleaseName,
+            URL: input.URL,
+            Values: input.Values,
+            Version: input.Version,
+          },
+        },
+      }, true);
+      return response;
+    },
   },
 };

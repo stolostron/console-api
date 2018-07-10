@@ -75,17 +75,6 @@ const clustersToItems = clusterData =>
     [],
   );
 
-// /**
-//  * Helper method to process the request and parse the response.
-//  */
-// async function processRequest(httpOptions) {
-//   const result = await request(httpOptions).then(res => res.body);
-//   if (result.Error) {
-//     throw new GenericError({ data: result.Error });
-//   }
-//   return JSON.parse(result.RetString).Result;
-// }
-
 async function pollWork(req, httpOptions) {
   const result = await request(httpOptions).then(res => res.body);
   if (result.Error) {
@@ -143,58 +132,6 @@ export async function getWork(req, type, opts) {
     json: getWorkOptions({ Resource: type }, opts),
   };
   return pollWork(req, options);
-}
-
-export async function installHelmChart(req, {
-  RepoName, ChartName, DstClusters, Version, ReleaseName, Namespace, URL, Values,
-}, opts) {
-  const httpOptions = {
-    url: `${hcmUrl}/api/v1alpha1/work`,
-    headers: {
-      Authorization: await getToken(req),
-    },
-    method: 'POST',
-    json: getWorkOptions({
-      Resource: 'helmrels',
-      Operation: 'install',
-      DstClusters,
-      Work: {
-        ChartName: `${RepoName}/${ChartName}`,
-        Namespace,
-        ReleaseName,
-        URL,
-        Values,
-        Version,
-      },
-    }, opts),
-  };
-
-  return pollWork(req, httpOptions);
-}
-
-export async function deleteHelmRelease(req, {
-  ChartName, DstClusters, Names, Namespaces, RepoName, Version,
-}, opts) {
-  const httpOptions = {
-    url: `${hcmUrl}/api/v1alpha1/work`,
-    headers: {
-      Authorization: await getToken(req),
-    },
-    method: 'POST',
-    json: getWorkOptions({
-      Resource: 'helmrels',
-      Operation: 'delete',
-      DstClusters,
-      Work: {
-        ChartName: RepoName && ChartName && `${RepoName}/${ChartName}`,
-        Names,
-        Namespaces,
-        Version,
-      },
-    }, opts),
-  };
-
-  return pollWork(req, httpOptions);
 }
 
 export async function search(req, type, name, opts = {}) {

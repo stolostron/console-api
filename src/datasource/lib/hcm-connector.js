@@ -177,8 +177,10 @@ export default class HCMConnector {
 
   async getWork(req, type, opts, workDefs) {
     let workDefaults = {};
-    if (typeof workDefs === 'boolean' && workDefs) {
-      workDefaults = { ...this.workDefaults };
+    if (typeof workDefs === 'boolean') {
+      if (workDefs) {
+        workDefaults = { ...this.workDefaults };
+      }
     } else {
       workDefaults = _.merge(this.workDefaults, { json: workDefs });
     }
