@@ -19,7 +19,7 @@ import cookieParser from 'cookie-parser';
 import https from 'https';
 import fs from 'fs';
 import schema from './schema/index';
-import config from '../config';
+import config from '../../config';
 import HCMConnector from './datasource/lib/hcm-connector';
 import MongoConnector from './datasource/lib/mongo-connector';
 

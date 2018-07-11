@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 import { addMockFunctionsToSchema, mockServer, makeExecutableSchema } from 'graphql-tools';
-import { typeDefs } from '../../src/schema/';
+import { typeDefs } from '../../src/v1/schema/';
 
 describe('Schema', () => {
   const mockSchema = makeExecutableSchema({ typeDefs });

@@ -7,8 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { clusterResolver } from '../../../src/schema/modules/cluster-type';
-import HCMConnector from '../../../src/datasource/lib/hcm-connector';
+import { clusterResolver } from '../../../src/v1/schema/modules/cluster-type';
+import HCMConnector from '../../../src/v1/datasource/lib/hcm-connector';
 
 describe('Cluster Resolver', () => {
   test('correctly resolves query', async () => {

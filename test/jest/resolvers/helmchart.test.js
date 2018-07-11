@@ -7,8 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { helmChartResolver } from '../../../src/schema/modules/helmchart-type';
-import HCMConnector from '../../../src/datasource/lib/hcm-connector';
+import { helmChartResolver } from '../../../src/v1/schema/modules/helmchart-type';
+import HCMConnector from '../../../src/v1/datasource/lib/hcm-connector';
 
 describe('Helm charts Resolver', () => {
   test('Correctly resolves helm charts query', async () => {

@@ -7,8 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { helmRepoResolver } from '../../../src/schema/modules/helmrepo-type';
-import HCMConnector from '../../../src/datasource/lib/hcm-connector';
+import { helmRepoResolver } from '../../../src/v1/schema/modules/helmrepo-type';
+import HCMConnector from '../../../src/v1/datasource/lib/hcm-connector';
 
 describe('Helm Repository Resolver', () => {
   test('Correctly resolves helm repos query', async () => {

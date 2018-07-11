@@ -9,7 +9,7 @@
 
 import _ from 'lodash';
 import request from './request';
-import config from '../../../config';
+import config from '../../../../config';
 import getToken from './util';
 import { GenericError } from './errors';
 

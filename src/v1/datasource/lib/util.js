@@ -10,7 +10,7 @@
 import lru from 'lru-cache';
 import _ from 'lodash';
 import request from './request';
-import config from '../../../config';
+import config from '../../../../config';
 import { AuthenticationError } from './errors';
 
 const tokenCache = lru({

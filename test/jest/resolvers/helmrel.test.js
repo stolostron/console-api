@@ -7,8 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { helmRelResolver } from '../../../src/schema/modules/helmrel-type';
-import HCMConnector from '../../../src/datasource/lib/hcm-connector';
+import { helmRelResolver } from '../../../src/v1/schema/modules/helmrel-type';
+import HCMConnector from '../../../src/v1/datasource/lib/hcm-connector';
 
 describe('Helm releases Resolver', () => {
   test('Correctly resolves helm releases query', async () => {

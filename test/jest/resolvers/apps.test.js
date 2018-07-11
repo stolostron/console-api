@@ -6,8 +6,8 @@
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
  ****************************************************************************** */
-import { applicationResolver } from '../../../src/schema/modules/application-type';
-import HCMConnector from '../../../src/datasource/lib/hcm-connector';
+import { applicationResolver } from '../../../src/v1/schema/modules/application-type';
+import HCMConnector from '../../../src/v1/datasource/lib/hcm-connector';
 
 describe('Application Resolver', () => {
   test('correctly resolves applications query', async () => {
