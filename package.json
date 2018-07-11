@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/v2/server.js --exec babel-node",
-    "start:production": "cross-env NODE_ENV=production node  ./build/v2/server.js",
-    "start:development:v1": "nodemon ./src/v1/server.js --exec babel-node",
-    "start:production:v1": "cross-env NODE_ENV=production node  ./build/v1/server.js",
+    "start": "nodemon ./src/index.js --exec babel-node",
+    "start:production": "cross-env NODE_ENV=production node ./build/index.js",
+    "start:development": "cross-env NODE_ENV=development node ./build/index.js",
     "build-server": "babel -d ./build ./src -s",
     "build": "npm run clean && npm run build-server",
     "build:production": "npm run build",

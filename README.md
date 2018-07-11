@@ -9,6 +9,7 @@ mongodbUrl
 PLATFORM_IDENTITY_PROVIDER_URL
 IAM_PDP_URL
 ARTIFACTORY_PWD - You can get this value from: https://ibm.ent.box.com/notes/287638278960
+hcmApiVersion - the hcm server version
 ```
 2. Start the dev server
 ```
