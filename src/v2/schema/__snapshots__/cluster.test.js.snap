@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cluster Resolver Correctly Resolves Cluster Query 1`] = `"{\\"data\\":{\\"clusters\\":[{\\"name\\":\\"crucial-owl\\",\\"namespace\\":\\"default\\",\\"uid\\":\\"69902715-8386-11e8-95ba-868ccf9e029b\\",\\"status\\":\\"OK\\",\\"createdAt\\":\\"2018-07-09T14:43:15Z\\",\\"labels\\":{\\"name\\":\\"crucial-owl\\"}}]}}"`;

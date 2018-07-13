@@ -14,7 +14,8 @@
     "shrinkwrap:clean": "del-cli node_modules npm-shrinkwrap.json && npm install --no-optional && npm prune && npm shrinkwrap",
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix .",
-    "test": "cross-env NODE_ENV=development jest --forceExit"
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch --forceExit"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "jest": "^23.1.0",
     "jest-tap-reporter": "^1.9.0",
     "nock": "^9.3.3",
-    "nodemon": "^1.17.3"
+    "nodemon": "^1.17.3",
+    "supertest": "^3.1.0"
   }
 }

@@ -85,7 +85,7 @@ export default class HCMConnector {
     let idToken;
     const authorization = req.headers.authorization ?
       req.headers.authorization : req.headers.Authorization;
-    if (_.isEmpty(authorization) && process.env.NODE_ENV === 'development') {
+    if (_.isEmpty(authorization) && process.env.NODE_ENV !== 'production') {
       // special case for graphiql to work locally
       // do not exchange for idtoken since authorization header is empty
       idToken = 'localdev';

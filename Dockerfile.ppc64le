@@ -21,4 +21,4 @@ COPY . /opt/ibm/hcm-ui-api
 EXPOSE 4000
 
 ENV NODE_ENV production
-CMD ["npm", "run", "start:production"]
+CMD ["node", "./build/index.js"]
