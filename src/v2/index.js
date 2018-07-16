@@ -21,6 +21,7 @@ import KubeModel from './models/kube';
 import createMockHttp from './mocks/';
 import schema from './schema/';
 import config from '../../config';
+import authMiddleware from './lib/auth-middleware';
 
 export const GRAPHQL_PATH = `${config.get('contextPath')}/graphql`;
 export const GRAPHIQL_PATH = `${config.get('contextPath')}/graphiql`;
@@ -49,7 +50,7 @@ if (process.env.NODE_ENV === 'production') {
     }),
   );
   logger.info('Authentication enabled');
-  graphQLServer.use(cookieParser(), inspect);
+  graphQLServer.use(cookieParser(), inspect, authMiddleware());
 
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
     formatError,
@@ -61,7 +62,7 @@ if (process.env.NODE_ENV === 'production') {
   const mockHttp = createMockHttp();
   graphQLServer.use('*', morgan('dev'));
   // disable security check and enable graphiql only for local dev
-  graphQLServer.use(cookieParser());
+  graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
     formatError,
@@ -71,7 +72,7 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   graphQLServer.use('*', morgan('dev'));
   // disable security check and enable graphiql only for local dev
-  graphQLServer.use(cookieParser());
+  graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
     formatError,
