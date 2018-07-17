@@ -9,6 +9,8 @@
 
 import _ from 'lodash';
 import { transformFilters } from './filter-type';
+import { GenericError } from '../../datasource/lib/errors';
+import config from '../../../../config';
 
 export const typeDef = `
   type TableRow {
@@ -25,8 +27,8 @@ export const typeDef = `
     warning: Int
     table: [TableRow]
     error: String
-  } 
-  
+  }
+
   type DashboardChartItem {
     name: String
     # return something looks like [ [[value1, value2, value3], title1] , [[valueA, valueB, valueC], title2] ]
@@ -34,7 +36,7 @@ export const typeDef = `
     data: [[String]]
     error: String
   }
-  
+
   type DashboardData {
     cardItems: [DashboardCardItem]
     pieChartItems: [DashboardChartItem]
@@ -148,11 +150,16 @@ function getDashboardPieChart({
   return { name, data: result };
 }
 
+const timeout = time => new Promise((resolve, reject) => {
+  setTimeout(reject, time, new GenericError({ data: { error: 'Request timed out' } }));
+});
+
+
 async function getDashboardItems({
   query, cards = [], pieCharts = [],
 }) {
   try {
-    const rawData = await query();
+    const rawData = await Promise.race([query(), timeout(config.get('hcmPollTimeout'))]);
     const cardsMap = cards.map(card => getDashboardCard({ rawData, ...card }));
     const pieChartsItems = pieCharts.map(chart => getDashboardPieChart({ rawData, ...chart }));
     return {
@@ -160,7 +167,10 @@ async function getDashboardItems({
       pieChartsItems,
     };
   } catch (error) {
-    return cards.map(() => ({ error }));
+    return {
+      cardsMap: cards.map(({ name }) => ({ name, error: error.data.error })),
+      pieChartsItems: pieCharts.map(({ name }) => ({ name, error: error.data.error })),
+    };
   }
 }
 
@@ -265,6 +275,7 @@ export const dashboardResolver = {
           }
         });
       }
+
       return {
         cardItems: sortCards(_.flatten(allCards)),
         pieChartItems,
