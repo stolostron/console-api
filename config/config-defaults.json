@@ -4,6 +4,6 @@
   "hcmUrl": "",
 	"hcmApiVersion": "V1",
   "mongodbUrl": "",
-  "hcmPollInterval": 200,
+  "hcmPollInterval": 500,
   "hcmPollTimeout": 30000
 }
