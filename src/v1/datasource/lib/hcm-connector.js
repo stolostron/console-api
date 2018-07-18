@@ -79,6 +79,8 @@ export default class HCMConnector {
         Description: '',
       },
     };
+
+    this.poll = this.poll.bind(this);
   }
 
   async getToken(req) {
@@ -143,20 +145,26 @@ export default class HCMConnector {
 
   timeout() {
     return new Promise((resolve, reject) => {
-      setTimeout(reject, this.pollTimeout, new GenericError({ data: { error: 'Manager request timed out' } }));
+      setTimeout((err) => {
+        reject(err);
+      }, this.pollTimeout, new GenericError({ data: { error: 'Manager request timed out' } }));
     });
   }
 
   poll(req, workID) {
-    return new Promise(async (resolve, reject) => {
+    let cancel;
+
+    const promise = new Promise(async (resolve, reject) => {
       const intervalID =
       // eslint-disable-next-line consistent-return
       setInterval(async () => {
         try {
-          const { Completed, Results } = await this.processRequest(req, `/api/v1alpha1/work/${workID}`);
+          const result = await this.processRequest(req, `/api/v1alpha1/work/${workID}`);
+          const { Completed, Results } = result;
           if (Completed) {
             clearInterval(intervalID);
             if (Results.code || Results.message) {
+              // eslint-disable-next-line
               return reject(Results);
             }
 
@@ -167,12 +175,19 @@ export default class HCMConnector {
           reject(err);
         }
       }, this.pollInterval);
+
+      cancel = () => {
+        clearInterval(intervalID);
+        reject();
+      };
     });
+
+    return { cancel, promise };
   }
 
   async pollWork(req, ...httpOverrides) {
     const workID = await this.processRequest(req, '/api/v1alpha1/work', {}, ...httpOverrides);
-    return Promise.race([this.poll(req, workID), this.timeout()]);
+    return this.poll(req, workID);
   }
 
   async getWork(req, type, opts, workDefs) {
@@ -184,8 +199,19 @@ export default class HCMConnector {
     } else {
       workDefaults = _.merge(this.workDefaults, { json: workDefs });
     }
-    const result = await this.pollWork(req, { json: { Resource: type } }, workDefaults, opts);
-    return clustersToItems(result);
+
+    const { cancel, promise: pollPromise } = await this.pollWork(req, {
+      json: { Resource: type },
+    }, workDefaults, opts);
+
+    try {
+      const result = await Promise.race([pollPromise, this.timeout()]);
+      return clustersToItems(result);
+    } catch (e) {
+      console.error('Work Request Timed out', e);
+      cancel();
+      throw e;
+    }
   }
 
   async search(req, type, name, ...httpOverrides) {

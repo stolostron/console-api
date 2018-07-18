@@ -63,7 +63,8 @@ describe('HCMConnector', () => {
         .mockReturnValueOnce(pollCompleteResponse);
 
       const pollConnector = new HCMConnector({ requestLib: mockRequestLibPoll });
-      await expect(pollConnector.pollWork(mockRequest)).resolves.toMatchSnapshot();
+      const { promise } = await pollConnector.pollWork(mockRequest);
+      await expect(promise).resolves.toMatchSnapshot();
     });
 
     test('throws GenericError if poll times out', async () => {
@@ -77,7 +78,7 @@ describe('HCMConnector', () => {
         requestLib: timeoutMockRequestLib,
       });
 
-      await expect(timeoutConnector.pollWork(mockRequest)).rejects.toMatchSnapshot();
+      await expect(timeoutConnector.getWork(mockRequest, 'node')).rejects.toMatchSnapshot();
     });
   });
 
