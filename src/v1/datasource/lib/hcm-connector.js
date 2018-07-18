@@ -45,6 +45,11 @@ const clustersToItems = clusterData =>
     [],
   );
 
+const tokenCache = lru({
+  max: 1000,
+  maxAge: 60 * 60 * 1000, // 1hr
+});
+
 export default class HCMConnector {
   constructor({
     hcmUrl = config.get('hcmUrl'),
@@ -56,11 +61,6 @@ export default class HCMConnector {
     this.pollInterval = pollInterval;
     this.pollTimeout = pollTimeout;
     this.request = requestLib;
-
-    this.tokenCache = lru({
-      max: 1000,
-      maxAge: 60 * 60 * 1000, // 1hr
-    });
 
     this.workDefaults = {
       method: 'POST',
@@ -93,7 +93,7 @@ export default class HCMConnector {
       idToken = 'localdev';
     } else {
       const accessToken = authorization.substring(7);
-      idToken = this.tokenCache.get(accessToken);
+      idToken = tokenCache.get(accessToken);
       if (!idToken) {
         const options = {
           url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/exchangetoken`,
@@ -109,7 +109,7 @@ export default class HCMConnector {
         const response = await this.request(options);
         idToken = _.get(response, 'body.id_token');
         if (idToken) {
-          this.tokenCache.set(accessToken, idToken);
+          tokenCache.set(accessToken, idToken);
         } else {
           throw new AuthenticationError({ data: response });
         }
