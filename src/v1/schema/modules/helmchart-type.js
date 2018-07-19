@@ -74,7 +74,11 @@ export const helmChartResolver = {
       const response = await hcmConnector.processRequest(req, '/api/v1alpha1/repo/*', { Resource: 'repo', Operation: 'get' });
       const helmRepos = response ? Object.values(response) : [];
 
-      const catalog = await Promise.all(helmRepos.map(repo => hcmConnector.search(req, 'repo', repo.Name)));
+      let catalog = [];
+      await Promise.all(helmRepos.map(repo => hcmConnector.search(req, 'repo', repo.Name).catch(err => console.log(err))))
+        .then((values) => {
+          catalog = values.filter(item => item !== undefined);
+        }).catch(err => console.log(err));
 
       const helmCharts = _.flatten(catalog.map(chart => Object.values(chart)));
       return _.sortBy(helmCharts, chart => `${chart.RepoName}/${chart.Name}`);
