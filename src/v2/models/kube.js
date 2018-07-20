@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import requestLib from 'requestretry';
+import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
 
 export default class KubeModel {

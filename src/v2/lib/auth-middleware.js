@@ -32,7 +32,7 @@ export default function createAuthMiddleWare({
     if (_.isEmpty(authorization) && shouldLocalAuth) {
       // special case for graphiql to work locally
       // do not exchange for idtoken since authorization header is empty
-      idToken = 'localdev';
+      idToken = config.get('localKubeToken') || 'localdev';
     } else {
       const accessToken = authorization.substring(7);
       idToken = cache.get(accessToken);

@@ -2,7 +2,8 @@
   "contextPath": "/hcmuiapi",
   "httpPort": 4000,
   "hcmUrl": "",
-	"hcmApiVersion": "V1",
+	"hcmApiVersion": "",
+	"localKubeToken": "",
   "mongodbUrl": "",
   "hcmPollInterval": 500,
   "hcmPollTimeout": 30000
