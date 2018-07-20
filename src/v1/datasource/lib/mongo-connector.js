@@ -91,7 +91,9 @@ export default class MongoConnector {
         if (args.filter[filterType] && args.filter[filterType][0]) {
           if (filterType === 'label') {
             filters.push({
-              $or: args.filter[filterType].map(f => ({ labels: f })),
+              $or: args.filter[filterType].map(label => (
+                { 'labels.name': label.name, 'labels.value': label.value }
+              )),
             });
           } else if (filterType !== 'cluster') { // Cluster is a special type, handled above.
             filters.push({ [filterType]: { $in: args.filter[filterType] } });
