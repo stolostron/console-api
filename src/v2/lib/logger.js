@@ -7,22 +7,11 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-export const typeDef = `
-type Cluster {
-  createdAt: String
-  labels: JSON
-  name: String
-  namespace: String
-  nodes: Int
-  status: String
-  totalMemory: Int
-  totalStorage: Int
-  uid: String,
-}
-`;
+import log4js from 'log4js';
 
-export const resolver = {
-  Query: {
-    clusters: (root, args, { kubeModel }) => kubeModel.getClusters(args),
-  },
-};
+const logger = log4js.getLogger('server');
+
+const log4jsConfig = process.env.LOG4JS_CONFIG ? JSON.parse(process.env.LOG4JS_CONFIG) : undefined;
+log4js.configure(log4jsConfig || 'config/log4js.json');
+
+export default logger;

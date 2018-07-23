@@ -54,7 +54,7 @@ export default function createAuthMiddleWare({
         if (idToken) {
           cache.set(accessToken, idToken);
         } else {
-          throw new Error(`Authentication error: ${response}`);
+          throw new Error(`Authentication error: ${response.body}`);
         }
       }
     }

@@ -7,8 +7,14 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
+
+const mock = (prefix, obj) => {
+  logger.warn(`Using mocked values for ${prefix}`, Object.keys(obj));
+  return obj;
+};
 
 export default class KubeModel {
   constructor({ kubeConnector, request, httpLib = requestLib }) {
@@ -23,15 +29,18 @@ export default class KubeModel {
 
   async getClusters() {
     const response = await this.kubeConnector.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
-    const cluster = response.items[0];
-
-    return [{
-      name: cluster.metadata.name,
-      namespace: cluster.metadata.namespace,
-      uid: cluster.metadata.uid,
-      status: cluster.status.conditions[0].type,
+    return response.items.map(cluster => ({
       createdAt: cluster.metadata.creationTimestamp,
       labels: cluster.metadata.labels,
-    }];
+      name: cluster.metadata.name,
+      namespace: cluster.metadata.namespace,
+      status: cluster.status.conditions[0].type.toLowerCase(),
+      uid: cluster.metadata.uid,
+      ...mock('Cluster', {
+        nodes: 1,
+        totalMemory: 0,
+        totalStorage: 0,
+      }),
+    }));
   }
 }
