@@ -165,6 +165,8 @@ Array [
 ]
 `;
 
+exports[`HCMConnector getWork throws GenericError if poll times out 1`] = `[GenericError: A generic error has occurred]`;
+
 exports[`HCMConnector pollWork polls and returns data 1`] = `
 Object {
   "crucial-owl": Object {
@@ -473,8 +475,6 @@ Object {
   },
 }
 `;
-
-exports[`HCMConnector pollWork throws GenericError if poll times out 1`] = `[GenericError: A generic error has occurred]`;
 
 exports[`HCMConnector processRequest returns parsed response if JSON.parse succeeds 1`] = `
 Object {

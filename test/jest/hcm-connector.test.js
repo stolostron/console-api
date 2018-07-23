@@ -66,6 +66,17 @@ describe('HCMConnector', () => {
       const { promise } = await pollConnector.pollWork(mockRequest);
       await expect(promise).resolves.toMatchSnapshot();
     });
+  });
+
+  describe('getWork', () => {
+    test('correctly transforms data from poll work', async () => {
+      const mockRequestLibPoll = jest.fn()
+        .mockReturnValueOnce(workIdResponse)
+        .mockReturnValueOnce(pollCompleteResponse);
+
+      const pollConnector = new HCMConnector({ requestLib: mockRequestLibPoll });
+      await expect(pollConnector.getWork(mockRequest, 'node')).resolves.toMatchSnapshot();
+    });
 
     test('throws GenericError if poll times out', async () => {
       const timeoutMockRequestLib = jest.fn()
@@ -79,17 +90,6 @@ describe('HCMConnector', () => {
       });
 
       await expect(timeoutConnector.getWork(mockRequest, 'node')).rejects.toMatchSnapshot();
-    });
-  });
-
-  describe('getWork', () => {
-    test('correctly transforms data from poll work', async () => {
-      const mockRequestLibPoll = jest.fn()
-        .mockReturnValueOnce(workIdResponse)
-        .mockReturnValueOnce(pollCompleteResponse);
-
-      const pollConnector = new HCMConnector({ requestLib: mockRequestLibPoll });
-      await expect(pollConnector.getWork(mockRequest, 'node')).resolves.toMatchSnapshot();
     });
   });
 });
