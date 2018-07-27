@@ -10,13 +10,15 @@
 import _ from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 
-import * as query from './query';
 import * as cluster from './cluster';
 import * as json from './json';
+import * as pod from './pod';
+import * as query from './query';
 
 const modules = [
   cluster,
   json,
+  pod,
   query,
 ];
 

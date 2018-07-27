@@ -11,5 +11,6 @@
 export const typeDef = `
 type Query {
   clusters: [Cluster]
+  pods: [Pod]
 }
 `;

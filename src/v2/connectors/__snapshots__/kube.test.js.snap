@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KubeConnector CreateWorkset submits correct arguments and returns selfLink 1`] = `
+Array [
+  Object {
+    "headers": Object {
+      "Authorization": "Bearer localdev",
+    },
+    "json": Object {
+      "apiVersion": "hcm.ibm.com/v1alpha1",
+      "kind": "WorkSet",
+      "metadata": Object {
+        "labels": Object {
+          "name": "pods-1234",
+        },
+        "name": "pods-1234",
+        "namespace": "default",
+      },
+      "spec": Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "name": "pods-1234",
+          },
+        },
+        "template": Object {
+          "metadata": Object {
+            "labels": Object {
+              "name": "pods-1234",
+            },
+          },
+          "spec": Object {
+            "scope": Object {
+              "resourceType": "pods",
+            },
+            "type": "Resource",
+          },
+        },
+      },
+    },
+    "method": "POST",
+    "url": "kubernetes/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets",
+  },
+]
+`;
+
+exports[`KubeConnector CreateWorkset submits correct arguments and returns selfLink 2`] = `
+Object {
+  "metadata": Object {
+    "selfLink": "/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets/test-set",
+  },
+}
+`;
+
+exports[`KubeConnector Get calls httpLib with correct arguments 1`] = `
+Array [
+  Object {
+    "headers": Object {
+      "Authorization": "Bearer localdev",
+    },
+    "method": "GET",
+    "url": "kubernetes/api/test",
+  },
+]
+`;
+
+exports[`KubeConnector Get correctly merges additional arguments 1`] = `
+Array [
+  Object {
+    "headers": Object {
+      "Authorization": "Bearer localdev",
+      "x-custom-header": "test-value",
+    },
+    "method": "GET",
+    "url": "kubernetes/api/test",
+  },
+]
+`;
+
+exports[`KubeConnector Post calls httpLib with correct arguments 1`] = `
+Array [
+  Object {
+    "headers": Object {
+      "Authorization": "Bearer localdev",
+    },
+    "json": Object {
+      "body": "test-value",
+    },
+    "method": "POST",
+    "url": "kubernetes/api/test",
+  },
+]
+`;
+
+exports[`KubeConnector WorksetResourceQuery creates and polls workset api 1`] = `
+Object {
+  "status": Object {
+    "response": Object {
+      "test": "test-value",
+    },
+    "status": "Completed",
+  },
+}
+`;
+
+exports[`KubeConnector WorksetResourceQuery throws if createWorkset fails 1`] = `[Error: Create Worset Failed [401] - Unauthorized]`;
+
+exports[`KubeConnector WorksetResourceQuery throws on timeout 1`] = `[Error: Manager request timed out]`;

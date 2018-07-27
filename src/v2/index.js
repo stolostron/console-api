@@ -47,10 +47,10 @@ if (process.env.NODE_ENV === 'production') {
   logger.info('Authentication enabled');
   graphQLServer.use(cookieParser(), inspect, authMiddleware());
 
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
     formatError,
     schema,
-    context: { req, kubeModel: new KubeModel({ request: req }) },
+    context: { req, kubeModel: new KubeModel({ token: req.kubeToken }) },
   })));
 } else if (process.env.NODE_ENV === 'test') {
   logger.info('RUNNING MOCK SERVER');
@@ -59,20 +59,20 @@ if (process.env.NODE_ENV === 'production') {
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
     formatError,
     schema,
-    context: { req, kubeModel: new KubeModel({ request: req, httpLib: mockHttp }) },
+    context: { req, kubeModel: new KubeModel({ token: req.kubeToken, httpLib: mockHttp }) },
   })));
 } else {
   graphQLServer.use('*', morgan('dev'));
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
     formatError,
     schema,
-    context: { req, kubeModel: new KubeModel({ request: req }) },
+    context: { req, kubeModel: new KubeModel({ token: req.kubeToken }) },
   })));
 }
 
