@@ -7,11 +7,20 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-// eslint-disable-next-line
 export const typeDef = `
-type Query {
-  clusters: [Cluster]
-  pods: [Pod]
-  repos: [HelmRepo]
+input HelmRepoInput {
+  Name: String!
+  URL: String
+}
+
+type HelmRepo {
+  Name: String
+  URL: String
 }
 `;
+
+export const resolver = {
+  Query: {
+    repos: async (root, args, { kubeModel }) => kubeModel.getRepos(args),
+  },
+};

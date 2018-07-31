@@ -11,10 +11,17 @@
 export default function createMockHttp() {
   const state = {
     clusters: require('./ClusterList').default,
+    repos: require('./ReposList').default,
   };
 
-  return async function MockLib() {
-    // TODO: add switch case for different routes/behavior
-    return state.clusters;
+  return async function MockLib(params) {
+    switch (true) {
+      case params.url.includes('cluster'):
+        return state.clusters;
+      case params.url.includes('helmrepos'):
+        return state.repos;
+      default:
+        return state.clusters;
+    }
   };
 }

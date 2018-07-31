@@ -74,4 +74,16 @@ export default class KubeModel {
       return accum;
     }, []);
   }
+
+  async getRepos() {
+    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/helmrepos');
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+    return response.items.map(cluster => ({
+      Name: cluster.metadata.name,
+      URL: cluster.spec.url,
+    }));
+  }
 }
