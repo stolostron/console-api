@@ -19,6 +19,7 @@ export const typeDef = `
     owners: [Owner]
     podIP: String
     startedAt: String
+    status: String
     uid: String
   }
 

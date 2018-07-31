@@ -67,6 +67,7 @@ export default class KubeModel {
         owners: pod.metadata.ownerReferences,
         podIP: pod.status.podIP,
         startedAt: pod.status.startTime,
+        status: pod.status.phase,
         uid: pod.metadata.uid,
       }));
 
