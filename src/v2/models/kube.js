@@ -86,4 +86,26 @@ export default class KubeModel {
       URL: cluster.spec.url,
     }));
   }
+
+  async getCharts() {
+    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/helmrepos');
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+    const charts = [];
+    response.items.forEach((cluster) => {
+      const rName = cluster.metadata.name;
+      const repo = Object.values(cluster.status.charts);
+      repo.forEach((chart) => {
+        charts.push({
+          repoName: rName,
+          name: chart.chartVersions[0].name,
+          version: chart.chartVersions[0].version,
+          urls: chart.chartVersions[0].urls,
+        });
+      });
+    });
+    return charts;
+  }
 }

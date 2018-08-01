@@ -7,12 +7,17 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-// eslint-disable-next-line
 export const typeDef = `
-type Query {
-  charts: [HelmChart]
-  clusters: [Cluster]
-  pods: [Pod]
-  repos: [HelmRepo]
+type HelmChart {
+  repoName: String
+  name: String
+  version: String
+  urls: [String]
 }
 `;
+
+export const resolver = {
+  Query: {
+    charts: async (root, args, { kubeModel }) => kubeModel.getCharts(args),
+  },
+};

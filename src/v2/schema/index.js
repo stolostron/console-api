@@ -13,10 +13,12 @@ import { makeExecutableSchema } from 'graphql-tools';
 import * as cluster from './cluster';
 import * as json from './json';
 import * as pod from './pod';
+import * as charts from './helmchart';
 import * as repos from './helmrepo';
 import * as query from './query';
 
 const modules = [
+  charts,
   cluster,
   json,
   pod,
