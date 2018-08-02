@@ -7,14 +7,18 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-// eslint-disable-next-line
 export const typeDef = `
-type Query {
-  charts: [HelmChart]
-  clusters: [Cluster]
-  nodes: [Node]
-  pods: [Pod]
-  repos: [HelmRepo]
-  namespaces: [Namespace]
+type Namespace {
+  cluster: String
+  createdAt: String
+  name: String
+  uid: String
+  status: String
 }
 `;
+
+export const resolver = {
+  Query: {
+    namespaces: (root, args, { kubeModel }) => kubeModel.getNamespaces(args),
+  },
+};

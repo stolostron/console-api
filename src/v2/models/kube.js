@@ -87,6 +87,52 @@ export default class KubeModel {
     }));
   }
 
+  async getNodes() {
+    const response = await this.kubeConnector.worksetResourceQuery('nodes');
+    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+      const nodes = response.status.results[clusterName].items;
+
+      nodes.map(node => accum.push({
+        allocatable: node.status.allocatable,
+        architecture: node.status.nodeInfo.architecture,
+        capacity: node.status.capacity,
+        cluster: clusterName,
+        createdAt: node.metadata.creationTimestamp,
+        labels: node.metadata.labels,
+        name: node.metadata.name,
+        images: node.status.images.reduce((imageNames, curr) => {
+          imageNames.push(...curr.names);
+          return imageNames;
+        }, []),
+        operatingSystem: node.status.nodeInfo.operatingSystem,
+        osImage: node.status.nodeInfo.osImage,
+        startedAt: node.status.startTime,
+        status: node.status.phase,
+        uid: node.metadata.uid,
+      }));
+
+      return accum;
+    }, []);
+  }
+
+  async getNamespaces() {
+    const response = await this.kubeConnector.worksetResourceQuery('namespaces');
+    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+      const namespaces = response.status.results[clusterName].items;
+
+      namespaces.map(namespace => accum.push({
+        cluster: clusterName,
+        createdAt: namespace.metadata.creationTimestamp,
+        labels: namespace.metadata.labels,
+        name: namespace.metadata.name,
+        status: namespace.status.phase,
+        uid: namespace.metadata.uid,
+      }));
+
+      return accum;
+    }, []);
+  }
+
   async getCharts() {
     const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/helmrepos');
     if (response.code || response.message) {
