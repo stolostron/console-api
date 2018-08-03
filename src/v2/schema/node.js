@@ -8,21 +8,13 @@
  ****************************************************************************** */
 
 export const typeDef = `
-interface HCMResource {
-  cluster: String
-  createdAt: String
-  labels: JSON
-  name: String
-  uid: String
-}
-
 type NodeResources {
   cpu: Int
   ephemeralStorage: String
   memory: String
 }
 
-type Node implements HCMResource {
+type Node {
   allocatable: NodeResources
   architecture: String
   capacity: NodeResources
