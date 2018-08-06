@@ -10,12 +10,12 @@
 import _ from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 
+import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as json from './json';
 import * as namespace from './namespace';
 import * as node from './node';
 import * as pod from './pod';
-import * as charts from './helmchart';
 import * as query from './query';
 import * as repo from './helmrepo';
 
@@ -33,6 +33,7 @@ const modules = [
 const mainDefs = [`
 schema {
   query: Query,
+  mutation: Mutation,
 }
 `];
 

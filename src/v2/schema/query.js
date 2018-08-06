@@ -12,9 +12,14 @@ export const typeDef = `
 type Query {
   charts: [HelmChart]
   clusters: [Cluster]
+  namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
   repos: [HelmRepo]
-  namespaces: [Namespace]
+}
+
+type Mutation {
+  deleteHelmRepository(input: HelmRepoInput): HelmRepo
+  setHelmRepo(input: HelmRepoInput): HelmRepo
 }
 `;

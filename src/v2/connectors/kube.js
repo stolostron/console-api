@@ -54,6 +54,18 @@ class KubeConnector {
     return this.http(_.merge(defaults, opts)).then(res => res.body);
   }
 
+  delete(path, jsonBody, opts = {}) {
+    const defaults = {
+      url: `${this.kubeApiEndpoint}${path}`,
+      method: 'DELETE',
+      headers: {
+        Authorization: this.token,
+      },
+      json: jsonBody,
+    };
+    return this.http(_.merge(defaults, opts)).then(res => res.body);
+  }
+
   // TODO: Allow filtering - 07/25/18 10:48:31 sidney.wijngaarde1@ibm.com
   createWorkset(resourceType) {
     const name = `${resourceType}-${this.uid()}`;

@@ -87,6 +87,40 @@ export default class KubeModel {
     }));
   }
 
+  async setRepo(input) {
+    const jsonBody = {
+      apiVersion: 'hcm.ibm.com/v1alpha1',
+      kind: 'HelmRepo',
+      metadata: {
+        name: input.Name,
+      },
+      spec: {
+        url: input.URL,
+      },
+    };
+    const response = await this.kubeConnector.post('/apis/hcm.ibm.com/v1alpha1/namespaces/default/helmrepos', jsonBody);
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+    return {
+      Name: response.metadata.name,
+      URL: response.spec.url,
+    };
+  }
+
+  async deleteRepo(input) {
+    const response = await this.kubeConnector.delete(`/apis/hcm.ibm.com/v1alpha1/namespaces/default/helmrepos/${input.Name}`);
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+    return {
+      Name: response.metadata.name,
+      URL: response.spec.url,
+    };
+  }
+
   async getNodes() {
     const response = await this.kubeConnector.worksetResourceQuery('nodes');
     return Object.keys(response.status.results).reduce((accum, clusterName) => {

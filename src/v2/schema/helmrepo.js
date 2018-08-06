@@ -23,4 +23,8 @@ export const resolver = {
   Query: {
     repos: async (root, args, { kubeModel }) => kubeModel.getRepos(args),
   },
+  Mutation: {
+    setHelmRepo: (root, { input }, { kubeModel }) => kubeModel.setRepo(input),
+    deleteHelmRepository: (root, { input }, { kubeModel }) => kubeModel.deleteRepo(input),
+  },
 };

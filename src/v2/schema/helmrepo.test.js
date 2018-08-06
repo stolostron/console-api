@@ -29,4 +29,42 @@ describe('Helm Repository Resolver', () => {
         done();
       });
   });
+
+  test('Correctly Resolves Set Helm Repository Mutation', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          setHelmRepo(input:{Name:"testRepo",URL:"https://testRepo.com"}) {
+            Name
+            URL
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(res.text).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Delete Helm Repository Mutation', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          deleteHelmRepository(input:{Name:"testRepo"}) {
+            Name
+            URL
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(res.text).toMatchSnapshot();
+        done();
+      });
+  });
 });

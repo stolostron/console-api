@@ -12,12 +12,15 @@ export default function createMockHttp() {
   const state = {
     clusters: require('./ClusterList').default,
     repos: require('./ReposList').default,
+    repoMutations: require('./RepoMutationsList').default,
   };
 
   return async function MockLib(params) {
     switch (true) {
       case params.url.includes('cluster'):
         return state.clusters;
+      case params.url.includes('default/helmrepos'):
+        return state.repoMutations;
       case params.url.includes('helmrepos'):
         return state.repos;
       default:
