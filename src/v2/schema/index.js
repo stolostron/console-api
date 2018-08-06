@@ -17,6 +17,8 @@ import * as namespace from './namespace';
 import * as node from './node';
 import * as pod from './pod';
 import * as query from './query';
+import * as filter from './filter';
+import * as topology from './topology';
 import * as repo from './helmrepo';
 
 const modules = [
@@ -27,6 +29,8 @@ const modules = [
   node,
   pod,
   query,
+  filter,
+  topology,
   repo,
 ];
 

@@ -18,6 +18,7 @@ import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
 import KubeModel from './models/kube';
+import MongoModel from './models/mongo';
 import createMockHttp from './mocks/';
 import schema from './schema/';
 import config from '../../config';
@@ -47,11 +48,20 @@ if (process.env.NODE_ENV === 'production') {
   logger.info('Authentication enabled');
   graphQLServer.use(cookieParser(), inspect, authMiddleware());
 
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
-    formatError,
-    schema,
-    context: { req, kubeModel: new KubeModel({ token: req.kubeToken }) },
-  })));
+  const mongoModel = new MongoModel();
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
+    await mongoModel.connect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
+
+    return {
+      formatError,
+      schema,
+      context: {
+        req,
+        kubeModel: new KubeModel({ token: req.kubeToken }),
+        mongoModel,
+      },
+    };
+  }));
 } else if (process.env.NODE_ENV === 'test') {
   logger.info('RUNNING MOCK SERVER');
   const mockHttp = createMockHttp();
@@ -69,11 +79,21 @@ if (process.env.NODE_ENV === 'production') {
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
-    formatError,
-    schema,
-    context: { req, kubeModel: new KubeModel({ token: req.kubeToken }) },
-  })));
+
+  const mongoModel = new MongoModel();
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
+    await mongoModel.connect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
+
+    return {
+      formatError,
+      schema,
+      context: {
+        req,
+        kubeModel: new KubeModel({ token: req.kubeToken }),
+        mongoModel,
+      },
+    };
+  }));
 }
 
 export default graphQLServer;

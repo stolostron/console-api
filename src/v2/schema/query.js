@@ -16,6 +16,12 @@ type Query {
   nodes: [Node]
   pods: [Pod]
   repos: [HelmRepo]
+
+  # Topology
+  filters: Filters
+  labels: [Label]
+  resourceTypes: [String]
+  topology(filter: Filter): Topology
 }
 
 type Mutation {
