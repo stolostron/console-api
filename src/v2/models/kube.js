@@ -87,6 +87,27 @@ export default class KubeModel {
     }));
   }
 
+  async getPolicies() {
+    const response = await this.kubeConnector.get('/apis/policy.hcm.ibm.com/v1alpha1/policies');
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+    return response.items.map(policy => ({
+      // enforcment: policy.spec && policy.spec.remediationAction,
+      name: policy.metadata && policy.metadata.name,
+      namespace: policy.metadata && policy.metadata.namespace,
+      status: () => {
+        if (policy.status && policy.status.Valid === false) {
+          return 'invalid';
+        } else if (policy.status && policy.status.Compliant) {
+          return policy.status.Compliant;
+        }
+        return 'unknown';
+      },
+    }));
+  }
+
   async setRepo(input) {
     const jsonBody = {
       apiVersion: 'hcm.ibm.com/v1alpha1',

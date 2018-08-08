@@ -20,6 +20,7 @@ import * as query from './query';
 import * as filter from './filter';
 import * as topology from './topology';
 import * as repo from './helmrepo';
+import * as policy from './policy';
 
 const modules = [
   charts,
@@ -32,6 +33,7 @@ const modules = [
   filter,
   topology,
   repo,
+  policy,
 ];
 
 const mainDefs = [`
