@@ -12,6 +12,7 @@ export const typeDef = `
 type Query {
   charts: [HelmChart]
   clusters: [Cluster]
+  dashboard: DashboardData
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]

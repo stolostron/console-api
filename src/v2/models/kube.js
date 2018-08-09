@@ -16,6 +16,15 @@ const mock = (prefix, obj) => {
   return obj;
 };
 
+// The last char(s) in usage are units - need to be removed in order to get an int for calculation
+function getPercentage(usage, capacity) {
+  return (usage.substring(0, usage.length - 2) / capacity.substring(0, capacity.length - 2)) * 100;
+}
+
+function getCPUPercentage(usage, capacity) {
+  return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
+}
+
 export default class KubeModel {
   constructor({ kubeConnector, token, httpLib = requestLib }) {
     if (kubeConnector) {
@@ -48,6 +57,28 @@ export default class KubeModel {
         totalMemory: 0,
         totalStorage: 0,
       }),
+    }));
+  }
+
+  async getClusterStatus() {
+    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/clusterstatuses');
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+
+    return response.items.map(cluster => ({
+      createdAt: cluster.metadata.creationTimestamp,
+      labels: cluster.metadata.labels,
+      name: cluster.metadata.name,
+      namespace: cluster.metadata.namespace,
+      uid: cluster.metadata.uid,
+      nodes: cluster.spec.capacity.nodes,
+      pods: cluster.spec.usage.pods,
+      ip: cluster.spec.masterAddresses[0].ip,
+      memoryUtilization: getPercentage(cluster.spec.usage.memory, cluster.spec.capacity.memory),
+      storageUtilization: getPercentage(cluster.spec.usage.storage, cluster.spec.capacity.storage),
+      cpuUtilization: getCPUPercentage(cluster.spec.usage.cpu, cluster.spec.capacity.cpu),
     }));
   }
 

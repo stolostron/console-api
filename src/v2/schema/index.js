@@ -12,6 +12,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 import * as charts from './helmchart';
 import * as cluster from './cluster';
+import * as dashboard from './dashboard';
 import * as json from './json';
 import * as namespace from './namespace';
 import * as node from './node';
@@ -25,6 +26,7 @@ import * as policy from './policy';
 const modules = [
   charts,
   cluster,
+  dashboard,
   json,
   namespace,
   node,
