@@ -9,6 +9,8 @@
 
 export const typeDef = `
 type Policy {
+  # Possible values are: enforce, inform
+  enforcement: String
   name: String
   namespace: String
   # Possible values are: compliant, notcompliant, invalid

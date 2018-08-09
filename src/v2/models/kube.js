@@ -94,7 +94,6 @@ export default class KubeModel {
       return [];
     }
     return response.items.map(policy => ({
-      // enforcment: policy.spec && policy.spec.remediationAction,
       name: policy.metadata && policy.metadata.name,
       namespace: policy.metadata && policy.metadata.namespace,
       status: () => {
@@ -102,6 +101,12 @@ export default class KubeModel {
           return 'invalid';
         } else if (policy.status && policy.status.Compliant) {
           return policy.status.Compliant;
+        }
+        return 'unknown';
+      },
+      enforcement: () => {
+        if (policy.spec) {
+          return policy.spec.remediationAction;
         }
         return 'unknown';
       },
