@@ -36,6 +36,26 @@ export default class KubeModel {
     }
   }
 
+  async getApplications() {
+    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/applications');
+    if (response.code || response.message) {
+      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      return [];
+    }
+
+    return response.items.map(app => ({
+      name: app.metadata.name,
+      status: app.metadata.status,
+      ...mock('Applications', {
+        annotations: {},
+        labels: {},
+        components: [],
+        dependencies: [],
+        dashboard: '',
+      }),
+    }));
+  }
+
   async getClusters() {
     const response = await this.kubeConnector.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
     if (response.code || response.message) {

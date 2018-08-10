@@ -10,32 +10,34 @@
 import _ from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 
+import * as applications from './application';
 import * as charts from './helmchart';
 import * as cluster from './cluster';
+import * as filter from './filter';
 import * as dashboard from './dashboard';
 import * as json from './json';
 import * as namespace from './namespace';
 import * as node from './node';
 import * as pod from './pod';
-import * as query from './query';
-import * as filter from './filter';
-import * as topology from './topology';
-import * as repo from './helmrepo';
 import * as policy from './policy';
+import * as query from './query';
+import * as repo from './helmrepo';
+import * as topology from './topology';
 
 const modules = [
+  applications,
   charts,
   cluster,
+  filter,
   dashboard,
   json,
   namespace,
   node,
   pod,
-  query,
-  filter,
-  topology,
-  repo,
   policy,
+  query,
+  repo,
+  topology,
 ];
 
 const mainDefs = [`
