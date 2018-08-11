@@ -10,7 +10,7 @@
 // eslint-disable-next-line
 export const typeDef = `
 type Query {
-  applications: [Application]
+  applications(name: String): [Application]
   charts: [HelmChart]
   clusters: [Cluster]
   dashboard: DashboardData

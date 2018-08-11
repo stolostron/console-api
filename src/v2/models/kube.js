@@ -36,24 +36,56 @@ export default class KubeModel {
     }
   }
 
-  async getApplications() {
+  async getApplications(name) {
     const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/applications');
     if (response.code || response.message) {
       logger.error(`HCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
 
-    return response.items.map(app => ({
-      name: app.metadata.name,
-      status: app.metadata.status,
-      ...mock('Applications', {
-        annotations: {},
-        labels: {},
-        components: [],
-        dependencies: [],
-        dashboard: '',
-      }),
-    }));
+    const items = name ? response.items.filter(app => app.metadata.name === name) : response.items;
+
+    return items.map((app) => {
+      const components = [];
+      const dependencies = [];
+      const relationships = [];
+      const { annotations } = app.metadata;
+      delete annotations['kubectl.kubernetes.io/last-applied-configuration'];
+
+      app.status.components.forEach((component) => {
+        components.push({
+          name: component.metadata.name,
+          ...mock('Application component', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
+        });
+
+        // Get dependencies for each component.
+        component.spec.dependencies.forEach((dep) => {
+          dependencies.push({
+            name: dep.destination.name,
+            ...mock('Application dependencies', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
+          });
+          relationships.push({
+            source: component.metadata.name,
+            destination: dep.destination.name,
+            type: 'dependsOn',
+          });
+        });
+      });
+
+
+      return {
+        annotations,
+        components,
+        dependencies,
+        labels: app.metadata.labels,
+        name: app.metadata.name,
+        relationships,
+        status: app.metadata.status,
+        ...mock('Applications', {
+          dashboard: '',
+        }),
+      };
+    });
   }
 
   async getClusters() {

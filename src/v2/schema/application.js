@@ -10,27 +10,33 @@
 export const typeDef = `
 # HCM Application
 type Application {
-  name: String
   annotations: JSON
-  labels: JSON
-  components: [AppNode]
-  dependencies: [AppNode]
+  components: [AppService]
   # URL to Grafana Dashboard.
   dashboard: String
+  dependencies: [AppService]
+  labels: JSON
+  name: String
+  relationships: [AppRelationship]
   status: String
 }
 
-# HCM Application Node (AppNode)
-type AppNode {
-  name: String
+type AppRelationship {
+  source: String!
+  destination: String!
+  type: String
+}
+
+# HCM Application Service (AppService)
+type AppService {
   cluster: String
-  kind: String
+  name: String
   status: String
 }
 `;
 
 export const resolver = {
   Query: {
-    applications: (root, args, { kubeModel }) => kubeModel.getApplications(args),
+    applications: (root, args, { kubeModel }) => kubeModel.getApplications(args.name),
   },
 };
