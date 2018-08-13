@@ -55,6 +55,10 @@ export default class KubeModel {
       app.status.components.forEach((component) => {
         components.push({
           name: component.metadata.name,
+          namespace: component.metadata.namespace,
+          created: component.metadata.creationTimestamp,
+          labels: component.metadata.labels,
+          annotations: component.metadata.annotations,
           ...mock('Application component', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
         });
 
@@ -62,6 +66,7 @@ export default class KubeModel {
         component.spec.dependencies.forEach((dep) => {
           dependencies.push({
             name: dep.destination.name,
+            type: dep.destination.kind,
             ...mock('Application dependencies', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
           });
           relationships.push({
@@ -80,6 +85,11 @@ export default class KubeModel {
         labels: app.metadata.labels,
         name: app.metadata.name,
         relationships,
+        namespace: app.metadata.namespace,
+        created: app.metadata.creationTimestamp,
+        selfLink: app.metadata.selfLink,
+        resourceVersion: app.metadata.resourceVersion,
+        uid: app.metadata.uid,
         status: app.metadata.status,
         ...mock('Applications', {
           dashboard: '',

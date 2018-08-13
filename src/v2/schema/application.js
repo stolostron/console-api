@@ -11,6 +11,11 @@ export const typeDef = `
 # HCM Application
 type Application {
   annotations: JSON
+  namespace: String
+  created: String
+  selfLink: String
+  resourceVersion: String
+  uid: String
   components: [AppService]
   # URL to Grafana Dashboard.
   dashboard: String
@@ -29,8 +34,12 @@ type AppRelationship {
 
 # HCM Application Service (AppService)
 type AppService {
-  cluster: String
   name: String
+  annotations: JSON
+  labels: JSON
+  namespace: String
+  created: String
+  cluster: String
   status: String
 }
 `;
