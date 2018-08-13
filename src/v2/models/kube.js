@@ -37,9 +37,9 @@ export default class KubeModel {
   }
 
   async getApplications(name) {
-    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/applications');
+    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/applications');
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
 
@@ -101,7 +101,7 @@ export default class KubeModel {
   async getClusters() {
     const response = await this.kubeConnector.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
 
       // TODO: How should we handle errors? - 07/25/18 10:20:57 sidney.wijngaarde1@ibm.com
       return [];
@@ -123,7 +123,7 @@ export default class KubeModel {
   }
 
   async getClusterStatus() {
-    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/clusterstatuses');
+    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/clusterstatuses');
     if (response.code || response.message) {
       logger.error(`HCM ERROR ${response.code} - ${response.message}`);
       return [];
@@ -169,9 +169,9 @@ export default class KubeModel {
   }
 
   async getRepos() {
-    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/helmrepos');
+    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     return response.items.map(cluster => ({
@@ -208,7 +208,7 @@ export default class KubeModel {
 
   async setRepo(input) {
     const jsonBody = {
-      apiVersion: 'hcm.ibm.com/v1alpha1',
+      apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'HelmRepo',
       metadata: {
         name: input.Name,
@@ -217,9 +217,9 @@ export default class KubeModel {
         url: input.URL,
       },
     };
-    const response = await this.kubeConnector.post('/apis/hcm.ibm.com/v1alpha1/namespaces/default/helmrepos', jsonBody);
+    const response = await this.kubeConnector.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos', jsonBody);
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     return {
@@ -229,9 +229,9 @@ export default class KubeModel {
   }
 
   async deleteRepo(input) {
-    const response = await this.kubeConnector.delete(`/apis/hcm.ibm.com/v1alpha1/namespaces/default/helmrepos/${input.Name}`);
+    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos/${input.Name}`);
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     return {
@@ -287,9 +287,9 @@ export default class KubeModel {
   }
 
   async getCharts() {
-    const response = await this.kubeConnector.get('/apis/hcm.ibm.com/v1alpha1/helmrepos');
+    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
     if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     const charts = [];

@@ -7,7 +7,7 @@ Array [
       "Authorization": "Bearer localdev",
     },
     "json": Object {
-      "apiVersion": "hcm.ibm.com/v1alpha1",
+      "apiVersion": "mcm.ibm.com/v1alpha1",
       "kind": "WorkSet",
       "metadata": Object {
         "labels": Object {
@@ -38,7 +38,7 @@ Array [
       },
     },
     "method": "POST",
-    "url": "kubernetes/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets",
+    "url": "kubernetes/apis/mcm.ibm.com/v1alpha1/namespaces/default/worksets",
   },
 ]
 `;

@@ -70,7 +70,7 @@ class KubeConnector {
   createWorkset(resourceType) {
     const name = `${resourceType}-${this.uid()}`;
     const body = {
-      apiVersion: 'hcm.ibm.com/v1alpha1',
+      apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'WorkSet',
       metadata: {
         labels: { name },
@@ -86,7 +86,7 @@ class KubeConnector {
       },
     };
 
-    return this.post('/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets', body);
+    return this.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/worksets', body);
   }
 
   timeout() {
