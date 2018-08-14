@@ -50,32 +50,35 @@ export default class KubeModel {
       const dependencies = [];
       const relationships = [];
       const { annotations } = app.metadata;
-      delete annotations['kubectl.kubernetes.io/last-applied-configuration'];
 
-      if (app.status && app.status.components) {
-        app.status.components.forEach((component) => {
+      if (app.status && app.status.Deployable) {
+        // FIXME: API should return an array.
+        const deployables = Array.isArray(app.status.Deployable) ? app.status.Deployable : [app.status.Deployable]; // eslint-disable-line max-len
+        deployables.forEach((component) => {
           components.push({
             name: component.metadata.name,
             namespace: component.metadata.namespace,
             created: component.metadata.creationTimestamp,
             labels: component.metadata.labels,
             annotations: component.metadata.annotations,
-            ...mock('Application component', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
+            ...mock('Application component', { cluster: 'unknown' }), // FIXME: Deployable object doesn't have this info.
           });
 
           // Get dependencies for each component.
-          component.spec.dependencies.forEach((dep) => {
-            dependencies.push({
-              name: dep.destination.name,
-              type: dep.destination.kind,
-              ...mock('Application dependencies', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
+          if (component.spec && component.spec.dependencies) {
+            component.spec.dependencies.forEach((dep) => {
+              dependencies.push({
+                name: dep.destination.name,
+                type: dep.destination.kind,
+                ...mock('Application dependencies', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
+              });
+              relationships.push({
+                source: component.metadata.name,
+                destination: dep.destination.name,
+                type: 'dependsOn',
+              });
             });
-            relationships.push({
-              source: component.metadata.name,
-              destination: dep.destination.name,
-              type: 'dependsOn',
-            });
-          });
+          }
         });
       }
 
@@ -83,6 +86,7 @@ export default class KubeModel {
       return {
         annotations,
         components,
+        dashboard: app.status.Dashboard,
         dependencies,
         labels: app.metadata.labels,
         name: app.metadata.name,
@@ -93,9 +97,6 @@ export default class KubeModel {
         resourceVersion: app.metadata.resourceVersion,
         uid: app.metadata.uid,
         status: app.metadata.status,
-        ...mock('Applications', {
-          dashboard: '',
-        }),
       };
     });
   }
