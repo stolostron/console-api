@@ -14,10 +14,12 @@ type Query {
   charts: [HelmChart]
   clusters: [Cluster]
   dashboard: DashboardData
+  deployables (selector: JSON): [Deployable]
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
   repos: [HelmRepo]
+  placementPolicies (selector: JSON): [PlacementPolicy]
   policies: [Policy]
 
   # Topology

@@ -10,42 +10,59 @@
 export const typeDef = `
 # HCM Application
 type Application {
+  details: ApplicationDetails
+  deployables: [Deployable]
+  placementPolicies: [PlacementPolicy]
+  selector: JSON
+}
+
+type ApplicationDetails {
   annotations: JSON
-  namespace: String
-  created: String
-  selfLink: String
-  resourceVersion: String
-  uid: String
-  components: [AppService]
-  # URL to Grafana Dashboard.
+  creationTimestamp: String
+  # URL to Grafana Dashboard
   dashboard: String
-  dependencies: [AppService]
   labels: JSON
   name: String
-  relationships: [AppRelationship]
-  status: String
-}
-
-type AppRelationship {
-  source: String!
-  destination: String!
-  type: String
-}
-
-# HCM Application Service (AppService)
-type AppService {
-  name: String
-  annotations: JSON
-  labels: JSON
   namespace: String
-  created: String
-  cluster: String
+  resourceVersion: String
+  selfLink: String
   status: String
+  uid: String
 }
+
+type Deployable {
+  dependencies: [DeployableDependency]
+  deployer: HelmDeployer
+  name: String
+}
+
+type PlacementPolicy {
+  name: String
+}
+
+type DeployableDependency {
+  kind: String
+  name: String
+}
+
+type HelmDeployer {
+  chartName: String
+  namespace: String
+  repository: String
+  version: String
+}
+
 `;
 
+/* eslint-disable max-len */
 export const resolver = {
   Query: {
-    applications: (root, args, { kubeModel }) => kubeModel.getApplications(args.name),
+    applications: (root, args, { applicationModel }) => applicationModel.getApplications(args.name, args.namespace),
+    deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(args.selector),
+    placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
+  },
+  Application: {
+    deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(root.selector),
+    placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(root.selector),
   },
 };

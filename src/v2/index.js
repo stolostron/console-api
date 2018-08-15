@@ -17,6 +17,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
+import ApplicationModel from './models/application';
 import KubeModel from './models/kube';
 import MongoModel from './models/mongo';
 import createMockHttp from './mocks/';
@@ -89,6 +90,7 @@ if (process.env.NODE_ENV === 'production') {
       schema,
       context: {
         req,
+        applicationModel: new ApplicationModel({ token: req.kubeToken }),
         kubeModel: new KubeModel({ token: req.kubeToken }),
         mongoModel,
       },
