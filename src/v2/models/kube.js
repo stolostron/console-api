@@ -148,7 +148,7 @@ export default class KubeModel {
   }
 
   async getPods() {
-    const response = await this.kubeConnector.worksetResourceQuery('pods');
+    const response = await this.kubeConnector.resourceViewQuery('pods');
     return Object.keys(response.status.results).reduce((accum, clusterName) => {
       const pods = response.status.results[clusterName].items;
 
@@ -244,7 +244,7 @@ export default class KubeModel {
   }
 
   async getNodes() {
-    const response = await this.kubeConnector.worksetResourceQuery('nodes');
+    const response = await this.kubeConnector.resourceViewQuery('nodes');
     return Object.keys(response.status.results).reduce((accum, clusterName) => {
       const nodes = response.status.results[clusterName].items;
 
@@ -272,7 +272,7 @@ export default class KubeModel {
   }
 
   async getNamespaces() {
-    const response = await this.kubeConnector.worksetResourceQuery('namespaces');
+    const response = await this.kubeConnector.resourceViewQuery('namespaces');
     return Object.keys(response.status.results).reduce((accum, clusterName) => {
       const namespaces = response.status.results[clusterName].items;
 
@@ -298,15 +298,17 @@ export default class KubeModel {
     const charts = [];
     response.items.forEach((cluster) => {
       const rName = cluster.metadata.name;
-      const repo = Object.values(cluster.status.charts);
-      repo.forEach((chart) => {
-        charts.push({
-          repoName: rName,
-          name: chart.chartVersions[0].name,
-          version: chart.chartVersions[0].version,
-          urls: chart.chartVersions[0].urls,
+      if (cluster.status.charts) {
+        const repo = Object.values(cluster.status.charts);
+        repo.forEach((chart) => {
+          charts.push({
+            repoName: rName,
+            name: chart.chartVersions[0].name,
+            version: chart.chartVersions[0].version,
+            urls: chart.chartVersions[0].urls,
+          });
         });
-      });
+      }
     });
     return charts;
   }

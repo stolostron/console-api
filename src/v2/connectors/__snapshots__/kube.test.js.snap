@@ -8,37 +8,22 @@ Array [
     },
     "json": Object {
       "apiVersion": "mcm.ibm.com/v1alpha1",
-      "kind": "WorkSet",
+      "kind": "ResourceView",
       "metadata": Object {
         "labels": Object {
           "name": "pods-1234",
         },
         "name": "pods-1234",
-        "namespace": "default",
       },
       "spec": Object {
-        "selector": Object {
-          "matchLabels": Object {
-            "name": "pods-1234",
-          },
+        "scope": Object {
+          "resource": "pods",
         },
-        "template": Object {
-          "metadata": Object {
-            "labels": Object {
-              "name": "pods-1234",
-            },
-          },
-          "spec": Object {
-            "scope": Object {
-              "resourceType": "pods",
-            },
-            "type": "Resource",
-          },
-        },
+        "summaryOnly": false,
       },
     },
     "method": "POST",
-    "url": "kubernetes/apis/mcm.ibm.com/v1alpha1/namespaces/default/worksets",
+    "url": "kubernetes/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews",
   },
 ]
 `;
@@ -46,7 +31,7 @@ Array [
 exports[`KubeConnector CreateWorkset submits correct arguments and returns selfLink 2`] = `
 Object {
   "metadata": Object {
-    "selfLink": "/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets/test-set",
+    "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/test-set",
   },
 }
 `;
@@ -94,14 +79,28 @@ Array [
 exports[`KubeConnector WorksetResourceQuery creates and polls workset api 1`] = `
 Object {
   "status": Object {
-    "response": Object {
-      "test": "test-value",
+    "conditions": Array [
+      Object {
+        "lastUpdateTime": "2018-08-15T18:44:41Z",
+        "type": "Completed",
+      },
+    ],
+    "results": Object {
+      "mycluster.icp": Object {
+        "apiVersion": "v1",
+        "items": Array [
+          [Function],
+        ],
+        "kind": "PodList",
+        "metadata": Array [
+          [Function],
+        ],
+      },
     },
-    "status": "Completed",
   },
 }
 `;
 
-exports[`KubeConnector WorksetResourceQuery throws if createWorkset fails 1`] = `[Error: Create Worset Failed [401] - Unauthorized]`;
+exports[`KubeConnector WorksetResourceQuery throws if createWorkset fails 1`] = `[Error: Create Resource View Failed [401] - Unauthorized]`;
 
 exports[`KubeConnector WorksetResourceQuery throws on timeout 1`] = `[Error: Manager request timed out]`;

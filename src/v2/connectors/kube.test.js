@@ -15,7 +15,7 @@ const asyncReturn = (value, waitTime = 500) =>
 const mockWorkset = {
   body: {
     metadata: {
-      selfLink: '/apis/hcm.ibm.com/v1alpha1/namespaces/default/worksets/test-set',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/test-set',
     },
   },
 };
@@ -39,9 +39,16 @@ const mockWorksetPollIncomplete = {
 const mockWorksetPollComplete = {
   body: {
     status: {
-      status: 'Completed',
-      response: {
-        test: 'test-value',
+      conditions: [
+        { type: 'Completed', lastUpdateTime: '2018-08-15T18:44:41Z' },
+      ],
+      results: {
+        'mycluster.icp': {
+          apiVersion: 'v1',
+          items: [Array],
+          kind: 'PodList',
+          metadata: [Object],
+        },
       },
     },
   },
@@ -94,7 +101,7 @@ describe('KubeConnector', () => {
         uid: () => '1234',
       });
 
-      const workset = await connector.createWorkset('pods');
+      const workset = await connector.createResourceView('pods');
 
       expect(mockHttp.mock.calls[0]).toHaveLength(1);
       expect(mockHttp.mock.calls[0]).toMatchSnapshot();
@@ -117,7 +124,7 @@ describe('KubeConnector', () => {
         uid: () => '1234',
       });
 
-      const result = await connector.worksetResourceQuery('pods');
+      const result = await connector.resourceViewQuery('pods');
 
       expect(result).toMatchSnapshot();
     });
@@ -133,7 +140,7 @@ describe('KubeConnector', () => {
         pollTimeout: 1000,
       });
 
-      await expect(connector.worksetResourceQuery('pods')).rejects.toMatchSnapshot();
+      await expect(connector.resourceViewQuery('pods')).rejects.toMatchSnapshot();
     });
 
     test('throws on timeout', async () => {
@@ -148,7 +155,7 @@ describe('KubeConnector', () => {
         pollTimeout: 1000,
       });
 
-      await expect(connector.worksetResourceQuery('pods')).rejects.toMatchSnapshot();
+      await expect(connector.resourceViewQuery('pods')).rejects.toMatchSnapshot();
     });
   });
 });

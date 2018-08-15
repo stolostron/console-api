@@ -67,26 +67,26 @@ class KubeConnector {
   }
 
   // TODO: Allow filtering - 07/25/18 10:48:31 sidney.wijngaarde1@ibm.com
-  createWorkset(resourceType) {
+  createResourceView(resourceType) {
     const name = `${resourceType}-${this.uid()}`;
     const body = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'WorkSet',
+      kind: 'ResourceView',
       metadata: {
-        labels: { name },
+        labels: {
+          name,
+        },
         name,
-        namespace: 'default',
       },
       spec: {
-        selector: { matchLabels: { name } },
-        template: {
-          metadata: { labels: { name } },
-          spec: { scope: { resourceType }, type: 'Resource' },
+        summaryOnly: false,
+        scope: {
+          resource: resourceType,
         },
       },
     };
 
-    return this.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/worksets', body);
+    return this.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews', body);
   }
 
   timeout() {
@@ -94,7 +94,7 @@ class KubeConnector {
       setTimeout(reject, this.pollTimeout, new Error('Manager request timed out')));
   }
 
-  pollWorkset(worksetLink) {
+  pollView(resourceViewLink) {
     let cancel;
 
     const promise = new Promise(async (resolve, reject) => {
@@ -102,14 +102,14 @@ class KubeConnector {
       // eslint-disable-next-line consistent-return
       setInterval(async () => {
         try {
-          const response = await this.get(worksetLink);
+          const response = await this.get(resourceViewLink);
 
           if (response.code || response.message) {
             clearInterval(intervalID);
             return reject(response);
           }
 
-          const isComplete = (response.status && response.status.status) || 'NO';
+          const isComplete = (response.status && response.status.conditions && response.status.conditions[0].type) || 'NO';
 
           if (isComplete === 'Completed') {
             clearInterval(intervalID);
@@ -131,18 +131,18 @@ class KubeConnector {
     return { cancel, promise };
   }
 
-  async worksetResourceQuery(resourceType, params) {
-    const workset = await this.createWorkset(resourceType, params);
-    if (workset.status === 'Failure' || workset.code >= 400) {
-      throw new Error(`Create Worset Failed [${workset.code}] - ${workset.message}`);
+  async resourceViewQuery(resourceType) {
+    const resource = await this.createResourceView(resourceType);
+    if (resource.status === 'Failure' || resource.code >= 400) {
+      throw new Error(`Create Resource View Failed [${resource.code}] - ${resource.message}`);
     }
-    const { cancel, promise: pollPromise } = this.pollWorkset(workset.metadata.selfLink);
+    const { cancel, promise: pollPromise } = this.pollView(resource.metadata.selfLink);
 
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
       return result;
     } catch (e) {
-      logger.error('Workset Resource Query Error', e.message);
+      logger.error('Resource View Query Error', e.message);
       cancel();
       throw e;
     }
