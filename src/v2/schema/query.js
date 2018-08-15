@@ -19,8 +19,8 @@ type Query {
   nodes: [Node]
   pods: [Pod]
   repos: [HelmRepo]
+  policies(name: String, namespace: String): [Policy]
   placementPolicies (selector: JSON): [PlacementPolicy]
-  policies: [Policy]
 
   # Topology
   filters: Filters
@@ -30,6 +30,10 @@ type Query {
 }
 
 type Mutation {
+  # Creates Kubernetes Policy
+  createPolicy(resources: [JSON]): JSON
+  # Delete Kubernetes Policy
+  deletePolicy(namespace: String, name: String!): String
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }

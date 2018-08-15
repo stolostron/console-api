@@ -7,6 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
@@ -15,6 +16,8 @@ const mock = (prefix, obj) => {
   logger.warn(`Using mocked values for ${prefix}`, Object.keys(obj));
   return obj;
 };
+
+const POLICY_FAILURE_STATUS = 'Failure';
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -36,6 +39,23 @@ export default class KubeModel {
     }
   }
 
+  async createPolicy(resources) {
+    let errorMessage = '';
+    const result = await Promise.all(resources.map(resource => this.kubeConnector.post('/apis/policy.hcm.ibm.com/v1alpha1/namespaces/default/policies', resource)
+      .catch(err => console.log(err))));
+    result.forEach((item) => {
+      if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
+        errorMessage += `${item.message}\n`;
+      }
+    });
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    } else {
+      // TODO: add partical errors
+      return result;
+    }
+  }
+
   async getApplications(name) {
     const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/applications');
     if (response.code || response.message) {
@@ -44,7 +64,6 @@ export default class KubeModel {
     }
 
     const items = name ? response.items.filter(app => app.metadata.name === name) : response.items;
-
     return items.map((app) => {
       const components = [];
       const dependencies = [];
@@ -183,30 +202,89 @@ export default class KubeModel {
     }));
   }
 
-  async getPolicies() {
+  async getPolicies(name, namespace = 'default') {
+    // if policy name specified, return a single policy with details
+    if (name !== undefined) {
+      const templates = [];
+      const rules = [];
+      const arr = [];
+      const responseTemplates = [];
+
+      const response = await this.kubeConnector.get(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
+      if (response.code || response.message) {
+        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+      const policy = {
+        name: _.get(response, 'metadata.name', 'none'),
+        namespace: _.get(response, 'metadata.namespace', 'none'),
+        status: _.get(response, 'status.Valid', false) === false ? 'invalid' : _.get(response, 'status.Compliant', 'unknown'),
+        enforcement: _.get(response, 'spec.remediationAction', 'unknown'),
+      };
+      policy.detail = {
+        uid: _.get(response, 'metadata.uid', 'none'),
+        resourceVersion: _.get(response, 'metadata.resourceVersion', 'none'),
+        annotations: _.get(response, 'metadata.annotations', ''),
+        selfLink: _.get(response, 'metadata.selfLink', '-'),
+        creationTime: _.get(response, 'metadata.creationTimestamp', ''),
+        exclude_namespace: _.get(response, 'spec.namespaces.exclude', ['*']),
+        include_namespace: _.get(response, 'spec.namespaces.include', ['*']),
+      };
+      const policySpec = _.get(response, 'spec', []);
+
+      // for now, `-templates` is the special key word that server side uses
+      // to identify if an attribute is template arrays or not
+      // only support role-templates and generic-templates
+      Object.entries(policySpec).forEach(([key, value]) => {
+        if (key.endsWith('-templates')) {
+          value.forEach(item => responseTemplates.push({ ...item, templateType: key }));
+        }
+      });
+
+      responseTemplates.forEach((res) => {
+        const template = {
+          name: _.get(res, 'metadata.name', '-'),
+          lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+          complianceType: _.get(res, 'complianceType', ''),
+          apiVersion: _.get(res, 'apiVersion', ''),
+          compliant: _.get(res, 'status.Compliant', ''),
+          validity: _.get(res, 'status.Validity', ''),
+          selector: _.get(res, 'selector', ''),
+          templateType: _.get(res, 'templateType', ''),
+        };
+        res.rules.forEach((rul) => {
+          const rule = {};
+          rule.complianceType = _.get(rul, 'complianceType', '-');
+          rule.apiGroups = _.get(rul, 'policyRule.apiGroups', ['-']);
+          rule.resources = _.get(rul, 'policyRule.resources', ['-']);
+          rule.verbs = _.get(rul, 'policyRule.verbs', ['-']);
+          rules.push(rule);
+        });
+        templates.push(template);
+      });
+      policy.templates = templates;
+      policy.rules = rules;
+      arr.push(policy);
+      return arr;
+    }
+
+    // for getting policy list
     const response = await this.kubeConnector.get('/apis/policy.hcm.ibm.com/v1alpha1/policies');
     if (response.code || response.message) {
       logger.error(`HCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
-    return response.items.map(policy => ({
-      name: policy.metadata && policy.metadata.name,
-      namespace: policy.metadata && policy.metadata.namespace,
-      status: () => {
-        if (policy.status && policy.status.Valid === false) {
-          return 'invalid';
-        } else if (policy.status && policy.status.Compliant) {
-          return policy.status.Compliant;
-        }
-        return 'unknown';
-      },
-      enforcement: () => {
-        if (policy.spec) {
-          return policy.spec.remediationAction;
-        }
-        return 'unknown';
-      },
-    }));
+    const arr = [];
+    response.items.forEach((res) => {
+      const policy = {
+        name: _.get(res, 'metadata.name', 'none'),
+        namespace: _.get(res, 'metadata.namespace', 'none'),
+        status: _.get(res, 'status.Valid', false) === false ? 'invalid' : _.get(res, 'status.Compliant', 'unknown'),
+        enforcement: _.get(res, 'spec.remediationAction', 'unknown'),
+      };
+      arr.push(policy);
+    });
+    return arr;
   }
 
   async setRepo(input) {
@@ -241,6 +319,14 @@ export default class KubeModel {
       Name: response.metadata.name,
       URL: response.spec.url,
     };
+  }
+
+  async deletePolicy(input) {
+    const response = await this.kubeConnector.delete(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${input.namespace}/policies/${input.name}`);
+    if (response.code || response.message) {
+      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
+    }
+    return response.metadata.name;
   }
 
   async getNodes() {
