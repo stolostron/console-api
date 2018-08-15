@@ -46,6 +46,8 @@ type PolicyRule {
   apiGroups: [String]
   resources: [String]
   verbs: [String]
+  templateType: String
+  ruleUID: String
 }
 `;
 

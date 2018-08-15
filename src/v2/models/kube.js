@@ -252,14 +252,22 @@ export default class KubeModel {
           selector: _.get(res, 'selector', ''),
           templateType: _.get(res, 'templateType', ''),
         };
-        res.rules.forEach((rul) => {
-          const rule = {};
-          rule.complianceType = _.get(rul, 'complianceType', '-');
-          rule.apiGroups = _.get(rul, 'policyRule.apiGroups', ['-']);
-          rule.resources = _.get(rul, 'policyRule.resources', ['-']);
-          rule.verbs = _.get(rul, 'policyRule.verbs', ['-']);
-          rules.push(rule);
-        });
+        if (res.rules) {
+          Object.entries(res.rules).forEach(([key, rul]) => {
+            const complianceType = _.get(rul, 'complianceType');
+            if (complianceType) {
+              const rule = {
+                complianceType,
+                apiGroups: _.get(rul, 'policyRule.apiGroups', ['-']),
+                resources: _.get(rul, 'policyRule.resources', ['-']),
+                verbs: _.get(rul, 'policyRule.verbs', ['-']),
+                templateType: _.get(res, 'templateType', ''),
+                ruleUID: `${_.get(res, 'metadata.name', '-')}-rule-${key}`,
+              };
+              rules.push(rule);
+            }
+          });
+        }
         templates.push(template);
       });
       policy.templates = templates;
