@@ -13,28 +13,44 @@ const mockResponse = {
     apiVersion: 'clusterregistry.k8s.io/v1alpha1',
     metadata: {
       selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/clusters',
-      resourceVersion: '3865',
+      resourceVersion: '136667',
     },
     items: [
       {
         kind: 'Cluster',
         apiVersion: 'clusterregistry.k8s.io/v1alpha1',
         metadata: {
-          name: 'crucial-owl',
+          name: 'mycluster.icp',
           namespace: 'default',
-          selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/crucial-owl',
-          uid: '69902715-8386-11e8-95ba-868ccf9e029b',
-          resourceVersion: '3865',
-          creationTimestamp: '2018-07-09T14:43:15Z',
+          selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp',
+          uid: 'd9f3a5aa-9f19-11e8-855e-f2b998610544',
+          resourceVersion: '136558',
+          creationTimestamp: '2018-08-13T16:56:41Z',
           labels: {
-            name: 'crucial-owl',
+            cloud: 'IBM',
+            datacenter: 'toronto',
+            environment: 'Dev',
+            name: 'mycluster.icp',
+            owner: 'marketing',
+            region: 'US',
+            vendor: 'ICP',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
           },
           finalizers: [
-            'finalizer.hcm.io',
+            'finalizer.hcm.ibm.com',
           ],
         },
         spec: {
-          kubernetesApiEndpoints: {},
+          kubernetesApiEndpoints: {
+            serverEndpoints: [
+              {
+                serverAddress: '9.42.80.212:8001',
+              },
+            ],
+          },
           authInfo: {},
         },
         status: {
@@ -42,7 +58,7 @@ const mockResponse = {
             {
               type: 'OK',
               status: '',
-              lastHeartbeatTime: '2018-07-10T19:45:49Z',
+              lastHeartbeatTime: '2018-08-15T19:41:20Z',
               lastTransitionTime: null,
             },
           ],

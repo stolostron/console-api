@@ -10,13 +10,16 @@
 export const typeDef = `
 type Cluster {
   createdAt: String
+  clusterip: String
   labels: JSON
   name: String
   namespace: String
   nodes: Int
   status: String
-  totalMemory: Int
-  totalStorage: Int
+  # Returns % of memory used.
+  totalMemory: String
+  # Returns % of storage used.
+  totalStorage: String
   uid: String,
 }
 `;

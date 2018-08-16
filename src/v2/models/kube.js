@@ -129,19 +129,24 @@ export default class KubeModel {
       return [];
     }
 
-    return response.items.map(cluster => ({
-      createdAt: cluster.metadata.creationTimestamp,
-      labels: cluster.metadata.labels,
-      name: cluster.metadata.name,
-      namespace: cluster.metadata.namespace,
-      status: cluster.status.conditions[0].type.toLowerCase(),
-      uid: cluster.metadata.uid,
-      ...mock('Cluster', {
-        nodes: 1,
-        totalMemory: 0,
-        totalStorage: 0,
-      }),
-    }));
+    const clusterStatus = await this.getClusterStatus();
+    const result = [];
+
+    response.items.forEach((cluster, idx) => {
+      result.push({
+        createdAt: cluster.metadata.creationTimestamp,
+        clusterip: clusterStatus[idx].ip,
+        labels: cluster.metadata.labels,
+        name: cluster.metadata.name,
+        namespace: cluster.metadata.namespace,
+        status: _.get(cluster, 'status.conditions[0].type', 'unknown').toLowerCase(),
+        uid: cluster.metadata.uid,
+        nodes: clusterStatus[idx].nodes,
+        totalMemory: parseInt(clusterStatus[idx].memoryUtilization, 10),
+        totalStorage: parseInt(clusterStatus[idx].storageUtilization, 10),
+      });
+    });
+    return result;
   }
 
   async getClusterStatus() {
@@ -151,19 +156,32 @@ export default class KubeModel {
       return [];
     }
 
-    return response.items.map(cluster => ({
-      createdAt: cluster.metadata.creationTimestamp,
-      labels: cluster.metadata.labels,
-      name: cluster.metadata.name,
-      namespace: cluster.metadata.namespace,
-      uid: cluster.metadata.uid,
-      nodes: cluster.spec.capacity.nodes,
-      pods: cluster.spec.usage.pods,
-      ip: cluster.spec.masterAddresses[0].ip,
-      memoryUtilization: getPercentage(cluster.spec.usage.memory, cluster.spec.capacity.memory),
-      storageUtilization: getPercentage(cluster.spec.usage.storage, cluster.spec.capacity.storage),
-      cpuUtilization: getCPUPercentage(cluster.spec.usage.cpu, cluster.spec.capacity.cpu),
-    }));
+    const result = [];
+    response.items.forEach((cluster) => {
+      result.push({
+        createdAt: cluster.metadata.creationTimestamp,
+        labels: cluster.metadata.labels,
+        name: cluster.metadata.name,
+        namespace: cluster.metadata.namespace,
+        uid: cluster.metadata.uid,
+        nodes: cluster.spec.capacity.nodes,
+        pods: cluster.spec.usage.pods,
+        ip: cluster.spec.masterAddresses[0].ip,
+        memoryUtilization: getPercentage(
+          cluster.spec.usage.memory,
+          cluster.spec.capacity.memory,
+        ),
+        storageUtilization: getPercentage(
+          cluster.spec.usage.storage,
+          cluster.spec.capacity.storage,
+        ),
+        cpuUtilization: getCPUPercentage(
+          cluster.spec.usage.cpu,
+          cluster.spec.capacity.cpu,
+        ),
+      });
+    });
+    return result;
   }
 
   async getPods() {

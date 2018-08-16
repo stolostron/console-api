@@ -184,16 +184,15 @@ const transformTotalCluster = (curr, status, currentData) => {
   return currentMap;
 };
 
-// TODO: Zack L. - do we want to have https and port hardcoded?
 const transformCluster = (cluster, status) => ({
-  link: `https://${cluster.ip}:8443`,
+  link: cluster.ip,
   percentage: cluster.percentage || 0,
   resourceName: cluster.name,
   status,
 });
 
 const transformPercentage = field => (cluster, status) => ({
-  link: `https://${cluster.ip}:8443`,
+  link: cluster.ip,
   percentage: Math.round(cluster[field]),
   resourceName: cluster.name,
   status,
