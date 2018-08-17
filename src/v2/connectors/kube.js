@@ -140,6 +140,10 @@ class KubeConnector {
 
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
+      if (result) {
+        this.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/${resource.metadata.name}`)
+          .catch(e => logger.error(`Error deleting resourceviews ${resource.metadata.name}`, e.message));
+      }
       return result;
     } catch (e) {
       logger.error('Resource View Query Error', e.message);
