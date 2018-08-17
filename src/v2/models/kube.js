@@ -424,4 +424,24 @@ export default class KubeModel {
     });
     return charts;
   }
+
+  async getReleases() {
+    const response = await this.kubeConnector.resourceViewQuery('releases');
+    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+      const rels = response.status.results[clusterName].items;
+
+      rels.map(rel => accum.push({
+        chartName: rel.spec.chartName,
+        chartVersion: rel.spec.chartVersion,
+        namespace: rel.spec.namespace,
+        status: rel.spec.status,
+        version: rel.spec.version,
+        name: rel.metadata.name,
+        cluster: clusterName,
+        lastDeployed: new Date(rel.spec.lastDeployed).getTime() / 1000,
+      }));
+
+      return accum;
+    }, []);
+  }
 }

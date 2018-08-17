@@ -1,0 +1,27 @@
+/** *****************************************************************************
+ * Licensed Materials - Property of IBM
+ * (c) Copyright IBM Corporation 2018. All Rights Reserved.
+ *
+ * Note to U.S. Government Users Restricted Rights:
+ * Use, duplication or disclosure restricted by GSA ADP Schedule
+ * Contract with IBM Corp.
+ ****************************************************************************** */
+
+export const typeDef = `
+type HelmRel {
+  chartName: String
+  chartVersion: String
+  namespace: String
+  status: String
+  version: Int
+  name: String
+  cluster: String
+  lastDeployed: String
+}
+`;
+
+export const resolver = {
+  Query: {
+    releases: (root, args, { kubeModel }) => kubeModel.getReleases(args),
+  },
+};

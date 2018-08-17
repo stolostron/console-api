@@ -21,6 +21,7 @@ import * as node from './node';
 import * as pod from './pod';
 import * as policy from './policy';
 import * as query from './query';
+import * as releases from './helmrels';
 import * as repo from './helmrepo';
 import * as topology from './topology';
 
@@ -36,6 +37,7 @@ const modules = [
   pod,
   policy,
   query,
+  releases,
   repo,
   topology,
 ];

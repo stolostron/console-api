@@ -18,6 +18,7 @@ type Query {
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
+  releases: [HelmRel]
   repos: [HelmRepo]
   policies(name: String, namespace: String): [Policy]
   placementPolicies (selector: JSON): [PlacementPolicy]
