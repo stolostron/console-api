@@ -28,6 +28,11 @@ function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
 }
 
+function getStatus(cluster) {
+  const status = _.get(cluster, 'status.conditions[0].type', 'unknown');
+  return status === '' ? 'unknown' : status.toLowerCase();
+}
+
 export default class KubeModel {
   constructor({ kubeConnector, token, httpLib = requestLib }) {
     if (kubeConnector) {
@@ -139,7 +144,7 @@ export default class KubeModel {
         labels: cluster.metadata.labels,
         name: cluster.metadata.name,
         namespace: cluster.metadata.namespace,
-        status: _.get(cluster, 'status.conditions[0].type', 'unknown').toLowerCase(),
+        status: getStatus(cluster),
         uid: cluster.metadata.uid,
         nodes: clusterStatus[idx].nodes,
         totalMemory: parseInt(clusterStatus[idx].memoryUtilization, 10),

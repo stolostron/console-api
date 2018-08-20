@@ -198,16 +198,12 @@ const transformPercentage = field => (cluster, status) => ({
   status,
 });
 
-// TODO: Zack L.
-// Releases isnt mapped correctly as there are none in 212 env
-
-// rels & pods dont have percentage || link data in v1 or v2
-// const transformRelease = (release, status) => ({
-//   link: '',
-//   percentage: 0,
-//   resourceName: release.name,
-//   status,
-// });
+const transformRelease = (release, status) => ({
+  link: '',
+  percentage: 0,
+  resourceName: release.name,
+  status,
+});
 
 const transformPod = (pod, status) => ({
   link: '',
@@ -251,15 +247,13 @@ export const resolver = {
           statusQuery: () => kubeModel.getClusterStatus(args),
           clusterQuery: () => kubeModel.getClusters(args),
         }),
-        // TODO: Zack Layne
-        // when helm rels is returning data we can come back to this card item.
-        //
-        // getDashboardItems({
-        //   cards: [
-        //     { name: 'helm releases', transform: transformRelease },
-        //   ],
-        //   query: () => kubeModel.getReleases(args),
-        // }),
+        getDashboardItems({
+          cards: [
+            { name: 'helm releases', transform: transformRelease },
+          ],
+          statusQuery: () => kubeModel.getReleases(args),
+          clusterQuery: () => kubeModel.getClusters(args),
+        }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod },
