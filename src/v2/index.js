@@ -58,6 +58,7 @@ if (process.env.NODE_ENV === 'production') {
       schema,
       context: {
         req,
+        applicationModel: new ApplicationModel({ token: req.kubeToken }),
         kubeModel: new KubeModel({ token: req.kubeToken }),
         mongoModel,
       },
@@ -73,7 +74,12 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
     formatError,
     schema,
-    context: { req, kubeModel: new KubeModel({ token: req.kubeToken, httpLib: mockHttp }) },
+    context: {
+      req,
+      applicationModel: new ApplicationModel({ token: req.kubeToken, httpLib: mockHttp }),
+      kubeModel: new KubeModel({ token: req.kubeToken, httpLib: mockHttp }),
+    },
+
   })));
 } else {
   graphQLServer.use('*', morgan('dev'));
