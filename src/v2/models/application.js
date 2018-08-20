@@ -77,8 +77,13 @@ export default class ApplicationModel {
         Object.keys(selector.matchLabels).lastIndexOf(key) > -1 &&
           pp.metadata.labels[key] === selector.matchLabels[key]));
 
-    return placementPolicies.map(deployable => ({
-      name: deployable.metadata.name,
+    return placementPolicies.map(({ metadata, spec }) => ({
+      name: metadata.name,
+      namespace: metadata.namespace,
+      annotations: metadata.annotations,
+      clusterSelector: spec.clusterSelector,
+      replicas: spec.replicas,
+      resourceSelector: spec.resourceSelector,
     }));
   }
 }

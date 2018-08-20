@@ -37,7 +37,12 @@ type Deployable {
 }
 
 type PlacementPolicy {
+  annotations: JSON
+  clusterSelector: JSON
   name: String
+  namespace: String
+  replicas: Int
+  resourceSelector: JSON
 }
 
 type DeployableDependency {
