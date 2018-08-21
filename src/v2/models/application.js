@@ -24,6 +24,61 @@ export default class ApplicationModel {
   }
 
 
+  async createApplication(resources) {
+    const appKinds = {
+      Application: 'applications',
+      ConfigMap: 'configmaps',
+      DeployableOverride: 'deployableoverrides',
+      Deployable: 'deployables',
+      PlacementPolicy: 'placementpolicies',
+    };
+
+    if (!resources.find(resource => resource.kind === 'Application')) {
+      return {
+        errors: [{ message: 'Must contain a resource with kind "Application".' }],
+      };
+    }
+
+    const result = await Promise.all(resources.map((resource) => {
+      const namespace = resource.metadata.namespace || 'default';
+      if (appKinds[resource.kind] === 'undefined') {
+        return Promise.resolve({
+          status: 'Failure',
+          message: `Invalid Kind: ${resource.kind}`,
+        });
+      }
+      return this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${appKinds[resource.kind]}`, resource)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }));
+    }));
+
+    const errors = [];
+    result.forEach((item) => {
+      if (item.code > 400 || item.status === 'Failure') {
+        errors.push({ message: item.message });
+      }
+    });
+
+    return {
+      errors,
+      result,
+    };
+  }
+
+  /**
+   * NOTE: This only deletes the top level Application object. Related objects like Deployable,
+   * PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
+   */
+  async deleteApplication(namespace = 'default', name) {
+    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`);
+    if (response.code || response.message) {
+      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
+    }
+    return response.metadata.name;
+  }
+
   async getApplications(name, namespace = 'default') {
     const response = name ?
       await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`) :

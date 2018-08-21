@@ -70,4 +70,8 @@ export const resolver = {
     deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(root.selector),
     placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(root.selector),
   },
+  Mutation: {
+    createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args.resources),
+    deleteApplication: (root, args, { applicationModel }) => applicationModel.deleteApplication(args.namespace, args.name),
+  },
 };

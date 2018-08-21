@@ -31,10 +31,21 @@ type Query {
 }
 
 type Mutation {
-  # Creates Kubernetes Policy
+  # Creates an Application.
+  # Requires a resource of kind "Application".
+  # Other supported kinds are: ConfigMap, Deployable, DeployableOverride, and PlacementPolicy
+  createApplication(resources: [JSON]): JSON
+
+  # Creates a Kubernetes Policy
   createPolicy(resources: [JSON]): JSON
+
+  # NOTE: This only deletes the top level Application object. Related objects like Deployable,
+  # PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
+  deleteApplication(namespace: String, name: String!): String
+
   # Delete Kubernetes Policy
   deletePolicy(namespace: String, name: String!): String
+
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }
