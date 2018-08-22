@@ -12,10 +12,6 @@ import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
 
-const mock = (prefix, obj) => {
-  logger.warn(`Using mocked values for ${prefix}`, Object.keys(obj));
-  return obj;
-};
 
 const POLICY_FAILURE_STATUS = 'Failure';
 
@@ -85,7 +81,6 @@ export default class KubeModel {
             created: component.metadata.creationTimestamp,
             labels: component.metadata.labels,
             annotations: component.metadata.annotations,
-            ...mock('Application component', { cluster: 'unknown' }), // FIXME: Deployable object doesn't have this info.
           });
 
           // Get dependencies for each component.
@@ -94,7 +89,6 @@ export default class KubeModel {
               dependencies.push({
                 name: dep.destination.name,
                 type: dep.destination.kind,
-                ...mock('Application dependencies', { cluster: 'unknown' }), // FIXME: AppService object doesn't have this info.
               });
               relationships.push({
                 source: component.metadata.name,
