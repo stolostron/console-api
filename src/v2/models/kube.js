@@ -11,6 +11,7 @@ import _ from 'lodash';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
+import config from '../../../config';
 
 
 const POLICY_FAILURE_STATUS = 'Failure';
@@ -22,6 +23,129 @@ function getPercentage(usage, capacity) {
 
 function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
+}
+
+function getComplianceObject(res) {
+  const statusArray = [];
+  const selectors = _.get(res, 'spec.clusterSelector', []);
+
+  let totalClusters = 0;
+  let compliantClusters = 0;
+  let totalPolicies = 0;
+  let compliantPolicies = 0;
+
+  const selectorArray = Object.entries(selectors).map(([selectorType, selector]) =>
+    ({ selectorType, selector }));
+  const status = _.get(res, 'status', []);
+  if (status) totalClusters = Object.keys(status).length;
+  Object.entries(status).forEach(([key, cluster]) => {
+    const policies = [];
+    let clusterCompliant = true;
+    Object.entries(cluster).forEach(([policyKey, policyValue]) => {
+      totalPolicies += 1;
+      if (_.get(policyValue, 'policyValue.Compliant', '').toLowerCase() === 'compliant') compliantPolicies += 1;
+      else clusterCompliant = false;
+      policies.push({ policyKey, compliant: policyValue.Compliant || '', valid: policyValue.Valid || '' });
+    });
+    if (clusterCompliant) compliantClusters += 1;
+    statusArray.push({
+      namespace: key,
+      cluster: key,
+      policies,
+    });
+  });
+  const compliance = {
+    name: _.get(res, 'metadata.name', 'none'),
+    namespace: _.get(res, 'metadata.namespace', 'none'),
+    kind: _.get(res, 'kind', 'Compliance'),
+    clusterSelector: selectorArray,
+    policyCompliant: `${compliantPolicies}/${totalPolicies}`,
+    clusterCompliant: `${compliantClusters}/${totalClusters}`,
+  };
+  compliance.complianceStatus = statusArray;
+  return compliance;
+}
+
+function getPolicyObject(response, target) {
+  const templates = [];
+  const rules = [];
+  const responseTemplates = [];
+  const violations = [];
+  const policySpec = _.get(response, 'spec', []);
+
+  // for now, `-templates` is the special key word that server side uses
+  // to identify if an attribute is template arrays or not
+  // only support role-templates and generic-templates
+  Object.entries(policySpec).forEach(([key, value]) => {
+    if (key.endsWith('-templates')) {
+      value.forEach(item => responseTemplates.push({ ...item, templateType: key }));
+    }
+  });
+
+  const detail = {
+    uid: _.get(response, 'metadata.uid', 'none'),
+    resourceVersion: _.get(response, 'metadata.resourceVersion', 'none'),
+    annotations: _.get(response, 'metadata.annotations', ''),
+    selfLink: _.get(response, 'metadata.selfLink', '-'),
+    creationTime: _.get(response, 'metadata.creationTimestamp', '-'),
+    exclude_namespace: _.get(response, 'spec.namespaces.exclude', ['*']),
+    include_namespace: _.get(response, 'spec.namespaces.include', ['*']),
+  };
+
+  responseTemplates.forEach((res) => {
+    // type: PolicyTemplate
+    const template = {
+      name: _.get(res, 'metadata.name', '-'),
+      lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+      complianceType: _.get(res, 'complianceType', ''),
+      apiVersion: _.get(res, 'apiVersion', ''),
+      compliant: _.get(res, 'status.Compliant', ''),
+      validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+      selector: _.get(res, 'selector', ''),
+      templateType: _.get(res, 'templateType', ''),
+    };
+    const templateCondition = _.get(res, 'status.conditions[0]');
+
+    // type: Violations
+    const violation = {
+      name: _.get(res, 'metadata.name', '-'),
+      cluster: 'local', // local means the cluster that this policy is applied
+      status: _.get(res, 'status.Validity.valid', false) ? _.get(response, 'status.Compliant', 'unknown') : 'invalid',
+      message: (templateCondition && _.get(templateCondition, 'message', 'unknown')) || 'unknown',
+      reason: (templateCondition && _.get(templateCondition, 'reason', 'unknown')) || 'unknown',
+      selector: _.get(res, 'selector', ''),
+    };
+    violations.push(violation);
+
+    // type: PolicyRules
+    if (res.rules) {
+      Object.entries(res.rules).forEach(([key, rul]) => {
+        const complianceType = _.get(rul, 'complianceType');
+        if (complianceType) {
+          const rule = {
+            complianceType,
+            apiGroups: _.get(rul, 'policyRule.apiGroups', ['-']),
+            resources: _.get(rul, 'policyRule.resources', ['-']),
+            verbs: _.get(rul, 'policyRule.verbs', ['-']),
+            templateType: _.get(res, 'templateType', ''),
+            ruleUID: `${_.get(res, 'metadata.name', '-')}-rule-${key}`,
+          };
+          rules.push(rule);
+        }
+      });
+    }
+    templates.push(template);
+  });
+  return {
+    ...target,
+    templates,
+    rules,
+    violations,
+    detail,
+    namespace: _.get(response, 'metadata.namespace', 'none'),
+    status: _.get(response, 'status.Valid', false) === false ? 'invalid' : _.get(response, 'status.Compliant', 'unknown'),
+    enforcement: _.get(response, 'spec.remediationAction', 'unknown'),
+  };
 }
 
 function getStatus(cluster) {
@@ -41,9 +165,34 @@ export default class KubeModel {
   }
 
   async createPolicy(resources) {
+    // TODO: revist this, do something like application,
+    // combine policy and compliance into one mutation
     let errorMessage = '';
-    const result = await Promise.all(resources.map(resource => this.kubeConnector.post('/apis/policy.hcm.ibm.com/v1alpha1/namespaces/default/policies', resource)
-      .catch(err => console.log(err))));
+    const result = await Promise.all(resources.map((resource) => {
+      const namespace = _.get(resource, 'metadata.namespace', 'default');
+      return this.kubeConnector.post(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
+        .catch(err => console.log(err));
+    }));
+    result.forEach((item) => {
+      if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
+        errorMessage += `${item.message}\n`;
+      }
+    });
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    } else {
+      // TODO: add partical errors
+      return result;
+    }
+  }
+
+  async createCompliance(resources) {
+    let errorMessage = '';
+    const result = await Promise.all(resources.map((resource) => {
+      const namespace = _.get(resource, 'metadata.namespace', 'default');
+      return this.kubeConnector.post(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
+        .catch(err => console.log(err));
+    }));
     result.forEach((item) => {
       if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
         errorMessage += `${item.message}\n`;
@@ -219,13 +368,76 @@ export default class KubeModel {
     }));
   }
 
+  async getCompliances(name, namespace = 'hcm') {
+    // for getting compliance list
+    const arr = [];
+    if (!name) {
+      const response = await this.kubeConnector.get(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${config.get('complianceNamespace') || 'hcm'}/compliances`);
+      if (response.code || response.message) {
+        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+      if (response.items) {
+        response.items.forEach((res) => {
+          arr.push(getComplianceObject(res));
+        });
+      }
+    } else {
+      // get single policy from a specific namespace
+      const response = await this.kubeConnector.get('/apis/compliance.hcm.ibm.com/v1alpha1/compliances');
+      if (response.code || response.message) {
+        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+      if (response.items) {
+        let compliance = {};
+        const complianceStatus = [];
+        const filteredResponseData = response.items.filter(item => _.get(item, 'metadata.name') === name);
+        filteredResponseData.forEach((complianceData) => {
+          const complianceNamespace = _.get(complianceData, 'metadata.namespace');
+          if (complianceNamespace === namespace) {
+            compliance = getComplianceObject(complianceData);
+            // compliance details for compliance-detail-page
+            const detail = {
+              uid: _.get(complianceData, 'metadata.uid', 'none'),
+              resourceVersion: _.get(complianceData, 'metadata.resourceVersion', 'none'),
+              selfLink: _.get(complianceData, 'metadata.selfLink', '-'),
+              creationTime: _.get(complianceData, 'metadata.creationTimestamp', ''),
+            };
+            compliance.detail = detail;
+          } else {
+            const statusLocal = _.get(complianceData, 'statusLocal.aggregatePoliciesStates', {});
+            // find out policy namespace
+            Object.entries(statusLocal).forEach(([key, value]) => {
+              let policyObject = {
+                name: key,
+                cluster: complianceNamespace,
+                compliant: _.get(value, 'Compliant', '-'),
+                valid: _.get(value, 'Valid', '-'),
+                complianceName: name,
+                complianceNamespace: namespace,
+              };
+              const spec = _.get(complianceData, 'spec', {});
+              let targetPolicy;
+              Object.values(spec).forEach((compliancePolicyArray) => {
+                targetPolicy = compliancePolicyArray.find(item => _.get(item, 'metadata.name') === key);
+              });
+              if (targetPolicy) policyObject = getPolicyObject(targetPolicy, policyObject);
+              complianceStatus.push(policyObject);
+            });
+          }
+        });
+        compliance.complianceStatus = complianceStatus;
+        arr.push(compliance);
+      }
+    }
+    return arr;
+  }
+
   async getPolicies(name, namespace = 'default') {
     // if policy name specified, return a single policy with details
     if (name !== undefined) {
-      const templates = [];
-      const rules = [];
       const arr = [];
-      const responseTemplates = [];
 
       const response = await this.kubeConnector.get(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
       if (response.code || response.message) {
@@ -234,62 +446,9 @@ export default class KubeModel {
       }
       const policy = {
         name: _.get(response, 'metadata.name', 'none'),
-        namespace: _.get(response, 'metadata.namespace', 'none'),
-        status: _.get(response, 'status.Valid', false) === false ? 'invalid' : _.get(response, 'status.Compliant', 'unknown'),
-        enforcement: _.get(response, 'spec.remediationAction', 'unknown'),
       };
-      policy.detail = {
-        uid: _.get(response, 'metadata.uid', 'none'),
-        resourceVersion: _.get(response, 'metadata.resourceVersion', 'none'),
-        annotations: _.get(response, 'metadata.annotations', ''),
-        selfLink: _.get(response, 'metadata.selfLink', '-'),
-        creationTime: _.get(response, 'metadata.creationTimestamp', ''),
-        exclude_namespace: _.get(response, 'spec.namespaces.exclude', ['*']),
-        include_namespace: _.get(response, 'spec.namespaces.include', ['*']),
-      };
-      const policySpec = _.get(response, 'spec', []);
 
-      // for now, `-templates` is the special key word that server side uses
-      // to identify if an attribute is template arrays or not
-      // only support role-templates and generic-templates
-      Object.entries(policySpec).forEach(([key, value]) => {
-        if (key.endsWith('-templates')) {
-          value.forEach(item => responseTemplates.push({ ...item, templateType: key }));
-        }
-      });
-
-      responseTemplates.forEach((res) => {
-        const template = {
-          name: _.get(res, 'metadata.name', '-'),
-          lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
-          complianceType: _.get(res, 'complianceType', ''),
-          apiVersion: _.get(res, 'apiVersion', ''),
-          compliant: _.get(res, 'status.Compliant', ''),
-          validity: _.get(res, 'status.Validity', ''),
-          selector: _.get(res, 'selector', ''),
-          templateType: _.get(res, 'templateType', ''),
-        };
-        if (res.rules) {
-          Object.entries(res.rules).forEach(([key, rul]) => {
-            const complianceType = _.get(rul, 'complianceType');
-            if (complianceType) {
-              const rule = {
-                complianceType,
-                apiGroups: _.get(rul, 'policyRule.apiGroups', ['-']),
-                resources: _.get(rul, 'policyRule.resources', ['-']),
-                verbs: _.get(rul, 'policyRule.verbs', ['-']),
-                templateType: _.get(res, 'templateType', ''),
-                ruleUID: `${_.get(res, 'metadata.name', '-')}-rule-${key}`,
-              };
-              rules.push(rule);
-            }
-          });
-        }
-        templates.push(template);
-      });
-      policy.templates = templates;
-      policy.rules = rules;
-      arr.push(policy);
+      arr.push(getPolicyObject(response, policy));
       return arr;
     }
 
@@ -300,15 +459,17 @@ export default class KubeModel {
       return [];
     }
     const arr = [];
-    response.items.forEach((res) => {
-      const policy = {
-        name: _.get(res, 'metadata.name', 'none'),
-        namespace: _.get(res, 'metadata.namespace', 'none'),
-        status: _.get(res, 'status.Valid', false) === false ? 'invalid' : _.get(res, 'status.Compliant', 'unknown'),
-        enforcement: _.get(res, 'spec.remediationAction', 'unknown'),
-      };
-      arr.push(policy);
-    });
+    if (response.items) {
+      response.items.forEach((res) => {
+        const policy = {
+          name: _.get(res, 'metadata.name', 'none'),
+          namespace: _.get(res, 'metadata.namespace', 'none'),
+          status: _.get(res, 'status.Valid', false) === false ? 'invalid' : _.get(res, 'status.Compliant', 'unknown'),
+          enforcement: _.get(res, 'spec.remediationAction', 'unknown'),
+        };
+        arr.push(policy);
+      });
+    }
     return arr;
   }
 
@@ -344,6 +505,14 @@ export default class KubeModel {
       Name: response.metadata.name,
       URL: response.spec.url,
     };
+  }
+
+  async deleteCompliance(input) {
+    const response = await this.kubeConnector.delete(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
+    if (response.code || response.message) {
+      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
+    }
+    return response.metadata.name;
   }
 
   async deletePolicy(input) {

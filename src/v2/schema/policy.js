@@ -16,8 +16,18 @@ type Policy {
   # Possible values are: compliant, notcompliant, invalid
   status: String
   detail: PolicyDetail
-  templates: [PolicyTemplate]
-  rules: [PolicyRule]
+  templates: [PolicyTemplates]
+  rules: [PolicyRules]
+  violations: [Violations]
+}
+
+type Violations {
+  name: String
+  cluster: String
+  status: String
+  message: String
+  reason: String
+  selector: JSON
 }
 
 type PolicyDetail {
@@ -30,7 +40,7 @@ type PolicyDetail {
   uid: String
 }
 
-type PolicyTemplate {
+type PolicyTemplates {
   name: String
   lastTransition: String
   complianceType: String
@@ -41,7 +51,7 @@ type PolicyTemplate {
   selector: JSON
 }
 
-type PolicyRule {
+type PolicyRules {
   complianceType: String
   apiGroups: [String]
   resources: [String]
