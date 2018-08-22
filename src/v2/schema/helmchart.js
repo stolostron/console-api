@@ -41,6 +41,6 @@ export const resolver = {
     charts: async (root, args, { kubeModel }) => kubeModel.getCharts(args),
   },
   Mutation: {
-    installHelmChart: async (root, input, { kubeModel }) => kubeModel.installHelmChart(input),
+    installHelmChart: async (root, { input }, { kubeModel }) => kubeModel.installHelmChart(input),
   },
 };
