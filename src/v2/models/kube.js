@@ -443,4 +443,49 @@ export default class KubeModel {
       return accum;
     }, []);
   }
+
+  async installHelmChart(input) {
+    const {
+      chartURL, namespace, releaseName, values, clusters,
+    } = input;
+
+    return clusters.map(async (cluster) => {
+      const workNamespace = `mcm-${cluster}`;
+      const jsonBody = {
+        apiVersion: 'mcm.ibm.com/v1alpha1',
+        kind: 'Work',
+        metadata: {
+          name: releaseName,
+          namespace: workNamespace,
+        },
+        spec: {
+          cluster: {
+            name: cluster,
+          },
+          type: 'Deployer',
+          helm: {
+            chartURL,
+            namespace,
+            values,
+          },
+        },
+      };
+
+      const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/mcm-${cluster}/works`, jsonBody);
+      if (response.code || response.message) {
+        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        return [{
+          code: response.code,
+          message: response.message,
+        }];
+      }
+
+      return {
+        chartName: response.metadata.name,
+        namespace: response.spec.helm.namespace,
+        status: response.status.type,
+        cluster: response.spec.cluster.name,
+      };
+    });
+  }
 }

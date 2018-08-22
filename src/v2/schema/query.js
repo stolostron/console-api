@@ -47,6 +47,7 @@ type Mutation {
   deletePolicy(namespace: String, name: String!): String
 
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
+  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
 }
 `;
