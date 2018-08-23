@@ -615,7 +615,7 @@ export default class KubeModel {
 
   async installHelmChart(input) {
     const {
-      chartURL, namespace, releaseName, values, clusters,
+      chartURL, namespace, releaseName, clusters,
     } = input;
 
     return clusters.map(async (cluster) => {
@@ -635,7 +635,6 @@ export default class KubeModel {
           helm: {
             chartURL,
             namespace,
-            values,
           },
         },
       };

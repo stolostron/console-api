@@ -13,7 +13,7 @@ input InstallHelmChartInput {
   namespace: String!
   releaseName: String!
   clusters: [String]!
-  values: JSON
+  values: String
 }
 
 type HelmChart {
