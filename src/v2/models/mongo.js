@@ -38,12 +38,13 @@ const wait = ms => new Promise((resolve) => {
 });
 
 export default class MongoModel {
-  constructor({ mongoose = mongooseLib, Resource = ResourceModel } = {}) {
+  constructor(mongoURI, { mongoose = mongooseLib, Resource = ResourceModel } = {}) {
+    this.mongoURI = mongoURI;
     this.mongoose = mongoose;
     this.Resource = Resource;
   }
 
-  async connect(mongoURI, numRetries = 100) {
+  async connect(numRetries = 5) {
     if (this.mongoose.connection.readyState) {
       return this.mongoose.connection;
     }
@@ -52,19 +53,19 @@ export default class MongoModel {
     while (retries) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await this.mongoose.connect(mongoURI);
-        logger.error('Mongo Connection Succesful');
+        await this.mongoose.connect(this.mongoURI);
+        logger.info('Mongo Connection Succesful');
         break;
       } catch (e) {
         retries -= 1;
         if (!retries) {
           logger.error(`Mongo connection failed with: ${e.message}`);
-          process.exit(1);
+          throw new Error(`Mongo connection failed with: ${e.message}`);
         }
 
-        logger.error(`Mongo connection failed with: ${e.message}, ${retries} retries remaining`);
+        logger.info(`Mongo connection failed with: ${e.message}, ${retries} retries remaining.`);
         // eslint-disable-next-line no-await-in-loop
-        await wait(1000);
+        await wait(500);
       }
     }
 
@@ -72,6 +73,7 @@ export default class MongoModel {
   }
 
   async getResourceQuery(args) {
+    await this.connect();
     if (args.filter) {
       const filters = [];
 
@@ -110,16 +112,19 @@ export default class MongoModel {
     return {};
   }
 
-  label() {
+  async label() {
+    await this.connect();
     return this.Resource.distinct('labels');
   }
 
   async resource(args, options) {
+    await this.connect();
     const query = await this.getResourceQuery(args);
     return this.Resource.find(query, null, options);
   }
 
   async type() {
+    await this.connect();
     const types = await this.Resource.distinct('type');
     // Exclude cluster, internet, and unmanaged types because these aren't valid filterable types.
     return types.filter(t => t !== 'cluster' && t !== 'internet' && t !== 'unmanaged');

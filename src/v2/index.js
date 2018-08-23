@@ -49,21 +49,16 @@ if (process.env.NODE_ENV === 'production') {
   logger.info('Authentication enabled');
   graphQLServer.use(cookieParser(), inspect, authMiddleware());
 
-  const mongoModel = new MongoModel();
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
-    await mongoModel.connect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
-
-    return {
-      formatError,
-      schema,
-      context: {
-        req,
-        applicationModel: new ApplicationModel({ token: req.kubeToken }),
-        kubeModel: new KubeModel({ token: req.kubeToken }),
-        mongoModel,
-      },
-    };
-  }));
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
+    formatError,
+    schema,
+    context: {
+      req,
+      applicationModel: new ApplicationModel({ token: req.kubeToken }),
+      kubeModel: new KubeModel({ token: req.kubeToken }),
+      mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
+    },
+  })));
 } else if (process.env.NODE_ENV === 'test') {
   logger.info('RUNNING MOCK SERVER');
   const mockHttp = createMockHttp();
@@ -87,21 +82,16 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
 
-  const mongoModel = new MongoModel();
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
-    await mongoModel.connect(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave');
-
-    return {
-      formatError,
-      schema,
-      context: {
-        req,
-        applicationModel: new ApplicationModel({ token: req.kubeToken }),
-        kubeModel: new KubeModel({ token: req.kubeToken }),
-        mongoModel,
-      },
-    };
-  }));
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
+    formatError,
+    schema,
+    context: {
+      req,
+      applicationModel: new ApplicationModel({ token: req.kubeToken }),
+      kubeModel: new KubeModel({ token: req.kubeToken }),
+      mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
+    },
+  })));
 }
 
 export default graphQLServer;
