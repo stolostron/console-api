@@ -54,7 +54,9 @@ type Mutation {
   # NOTE: This only deletes the top level Application object. Related objects like Deployable,
   # PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
   deleteApplication(namespace: String, name: String!): String
-
+  
+  # Delete helm release on specific cluster
+  # deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
 
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]

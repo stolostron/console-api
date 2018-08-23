@@ -18,10 +18,18 @@ type HelmRel {
   cluster: String
   lastDeployed: String
 }
+
+input DeleteHelmReleaseInput {
+  cluster: String!
+  name: String!
+}
 `;
 
 export const resolver = {
   Query: {
     releases: (root, args, { kubeModel }) => kubeModel.getReleases(args),
   },
+  // Mutation: {
+  //   deleteHelmRelease: (root, { input }, { kubeModel }) => kubeModel.deleteRelease(input),
+  // },
 };
