@@ -12,19 +12,21 @@ type Compliance {
   name: String
   namespace: String
   kind: String
-  clusterSelector: [ClusterSelector]
+  clusterSelector: JSON
   detail: ComplianceDetail
   policyCompliant: String
   clusterCompliant: String
-  complianceStatus: [ComplianceData]
+  compliancePolicies: [CompliancePolicy]
+  complianceStatus: [CompliantStatus]
 }
 
-type ClusterSelector {
-  selectorType: String
-  selectors: [String]
+type CompliantStatus {
+  clusterNamespace: String
+  localCompliantStatus: String
+  localValidStatus: String
 }
 
-type ComplianceData {
+type CompliancePolicy {
   name: String
   cluster: String
   compliant: String

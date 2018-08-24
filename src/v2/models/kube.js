@@ -28,43 +28,28 @@ function getCPUPercentage(usage, capacity) {
 }
 
 function getComplianceObject(res) {
-  const statusArray = [];
-  const selectors = _.get(res, 'spec.clusterSelector', []);
-
   let totalClusters = 0;
   let compliantClusters = 0;
   let totalPolicies = 0;
   let compliantPolicies = 0;
 
-  const selectorArray = Object.entries(selectors).map(([selectorType, selector]) =>
-    ({ selectorType, selector }));
   const status = _.get(res, 'status', []);
   if (status) totalClusters = Object.keys(status).length;
-  Object.entries(status).forEach(([key, cluster]) => {
-    const policies = [];
-    let clusterCompliant = true;
-    Object.entries(cluster).forEach(([policyKey, policyValue]) => {
+  Object.values(status).forEach((cluster) => {
+    if (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant') compliantClusters += 1;
+    Object.values(cluster.aggregatePoliciesStatus || {}).forEach((policyValue) => {
       totalPolicies += 1;
-      if (_.get(policyValue, 'policyValue.Compliant', '').toLowerCase() === 'compliant') compliantPolicies += 1;
-      else clusterCompliant = false;
-      policies.push({ policyKey, compliant: policyValue.Compliant || '', valid: policyValue.Valid || '' });
-    });
-    if (clusterCompliant) compliantClusters += 1;
-    statusArray.push({
-      namespace: key,
-      cluster: key,
-      policies,
+      if (_.get(policyValue, 'Compliant', '').toLowerCase() === 'compliant') compliantPolicies += 1;
     });
   });
   const compliance = {
     name: _.get(res, 'metadata.name', 'none'),
     namespace: _.get(res, 'metadata.namespace', 'none'),
     kind: _.get(res, 'kind', 'Compliance'),
-    clusterSelector: selectorArray,
+    clusterSelector: _.get(res, 'spec.clusterSelector', {}),
     policyCompliant: `${compliantPolicies}/${totalPolicies}`,
     clusterCompliant: `${compliantClusters}/${totalClusters}`,
   };
-  compliance.complianceStatus = statusArray;
   return compliance;
 }
 
@@ -336,7 +321,8 @@ export default class KubeModel {
 
   async getPods() {
     const response = await this.kubeConnector.resourceViewQuery('pods');
-    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+    const results = _.get(response, 'status.results', {});
+    return Object.keys(results).reduce((accum, clusterName) => {
       const pods = response.status.results[clusterName].items;
 
       pods.map(pod => accum.push({
@@ -370,7 +356,7 @@ export default class KubeModel {
     }));
   }
 
-  async getCompliances(name, namespace = 'hcm') {
+  async getCompliances(name, namespace = 'mcm') {
     // for getting compliance list
     const arr = [];
     if (!name) {
@@ -393,12 +379,20 @@ export default class KubeModel {
       }
       if (response.items) {
         let compliance = {};
-        const complianceStatus = [];
+        const compliancePolicies = [];
+
+        // get compliance from all namespaces, filter down by the target name
         const filteredResponseData = response.items.filter(item => _.get(item, 'metadata.name') === name);
+
+        // for each of the compliance
         filteredResponseData.forEach((complianceData) => {
           const complianceNamespace = _.get(complianceData, 'metadata.namespace');
+
+          // in this case, variable namespace is the one where compliance
+          // object has been created on the hub cluster
           if (complianceNamespace === namespace) {
             compliance = getComplianceObject(complianceData);
+
             // compliance details for compliance-detail-page
             const detail = {
               uid: _.get(complianceData, 'metadata.uid', 'none'),
@@ -406,30 +400,55 @@ export default class KubeModel {
               selfLink: _.get(complianceData, 'metadata.selfLink', '-'),
               creationTime: _.get(complianceData, 'metadata.creationTimestamp', ''),
             };
+            const complianceStatus = [];
+            const aggregatedStatus = _.get(complianceData, 'status', {});
+
+            // get compliant status per cluster
+            if (aggregatedStatus) {
+              Object.values(aggregatedStatus).forEach((cluster) => {
+                let validNum = 0;
+                let compliantNum = 0;
+                let policyNum = 0;
+                Object.values(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach((object) => {
+                  if (_.get(object, 'Compliant', '') === 'Compliant') compliantNum += 1;
+                  if (_.get(object, 'Valid')) validNum += 1;
+                  policyNum += 1;
+                });
+                complianceStatus.push({
+                  clusterNamespace: _.get(cluster, 'clustername', '-'),
+                  localCompliantStatus: `${compliantNum}/${policyNum}`,
+                  localValidStatus: `${validNum}/${policyNum}`,
+                });
+              });
+            }
+            compliance.complianceStatus = complianceStatus;
             compliance.detail = detail;
           } else {
-            const statusLocal = _.get(complianceData, 'statusLocal.aggregatePoliciesStates', {});
+            // the compliance in the namespace that is associated with a remote cluster
+            const aggregatedStatus = _.get(complianceData, 'status', {});
             // find out policy namespace
-            Object.entries(statusLocal).forEach(([key, value]) => {
-              let policyObject = {
-                name: key,
-                cluster: complianceNamespace,
-                compliant: _.get(value, 'Compliant', '-'),
-                valid: _.get(value, 'Valid', '-'),
-                complianceName: name,
-                complianceNamespace: namespace,
-              };
-              const spec = _.get(complianceData, 'spec', {});
-              let targetPolicy;
-              Object.values(spec).forEach((compliancePolicyArray) => {
-                targetPolicy = compliancePolicyArray.find(item => _.get(item, 'metadata.name') === key);
+            Object.values(aggregatedStatus).forEach((cluster) => {
+              Object.entries(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach(([key, value]) => {
+                let policyObject = {
+                  name: key,
+                  cluster: _.get(cluster, 'clustername', complianceNamespace),
+                  compliant: _.get(value, 'Compliant', '-'),
+                  valid: _.get(value, 'Valid', '-'),
+                  complianceName: name,
+                  complianceNamespace: namespace,
+                };
+                const spec = _.get(complianceData, 'spec', {});
+                let targetPolicy;
+                Object.values(spec).forEach((compliancePolicyArray) => {
+                  targetPolicy = compliancePolicyArray.find(item => _.get(item, 'metadata.name') === key);
+                });
+                if (targetPolicy) policyObject = getPolicyObject(targetPolicy, policyObject);
+                compliancePolicies.push(policyObject);
               });
-              if (targetPolicy) policyObject = getPolicyObject(targetPolicy, policyObject);
-              complianceStatus.push(policyObject);
             });
           }
         });
-        compliance.complianceStatus = complianceStatus;
+        compliance.compliancePolicies = compliancePolicies;
         arr.push(compliance);
       }
     }

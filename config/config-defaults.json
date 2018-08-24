@@ -7,5 +7,5 @@
   "mongodbUrl": "",
   "hcmPollInterval": 500,
   "hcmPollTimeout": 30000,
-  "complianceNamespace": "hcm"
+  "complianceNamespace": "mcm"
 }

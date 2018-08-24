@@ -7,10 +7,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
-
 
 export default class ApplicationModel {
   constructor({ kubeConnector, token, httpLib = requestLib }) {
@@ -40,7 +40,7 @@ export default class ApplicationModel {
     }
 
     const result = await Promise.all(resources.map((resource) => {
-      const namespace = resource.metadata.namespace || 'default';
+      const namespace = _.get(resource, 'metadata.namespace', 'default');
       if (appKinds[resource.kind] === 'undefined') {
         return Promise.resolve({
           status: 'Failure',
