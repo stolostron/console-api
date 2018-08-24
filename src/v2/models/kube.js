@@ -8,6 +8,8 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import yaml from 'js-yaml';
+import { unflatten } from 'flat';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
@@ -638,8 +640,13 @@ export default class KubeModel {
 
   async installHelmChart(input) {
     const {
-      chartURL, namespace, releaseName, clusters,
+      chartURL, namespace, releaseName, clusters, values,
     } = input;
+
+    const vals = JSON.parse(values.replace(/'/g, '"'));
+    const valuesUnflat = unflatten(vals);
+    const valuesYaml = yaml.safeDump(valuesUnflat);
+    const valuesEncoded = Buffer.from(valuesYaml).toString('base64');
 
     return clusters.map(async (cluster) => {
       const workNamespace = `mcm-${cluster}`;
@@ -658,6 +665,7 @@ export default class KubeModel {
           helm: {
             chartURL,
             namespace,
+            values: valuesEncoded,
           },
         },
       };
