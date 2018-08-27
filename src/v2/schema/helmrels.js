@@ -27,9 +27,9 @@ input DeleteHelmReleaseInput {
 
 export const resolver = {
   Query: {
-    releases: (root, args, { kubeModel }) => kubeModel.getReleases(args),
+    releases: (root, args, { helmModel }) => helmModel.getReleases(args),
   },
   // Mutation: {
-  //   deleteHelmRelease: (root, { input }, { kubeModel }) => kubeModel.deleteRelease(input),
+  //   deleteHelmRelease: (root, { input }, { helmModel }) => helmModel.deleteRelease(input),
   // },
 };

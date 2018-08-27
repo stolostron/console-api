@@ -214,7 +214,7 @@ const transformPod = (pod, status) => ({
 
 export const resolver = {
   Query: {
-    dashboard: async (root, args, { kubeModel }) => {
+    dashboard: async (root, args, { kubeModel, helmModel }) => {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
@@ -251,7 +251,7 @@ export const resolver = {
           cards: [
             { name: 'helm releases', transform: transformRelease },
           ],
-          statusQuery: () => kubeModel.getReleases(args),
+          statusQuery: () => helmModel.getReleases(args),
           clusterQuery: () => kubeModel.getClusters(args),
         }),
         getDashboardItems({

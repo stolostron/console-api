@@ -18,6 +18,8 @@ import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
 import ApplicationModel from './models/application';
+import HelmModel from './models/helm';
+import KubeConnector from './connectors/kube';
 import KubeModel from './models/kube';
 import MongoModel from './models/mongo';
 import createMockHttp from './mocks/';
@@ -49,16 +51,21 @@ if (process.env.NODE_ENV === 'production') {
   logger.info('Authentication enabled');
   graphQLServer.use(cookieParser(), inspect, authMiddleware());
 
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
-    formatError,
-    schema,
-    context: {
-      req,
-      applicationModel: new ApplicationModel({ token: req.kubeToken }),
-      kubeModel: new KubeModel({ token: req.kubeToken }),
-      mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
-    },
-  })));
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
+    const kubeConnector = new KubeConnector({ token: req.kubeToken });
+
+    return {
+      formatError,
+      schema,
+      context: {
+        req,
+        helmModel: new HelmModel({ kubeConnector }),
+        applicationModel: new ApplicationModel({ kubeConnector }),
+        kubeModel: new KubeModel({ kubeConnector }),
+        mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
+      },
+    };
+  }));
 } else if (process.env.NODE_ENV === 'test') {
   logger.info('RUNNING MOCK SERVER');
   const mockHttp = createMockHttp();
@@ -66,32 +73,41 @@ if (process.env.NODE_ENV === 'production') {
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(req => ({
-    formatError,
-    schema,
-    context: {
-      req,
-      applicationModel: new ApplicationModel({ token: req.kubeToken, httpLib: mockHttp }),
-      kubeModel: new KubeModel({ token: req.kubeToken, httpLib: mockHttp }),
-    },
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress((req) => {
+    const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: mockHttp });
 
-  })));
+    return {
+      formatError,
+      schema,
+      context: {
+        req,
+        helmModel: new HelmModel({ kubeConnector }),
+        applicationModel: new ApplicationModel({ kubeConnector }),
+        kubeModel: new KubeModel({ kubeConnector }),
+      },
+    };
+  }));
 } else {
   graphQLServer.use('*', morgan('dev'));
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
 
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async req => ({
-    formatError,
-    schema,
-    context: {
-      req,
-      applicationModel: new ApplicationModel({ token: req.kubeToken }),
-      kubeModel: new KubeModel({ token: req.kubeToken }),
-      mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
-    },
-  })));
+  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
+    const kubeConnector = new KubeConnector({ token: req.kubeToken });
+
+    return {
+      formatError,
+      schema,
+      context: {
+        req,
+        helmModel: new HelmModel({ kubeConnector }),
+        applicationModel: new ApplicationModel({ kubeConnector }),
+        kubeModel: new KubeModel({ kubeConnector }),
+        mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
+      },
+    };
+  }));
 }
 
 export default graphQLServer;

@@ -21,10 +21,10 @@ type HelmRepo {
 
 export const resolver = {
   Query: {
-    repos: async (root, args, { kubeModel }) => kubeModel.getRepos(args),
+    repos: async (root, args, { helmModel }) => helmModel.getRepos(args),
   },
   Mutation: {
-    setHelmRepo: (root, { input }, { kubeModel }) => kubeModel.setRepo(input),
-    deleteHelmRepository: (root, { input }, { kubeModel }) => kubeModel.deleteRepo(input),
+    setHelmRepo: (root, { input }, { helmModel }) => helmModel.setRepo(input),
+    deleteHelmRepository: (root, { input }, { helmModel }) => helmModel.deleteRepo(input),
   },
 };

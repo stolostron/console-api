@@ -8,8 +8,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import yaml from 'js-yaml';
-import { unflatten } from 'flat';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
@@ -344,18 +342,6 @@ export default class KubeModel {
     }, []);
   }
 
-  async getRepos() {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    return response.items.map(cluster => ({
-      Name: cluster.metadata.name,
-      URL: cluster.spec.url,
-    }));
-  }
-
   async getCompliances(name, namespace = 'mcm') {
     // for getting compliance list
     const arr = [];
@@ -494,40 +480,6 @@ export default class KubeModel {
     return arr;
   }
 
-  async setRepo(input) {
-    const jsonBody = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'HelmRepo',
-      metadata: {
-        name: input.Name,
-      },
-      spec: {
-        url: input.URL,
-      },
-    };
-    const response = await this.kubeConnector.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos', jsonBody);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    return {
-      Name: response.metadata.name,
-      URL: response.spec.url,
-    };
-  }
-
-  async deleteRepo(input) {
-    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos/${input.Name}`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    return {
-      Name: response.metadata.name,
-      URL: response.spec.url,
-    };
-  }
-
   async deleteCompliance(input) {
     const response = await this.kubeConnector.delete(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
     if (response.code || response.message) {
@@ -588,122 +540,5 @@ export default class KubeModel {
 
       return accum;
     }, []);
-  }
-
-  async getCharts() {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    const charts = [];
-    response.items.forEach((cluster) => {
-      const rName = cluster.metadata.name;
-      if (cluster.status.charts) {
-        const repo = Object.values(cluster.status.charts);
-        repo.forEach((chart) => {
-          charts.push({
-            repoName: rName,
-            name: chart.chartVersions[0].name,
-            version: chart.chartVersions[0].version,
-            urls: chart.chartVersions[0].urls,
-          });
-        });
-      }
-    });
-    return charts;
-  }
-
-  async getReleases() {
-    const response = await this.kubeConnector.resourceViewQuery('releases');
-    return Object.keys(response.status.results).reduce((accum, clusterName) => {
-      const rels = response.status.results[clusterName].items;
-
-      rels.map(rel => accum.push({
-        chartName: rel.spec.chartName,
-        chartVersion: rel.spec.chartVersion,
-        namespace: rel.spec.namespace,
-        status: rel.spec.status,
-        version: rel.spec.version,
-        name: rel.metadata.name,
-        cluster: clusterName,
-        lastDeployed: new Date(rel.spec.lastDeployed).getTime() / 1000,
-      }));
-
-      return accum;
-    }, []);
-  }
-
-  // This is not currently implemented as we are unable to delete the "default" cluster releases
-  // To avoid confusion the remove action has been removed from releases table.
-  async deleteRelease(input) {
-    // TODO: Zack L - Need to make sure releases installed remotly always begin with md- in name.
-    // currently have to strip the md- so name matches the work created for the release
-    const deploymentName = input.name.substring(3);
-    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/mcm-${input.cluster}/works/${deploymentName}`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [{
-        code: response.code,
-        message: response.message,
-      }];
-    }
-
-    return [{
-      name: response.metadata.name,
-      namespace: response.spec.helm.namespace,
-      status: response.status.type,
-      cluster: response.spec.cluster.name,
-    }];
-  }
-
-  async installHelmChart(input) {
-    const {
-      chartURL, namespace, releaseName, clusters, values,
-    } = input;
-
-    const vals = JSON.parse(values.replace(/'/g, '"'));
-    const valuesUnflat = unflatten(vals);
-    const valuesYaml = yaml.safeDump(valuesUnflat);
-    const valuesEncoded = Buffer.from(valuesYaml).toString('base64');
-
-    return clusters.map(async (cluster) => {
-      const workNamespace = `mcm-${cluster}`;
-      const jsonBody = {
-        apiVersion: 'mcm.ibm.com/v1alpha1',
-        kind: 'Work',
-        metadata: {
-          name: releaseName,
-          namespace: workNamespace,
-        },
-        spec: {
-          cluster: {
-            name: cluster,
-          },
-          type: 'Deployer',
-          helm: {
-            chartURL,
-            namespace,
-            values: valuesEncoded,
-          },
-        },
-      };
-
-      const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/mcm-${cluster}/works`, jsonBody);
-      if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-        return [{
-          code: response.code,
-          message: response.message,
-        }];
-      }
-
-      return {
-        name: response.metadata.name,
-        namespace: response.spec.helm.namespace,
-        status: response.status.type,
-        cluster: response.spec.cluster.name,
-      };
-    });
   }
 }

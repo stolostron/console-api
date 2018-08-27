@@ -38,9 +38,9 @@ type HelmChartResponse {
 
 export const resolver = {
   Query: {
-    charts: async (root, args, { kubeModel }) => kubeModel.getCharts(args),
+    charts: async (root, args, { helmModel }) => helmModel.getCharts(args),
   },
   Mutation: {
-    installHelmChart: async (root, { input }, { kubeModel }) => kubeModel.installHelmChart(input),
+    installHelmChart: async (root, { input }, { helmModel }) => helmModel.installHelmChart(input),
   },
 };
