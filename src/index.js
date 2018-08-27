@@ -19,7 +19,7 @@ log4js.configure(log4jsConfig || 'config/log4js.json');
 
 const GRAPHQL_PORT = process.env.PORT || config.get('httpPort') || 4000;
 const CONTEXT_PATH = config.get('contextPath');
-const HCM_API_VERSION = config.get('hcmApiVersion') || 'V1';
+const HCM_API_VERSION = config.get('hcmApiVersion') || 'V2';
 
 const graphQLServer = (HCM_API_VERSION === 'V2')
   ? require('./v2').default
