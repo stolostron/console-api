@@ -95,9 +95,9 @@ function getPolicyObject(response, target) {
     const violation = {
       name: _.get(res, 'metadata.name', '-'),
       cluster: 'local', // local means the cluster that this policy is applied
-      status: _.get(res, 'status.Validity.valid', false) ? _.get(response, 'status.Compliant', 'unknown') : 'invalid',
-      message: (templateCondition && _.get(templateCondition, 'message', 'unknown')) || 'unknown',
-      reason: (templateCondition && _.get(templateCondition, 'reason', 'unknown')) || 'unknown',
+      status: _.get(res, 'status.Validity.valid', false) ? _.get(response, 'status.Compliant', '-') : 'invalid',
+      message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
+      reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
       selector: _.get(res, 'selector', ''),
     };
     violations.push(violation);
