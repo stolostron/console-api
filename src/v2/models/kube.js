@@ -526,7 +526,7 @@ export default class KubeModel {
 
   async getNamespaces() {
     const response = await this.kubeConnector.resourceViewQuery('namespaces');
-    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+    return Object.keys(response.status.results || {}).reduce((accum, clusterName) => {
       const namespaces = response.status.results[clusterName].items;
 
       namespaces.map(namespace => accum.push({
