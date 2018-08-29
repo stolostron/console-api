@@ -186,7 +186,6 @@ const transformTotalCluster = (curr, status, currentData) => {
 
 const transformCluster = (cluster, status) => ({
   link: cluster.ip,
-  percentage: cluster.percentage || 0,
   resourceName: cluster.name,
   status,
 });
@@ -200,14 +199,12 @@ const transformPercentage = field => (cluster, status) => ({
 
 const transformRelease = (release, status) => ({
   link: '',
-  percentage: 0,
   resourceName: release.name,
   status,
 });
 
 const transformPod = (pod, status) => ({
   link: '',
-  percentage: 0,
   resourceName: pod.name,
   status,
 });
