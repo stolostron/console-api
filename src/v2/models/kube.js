@@ -387,26 +387,28 @@ export default class KubeModel {
               creationTime: _.get(complianceData, 'metadata.creationTimestamp', ''),
             };
             const complianceStatus = [];
-            const aggregatedStatus = _.get(complianceData, 'status', {});
 
-            // get compliant status per cluster
-            if (aggregatedStatus) {
-              Object.values(aggregatedStatus).forEach((cluster) => {
+            Object.entries(_.get(complianceData, 'status', {})).forEach(([clusterName, perClusterStatus]) => {
+              const aggregatedStatus = _.get(perClusterStatus, 'aggregatePoliciesStatus', {});
+
+              // get compliant status per cluster
+              if (aggregatedStatus) {
                 let validNum = 0;
                 let compliantNum = 0;
                 let policyNum = 0;
-                Object.values(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach((object) => {
+                Object.values(aggregatedStatus).forEach((object) => {
                   if (_.get(object, 'Compliant', '') === 'Compliant') compliantNum += 1;
                   if (_.get(object, 'Valid')) validNum += 1;
                   policyNum += 1;
                 });
                 complianceStatus.push({
-                  clusterNamespace: _.get(cluster, 'clustername', '-'),
+                  clusterNamespace: clusterName,
                   localCompliantStatus: `${compliantNum}/${policyNum}`,
                   localValidStatus: `${validNum}/${policyNum}`,
                 });
-              });
-            }
+              }
+            });
+
             compliance.complianceStatus = complianceStatus;
             compliance.detail = detail;
           } else {
