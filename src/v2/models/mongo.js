@@ -84,7 +84,9 @@ export default class MongoModel {
         const clusterDocs = await this.Resource.find({ type: 'cluster' });
         if (clusterDocs.length > 0) {
           filters.push({
-            cluster: { $in: args.filter.cluster.map(f => clusterDocs.find(c => c.name === f).id) },
+            cluster: {
+              $in: args.filter.cluster.map(f => (clusterDocs.find(c => c.name === f) || {}).id),
+            },
           });
         }
       }
