@@ -156,7 +156,7 @@ export default class KubeModel {
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', 'default');
       return this.kubeConnector.post(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
-        .catch(err => console.log(err));
+        .catch(err => Error(err));
     }));
     result.forEach((item) => {
       if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
@@ -176,7 +176,7 @@ export default class KubeModel {
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', 'default');
       return this.kubeConnector.post(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
-        .catch(err => console.log(err));
+        .catch(err => Error(err));
     }));
     result.forEach((item) => {
       if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
