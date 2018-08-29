@@ -7,6 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import { unflatten } from 'flat';
 import logger from '../lib/logger';
@@ -22,7 +23,8 @@ export default class HelmModel {
 
   async getReleases() {
     const response = await this.kubeConnector.resourceViewQuery('releases');
-    return Object.keys(response.status.results).reduce((accum, clusterName) => {
+    const results = _.get(response, 'status.results', {});
+    return Object.keys(results).reduce((accum, clusterName) => {
       const rels = response.status.results[clusterName].items;
 
       rels.map(rel => accum.push({
