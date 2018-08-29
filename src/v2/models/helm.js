@@ -43,15 +43,14 @@ export default class HelmModel {
   }
 
   async installHelmChart({
-    chartURL, clusters, namespace, releaseName, values,
+    chartURL, destinationClusters, namespace, releaseName, values,
   }) {
     const vals = JSON.parse(values.replace(/'/g, '"'));
     const valuesUnflat = unflatten(vals);
     const valuesYaml = yaml.safeDump(valuesUnflat);
     const valuesEncoded = Buffer.from(valuesYaml).toString('base64');
 
-    return clusters.map(async (cluster) => {
-      const workNamespace = `mcm-${cluster}`;
+    return destinationClusters.map(async ({ name: clusterName, namespace: workNamespace }) => {
       const jsonBody = {
         apiVersion: 'mcm.ibm.com/v1alpha1',
         kind: 'Work',
@@ -61,7 +60,7 @@ export default class HelmModel {
         },
         spec: {
           cluster: {
-            name: cluster,
+            name: clusterName,
           },
           type: 'Deployer',
           helm: {
@@ -72,7 +71,7 @@ export default class HelmModel {
         },
       };
 
-      const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/mcm-${cluster}/works`, jsonBody);
+      const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${workNamespace}/works`, jsonBody);
       if (response.code || response.message) {
         logger.error(`MCM ERROR ${response.code} - ${response.message}`);
         return [{

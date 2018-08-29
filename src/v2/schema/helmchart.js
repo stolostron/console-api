@@ -8,11 +8,17 @@
  ****************************************************************************** */
 
 export const typeDef = `
+input DestinationCluster {
+  name: String!
+  # Namespace that the klusterlet exists in
+  namespace: String!
+}
+
 input InstallHelmChartInput {
   chartURL: String!
   namespace: String!
   releaseName: String!
-  clusters: [String]!
+  destinationClusters: [DestinationCluster]!
   values: String
 }
 
