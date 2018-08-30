@@ -155,7 +155,7 @@ export default class KubeModel {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', 'default');
-      return this.kubeConnector.post(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
+      return this.kubeConnector.post(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
         .catch(err => Error(err));
     }));
     result.forEach((item) => {
@@ -175,7 +175,7 @@ export default class KubeModel {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', 'default');
-      return this.kubeConnector.post(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
+      return this.kubeConnector.post(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
         .catch(err => Error(err));
     }));
     result.forEach((item) => {
@@ -346,7 +346,7 @@ export default class KubeModel {
     // for getting compliance list
     const arr = [];
     if (!name) {
-      const response = await this.kubeConnector.get(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${config.get('complianceNamespace') || 'hcm'}/compliances`);
+      const response = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${config.get('complianceNamespace') || 'hcm'}/compliances`);
       if (response.code || response.message) {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
@@ -358,7 +358,7 @@ export default class KubeModel {
       }
     } else {
       // get single policy from a specific namespace
-      const response = await this.kubeConnector.get('/apis/compliance.hcm.ibm.com/v1alpha1/compliances');
+      const response = await this.kubeConnector.get('/apis/compliance.mcm.ibm.com/v1alpha1/compliances');
       if (response.code || response.message) {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
@@ -448,7 +448,7 @@ export default class KubeModel {
     if (name !== undefined) {
       const arr = [];
 
-      const response = await this.kubeConnector.get(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
+      const response = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
       if (response.code || response.message) {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
@@ -462,7 +462,7 @@ export default class KubeModel {
     }
 
     // for getting policy list
-    const response = await this.kubeConnector.get('/apis/policy.hcm.ibm.com/v1alpha1/policies');
+    const response = await this.kubeConnector.get('/apis/policy.mcm.ibm.com/v1alpha1/policies');
     if (response.code || response.message) {
       logger.error(`HCM ERROR ${response.code} - ${response.message}`);
       return [];
@@ -483,7 +483,7 @@ export default class KubeModel {
   }
 
   async deleteCompliance(input) {
-    const response = await this.kubeConnector.delete(`/apis/compliance.hcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
+    const response = await this.kubeConnector.delete(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
     if (response.code || response.message) {
       throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
     }
@@ -491,7 +491,7 @@ export default class KubeModel {
   }
 
   async deletePolicy(input) {
-    const response = await this.kubeConnector.delete(`/apis/policy.hcm.ibm.com/v1alpha1/namespaces/${input.namespace}/policies/${input.name}`);
+    const response = await this.kubeConnector.delete(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/policies/${input.name}`);
     if (response.code || response.message) {
       throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
     }
