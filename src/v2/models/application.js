@@ -12,6 +12,47 @@ import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import KubeConnector from '../connectors/kube';
 
+// use selector to filter objects by labels
+const getSelected = (selector, items) => {
+  const { matchLabels, matchExpressions } = selector;
+  return items.filter(({ metadata: { labels } }) => {
+    let r = false;
+    const keys = Object.keys(labels);
+    for (let i = 0; i < keys.length;) {
+      const key = keys[i];
+      if (matchLabels) {
+        r = ((Object.keys(matchLabels).lastIndexOf(key) > -1 &&
+                     labels[key] === matchLabels[key]));
+        if (r) {
+          break;
+        }
+      } else if (matchExpressions) {
+        for (let j = 0; j < matchExpressions.length && !r;) {
+          const { key: k, operator = '', values = [] } = matchExpressions[i];
+          switch (operator.toLowerCase()) {
+            case 'in':
+              if (labels[k] && values.indexOf(labels[k]) !== -1) {
+                r = true;
+              }
+              break;
+
+            case 'notin':
+              // TODO
+              break;
+
+            default:
+              break;
+          }
+          j += 1;
+        }
+        return false;
+      }
+      i += 1;
+    }
+    return r;
+  });
+};
+
 export default class ApplicationModel {
   constructor({ kubeConnector, token, httpLib = requestLib }) {
     if (kubeConnector) {
@@ -106,11 +147,7 @@ export default class ApplicationModel {
       return [];
     }
 
-    const deployables = response.items.filter(dep => Object.keys(dep.metadata.labels).find(key =>
-      Object.keys(selector.matchLabels).lastIndexOf(key) > -1 &&
-        dep.metadata.labels[key] === selector.matchLabels[key]));
-
-    return deployables.map(deployable => ({
+    return getSelected(selector, response.items).map(deployable => ({
       name: deployable.metadata.name,
       dependencies: deployable.spec.dependencies && deployable.spec.dependencies.map(dep => ({
         name: dep.destination.name,
@@ -127,12 +164,7 @@ export default class ApplicationModel {
       return [];
     }
 
-    const placementPolicies = response.items.filter(pp =>
-      Object.keys(pp.metadata.labels).find(key =>
-        Object.keys(selector.matchLabels).lastIndexOf(key) > -1 &&
-          pp.metadata.labels[key] === selector.matchLabels[key]));
-
-    return placementPolicies.map(({ metadata, spec }) => ({
+    return getSelected(selector, response.items).map(({ metadata, spec }) => ({
       name: metadata.name,
       namespace: metadata.namespace,
       annotations: metadata.annotations,
