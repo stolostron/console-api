@@ -18,14 +18,11 @@ const getSelected = (selector, items) => {
   return items.filter(({ metadata: { labels } }) => {
     let r = false;
     const keys = Object.keys(labels);
-    for (let i = 0; i < keys.length;) {
+    for (let i = 0; i < keys.length && !r;) {
       const key = keys[i];
       if (matchLabels) {
         r = ((Object.keys(matchLabels).lastIndexOf(key) > -1 &&
                      labels[key] === matchLabels[key]));
-        if (r) {
-          break;
-        }
       } else if (matchExpressions) {
         for (let j = 0; j < matchExpressions.length && !r;) {
           const { key: k, operator = '', values = [] } = matchExpressions[i];
@@ -45,7 +42,6 @@ const getSelected = (selector, items) => {
           }
           j += 1;
         }
-        return false;
       }
       i += 1;
     }
