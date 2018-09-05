@@ -1,3 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Helm Chart Resolver Correctly Resolves Helm Chart Query 1`] = `"{\\"data\\":{\\"charts\\":[{\\"repoName\\":\\"google\\",\\"name\\":\\"acs-engine-autoscaler\\",\\"version\\":\\"2.2.0\\",\\"urls\\":[\\"https://kubernetes-charts.storage.googleapis.com/acs-engine-autoscaler-2.2.0.tgz\\"]},{\\"repoName\\":\\"google\\",\\"name\\":\\"aerospike\\",\\"version\\":\\"0.1.7\\",\\"urls\\":[\\"https://kubernetes-charts.storage.googleapis.com/aerospike-0.1.7.tgz\\"]},{\\"repoName\\":\\"google\\",\\"name\\":\\"zetcd\\",\\"version\\":\\"0.1.9\\",\\"urls\\":[\\"https://kubernetes-charts.storage.googleapis.com/zetcd-0.1.9.tgz\\"]}]}}"`;
+
+exports[`Helm Chart Resolver Correctly Resolves Install Helm Chart 1`] = `"{\\"data\\":{\\"installHelmChart\\":[{\\"name\\":\\"test-weave-scope\\",\\"namespace\\":\\"default\\",\\"status\\":\\"Completed\\",\\"cluster\\":\\"mycluster\\"}]}}"`;
