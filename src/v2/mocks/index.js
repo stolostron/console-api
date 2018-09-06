@@ -19,6 +19,7 @@ export default function createMockHttp() {
     nodes: require('./NodeList'),
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
+    policies: require('./PolicyList'),
   };
 
   return async function MockLib(params) {
@@ -36,6 +37,8 @@ export default function createMockHttp() {
           return state.repoMutations;
         case params.json.metadata.name.includes('test-weave-scope'):
           return state.relMutations;
+        case params.url.includes('policies'):
+          return state.policies.mockCreatePolicy;
         default:
           return state.pods;
       }
@@ -58,6 +61,12 @@ export default function createMockHttp() {
         return state.namespace.mockResponse;
       case params.url.includes('resourceviews/release'):
         return state.release.mockResponse;
+      case params.url.includes('default/policies/test-policy'):
+        return state.policies.mockDeleteResponse;
+      case params.url.includes('policies/policy-xz-1'):
+        return state.policies.mockSinglePolicyResponse;
+      case params.url.includes('policies'):
+        return state.policies.mockPolicyListResponse;
       default:
         return state.clusters;
     }
