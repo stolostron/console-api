@@ -191,68 +191,6 @@ export default class KubeModel {
     }
   }
 
-  async getApplications(name) {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/applications');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-
-    const items = name ? response.items.filter(app => app.metadata.name === name) : response.items;
-    return items.map((app) => {
-      const components = [];
-      const dependencies = [];
-      const relationships = [];
-      const { annotations } = app.metadata;
-
-      if (app.status && app.status.Deployable) {
-        // FIXME: API should return an array.
-        const deployables = Array.isArray(app.status.Deployable) ? app.status.Deployable : [app.status.Deployable]; // eslint-disable-line max-len
-        deployables.forEach((component) => {
-          components.push({
-            name: component.metadata.name,
-            namespace: component.metadata.namespace,
-            created: component.metadata.creationTimestamp,
-            labels: component.metadata.labels,
-            annotations: component.metadata.annotations,
-          });
-
-          // Get dependencies for each component.
-          if (component.spec && component.spec.dependencies) {
-            component.spec.dependencies.forEach((dep) => {
-              dependencies.push({
-                name: dep.destination.name,
-                type: dep.destination.kind,
-              });
-              relationships.push({
-                source: component.metadata.name,
-                destination: dep.destination.name,
-                type: 'dependsOn',
-              });
-            });
-          }
-        });
-      }
-
-
-      return {
-        annotations,
-        components,
-        dashboard: app.status.Dashboard,
-        dependencies,
-        labels: app.metadata.labels,
-        name: app.metadata.name,
-        relationships,
-        namespace: app.metadata.namespace,
-        created: app.metadata.creationTimestamp,
-        selfLink: app.metadata.selfLink,
-        resourceVersion: app.metadata.resourceVersion,
-        uid: app.metadata.uid,
-        status: app.metadata.status,
-      };
-    });
-  }
-
   async getClusters() {
     const response = await this.kubeConnector.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
     if (response.code || response.message) {
