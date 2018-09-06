@@ -18,6 +18,7 @@ import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
 import ApplicationModel from './models/application';
+import ClusterModel from './models/cluster';
 import HelmModel from './models/helm';
 import KubeConnector from './connectors/kube';
 import KubeModel from './models/kube';
@@ -62,6 +63,7 @@ if (process.env.NODE_ENV === 'production') {
         req,
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
+        clusterModel: new ClusterModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
@@ -85,6 +87,7 @@ if (process.env.NODE_ENV === 'production') {
         req,
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
+        clusterModel: new ClusterModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
@@ -106,6 +109,7 @@ if (process.env.NODE_ENV === 'production') {
         req,
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
+        clusterModel: new ClusterModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),

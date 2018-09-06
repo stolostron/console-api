@@ -26,6 +26,6 @@ type Cluster {
 
 export const resolver = {
   Query: {
-    clusters: (root, args, { kubeModel }) => kubeModel.getClusters(args),
+    clusters: (root, args, { clusterModel }) => clusterModel.getClusters(args),
   },
 };

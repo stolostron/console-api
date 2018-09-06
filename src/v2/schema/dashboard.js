@@ -24,7 +24,7 @@ type DashboardCardItem {
   warning: Int
   table: [TableRow]
   error: String
-} 
+}
 type DashboardChartItem {
   name: String
   # return something looks like [ [[value1, value2, value3], title1] , [[valueA, valueB, valueC], title2] ]
@@ -211,7 +211,7 @@ const transformPod = (pod, status) => ({
 
 export const resolver = {
   Query: {
-    dashboard: async (root, args, { kubeModel, helmModel, resourceViewModel }) => {
+    dashboard: async (root, args, { clusterModel, helmModel, resourceViewModel }) => {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
@@ -241,22 +241,22 @@ export const resolver = {
               transform: transformTotalCluster,
             },
           ],
-          statusQuery: () => kubeModel.getClusterStatus(args),
-          clusterQuery: () => kubeModel.getClusters(args),
+          statusQuery: () => clusterModel.getClusterStatus(args),
+          clusterQuery: () => clusterModel.getClusters(args),
         }),
         getDashboardItems({
           cards: [
             { name: 'helm releases', transform: transformRelease },
           ],
           statusQuery: () => helmModel.getReleases(args),
-          clusterQuery: () => kubeModel.getClusters(args),
+          clusterQuery: () => clusterModel.getClusters(args),
         }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod },
           ],
           statusQuery: () => resourceViewModel.getPods(args),
-          clusterQuery: () => kubeModel.getClusters(args),
+          clusterQuery: () => clusterModel.getClusters(args),
         }),
       ]);
       let allCards = [];
