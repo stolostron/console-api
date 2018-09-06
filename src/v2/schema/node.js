@@ -31,6 +31,6 @@ type Node {
 
 export const resolver = {
   Query: {
-    nodes: (root, args, { kubeModel }) => kubeModel.getNodes(args),
+    nodes: (root, args, { resourceViewModel }) => resourceViewModel.getNodes(args),
   },
 };

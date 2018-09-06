@@ -21,6 +21,7 @@ import ApplicationModel from './models/application';
 import HelmModel from './models/helm';
 import KubeConnector from './connectors/kube';
 import KubeModel from './models/kube';
+import ResourceViewModel from './models/resourceview';
 import MongoModel from './models/mongo';
 import createMockHttp from './mocks/';
 import schema from './schema/';
@@ -63,6 +64,7 @@ if (process.env.NODE_ENV === 'production') {
         applicationModel: new ApplicationModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
+        resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
     };
   }));
@@ -84,6 +86,7 @@ if (process.env.NODE_ENV === 'production') {
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
+        resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
     };
   }));
@@ -104,6 +107,7 @@ if (process.env.NODE_ENV === 'production') {
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         kubeModel: new KubeModel({ kubeConnector }),
+        resourceViewModel: new ResourceViewModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
       },
     };

@@ -317,31 +317,6 @@ export default class KubeModel {
     return result;
   }
 
-  async getPods() {
-    const response = await this.kubeConnector.resourceViewQuery('pods');
-    const results = _.get(response, 'status.results', {});
-    return Object.keys(results).reduce((accum, clusterName) => {
-      const pods = response.status.results[clusterName].items;
-
-      pods.map(pod => accum.push({
-        cluster: clusterName,
-        containers: pod.spec.containers,
-        createdAt: pod.metadata.creationTimestamp,
-        hostIP: pod.status.hostIP,
-        labels: pod.metadata.labels,
-        name: pod.metadata.name,
-        namespace: pod.metadata.namespace,
-        owners: pod.metadata.ownerReferences,
-        podIP: pod.status.podIP,
-        startedAt: pod.status.startTime,
-        status: pod.status.phase,
-        uid: pod.metadata.uid,
-      }));
-
-      return accum;
-    }, []);
-  }
-
   async getCompliances(name, namespace = 'mcm') {
     // for getting compliance list
     const arr = [];
@@ -496,51 +471,5 @@ export default class KubeModel {
       throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
     }
     return response.metadata.name;
-  }
-
-  async getNodes() {
-    const response = await this.kubeConnector.resourceViewQuery('nodes');
-    return Object.keys(response.status.results).reduce((accum, clusterName) => {
-      const nodes = response.status.results[clusterName].items;
-
-      nodes.map(node => accum.push({
-        allocatable: node.status.allocatable,
-        architecture: node.status.nodeInfo.architecture,
-        capacity: node.status.capacity,
-        cluster: clusterName,
-        createdAt: node.metadata.creationTimestamp,
-        labels: node.metadata.labels,
-        name: node.metadata.name,
-        images: node.status.images.reduce((imageNames, curr) => {
-          imageNames.push(...curr.names);
-          return imageNames;
-        }, []),
-        operatingSystem: node.status.nodeInfo.operatingSystem,
-        osImage: node.status.nodeInfo.osImage,
-        startedAt: node.status.startTime,
-        status: node.status.phase,
-        uid: node.metadata.uid,
-      }));
-
-      return accum;
-    }, []);
-  }
-
-  async getNamespaces() {
-    const response = await this.kubeConnector.resourceViewQuery('namespaces');
-    return Object.keys(response.status.results || {}).reduce((accum, clusterName) => {
-      const namespaces = response.status.results[clusterName].items;
-
-      namespaces.map(namespace => accum.push({
-        cluster: clusterName,
-        createdAt: namespace.metadata.creationTimestamp,
-        labels: namespace.metadata.labels,
-        name: namespace.metadata.name,
-        status: namespace.status.phase,
-        uid: namespace.metadata.uid,
-      }));
-
-      return accum;
-    }, []);
   }
 }

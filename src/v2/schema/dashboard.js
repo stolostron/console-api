@@ -211,7 +211,7 @@ const transformPod = (pod, status) => ({
 
 export const resolver = {
   Query: {
-    dashboard: async (root, args, { kubeModel, helmModel }) => {
+    dashboard: async (root, args, { kubeModel, helmModel, resourceViewModel }) => {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
@@ -255,7 +255,7 @@ export const resolver = {
           cards: [
             { name: 'pods', transform: transformPod },
           ],
-          statusQuery: () => kubeModel.getPods(args),
+          statusQuery: () => resourceViewModel.getPods(args),
           clusterQuery: () => kubeModel.getClusters(args),
         }),
       ]);

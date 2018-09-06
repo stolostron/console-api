@@ -39,6 +39,6 @@ export const typeDef = `
 
 export const resolver = {
   Query: {
-    pods: (root, args, { kubeModel }) => kubeModel.getPods(args),
+    pods: (root, args, { resourceViewModel }) => resourceViewModel.getPods(args),
   },
 };

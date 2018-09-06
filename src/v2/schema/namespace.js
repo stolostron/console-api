@@ -19,6 +19,6 @@ type Namespace {
 
 export const resolver = {
   Query: {
-    namespaces: (root, args, { kubeModel }) => kubeModel.getNamespaces(args),
+    namespaces: (root, args, { resourceViewModel }) => resourceViewModel.getNamespaces(args),
   },
 };
