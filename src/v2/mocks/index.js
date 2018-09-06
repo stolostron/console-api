@@ -20,6 +20,7 @@ export default function createMockHttp() {
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
     policies: require('./PolicyList'),
+    compliances: require('./ComplianceList'),
   };
 
   return async function MockLib(params) {
@@ -39,6 +40,8 @@ export default function createMockHttp() {
           return state.relMutations;
         case params.url.includes('policies'):
           return state.policies.mockCreatePolicy;
+        case params.url.includes('compliances'):
+          return state.compliances.mockCreateCompliance;
         default:
           return state.pods;
       }
@@ -67,6 +70,10 @@ export default function createMockHttp() {
         return state.policies.mockSinglePolicyResponse;
       case params.url.includes('policies'):
         return state.policies.mockPolicyListResponse;
+      case params.url.includes('compliances/compliance-xz'):
+        return state.compliances.mockDeleteResponse;
+      case params.url.includes('compliances'):
+        return state.compliances.mockComplianceListResponse;
       default:
         return state.clusters;
     }
