@@ -17,13 +17,15 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
+
 import ApplicationModel from './models/application';
 import ClusterModel from './models/cluster';
+import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import KubeConnector from './connectors/kube';
-import KubeModel from './models/kube';
-import ResourceViewModel from './models/resourceview';
 import MongoModel from './models/mongo';
+import ResourceViewModel from './models/resourceview';
+
 import createMockHttp from './mocks/';
 import schema from './schema/';
 import config from '../../config';
@@ -64,7 +66,7 @@ if (process.env.NODE_ENV === 'production') {
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
-        kubeModel: new KubeModel({ kubeConnector }),
+        complianceModel: new ComplianceModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
@@ -88,7 +90,7 @@ if (process.env.NODE_ENV === 'production') {
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
-        kubeModel: new KubeModel({ kubeConnector }),
+        complianceModel: new ComplianceModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
     };
@@ -110,7 +112,7 @@ if (process.env.NODE_ENV === 'production') {
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
-        kubeModel: new KubeModel({ kubeConnector }),
+        complianceModel: new ComplianceModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
       },

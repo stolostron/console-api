@@ -9,10 +9,7 @@
 
 import _ from 'lodash';
 import logger from '../lib/logger';
-import requestLib from '../lib/request';
-import KubeConnector from '../connectors/kube';
 import config from '../../../config';
-
 
 const POLICY_FAILURE_STATUS = 'Failure';
 
@@ -124,15 +121,13 @@ function getPolicyObject(response, target) {
   };
 }
 
-export default class KubeModel {
-  constructor({ kubeConnector, token, httpLib = requestLib }) {
-    if (kubeConnector) {
-      this.kubeConnector = kubeConnector;
-    } else if (token && httpLib) {
-      this.kubeConnector = new KubeConnector({ token, httpLib });
-    } else {
-      throw new Error('Either initialize with KubeConnector or token + httpLib');
+export default class ComplianceModel {
+  constructor({ kubeConnector }) {
+    if (!kubeConnector) {
+      throw new Error('kubeConnector is a required parameter');
     }
+
+    this.kubeConnector = kubeConnector;
   }
 
   async createPolicy(resources) {

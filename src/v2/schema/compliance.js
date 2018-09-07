@@ -55,10 +55,13 @@ type ComplianceDetail {
 
 export const resolver = {
   Query: {
-    compliances: (root, args, { kubeModel }) => kubeModel.getCompliances(args.name, args.namespace),
+    compliances: (root, args, { complianceModel }) =>
+      complianceModel.getCompliances(args.name, args.namespace),
   },
   Mutation: {
-    createCompliance: (root, args, { kubeModel }) => kubeModel.createCompliance(args.resources),
-    deleteCompliance: (root, args, { kubeModel }) => kubeModel.deleteCompliance(args),
+    createCompliance: (root, args, { complianceModel }) =>
+      complianceModel.createCompliance(args.resources),
+    deleteCompliance: (root, args, { complianceModel }) =>
+      complianceModel.deleteCompliance(args),
   },
 };

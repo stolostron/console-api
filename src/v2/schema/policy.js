@@ -63,10 +63,11 @@ type PolicyRules {
 
 export const resolver = {
   Query: {
-    policies: (root, args, { kubeModel }) => kubeModel.getPolicies(args.name, args.namespace),
+    policies: (root, args, { complianceModel }) =>
+      complianceModel.getPolicies(args.name, args.namespace),
   },
   Mutation: {
-    createPolicy: (root, args, { kubeModel }) => kubeModel.createPolicy(args.resources),
-    deletePolicy: (root, args, { kubeModel }) => kubeModel.deletePolicy(args),
+    createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),
+    deletePolicy: (root, args, { complianceModel }) => complianceModel.deletePolicy(args),
   },
 };
