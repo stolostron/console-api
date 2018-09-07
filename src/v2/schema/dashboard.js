@@ -151,6 +151,9 @@ async function getDashboardItems({
 }) {
   try {
     const statusData = await Promise.race([statusQuery(), timeout(config.get('hcmPollTimeout'))]);
+    if (statusData.code || statusData.message) {
+      return new GenericError({ data: { error: 'An error occured while getting status data' } });
+    }
     const clusterData = await Promise.race([clusterQuery(), timeout(config.get('hcmPollTimeout'))]);
     const cardsMap = cards.map(card => getDashboardCard({
       statusData,
