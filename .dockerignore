@@ -3,3 +3,5 @@
 .travis.yml
 .npmrc
 src
+build/v1/*
+test
