@@ -11,7 +11,6 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Policy Resolver', () => {
-  // TODO: need a test for policy list and single policy
   test('Correctly Resolves Policy List Query', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)

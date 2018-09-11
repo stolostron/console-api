@@ -10,6 +10,7 @@
 
 export default function createMockHttp() {
   const state = {
+    apps: require('./AppList'),
     clusters: require('./ClusterList').default,
     clusterStatus: require('./ClusterStatusList').default,
     repos: require('./ReposList').default,
@@ -42,16 +43,26 @@ export default function createMockHttp() {
           return state.policies.mockCreatePolicy;
         case params.url.includes('compliances'):
           return state.compliances.mockCreateCompliance;
+        case params.url.includes('applications'):
+          return state.apps.mockCreateAppResponse;
         default:
           return state.pods;
       }
     }
 
     switch (true) {
+      case params.url.includes('applications/app02'):
+        return state.apps.mockSingleAppResponse;
+      case params.url.includes('applications/testapp'):
+        return state.apps.mockDeleteAppResponse;
+      case params.url.includes('applications'):
+        return state.apps.mockAppsResponse;
       case params.url.includes('clusterstatuses'):
         return state.clusterStatus;
       case params.url.includes('cluster'):
         return state.clusters;
+      case params.url.includes('deployables'):
+        return state.apps.mockDeployablesResponse;
       case params.url.includes('default/helmrepos'):
         return state.repoMutations;
       case params.url.includes('helmrepos'):
@@ -66,6 +77,8 @@ export default function createMockHttp() {
         return state.release.mockResponse;
       case params.url.includes('default/policies/test-policy'):
         return state.policies.mockDeleteResponse;
+      case params.url.includes('placementpolicies'):
+        return state.apps.mockPlacementPoliciesResponse;
       case params.url.includes('policies/policy-xz-1'):
         return state.policies.mockSinglePolicyResponse;
       case params.url.includes('policies'):
