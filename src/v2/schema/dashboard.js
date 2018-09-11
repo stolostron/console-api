@@ -7,7 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 import _ from 'lodash';
-import { GenericError } from '../../v1/datasource/lib/errors';
+import { GenericError } from '../../v2/lib/errors';
 import config from '../../../config';
 
 export const typeDef = `
