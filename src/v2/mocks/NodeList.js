@@ -223,8 +223,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-ui@sha256:2391f66beec3417c38f01272e2f8475d048478b8fb57821b385de81101e29783',
-                      'sidneywibm/hcm-ui:latest',
+                      'sidneywibm/mcm-ui@sha256:2391f66beec3417c38f01272e2f8475d048478b8fb57821b385de81101e29783',
+                      'sidneywibm/mcm-ui:latest',
                     ],
                     sizeBytes: 447269465,
                   },
@@ -281,7 +281,7 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-ui@sha256:b4a375abee72cf58e3bff5b883511a71d1b683031ec2ecb79a0b9b3f7db4f9e6',
+                      'sidneywibm/mcm-ui@sha256:b4a375abee72cf58e3bff5b883511a71d1b683031ec2ecb79a0b9b3f7db4f9e6',
                     ],
                     sizeBytes: 343995977,
                   },
@@ -369,8 +369,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'xubinzheng12/icp-hcm-ui-amd64@sha256:01e3c37ae26c6a9d893a678fff49439972c2a4f4aff79f266630afd6683f226f',
-                      'xubinzheng12/icp-hcm-ui-amd64:latest',
+                      'xubinzheng12/icp-mcm-ui-amd64@sha256:01e3c37ae26c6a9d893a678fff49439972c2a4f4aff79f266630afd6683f226f',
+                      'xubinzheng12/icp-mcm-ui-amd64:latest',
                     ],
                     sizeBytes: 199485837,
                   },
@@ -383,40 +383,40 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:a1a0238fc87e747b825f6dc36f16e5b700c96afc8491cf767a4236f28daaf24a',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64:38d52ca',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:a1a0238fc87e747b825f6dc36f16e5b700c96afc8491cf767a4236f28daaf24a',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64:38d52ca',
                     ],
                     sizeBytes: 183791610,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui@sha256:766c95079668dd67ea7fdefa572ad8189009270dbe993470024fb1f15a6261df',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui@sha256:766c95079668dd67ea7fdefa572ad8189009270dbe993470024fb1f15a6261df',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui:latest',
                     ],
                     sizeBytes: 182749935,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui@sha256:97994a4f7a1da1d7d226ab0316b0d410afd8c8cba0aba47563b7b4521be51004',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui@sha256:97994a4f7a1da1d7d226ab0316b0d410afd8c8cba0aba47563b7b4521be51004',
                     ],
                     sizeBytes: 182738960,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui@sha256:d966df07ac0392745d4cd81fd301bf8cf80daae777c21da535581e1988d1ae98',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui@sha256:d966df07ac0392745d4cd81fd301bf8cf80daae777c21da535581e1988d1ae98',
                     ],
                     sizeBytes: 182685124,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:0bb825eb94f12133308e7b8ced3b18d1f299a442dbabcebe35b605c8ed10b50f',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:0bb825eb94f12133308e7b8ced3b18d1f299a442dbabcebe35b605c8ed10b50f',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64:latest',
                     ],
                     sizeBytes: 182268279,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:0c6859417f693a8c21c54c433b011bfd2b935a1bfd10e99669356d0bffbcddaa',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:0c6859417f693a8c21c54c433b011bfd2b935a1bfd10e99669356d0bffbcddaa',
                     ],
                     sizeBytes: 182201284,
                   },
@@ -472,33 +472,33 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/mdelder/icp-hcm-ui-amd64@sha256:4dfe922b456861814219da452371edb7f737eb55559176392da4ed333fe06064',
+                      'registry.ng.bluemix.net/mdelder/icp-mcm-ui-amd64@sha256:4dfe922b456861814219da452371edb7f737eb55559176392da4ed333fe06064',
                     ],
                     sizeBytes: 163093854,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/mdelder/icp-hcm-ui-amd64@sha256:c762e43b23575a2e75be156d6e38a5161b9c999fff82823e46f4576e4506493b',
+                      'registry.ng.bluemix.net/mdelder/icp-mcm-ui-amd64@sha256:c762e43b23575a2e75be156d6e38a5161b9c999fff82823e46f4576e4506493b',
                     ],
                     sizeBytes: 163091857,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:5f519cebf657fada4fc859436b0a5146fe143355895289af4da27bb088bb8f80',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64:v1',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:5f519cebf657fada4fc859436b0a5146fe143355895289af4da27bb088bb8f80',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64:v1',
                     ],
                     sizeBytes: 158965038,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/mdelder/icp-hcm-ui-amd64@sha256:8e3f58a3a4a5dab37ce2e765f90d9574515ded3250acad624e0f684b268a4289',
-                      'registry.ng.bluemix.net/mdelder/icp-hcm-ui-amd64:latest',
+                      'registry.ng.bluemix.net/mdelder/icp-mcm-ui-amd64@sha256:8e3f58a3a4a5dab37ce2e765f90d9574515ded3250acad624e0f684b268a4289',
+                      'registry.ng.bluemix.net/mdelder/icp-mcm-ui-amd64:latest',
                     ],
                     sizeBytes: 158938154,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/mdelder/icp-hcm-ui-amd64@sha256:54cc42a8808ee85195df0efa0615ad64e74cc5bcdcdb7e2458999bff229c6da8',
+                      'registry.ng.bluemix.net/mdelder/icp-mcm-ui-amd64@sha256:54cc42a8808ee85195df0efa0615ad64e74cc5bcdcdb7e2458999bff229c6da8',
                     ],
                     sizeBytes: 158933025,
                   },
@@ -667,8 +667,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-ui@sha256:2391f66beec3417c38f01272e2f8475d048478b8fb57821b385de81101e29783',
-                      'sidneywibm/hcm-ui:latest',
+                      'sidneywibm/mcm-ui@sha256:2391f66beec3417c38f01272e2f8475d048478b8fb57821b385de81101e29783',
+                      'sidneywibm/mcm-ui:latest',
                     ],
                     sizeBytes: 447269465,
                   },
@@ -681,7 +681,7 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-ui@sha256:b4a375abee72cf58e3bff5b883511a71d1b683031ec2ecb79a0b9b3f7db4f9e6',
+                      'sidneywibm/mcm-ui@sha256:b4a375abee72cf58e3bff5b883511a71d1b683031ec2ecb79a0b9b3f7db4f9e6',
                     ],
                     sizeBytes: 343995977,
                   },
@@ -701,7 +701,7 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-ui@sha256:8567a56b2c80e4f47e9f023dfca44888796faedc14e229362ec963b66b9faab0',
+                      'sidneywibm/mcm-ui@sha256:8567a56b2c80e4f47e9f023dfca44888796faedc14e229362ec963b66b9faab0',
                     ],
                     sizeBytes: 280184145,
                   },
@@ -763,64 +763,64 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'ycao/icp-hcm-ui-amd64@sha256:0311668ae7e17dab58b71d97d4e756e997c4c3c8faf31c6e5843a3a2660f6980',
+                      'ycao/icp-mcm-ui-amd64@sha256:0311668ae7e17dab58b71d97d4e756e997c4c3c8faf31c6e5843a3a2660f6980',
                     ],
                     sizeBytes: 194334536,
                   },
                   {
                     names: [
-                      'ycao/icp-hcm-ui-amd64@sha256:d6d8bd49b904e6d67aef66b4b2590e669437067d9ef358030206a03353ee6000',
+                      'ycao/icp-mcm-ui-amd64@sha256:d6d8bd49b904e6d67aef66b4b2590e669437067d9ef358030206a03353ee6000',
                     ],
                     sizeBytes: 189869268,
                   },
                   {
                     names: [
-                      'ycao/icp-hcm-ui-amd64@sha256:b45868bee98bdd72e81b2606c8726f4db3133e4614880eee129ddfa8b25e5221',
+                      'ycao/icp-mcm-ui-amd64@sha256:b45868bee98bdd72e81b2606c8726f4db3133e4614880eee129ddfa8b25e5221',
                     ],
                     sizeBytes: 184818263,
                   },
                   {
                     names: [
-                      'ycao/icp-hcm-ui-amd64@sha256:ffb8df15150f6fe3b90f434df4ec19a561415054e0e02050066dbbf9d2f0532e',
-                      'ycao/icp-hcm-ui-amd64:latest',
+                      'ycao/icp-mcm-ui-amd64@sha256:ffb8df15150f6fe3b90f434df4ec19a561415054e0e02050066dbbf9d2f0532e',
+                      'ycao/icp-mcm-ui-amd64:latest',
                     ],
                     sizeBytes: 184253051,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui@sha256:97994a4f7a1da1d7d226ab0316b0d410afd8c8cba0aba47563b7b4521be51004',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui@sha256:97994a4f7a1da1d7d226ab0316b0d410afd8c8cba0aba47563b7b4521be51004',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui:latest',
                     ],
                     sizeBytes: 182738960,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui@sha256:d966df07ac0392745d4cd81fd301bf8cf80daae777c21da535581e1988d1ae98',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui@sha256:d966df07ac0392745d4cd81fd301bf8cf80daae777c21da535581e1988d1ae98',
                     ],
                     sizeBytes: 182685124,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:6dcd34d77d3310887d7b328109e95e96633d87e0378c49c43c4a1bc1e9fc8997',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:6dcd34d77d3310887d7b328109e95e96633d87e0378c49c43c4a1bc1e9fc8997',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64:latest',
                     ],
                     sizeBytes: 182609223,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:2b67e24e30923e6470781363e507d59a51e8551c4a511939d4e4aff29c0922e9',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:2b67e24e30923e6470781363e507d59a51e8551c4a511939d4e4aff29c0922e9',
                     ],
                     sizeBytes: 182503366,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:ec79c203153eda5d2f0ad635c573e6eb0eab802e6b46754b567938562681371a',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:ec79c203153eda5d2f0ad635c573e6eb0eab802e6b46754b567938562681371a',
                     ],
                     sizeBytes: 182335348,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-amd64@sha256:b7d039a814c1b06991683beca171cb8997015ef5fd634944b3d16ce2b800c436',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-amd64@sha256:b7d039a814c1b06991683beca171cb8997015ef5fd634944b3d16ce2b800c436',
                     ],
                     sizeBytes: 158965083,
                   },
@@ -875,8 +875,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-uiapi@sha256:aac3e99ae7d6bf8436f294c25e02446021c4c8340e9bf2d184b9cb38c0549c65',
-                      'sidneywibm/hcm-uiapi:latest',
+                      'sidneywibm/mcm-uiapi@sha256:aac3e99ae7d6bf8436f294c25e02446021c4c8340e9bf2d184b9cb38c0549c65',
+                      'sidneywibm/mcm-uiapi:latest',
                     ],
                     sizeBytes: 113623001,
                   },
@@ -889,63 +889,63 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-uiapi@sha256:5dc05135e16efc2ced395f26479edc20c901d42896f82bd55ad8fc51bd5b3ade',
+                      'sidneywibm/mcm-uiapi@sha256:5dc05135e16efc2ced395f26479edc20c901d42896f82bd55ad8fc51bd5b3ade',
                     ],
                     sizeBytes: 111526751,
                   },
                   {
                     names: [
-                      'sidneywibm/hcm-uiapi@sha256:59e63cc4ad1b057553fde8d6ef2cec6b9259aa0cfeaaf8beacd1df21f8237fbf',
+                      'sidneywibm/mcm-uiapi@sha256:59e63cc4ad1b057553fde8d6ef2cec6b9259aa0cfeaaf8beacd1df21f8237fbf',
                     ],
                     sizeBytes: 111526035,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api@sha256:b9d8905ca43996fec515e7e9d9e8406c5ab21f00f2473b3bb51c19c974841c25',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api@sha256:b9d8905ca43996fec515e7e9d9e8406c5ab21f00f2473b3bb51c19c974841c25',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api:latest',
                     ],
                     sizeBytes: 104427685,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:295b974ee0c53dcdfccbca79bef1efd62c7c537cee8484af2a3345cedf2db92c',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:295b974ee0c53dcdfccbca79bef1efd62c7c537cee8484af2a3345cedf2db92c',
                     ],
                     sizeBytes: 104426823,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:45d109365b5d0fa8ef3536c6f7f88f3e159cee8a5e32149c692182b26f2c552e',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:45d109365b5d0fa8ef3536c6f7f88f3e159cee8a5e32149c692182b26f2c552e',
                     ],
                     sizeBytes: 104426663,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:24aa4d9e355ba3315ae2dd50a00a4d5622111e330b2cd9394d101c276af9b174',
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64:latest',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:24aa4d9e355ba3315ae2dd50a00a4d5622111e330b2cd9394d101c276af9b174',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64:latest',
                     ],
                     sizeBytes: 104426518,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api@sha256:7a8d90fdf36b5abf91afde17e346a155376972af0030f2b8fa3a6febdee6059b',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api@sha256:7a8d90fdf36b5abf91afde17e346a155376972af0030f2b8fa3a6febdee6059b',
                     ],
                     sizeBytes: 104426422,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:a7ec1b86ab4f20d342bf0f6ce40130f33cec0cb186dbb49949da3e3f2ec52f02',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:a7ec1b86ab4f20d342bf0f6ce40130f33cec0cb186dbb49949da3e3f2ec52f02',
                     ],
                     sizeBytes: 104403736,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:fbb69a6f973e468fea35bb468a09123fcf0eef8d94ff8b286408eea28f349992',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:fbb69a6f973e468fea35bb468a09123fcf0eef8d94ff8b286408eea28f349992',
                     ],
                     sizeBytes: 104391370,
                   },
                   {
                     names: [
-                      'registry.ng.bluemix.net/icp-integration/icp-hcm-ui-api-amd64@sha256:cddbe08f0fe6e1f73e29366053fee32d5ad2ad51876af5d6f57bcd1f72ec095e',
+                      'registry.ng.bluemix.net/icp-integration/icp-mcm-ui-api-amd64@sha256:cddbe08f0fe6e1f73e29366053fee32d5ad2ad51876af5d6f57bcd1f72ec095e',
                     ],
                     sizeBytes: 103392115,
                   },

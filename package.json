@@ -1,5 +1,5 @@
 {
-  "name": "hcm-ui-api",
+  "name": "mcm-ui-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.ibm.com:IBMPrivateCloud/hcm-ui-api.git"
+    "url": "git@github.ibm.com:IBMPrivateCloud/mcm-ui-api.git"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
