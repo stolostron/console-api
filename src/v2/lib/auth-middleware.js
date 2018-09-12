@@ -9,6 +9,7 @@
 
 import _ from 'lodash';
 import lru from 'lru-cache';
+import jws from 'jws';
 import config from '../../../config';
 import request from './request';
 
@@ -61,6 +62,8 @@ export default function createAuthMiddleWare({
 
     // eslint-disable-next-line no-param-reassign
     req.kubeToken = `Bearer ${idToken}`;
+    // eslint-disable-next-line no-param-reassign
+    req.user = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
     next();
   });
 }
