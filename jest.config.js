@@ -18,6 +18,7 @@ const tapReporter = [
 
 const jestConfig = {
   collectCoverage: true,
+  coverageDirectory: './test-output/coverage',
   coverageReporters: [
     'json',
     'html',
@@ -26,10 +27,10 @@ const jestConfig = {
   ],
   coverageThreshold: {
     global: {
-      branches: 10,
-      functions: 10,
-      lines: 10,
-      statements: 10,
+      branches: 55,
+      functions: 75,
+      lines: 70,
+      statements: 70,
     },
   },
   collectCoverageFrom: [
