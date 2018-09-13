@@ -30,7 +30,7 @@ export default function createAuthMiddleWare({
   return asyncMiddleware(async (req, res, next) => {
     let idToken;
     const authorization = req.headers.authorization || req.headers.Authorization;
-    if (_.isEmpty(authorization) && shouldLocalAuth) {
+    if ((_.isEmpty(authorization) && shouldLocalAuth) || process.env.MOCK === 'true') {
       // special case for graphiql to work locally
       // do not exchange for idtoken since authorization header is empty
       idToken = config.get('localKubeToken') || 'localdev';
