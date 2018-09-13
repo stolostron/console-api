@@ -29,8 +29,9 @@ function getComplianceObject(res) {
     });
   });
   const compliance = {
-    name: _.get(res, 'metadata.name', 'none'),
-    namespace: _.get(res, 'metadata.namespace', 'none'),
+    metadata: _.get(res, 'metadata'),
+    name: _.get(res, 'metadata.name', 'none'), // TODO: Remove, use metadata.name instead.
+    namespace: _.get(res, 'metadata.namespace', 'none'), // TODO: Remove, use metadata.namespace instead
     kind: _.get(res, 'kind', 'Compliance'),
     clusterSelector: _.get(res, 'spec.clusterSelector', {}),
     policyCompliant: `${compliantPolicies}/${totalPolicies}`,
@@ -240,7 +241,8 @@ export default class ComplianceModel {
             });
 
             compliance.complianceStatus = complianceStatus;
-            compliance.detail = detail;
+            compliance.detail = detail; // TODO Remove, use metadata instead.
+            compliance.metadata = complianceData.metadata;
           } else {
             // the compliance in the namespace that is associated with a remote cluster
             const aggregatedStatus = _.get(complianceData, 'status', {});
@@ -284,7 +286,8 @@ export default class ComplianceModel {
         return [];
       }
       const policy = {
-        name: _.get(response, 'metadata.name', 'none'),
+        metadata: _.get(response, 'metadata'),
+        name: _.get(response, 'metadata.name', 'none'), // TODO: Remove, use metadata.name instead.
       };
 
       arr.push(getPolicyObject(response, policy));
@@ -301,8 +304,9 @@ export default class ComplianceModel {
     if (response.items) {
       response.items.forEach((res) => {
         const policy = {
-          name: _.get(res, 'metadata.name', 'none'),
-          namespace: _.get(res, 'metadata.namespace', 'none'),
+          metadata: _.get(res, 'metadata'),
+          name: _.get(res, 'metadata.name', 'none'), // TODO: Remove, use metadata.name instead.
+          namespace: _.get(res, 'metadata.namespace', 'none'), // TODO: Remove, use metadata.namespace instead
           status: _.get(res, 'status.Valid', false) === false ? 'invalid' : _.get(res, 'status.Compliant', 'unknown'),
           enforcement: _.get(res, 'spec.remediationAction', 'unknown'),
         };

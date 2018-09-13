@@ -20,7 +20,7 @@ type Query {
   pods: [Pod]
   releases: [HelmRel]
   repos: [HelmRepo]
-  
+
   # Policies and Compliances
   policies(name: String, namespace: String): [Policy]
   compliances(name: String, namespace: String): [Compliance]
@@ -41,25 +41,43 @@ type Mutation {
 
   # Creates a Kubernetes Policy
   createPolicy(resources: [JSON]): JSON
-  
+
   # Delete Kubernetes Policy
   deletePolicy(namespace: String, name: String!): String
-  
+
   # Creates Kubernetes Compliance
   createCompliance(resources: [JSON]): JSON
-  
+
   # Delete Kubernetes Compliance
   deleteCompliance(namespace: String, name: String!): String
 
   # NOTE: This only deletes the top level Application object. Related objects like Deployable,
   # PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
   deleteApplication(namespace: String, name: String!): String
-  
+
   # Delete helm release on specific cluster
   # deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
 
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
+}
+
+# Common fields for all Kubernetes objects
+interface K8sObject {
+  metadata: Metadata
+}
+
+# Common fields in all Kubernetes metadata objects.
+type Metadata {
+  annotations: JSON
+  creationTimestamp: String
+  labels: JSON
+  name: String
+  namespace: String
+  resourceVersion: String
+  selfLink: String
+  status: String
+  uid: String
 }
 `;

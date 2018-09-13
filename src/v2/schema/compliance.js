@@ -8,16 +8,17 @@
  ****************************************************************************** */
 
 export const typeDef = `
-type Compliance {
-  name: String
-  namespace: String
+type Compliance implements K8sObject {
+  metadata: Metadata
   kind: String
   clusterSelector: JSON
-  detail: ComplianceDetail
   policyCompliant: String
   clusterCompliant: String
   compliancePolicies: [CompliancePolicy]
   complianceStatus: [CompliantStatus]
+  name: String @deprecated(reason: "Use metadata.name field.")
+  namespace: String @deprecated(reason: "Use metadata.namespace field.")
+  detail: ComplianceDetail @deprecated(reason: "Use metadata field.")
 }
 
 type CompliantStatus {
@@ -26,30 +27,29 @@ type CompliantStatus {
   localValidStatus: String
 }
 
-type CompliancePolicy {
-  name: String
+type CompliancePolicy implements K8sObject {
+  metadata: Metadata
   cluster: String
   compliant: String
   valid: String
   complianceName: String
   complianceNamespace: String
-  
   # Possible values are: enforce, inform
   enforcement: String
-  namespace: String
   status: String
-  detail: PolicyDetail
   templates: [PolicyTemplates]
   rules: [PolicyRules]
   violations: [Violations]
+  name: String @deprecated(reason: "Use metadata.name field.")
+  namespace: String @deprecated(reason: "Use metadata.namespace field.")
+  detail: PolicyDetail @deprecated(reason: "Use metadata field.")
 }
 
-
 type ComplianceDetail {
-  selfLink: String
-  creationTime: String
-  resourceVersion: String
-  uid: String
+  selfLink: String @deprecated(reason: "Use metadata.selfLink field.")
+  creationTime: String @deprecated(reason: "Use metadata.creationTimestamp field.")
+  resourceVersion: String @deprecated(reason: "Use metadata.resourceVersion field.")
+  uid: String @deprecated(reason: "Use metadata.uid field.")
 }
 `;
 

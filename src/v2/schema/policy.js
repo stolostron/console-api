@@ -8,17 +8,18 @@
  ****************************************************************************** */
 
 export const typeDef = `
-type Policy {
+type Policy implements K8sObject {
+  metadata: Metadata
   # Possible values are: enforce, inform
   enforcement: String
-  name: String
-  namespace: String
   # Possible values are: compliant, notcompliant, invalid
   status: String
   detail: PolicyDetail
   templates: [PolicyTemplates]
   rules: [PolicyRules]
   violations: [Violations]
+  name: String @deprecated(reason: "Use metadata.name field.")
+  namespace: String @deprecated(reason: "Use metadata.namespace field.")
 }
 
 type Violations {
@@ -31,13 +32,13 @@ type Violations {
 }
 
 type PolicyDetail {
-  selfLink: String
-  creationTime: String
+  selfLink: String @deprecated(reason: "Use metadata.selfLink field.")
+  creationTime: String @deprecated(reason: "Use metadata.creationTimestamp field.")
   exclude_namespace: [String]
   include_namespace: [String]
-  annotations: JSON
-  resourceVersion: String
-  uid: String
+  annotations: JSON @deprecated(reason: "Use metadata.annotations field.")
+  resourceVersion: String @deprecated(reason: "Use metadata.resourceVersion field.")
+  uid: String @deprecated(reason: "Use metadata.uid field.")
 }
 
 type PolicyTemplates {
