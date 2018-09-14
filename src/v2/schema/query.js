@@ -81,3 +81,11 @@ type Metadata {
   uid: String
 }
 `;
+
+export const resolver = {
+  K8sObject: {
+    __resolveType() {
+      return null;
+    },
+  },
+};

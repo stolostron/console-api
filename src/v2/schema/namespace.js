@@ -8,11 +8,12 @@
  ****************************************************************************** */
 
 export const typeDef = `
-type Namespace {
+type Namespace implements K8sObject {
   cluster: String
-  createdAt: String
-  name: String
-  uid: String
+  createdAt: String @deprecated(reason: "Use metadata.creationTimestamp field.")
+  metadata: Metadata
+  name: String @deprecated(reason: "Use metadata.name field.")
+  uid: String @deprecated(reason: "Use metadata.uid field.")
   status: String
 }
 `;

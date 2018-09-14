@@ -14,18 +14,19 @@ type NodeResources {
   memory: String
 }
 
-type Node {
+type Node implements K8sObject {
   allocatable: NodeResources
   architecture: String
   capacity: NodeResources
   cluster: String
-  createdAt: String
+  createdAt: String @deprecated(reason: "Use metadata.creationTimestamp field.")
   images: [String]
-  labels: JSON
-  name: String
+  labels: JSON @deprecated(reason: "Use metadata.labels field.")
+  metadata: Metadata
+  name: String @deprecated(reason: "Use metadata.name field.")
   operatingSystem: String
   osImage: String
-  uid: String
+  uid: String @deprecated(reason: "Use metadata.uid field.")
 }
 `;
 
