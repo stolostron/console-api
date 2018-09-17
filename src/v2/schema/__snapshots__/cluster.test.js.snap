@@ -1,3 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Cluster Resolver Correctly Resolves Cluster Query 1`] = `"{\\"data\\":{\\"clusters\\":[{\\"createdAt\\":\\"2018-08-13T16:56:41Z\\",\\"clusterip\\":\\"9.42.23.230\\",\\"labels\\":{\\"cloud\\":\\"IBM\\",\\"datacenter\\":\\"toronto\\",\\"environment\\":\\"Dev\\",\\"name\\":\\"mycluster.icp\\",\\"owner\\":\\"marketing\\",\\"region\\":\\"US\\",\\"vendor\\":\\"ICP\\"},\\"name\\":\\"mycluster.icp\\",\\"namespace\\":\\"default\\",\\"nodes\\":3,\\"status\\":\\"ok\\",\\"totalMemory\\":\\"21\\",\\"totalStorage\\":\\"75\\",\\"uid\\":\\"d9f3a5aa-9f19-11e8-855e-f2b998610544\\"}]}}"`;
+exports[`Cluster Resolver Correctly Resolves Cluster Query 1`] = `
+Object {
+  "data": Object {
+    "clusters": Array [
+      Object {
+        "clusterip": "9.42.23.230",
+        "createdAt": "2018-08-13T16:56:41Z",
+        "labels": Object {
+          "cloud": "IBM",
+          "datacenter": "toronto",
+          "environment": "Dev",
+          "name": "managed-cluster",
+          "owner": "marketing",
+          "region": "US",
+          "vendor": "ICP",
+        },
+        "name": "managed-cluster",
+        "namespace": "default",
+        "nodes": 3,
+        "status": "ok",
+        "totalMemory": "21",
+        "totalStorage": "75",
+        "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+      },
+      Object {
+        "clusterip": "9.42.23.230",
+        "createdAt": "2018-08-13T16:56:41Z",
+        "labels": Object {
+          "cloud": "IBM",
+          "datacenter": "raleigh",
+          "environment": "Dev",
+          "name": "hub-cluster",
+          "owner": "development",
+          "region": "US",
+          "vendor": "ICP",
+        },
+        "name": "hub-cluster",
+        "namespace": "kube-system",
+        "nodes": 3,
+        "status": "ok",
+        "totalMemory": "21",
+        "totalStorage": "75",
+        "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+      },
+    ],
+  },
+}
+`;

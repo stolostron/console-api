@@ -11,6 +11,10 @@
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
+    clustersByNamespace: {
+      default: require('./ClusterByNS').default,
+      kubeSystem: require('./ClusterByNS').kubeSystem,
+    },
     clusters: require('./ClusterList').default,
     clusterStatus: require('./ClusterStatusList').default,
     repos: require('./ReposList').default,
@@ -59,8 +63,10 @@ export default function createMockHttp() {
         return state.apps.mockAppsResponse;
       case params.url.includes('clusterstatuses'):
         return state.clusterStatus;
-      case params.url.includes('cluster'):
-        return state.clusters;
+      case params.url.includes('namespaces/default/clusters'):
+        return state.clustersByNamespace.default;
+      case params.url.includes('namespaces/kube-system/clusters'):
+        return state.clustersByNamespace.kubeSystem;
       case params.url.includes('deployables'):
         return state.apps.mockDeployablesResponse;
       case params.url.includes('default/helmrepos'):

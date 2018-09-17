@@ -12,7 +12,7 @@ import logger from '../lib/logger';
 import config from '../../../config';
 import requestLib from '../lib/request';
 
-class KubeConnector {
+export default class KubeConnector {
   constructor({
     token = 'Bearer localdev',
     httpLib = requestLib,
@@ -152,5 +152,3 @@ class KubeConnector {
     }
   }
 }
-
-export default KubeConnector;

@@ -214,7 +214,9 @@ const transformPod = (pod, status) => ({
 
 export const resolver = {
   Query: {
-    dashboard: async (root, args, { clusterModel, helmModel, resourceViewModel }) => {
+    dashboard: async (root, args, {
+      clusterModel, helmModel, resourceViewModel, req,
+    }) => {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
@@ -245,21 +247,21 @@ export const resolver = {
             },
           ],
           statusQuery: () => clusterModel.getClusterStatus(args),
-          clusterQuery: () => clusterModel.getClusters(args),
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
         getDashboardItems({
           cards: [
             { name: 'helm releases', transform: transformRelease },
           ],
           statusQuery: () => helmModel.getReleases(args),
-          clusterQuery: () => clusterModel.getClusters(args),
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod },
           ],
           statusQuery: () => resourceViewModel.getPods(args),
-          clusterQuery: () => clusterModel.getClusters(args),
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
       ]);
       let allCards = [];

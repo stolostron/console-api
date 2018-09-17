@@ -26,6 +26,7 @@ type Cluster {
 
 export const resolver = {
   Query: {
-    clusters: (root, args, { clusterModel }) => clusterModel.getClusters(args),
+    clusters: (root, args, { clusterModel, req }) =>
+      clusterModel.getClusters({ ...args, user: req.user }),
   },
 };

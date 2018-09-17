@@ -25,41 +25,93 @@ function getStatus(cluster) {
 }
 
 export default class ClusterModel {
-  constructor({ kubeConnector }) {
+  constructor({ kubeConnector, idConnector }) {
     if (!kubeConnector) {
       throw new Error('kubeConnector is a required parameter');
     }
 
-    this.kubeConnector = kubeConnector;
-  }
-
-  async getClusters() {
-    const response = await this.kubeConnector.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-
-      // TODO: How should we handle errors? - 07/25/18 10:20:57 sidney.wijngaarde1@ibm.com
-      return [];
+    if (!idConnector) {
+      throw new Error('idConnector is a required parameter');
     }
 
-    const clusterStatus = await this.getClusterStatus();
-    const result = [];
+    this.kubeConnector = kubeConnector;
+    this.idConnector = idConnector;
+  }
 
-    response.items.forEach((cluster, idx) => {
-      result.push({
+  async getClusterByNamespace(namespace) {
+    const response = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters`);
+    if (response.code || response.message) {
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      return null;
+    }
+
+    if (response.items.length > 1) {
+      logger.error('MCMM ERROR - cluster query return more than on cluster for a namespace');
+      return null;
+    }
+
+    return response.items[0];
+  }
+
+  async getClusterStatusByNamespace(namespace) {
+    const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses`);
+    if (response.code || response.message) {
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      return null;
+    }
+
+    if (response.items.length > 1) {
+      logger.error('MCMM ERROR - cluster query return more than on cluster for a namespace');
+      return null;
+    }
+
+    return response.items[0];
+  }
+
+  async getClusters({ user }) {
+    const namespaces = await this.idConnector.get(`/identity/api/v1/users/${user}/getTeamResources?resourceType=namespace`);
+
+    const clusterQueries = namespaces.map(({ namespaceId }) => Promise.all([
+      this.getClusterByNamespace(namespaceId),
+      this.getClusterStatusByNamespace(namespaceId),
+    ]));
+
+    const clusterData = await Promise.all(clusterQueries);
+
+    const results = clusterData.reduce((accum, [cluster, clusterstatus]) => {
+      // namespace doesn't contain a clusteer
+      if (!cluster) {
+        return accum;
+      }
+
+      const result = {
         createdAt: cluster.metadata.creationTimestamp,
-        clusterip: clusterStatus[idx].ip,
         labels: cluster.metadata.labels,
         name: cluster.metadata.name,
         namespace: cluster.metadata.namespace,
-        status: getStatus(cluster),
         uid: cluster.metadata.uid,
-        nodes: clusterStatus[idx].nodes,
-        totalMemory: parseInt(clusterStatus[idx].memoryUtilization, 10),
-        totalStorage: parseInt(clusterStatus[idx].storageUtilization, 10),
-      });
-    });
-    return result;
+        status: getStatus(cluster),
+        nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
+        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
+      };
+
+      const memoryUsage = _.get(clusterstatus, 'spec.usage.memory');
+      const memoryCapacity = _.get(clusterstatus, 'spec.capacity.memory');
+      if (memoryUsage && memoryCapacity) {
+        result.totalMemory = parseInt(getPercentage(memoryUsage, memoryCapacity), 10);
+      }
+
+      const storageUsage = _.get(clusterstatus, 'spec.usage.storage');
+      const storageCapacity = _.get(clusterstatus, 'spec.capacity.storage');
+      if (storageUsage && storageCapacity) {
+        result.totalStorage = parseInt(getPercentage(storageUsage, storageCapacity), 10);
+      }
+
+      accum.push(result);
+      return accum;
+    }, []);
+
+    return results;
   }
 
   async getClusterStatus() {

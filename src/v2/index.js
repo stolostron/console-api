@@ -23,10 +23,12 @@ import ClusterModel from './models/cluster';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import KubeConnector from './connectors/kube';
+import IDConnector from './connectors/idmgmt';
 import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
 
-import createMockHttp from './mocks/';
+import createMockKubeHTTP from './mocks/kube-http';
+import createMockIAMHTTP from './mocks/iam-http';
 import schema from './schema/';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
@@ -74,13 +76,15 @@ if (process.env.NODE_ENV === 'production') {
   }));
 } else if (process.env.NODE_ENV === 'test') {
   logger.info('RUNNING MOCK SERVER');
-  const mockHttp = createMockHttp();
+  const mockKube = createMockKubeHTTP();
+  const mockIAM = createMockIAMHTTP();
   graphQLServer.use('*', morgan('dev'));
   // disable security check and enable graphiql only for local dev
   graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress((req) => {
-    const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: mockHttp });
+    const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: mockKube });
+    const idConnector = new IDConnector({ iamToken: req.cookies['cfc-access-token-cookie'], httpLib: mockIAM });
 
     return {
       formatError,
@@ -89,7 +93,7 @@ if (process.env.NODE_ENV === 'production') {
         req,
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
-        clusterModel: new ClusterModel({ kubeConnector }),
+        clusterModel: new ClusterModel({ kubeConnector, idConnector }),
         complianceModel: new ComplianceModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
       },
@@ -103,6 +107,7 @@ if (process.env.NODE_ENV === 'production') {
 
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
     const kubeConnector = new KubeConnector({ token: req.kubeToken });
+    const idConnector = new IDConnector({ iamToken: req.cookies['cfc-access-token-cookie'] });
 
     return {
       formatError,
@@ -111,7 +116,7 @@ if (process.env.NODE_ENV === 'production') {
         req,
         helmModel: new HelmModel({ kubeConnector }),
         applicationModel: new ApplicationModel({ kubeConnector }),
-        clusterModel: new ClusterModel({ kubeConnector }),
+        clusterModel: new ClusterModel({ kubeConnector, idConnector }),
         complianceModel: new ComplianceModel({ kubeConnector }),
         resourceViewModel: new ResourceViewModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
