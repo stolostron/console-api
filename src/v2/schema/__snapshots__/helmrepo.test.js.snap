@@ -1,7 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Helm Repository Resolver Correctly Resolves Delete Helm Repository Mutation 1`] = `"{\\"data\\":{\\"deleteHelmRepository\\":{\\"Name\\":\\"testRepo\\",\\"URL\\":\\"https://testRepo.com\\"}}}"`;
+exports[`Helm Repository Resolver Correctly Resolves Delete Helm Repository Mutation 1`] = `
+Object {
+  "data": Object {
+    "deleteHelmRepository": Object {
+      "Name": "testRepo",
+      "URL": "https://testRepo.com",
+    },
+  },
+}
+`;
 
-exports[`Helm Repository Resolver Correctly Resolves Helm Repository Query 1`] = `"{\\"data\\":{\\"repos\\":[{\\"Name\\":\\"google\\",\\"URL\\":\\"https://kubernetes-charts.storage.googleapis.com/\\"}]}}"`;
+exports[`Helm Repository Resolver Correctly Resolves Helm Repository Query 1`] = `
+Object {
+  "data": Object {
+    "repos": Array [
+      Object {
+        "Name": "google",
+        "URL": "https://kubernetes-charts.storage.googleapis.com/",
+      },
+    ],
+  },
+}
+`;
 
-exports[`Helm Repository Resolver Correctly Resolves Set Helm Repository Mutation 1`] = `"{\\"data\\":{\\"setHelmRepo\\":{\\"Name\\":\\"testRepo\\",\\"URL\\":\\"https://testRepo.com\\"}}}"`;
+exports[`Helm Repository Resolver Correctly Resolves Set Helm Repository Mutation 1`] = `
+Object {
+  "data": Object {
+    "setHelmRepo": Object {
+      "Name": "testRepo",
+      "URL": "https://testRepo.com",
+    },
+  },
+}
+`;

@@ -1,3 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Nodes Resolver Correctly Resolves Nodes Query 1`] = `"{\\"data\\":{\\"nodes\\":[{\\"architecture\\":\\"amd64\\",\\"cluster\\":\\"mycluster\\",\\"createdAt\\":\\"2018-08-18T15:52:43Z\\",\\"labels\\":{\\"beta.kubernetes.io/arch\\":\\"amd64\\",\\"beta.kubernetes.io/os\\":\\"linux\\",\\"kubernetes.io/hostname\\":\\"9.37.137.174\\",\\"node-role.kubernetes.io/worker\\":\\"true\\"},\\"name\\":\\"9.37.137.174\\",\\"operatingSystem\\":\\"linux\\",\\"osImage\\":\\"Ubuntu 16.04.4 LTS\\",\\"uid\\":\\"beb1f1e6-a2fe-11e8-8a50-005056a0d11b\\"},{\\"architecture\\":\\"amd64\\",\\"cluster\\":\\"mycluster\\",\\"createdAt\\":\\"2018-08-18T15:52:44Z\\",\\"labels\\":{\\"beta.kubernetes.io/arch\\":\\"amd64\\",\\"beta.kubernetes.io/os\\":\\"linux\\",\\"kubernetes.io/hostname\\":\\"9.37.137.92\\",\\"node-role.kubernetes.io/worker\\":\\"true\\"},\\"name\\":\\"9.37.137.92\\",\\"operatingSystem\\":\\"linux\\",\\"osImage\\":\\"Ubuntu 16.04.4 LTS\\",\\"uid\\":\\"beb9ff97-a2fe-11e8-8a50-005056a0d11b\\"},{\\"architecture\\":\\"amd64\\",\\"cluster\\":\\"mycluster\\",\\"createdAt\\":\\"2018-08-18T15:50:24Z\\",\\"labels\\":{\\"beta.kubernetes.io/arch\\":\\"amd64\\",\\"beta.kubernetes.io/os\\":\\"linux\\",\\"etcd\\":\\"true\\",\\"kubernetes.io/hostname\\":\\"9.42.23.230\\",\\"management\\":\\"true\\",\\"master\\":\\"true\\",\\"node-role.kubernetes.io/etcd\\":\\"true\\",\\"node-role.kubernetes.io/management\\":\\"true\\",\\"node-role.kubernetes.io/master\\":\\"true\\",\\"node-role.kubernetes.io/proxy\\":\\"true\\",\\"proxy\\":\\"true\\",\\"role\\":\\"master\\"},\\"name\\":\\"9.42.23.230\\",\\"operatingSystem\\":\\"linux\\",\\"osImage\\":\\"Ubuntu 16.04.4 LTS\\",\\"uid\\":\\"6bd82787-a2fe-11e8-8a50-005056a0d11b\\"}]}}"`;
+exports[`Nodes Resolver Correctly Resolves Nodes Query 1`] = `
+Object {
+  "data": Object {
+    "nodes": Array [
+      Object {
+        "architecture": "amd64",
+        "cluster": "mycluster",
+        "createdAt": "2018-08-18T15:52:43Z",
+        "labels": Object {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/os": "linux",
+          "kubernetes.io/hostname": "9.37.137.174",
+          "node-role.kubernetes.io/worker": "true",
+        },
+        "name": "9.37.137.174",
+        "operatingSystem": "linux",
+        "osImage": "Ubuntu 16.04.4 LTS",
+        "uid": "beb1f1e6-a2fe-11e8-8a50-005056a0d11b",
+      },
+      Object {
+        "architecture": "amd64",
+        "cluster": "mycluster",
+        "createdAt": "2018-08-18T15:52:44Z",
+        "labels": Object {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/os": "linux",
+          "kubernetes.io/hostname": "9.37.137.92",
+          "node-role.kubernetes.io/worker": "true",
+        },
+        "name": "9.37.137.92",
+        "operatingSystem": "linux",
+        "osImage": "Ubuntu 16.04.4 LTS",
+        "uid": "beb9ff97-a2fe-11e8-8a50-005056a0d11b",
+      },
+      Object {
+        "architecture": "amd64",
+        "cluster": "mycluster",
+        "createdAt": "2018-08-18T15:50:24Z",
+        "labels": Object {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/os": "linux",
+          "etcd": "true",
+          "kubernetes.io/hostname": "9.42.23.230",
+          "management": "true",
+          "master": "true",
+          "node-role.kubernetes.io/etcd": "true",
+          "node-role.kubernetes.io/management": "true",
+          "node-role.kubernetes.io/master": "true",
+          "node-role.kubernetes.io/proxy": "true",
+          "proxy": "true",
+          "role": "master",
+        },
+        "name": "9.42.23.230",
+        "operatingSystem": "linux",
+        "osImage": "Ubuntu 16.04.4 LTS",
+        "uid": "6bd82787-a2fe-11e8-8a50-005056a0d11b",
+      },
+    ],
+  },
+}
+`;

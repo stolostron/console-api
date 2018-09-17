@@ -1,13 +1,164 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Application Resolver Correctly Resolves Applications Query 1`] = `"{\\"data\\":{\\"applications\\":[{\\"selector\\":{\\"matchLabels\\":{\\"hcmapp\\":\\"app01\\"}}},{\\"selector\\":{\\"matchLabels\\":{\\"hcmapp\\":\\"app02\\"}}}]}}"`;
+exports[`Application Resolver Correctly Resolves Applications Query 1`] = `
+Object {
+  "data": Object {
+    "applications": Array [
+      Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "hcmapp": "app01",
+          },
+        },
+      },
+      Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "hcmapp": "app02",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
 
-exports[`Application Resolver Correctly Resolves Create Application Mutation 1`] = `"{\\"data\\":{\\"createApplication\\":{\\"errors\\":[],\\"result\\":[{\\"kind\\":\\"Application\\",\\"apiVersion\\":\\"mcm.ibm.com/v1alpha1\\",\\"metadata\\":{\\"name\\":\\"testapp\\",\\"namespace\\":\\"default\\",\\"selfLink\\":\\"/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/testapp\\",\\"uid\\":\\"f849165a-b2a8-11e8-bd43-b69970856045\\",\\"resourceVersion\\":\\"59905\\",\\"creationTimestamp\\":\\"2018-09-07T14:19:02Z\\",\\"labels\\":{\\"deployable\\":\\"deployable01\\",\\"hcmapp\\":\\"testapp\\"},\\"annotations\\":{\\"mcm.ibm.com/user-group\\":\\"c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=\\",\\"mcm.ibm.com/user-identity\\":\\"aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==\\"}},\\"spec\\":{\\"componentKinds\\":[{\\"group\\":\\"mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"PlacementPolicy\\"},{\\"group\\":\\"mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"Deployable\\"}],\\"descriptor\\":{},\\"selector\\":{\\"matchLabels\\":{\\"hcmapp\\":\\"testapp\\"}}},\\"status\\":{\\"Deployable\\":{\\"metadata\\":{\\"creationTimestamp\\":null},\\"spec\\":{\\"deployer\\":{\\"helm\\":{}}},\\"status\\":{}}}}]}}}"`;
+exports[`Application Resolver Correctly Resolves Create Application Mutation 1`] = `
+Object {
+  "data": Object {
+    "createApplication": Object {
+      "errors": Array [],
+      "result": Array [
+        Object {
+          "apiVersion": "mcm.ibm.com/v1alpha1",
+          "kind": "Application",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
+              "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
+            },
+            "creationTimestamp": "2018-09-07T14:19:02Z",
+            "labels": Object {
+              "deployable": "deployable01",
+              "hcmapp": "testapp",
+            },
+            "name": "testapp",
+            "namespace": "default",
+            "resourceVersion": "59905",
+            "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/testapp",
+            "uid": "f849165a-b2a8-11e8-bd43-b69970856045",
+          },
+          "spec": Object {
+            "componentKinds": Array [
+              Object {
+                "group": "mcm.ibm.com/v1alpha1",
+                "kind": "PlacementPolicy",
+              },
+              Object {
+                "group": "mcm.ibm.com/v1alpha1",
+                "kind": "Deployable",
+              },
+            ],
+            "descriptor": Object {},
+            "selector": Object {
+              "matchLabels": Object {
+                "hcmapp": "testapp",
+              },
+            },
+          },
+          "status": Object {
+            "Deployable": Object {
+              "metadata": Object {
+                "creationTimestamp": null,
+              },
+              "spec": Object {
+                "deployer": Object {
+                  "helm": Object {},
+                },
+              },
+              "status": Object {},
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+`;
 
-exports[`Application Resolver Correctly Resolves Delete Application Mutation 1`] = `"{\\"data\\":{\\"deleteApplication\\":\\"testapp\\"}}"`;
+exports[`Application Resolver Correctly Resolves Delete Application Mutation 1`] = `
+Object {
+  "data": Object {
+    "deleteApplication": "testapp",
+  },
+}
+`;
 
-exports[`Application Resolver Correctly Resolves Deployables Query - MatchLabels 1`] = `"{\\"data\\":{\\"deployables\\":[{\\"name\\":\\"deployable02-a\\",\\"deployer\\":{\\"chartName\\":\\"nginx-lego\\",\\"namespace\\":\\"default\\",\\"repository\\":\\"google\\",\\"version\\":\\"0.3.1\\"},\\"dependencies\\":null},{\\"name\\":\\"deployable02-b\\",\\"deployer\\":{\\"chartName\\":\\"nginx-lego\\",\\"namespace\\":\\"default\\",\\"repository\\":\\"google\\",\\"version\\":\\"0.3.1\\"},\\"dependencies\\":null}]}}"`;
+exports[`Application Resolver Correctly Resolves Deployables Query - MatchLabels 1`] = `
+Object {
+  "data": Object {
+    "deployables": Array [
+      Object {
+        "dependencies": null,
+        "deployer": Object {
+          "chartName": "nginx-lego",
+          "namespace": "default",
+          "repository": "google",
+          "version": "0.3.1",
+        },
+        "name": "deployable02-a",
+      },
+      Object {
+        "dependencies": null,
+        "deployer": Object {
+          "chartName": "nginx-lego",
+          "namespace": "default",
+          "repository": "google",
+          "version": "0.3.1",
+        },
+        "name": "deployable02-b",
+      },
+    ],
+  },
+}
+`;
 
-exports[`Application Resolver Correctly Resolves Placement Policies Query 1`] = `"{\\"data\\":{\\"placementPolicies\\":[{\\"annotations\\":{\\"mcm.ibm.com/user-group\\":\\"c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=\\",\\"mcm.ibm.com/user-identity\\":\\"aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==\\"},\\"clusterSelector\\":{\\"matchLabels\\":{\\"name\\":\\"mycluster.icp\\"}},\\"name\\":\\"placement02\\",\\"namespace\\":\\"default\\",\\"replicas\\":1,\\"resourceSelector\\":{}}]}}"`;
+exports[`Application Resolver Correctly Resolves Placement Policies Query 1`] = `
+Object {
+  "data": Object {
+    "placementPolicies": Array [
+      Object {
+        "annotations": Object {
+          "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
+          "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
+        },
+        "clusterSelector": Object {
+          "matchLabels": Object {
+            "name": "mycluster.icp",
+          },
+        },
+        "name": "placement02",
+        "namespace": "default",
+        "replicas": 1,
+        "resourceSelector": Object {},
+      },
+    ],
+  },
+}
+`;
 
-exports[`Application Resolver Correctly Resolves Single Applications Query 1`] = `"{\\"data\\":{\\"applications\\":[{\\"selector\\":{\\"matchLabels\\":{\\"hcmapp\\":\\"app02\\"}}}]}}"`;
+exports[`Application Resolver Correctly Resolves Single Applications Query 1`] = `
+Object {
+  "data": Object {
+    "applications": Array [
+      Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "hcmapp": "app02",
+          },
+        },
+      },
+    ],
+  },
+}
+`;

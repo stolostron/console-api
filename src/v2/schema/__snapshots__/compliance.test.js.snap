@@ -1,9 +1,229 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Compliance Resolver Correctly Resolves Compliance List Query 1`] = `"{\\"data\\":{\\"compliances\\":[{\\"name\\":\\"compliance-xz\\",\\"namespace\\":\\"mcm\\",\\"kind\\":\\"Compliance\\",\\"clusterSelector\\":{\\"matchNames\\":[\\"mycluster\\"]},\\"policyCompliant\\":\\"1/2\\",\\"clusterCompliant\\":\\"0/1\\"}]}}"`;
+exports[`Compliance Resolver Correctly Resolves Compliance List Query 1`] = `
+Object {
+  "data": Object {
+    "compliances": Array [
+      Object {
+        "clusterCompliant": "0/1",
+        "clusterSelector": Object {
+          "matchNames": Array [
+            "mycluster",
+          ],
+        },
+        "kind": "Compliance",
+        "name": "compliance-xz",
+        "namespace": "mcm",
+        "policyCompliant": "1/2",
+      },
+    ],
+  },
+}
+`;
 
-exports[`Compliance Resolver Correctly Resolves Create Compliance Mutation 1`] = `"{\\"data\\":{\\"createCompliance\\":[{\\"apiVersion\\":\\"compliance.mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"Compliance\\",\\"metadata\\":{\\"creationTimestamp\\":\\"2018-09-06T18:19:43Z\\",\\"generation\\":1,\\"name\\":\\"test-compliance\\",\\"namespace\\":\\"mcm\\",\\"resourceVersion\\":\\"4405693\\",\\"selfLink\\":\\"/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/test-compliance\\",\\"uid\\":\\"6d5dbb6e-b201-11e8-9a12-005056a0d11b\\"},\\"spec\\":{\\"clusterSelector\\":{\\"matchNames\\":[\\"mycluster\\"]},\\"runtime-rules\\":[{\\"apiVersion\\":\\"policy.mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"Policy\\",\\"metadata\\":{\\"description\\":\\"Instance descriptor for policy resource\\",\\"name\\":\\"test-policy-1\\"},\\"spec\\":{\\"namespaces\\":{\\"exclude\\":[\\"kube*\\"],\\"include\\":[\\"default\\"]},\\"remediationAction\\":\\"inform\\",\\"role-templates\\":[{\\"apiVersion\\":\\"roletemplate.mcm.ibm.com/v1alpha1\\",\\"complianceType\\":\\"musthave\\",\\"kind\\":\\"RoleTemplate\\",\\"metadata\\":{\\"name\\":\\"role-xz-1\\",\\"namespace\\":\\"\\"},\\"rules\\":[{\\"PolicyRule\\":{\\"apiGroups\\":[\\"extensions\\",\\"apps\\"],\\"resources\\":[\\"deployments\\"],\\"verbs\\":[\\"get\\",\\"list\\",\\"watch\\",\\"create\\",\\"delete\\",\\"patch\\"]},\\"complianceType\\":\\"musthave\\"}],\\"selector\\":{\\"matchLabels\\":{\\"cloud\\":\\"IBM\\"}}}]}},{\\"apiVersion\\":\\"policy.mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"Policy\\",\\"metadata\\":{\\"description\\":\\"Instance descriptor for policy resource\\",\\"name\\":\\"test-policy-2\\"},\\"spec\\":{\\"namespaces\\":{\\"exclude\\":[\\"kube*\\"],\\"include\\":[\\"default\\"]},\\"remediationAction\\":\\"enforce\\",\\"role-templates\\":[{\\"apiVersion\\":\\"roletemplate.mcm.ibm.com/v1alpha1\\",\\"complianceType\\":\\"musthave\\",\\"kind\\":\\"RoleTemplate\\",\\"metadata\\":{\\"name\\":\\"role-xz-2\\",\\"namespace\\":\\"\\"},\\"rules\\":[{\\"PolicyRule\\":{\\"apiGroups\\":[\\"extensions\\",\\"apps\\"],\\"resources\\":[\\"deployments\\"],\\"verbs\\":[\\"get\\",\\"list\\",\\"watch\\",\\"delete\\"]},\\"complianceType\\":\\"musthave\\"},{\\"PolicyRule\\":{\\"apiGroups\\":[\\"core\\"],\\"resources\\":[\\"pods\\"],\\"verbs\\":[\\"create\\",\\"update\\",\\"patch\\"]},\\"complianceType\\":\\"mustnothave\\"},{\\"PolicyRule\\":{\\"apiGroups\\":[\\"core\\"],\\"resources\\":[\\"secrets\\"],\\"verbs\\":[\\"get\\",\\"watch\\",\\"list\\",\\"create\\",\\"delete\\",\\"update\\",\\"patch\\"]}}],\\"selector\\":{\\"matchLabels\\":{\\"cloud\\":\\"IBM\\"}}}]}}]}}]}}"`;
+exports[`Compliance Resolver Correctly Resolves Create Compliance Mutation 1`] = `
+Object {
+  "data": Object {
+    "createCompliance": Array [
+      Object {
+        "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
+        "kind": "Compliance",
+        "metadata": Object {
+          "creationTimestamp": "2018-09-06T18:19:43Z",
+          "generation": 1,
+          "name": "test-compliance",
+          "namespace": "mcm",
+          "resourceVersion": "4405693",
+          "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/test-compliance",
+          "uid": "6d5dbb6e-b201-11e8-9a12-005056a0d11b",
+        },
+        "spec": Object {
+          "clusterSelector": Object {
+            "matchNames": Array [
+              "mycluster",
+            ],
+          },
+          "runtime-rules": Array [
+            Object {
+              "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+              "kind": "Policy",
+              "metadata": Object {
+                "description": "Instance descriptor for policy resource",
+                "name": "test-policy-1",
+              },
+              "spec": Object {
+                "namespaces": Object {
+                  "exclude": Array [
+                    "kube*",
+                  ],
+                  "include": Array [
+                    "default",
+                  ],
+                },
+                "remediationAction": "inform",
+                "role-templates": Array [
+                  Object {
+                    "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                    "complianceType": "musthave",
+                    "kind": "RoleTemplate",
+                    "metadata": Object {
+                      "name": "role-xz-1",
+                      "namespace": "",
+                    },
+                    "rules": Array [
+                      Object {
+                        "PolicyRule": Object {
+                          "apiGroups": Array [
+                            "extensions",
+                            "apps",
+                          ],
+                          "resources": Array [
+                            "deployments",
+                          ],
+                          "verbs": Array [
+                            "get",
+                            "list",
+                            "watch",
+                            "create",
+                            "delete",
+                            "patch",
+                          ],
+                        },
+                        "complianceType": "musthave",
+                      },
+                    ],
+                    "selector": Object {
+                      "matchLabels": Object {
+                        "cloud": "IBM",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            Object {
+              "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+              "kind": "Policy",
+              "metadata": Object {
+                "description": "Instance descriptor for policy resource",
+                "name": "test-policy-2",
+              },
+              "spec": Object {
+                "namespaces": Object {
+                  "exclude": Array [
+                    "kube*",
+                  ],
+                  "include": Array [
+                    "default",
+                  ],
+                },
+                "remediationAction": "enforce",
+                "role-templates": Array [
+                  Object {
+                    "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                    "complianceType": "musthave",
+                    "kind": "RoleTemplate",
+                    "metadata": Object {
+                      "name": "role-xz-2",
+                      "namespace": "",
+                    },
+                    "rules": Array [
+                      Object {
+                        "PolicyRule": Object {
+                          "apiGroups": Array [
+                            "extensions",
+                            "apps",
+                          ],
+                          "resources": Array [
+                            "deployments",
+                          ],
+                          "verbs": Array [
+                            "get",
+                            "list",
+                            "watch",
+                            "delete",
+                          ],
+                        },
+                        "complianceType": "musthave",
+                      },
+                      Object {
+                        "PolicyRule": Object {
+                          "apiGroups": Array [
+                            "core",
+                          ],
+                          "resources": Array [
+                            "pods",
+                          ],
+                          "verbs": Array [
+                            "create",
+                            "update",
+                            "patch",
+                          ],
+                        },
+                        "complianceType": "mustnothave",
+                      },
+                      Object {
+                        "PolicyRule": Object {
+                          "apiGroups": Array [
+                            "core",
+                          ],
+                          "resources": Array [
+                            "secrets",
+                          ],
+                          "verbs": Array [
+                            "get",
+                            "watch",
+                            "list",
+                            "create",
+                            "delete",
+                            "update",
+                            "patch",
+                          ],
+                        },
+                      },
+                    ],
+                    "selector": Object {
+                      "matchLabels": Object {
+                        "cloud": "IBM",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
+`;
 
-exports[`Compliance Resolver Correctly Resolves Delete Compliance Mutation 1`] = `"{\\"data\\":{\\"deleteCompliance\\":\\"compliance-xz\\"}}"`;
+exports[`Compliance Resolver Correctly Resolves Delete Compliance Mutation 1`] = `
+Object {
+  "data": Object {
+    "deleteCompliance": "compliance-xz",
+  },
+}
+`;
 
-exports[`Compliance Resolver Correctly Resolves Single Compliance Query 1`] = `"{\\"data\\":{\\"compliances\\":[{\\"name\\":\\"compliance-xz\\",\\"namespace\\":\\"mcm\\",\\"kind\\":\\"Compliance\\",\\"clusterSelector\\":{\\"matchNames\\":[\\"mycluster\\"]},\\"policyCompliant\\":\\"1/2\\",\\"clusterCompliant\\":\\"0/1\\"}]}}"`;
+exports[`Compliance Resolver Correctly Resolves Single Compliance Query 1`] = `
+Object {
+  "data": Object {
+    "compliances": Array [
+      Object {
+        "clusterCompliant": "0/1",
+        "clusterSelector": Object {
+          "matchNames": Array [
+            "mycluster",
+          ],
+        },
+        "kind": "Compliance",
+        "name": "compliance-xz",
+        "namespace": "mcm",
+        "policyCompliant": "1/2",
+      },
+    ],
+  },
+}
+`;

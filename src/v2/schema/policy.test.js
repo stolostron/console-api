@@ -27,7 +27,7 @@ describe('Policy Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -48,7 +48,7 @@ describe('Policy Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -153,7 +153,7 @@ describe('Policy Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -169,7 +169,7 @@ describe('Policy Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });

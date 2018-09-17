@@ -29,7 +29,7 @@ describe('Compliance Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -52,7 +52,7 @@ describe('Compliance Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -232,7 +232,7 @@ describe('Compliance Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });
@@ -248,7 +248,7 @@ describe('Compliance Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });

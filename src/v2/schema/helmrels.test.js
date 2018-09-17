@@ -31,7 +31,7 @@ describe('Helm Release Resolver', () => {
       `,
       })
       .end((err, res) => {
-        expect(res.text).toMatchSnapshot();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
   });

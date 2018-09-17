@@ -1,3 +1,170 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Dashboard Resolver Correctly Resolves Dashboard Query 1`] = `"{\\"data\\":{\\"dashboard\\":{\\"cardItems\\":[{\\"name\\":\\"pods\\",\\"healthy\\":79,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"ibm-cert-manager-cert-manager-9c6944dc5-6xgtx\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"audit-logging-fluentd-ds-jz2vs\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"audit-logging-fluentd-ds-kghsh\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"audit-logging-fluentd-ds-xvcgr\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"auth-apikeys-8m4pl\\",\\"percentage\\":null}],\\"error\\":null},{\\"name\\":\\"helm releases\\",\\"healthy\\":37,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"audit-logging\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"auth-apikeys\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"auth-idp\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"auth-pap\\",\\"percentage\\":null},{\\"status\\":\\"healthy\\",\\"link\\":\\"\\",\\"resourceName\\":\\"auth-pdp\\",\\"percentage\\":null}],\\"error\\":null},{\\"name\\":\\"clusters\\",\\"healthy\\":1,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"9.42.23.230\\",\\"resourceName\\":\\"mycluster\\",\\"percentage\\":null}],\\"error\\":null},{\\"name\\":\\"cpu\\",\\"healthy\\":1,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"9.42.23.230\\",\\"resourceName\\":\\"mycluster\\",\\"percentage\\":41}],\\"error\\":null},{\\"name\\":\\"memory\\",\\"healthy\\":1,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"9.42.23.230\\",\\"resourceName\\":\\"mycluster\\",\\"percentage\\":21}],\\"error\\":null},{\\"name\\":\\"storage\\",\\"healthy\\":1,\\"critical\\":0,\\"warning\\":0,\\"table\\":[{\\"status\\":\\"healthy\\",\\"link\\":\\"9.42.23.230\\",\\"resourceName\\":\\"mycluster\\",\\"percentage\\":75}],\\"error\\":null}],\\"pieChartItems\\":[{\\"name\\":\\"totalClusterHealth\\",\\"data\\":[[\\"healthy\\",\\"1\\"],[\\"warning\\",\\"0\\"],[\\"critical\\",\\"0\\"]],\\"error\\":null}]}}}"`;
+exports[`Dashboard Resolver Correctly Resolves Dashboard Query 1`] = `
+Object {
+  "data": Object {
+    "dashboard": Object {
+      "cardItems": Array [
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 79,
+          "name": "pods",
+          "table": Array [
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "ibm-cert-manager-cert-manager-9c6944dc5-6xgtx",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-jz2vs",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-kghsh",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-xvcgr",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "auth-apikeys-8m4pl",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 37,
+          "name": "helm releases",
+          "table": Array [
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "audit-logging",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "auth-apikeys",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "auth-idp",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "auth-pap",
+              "status": "healthy",
+            },
+            Object {
+              "link": "",
+              "percentage": null,
+              "resourceName": "auth-pdp",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 1,
+          "name": "clusters",
+          "table": Array [
+            Object {
+              "link": "9.42.23.230",
+              "percentage": null,
+              "resourceName": "mycluster",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 1,
+          "name": "cpu",
+          "table": Array [
+            Object {
+              "link": "9.42.23.230",
+              "percentage": 41,
+              "resourceName": "mycluster",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 1,
+          "name": "memory",
+          "table": Array [
+            Object {
+              "link": "9.42.23.230",
+              "percentage": 21,
+              "resourceName": "mycluster",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 1,
+          "name": "storage",
+          "table": Array [
+            Object {
+              "link": "9.42.23.230",
+              "percentage": 75,
+              "resourceName": "mycluster",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+      ],
+      "pieChartItems": Array [
+        Object {
+          "data": Array [
+            Array [
+              "healthy",
+              "1",
+            ],
+            Array [
+              "warning",
+              "0",
+            ],
+            Array [
+              "critical",
+              "0",
+            ],
+          ],
+          "error": null,
+          "name": "totalClusterHealth",
+        },
+      ],
+    },
+  },
+}
+`;

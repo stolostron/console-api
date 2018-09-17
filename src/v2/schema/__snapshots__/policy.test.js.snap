@@ -1,9 +1,149 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Policy Resolver Correctly Resolves Create Policy Mutation 1`] = `"{\\"data\\":{\\"createPolicy\\":[{\\"apiVersion\\":\\"policy.mcm.ibm.com/v1alpha1\\",\\"kind\\":\\"Policy\\",\\"metadata\\":{\\"creationTimestamp\\":\\"2018-09-06T17:12:34Z\\",\\"generation\\":1,\\"name\\":\\"test-policy\\",\\"namespace\\":\\"default\\",\\"resourceVersion\\":\\"4385854\\",\\"selfLink\\":\\"/apis/policy.mcm.ibm.com/v1alpha1/namespaces/default/policies/test-policy\\",\\"uid\\":\\"0c388331-b1f8-11e8-9a12-005056a0d11b\\"},\\"spec\\":{\\"namespaces\\":{\\"exclude\\":[\\"kube*\\"],\\"include\\":[\\"default\\"]},\\"remediationAction\\":\\"enforce\\",\\"role-templates\\":[{\\"apiVersion\\":\\"roletemplate.mcm.ibm.com/v1alpha1\\",\\"complianceType\\":\\"musthave\\",\\"kind\\":\\"RoleTemplate\\",\\"metadata\\":{\\"name\\":\\"test-role\\",\\"namespace\\":\\"\\"},\\"rules\\":[{\\"PolicyRule\\":{\\"apiGroups\\":[\\"extensions\\",\\"apps\\"],\\"resources\\":[\\"deployments\\"],\\"verbs\\":[\\"get\\",\\"list\\",\\"watch\\",\\"delete\\"]},\\"complianceType\\":\\"musthave\\"},{\\"PolicyRule\\":{\\"apiGroups\\":[\\"core\\"],\\"resources\\":[\\"pods\\"],\\"verbs\\":[\\"create\\",\\"update\\",\\"patch\\"]},\\"complianceType\\":\\"mustnothave\\"},{\\"PolicyRule\\":{\\"apiGroups\\":[\\"core\\"],\\"resources\\":[\\"secrets\\"],\\"verbs\\":[\\"get\\",\\"watch\\",\\"list\\",\\"create\\",\\"delete\\",\\"update\\",\\"patch\\"]}}],\\"selector\\":{\\"matchLabels\\":{\\"cloud\\":\\"IBM\\"}}}]}}]}}"`;
+exports[`Policy Resolver Correctly Resolves Create Policy Mutation 1`] = `
+Object {
+  "data": Object {
+    "createPolicy": Array [
+      Object {
+        "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+        "kind": "Policy",
+        "metadata": Object {
+          "creationTimestamp": "2018-09-06T17:12:34Z",
+          "generation": 1,
+          "name": "test-policy",
+          "namespace": "default",
+          "resourceVersion": "4385854",
+          "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/default/policies/test-policy",
+          "uid": "0c388331-b1f8-11e8-9a12-005056a0d11b",
+        },
+        "spec": Object {
+          "namespaces": Object {
+            "exclude": Array [
+              "kube*",
+            ],
+            "include": Array [
+              "default",
+            ],
+          },
+          "remediationAction": "enforce",
+          "role-templates": Array [
+            Object {
+              "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+              "complianceType": "musthave",
+              "kind": "RoleTemplate",
+              "metadata": Object {
+                "name": "test-role",
+                "namespace": "",
+              },
+              "rules": Array [
+                Object {
+                  "PolicyRule": Object {
+                    "apiGroups": Array [
+                      "extensions",
+                      "apps",
+                    ],
+                    "resources": Array [
+                      "deployments",
+                    ],
+                    "verbs": Array [
+                      "get",
+                      "list",
+                      "watch",
+                      "delete",
+                    ],
+                  },
+                  "complianceType": "musthave",
+                },
+                Object {
+                  "PolicyRule": Object {
+                    "apiGroups": Array [
+                      "core",
+                    ],
+                    "resources": Array [
+                      "pods",
+                    ],
+                    "verbs": Array [
+                      "create",
+                      "update",
+                      "patch",
+                    ],
+                  },
+                  "complianceType": "mustnothave",
+                },
+                Object {
+                  "PolicyRule": Object {
+                    "apiGroups": Array [
+                      "core",
+                    ],
+                    "resources": Array [
+                      "secrets",
+                    ],
+                    "verbs": Array [
+                      "get",
+                      "watch",
+                      "list",
+                      "create",
+                      "delete",
+                      "update",
+                      "patch",
+                    ],
+                  },
+                },
+              ],
+              "selector": Object {
+                "matchLabels": Object {
+                  "cloud": "IBM",
+                },
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
+`;
 
-exports[`Policy Resolver Correctly Resolves Delete Policy Mutation 1`] = `"{\\"data\\":{\\"deletePolicy\\":\\"test-policy\\"}}"`;
+exports[`Policy Resolver Correctly Resolves Delete Policy Mutation 1`] = `
+Object {
+  "data": Object {
+    "deletePolicy": "test-policy",
+  },
+}
+`;
 
-exports[`Policy Resolver Correctly Resolves Policy List Query 1`] = `"{\\"data\\":{\\"policies\\":[{\\"enforcement\\":\\"inform\\",\\"name\\":\\"policy-xz-1\\",\\"namespace\\":\\"mycluster\\",\\"status\\":\\"NonCompliant\\"},{\\"enforcement\\":\\"enforce\\",\\"name\\":\\"policy-xz-2\\",\\"namespace\\":\\"mycluster\\",\\"status\\":\\"Compliant\\"}]}}"`;
+exports[`Policy Resolver Correctly Resolves Policy List Query 1`] = `
+Object {
+  "data": Object {
+    "policies": Array [
+      Object {
+        "enforcement": "inform",
+        "name": "policy-xz-1",
+        "namespace": "mycluster",
+        "status": "NonCompliant",
+      },
+      Object {
+        "enforcement": "enforce",
+        "name": "policy-xz-2",
+        "namespace": "mycluster",
+        "status": "Compliant",
+      },
+    ],
+  },
+}
+`;
 
-exports[`Policy Resolver Correctly Resolves Single Policy Query 1`] = `"{\\"data\\":{\\"policies\\":[{\\"enforcement\\":\\"inform\\",\\"name\\":\\"policy-xz-1\\",\\"namespace\\":\\"mycluster\\",\\"status\\":\\"NonCompliant\\"}]}}"`;
+exports[`Policy Resolver Correctly Resolves Single Policy Query 1`] = `
+Object {
+  "data": Object {
+    "policies": Array [
+      Object {
+        "enforcement": "inform",
+        "name": "policy-xz-1",
+        "namespace": "mycluster",
+        "status": "NonCompliant",
+      },
+    ],
+  },
+}
+`;
