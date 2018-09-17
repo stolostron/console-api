@@ -17,17 +17,18 @@ describe('Auth Middleware', () => {
 
   const mockHttpLib = jest.fn().mockReturnValue({ body: { id_token: 'test-id-token' } });
 
-  test('Sets kubeToken to Bearer localdev in development', async () => {
+  test('Sets kubeToken to Bearer localdev in development', (done) => {
     const mockRequest = { headers: { authorization: '' } };
     const authMiddleware = createAuthMiddleWare({ shouldLocalAuth: true });
 
-    await authMiddleware(mockRequest, null, (err) => {
+    authMiddleware(mockRequest, null, (err) => {
       expect(err).not.toBeDefined();
       expect(mockRequest.kubeToken).toBe('Bearer localdev');
+      done();
     });
   });
 
-  test('Caches token on first authorization', async () => {
+  test('Caches token on first authorization', (done) => {
     const mockRequest = { headers: { authorization: 'substring-for-auth' } };
     const authMiddleware = createAuthMiddleWare({
       cache: mockCache,
@@ -35,16 +36,17 @@ describe('Auth Middleware', () => {
       shouldLocalAuth: false,
     });
 
-    await authMiddleware(mockRequest, null, (err) => {
+    authMiddleware(mockRequest, null, (err) => {
       expect(err).not.toBeDefined();
       expect(mockRequest.kubeToken).toBe('Bearer test-id-token');
       expect(mockHttpLib.mock.calls).toHaveLength(1);
       expect(mockCache.set.mock.calls).toHaveLength(1);
       expect(mockCache.set.mock.calls[0]).toMatchSnapshot();
+      done();
     });
   });
 
-  test('Retrieves token from cache if present', async () => {
+  test('Retrieves token from cache if present', (done) => {
     mockHttpLib.mockClear();
     mockCache.get.mockClear();
 
@@ -57,12 +59,13 @@ describe('Auth Middleware', () => {
       shouldLocalAuth: false,
     });
 
-    await authMiddleware(mockRequest, null, (err) => {
+    authMiddleware(mockRequest, null, (err) => {
       expect(err).not.toBeDefined();
       expect(mockHttpLib.mock.calls).toHaveLength(0);
       expect(mockRequest.kubeToken).toBe('Bearer test-cached-token');
       expect(mockCache.get.mock.calls).toHaveLength(1);
       expect(mockCache.get.mock.calls[0]).toMatchSnapshot();
+      done();
     });
   });
 });
