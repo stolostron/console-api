@@ -11,6 +11,8 @@ import _ from 'lodash';
 import lru from 'lru-cache';
 import jws from 'jws';
 import config from '../../../config';
+import IDConnector from '../connectors/idmgmt';
+import createMockIAMHTTP from '../mocks/iam-http';
 import request from './request';
 
 // Async middleware error handler
@@ -18,6 +20,57 @@ const asyncMiddleware = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next))
     .catch(next);
 };
+
+async function getKubeToken({
+  authorization,
+  cache,
+  httpLib,
+  shouldLocalAuth,
+}) {
+  let idToken;
+  if ((_.isEmpty(authorization) && shouldLocalAuth) || process.env.MOCK === 'true') {
+    // special case for graphiql to work locally
+    // do not exchange for idtoken since authorization header is empty
+    idToken = config.get('localKubeToken') || 'localdev';
+  } else {
+    const accessToken = authorization.substring(7);
+    idToken = cache.get(accessToken);
+    if (!idToken) {
+      const options = {
+        url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/exchangetoken`,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        json: true,
+        form: {
+          access_token: accessToken,
+        },
+      };
+
+      const response = await httpLib(options);
+      idToken = _.get(response, 'body.id_token');
+      if (idToken) {
+        cache.set(accessToken, idToken);
+      } else {
+        throw new Error(`Authentication error: ${response.body}`);
+      }
+    }
+  }
+
+  return idToken;
+}
+
+async function getNamespaces({ iamToken, user }) {
+  const options = { iamToken };
+  if (process.env.NODE_ENV === 'test') {
+    options.httpLib = createMockIAMHTTP();
+  }
+
+  const idConnector = new IDConnector(options);
+
+  return idConnector.get(`/identity/api/v1/users/${user}/getTeamResources?resourceType=namespace`);
+}
 
 export default function createAuthMiddleWare({
   cache = lru({
@@ -28,40 +81,25 @@ export default function createAuthMiddleWare({
   shouldLocalAuth,
 } = {}) {
   return asyncMiddleware(async (req, res, next) => {
-    let idToken;
-    const authorization = req.headers.authorization || req.headers.Authorization;
-    if ((_.isEmpty(authorization) && shouldLocalAuth) || process.env.MOCK === 'true') {
-      // special case for graphiql to work locally
-      // do not exchange for idtoken since authorization header is empty
-      idToken = config.get('localKubeToken') || 'localdev';
-    } else {
-      const accessToken = authorization.substring(7);
-      idToken = cache.get(accessToken);
-      if (!idToken) {
-        const options = {
-          url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/exchangetoken`,
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          method: 'POST',
-          json: true,
-          form: {
-            access_token: accessToken,
-          },
-        };
-
-        const response = await httpLib(options);
-        idToken = _.get(response, 'body.id_token');
-        if (idToken) {
-          cache.set(accessToken, idToken);
-        } else {
-          throw new Error(`Authentication error: ${response.body}`);
-        }
-      }
-    }
+    const idToken = await getKubeToken({
+      authorization: req.headers.authorization || req.headers.Authorization,
+      cache,
+      httpLib,
+      shouldLocalAuth,
+    });
 
     req.kubeToken = `Bearer ${idToken}`;
-    req.user = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
+    const userName = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
+
+    req.user = {
+      name: userName,
+      namespaces: await getNamespaces({
+        // cookies field doesn't exist on test case requests
+        iamToken: _.get(req, "cookies['cfc-access-token-cookie']"),
+        user: userName,
+      }),
+    };
+
     next();
   });
 }

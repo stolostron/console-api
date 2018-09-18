@@ -25,17 +25,12 @@ function getStatus(cluster) {
 }
 
 export default class ClusterModel {
-  constructor({ kubeConnector, idConnector }) {
+  constructor({ kubeConnector }) {
     if (!kubeConnector) {
       throw new Error('kubeConnector is a required parameter');
     }
 
-    if (!idConnector) {
-      throw new Error('idConnector is a required parameter');
-    }
-
     this.kubeConnector = kubeConnector;
-    this.idConnector = idConnector;
   }
 
   async getClusterByNamespace(namespace) {
@@ -69,9 +64,7 @@ export default class ClusterModel {
   }
 
   async getClusters({ user }) {
-    const namespaces = await this.idConnector.get(`/identity/api/v1/users/${user}/getTeamResources?resourceType=namespace`);
-
-    const clusterQueries = namespaces.map(({ namespaceId }) => Promise.all([
+    const clusterQueries = user.namespaces.map(({ namespaceId }) => Promise.all([
       this.getClusterByNamespace(namespaceId),
       this.getClusterStatusByNamespace(namespaceId),
     ]));
