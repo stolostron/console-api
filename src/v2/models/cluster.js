@@ -41,7 +41,7 @@ export default class ClusterModel {
     }
 
     if (response.items.length > 1) {
-      logger.error('MCMM ERROR - cluster query return more than on cluster for a namespace');
+      logger.error('MCMM ERROR - cluster query return more than one cluster for a namespace');
       return null;
     }
 
@@ -56,7 +56,7 @@ export default class ClusterModel {
     }
 
     if (response.items.length > 1) {
-      logger.error('MCMM ERROR - cluster query return more than on cluster for a namespace');
+      logger.error('MCMM ERROR - cluster query return more than one cluster for a namespace');
       return null;
     }
 
@@ -72,7 +72,7 @@ export default class ClusterModel {
     const clusterData = await Promise.all(clusterQueries);
 
     const results = clusterData.reduce((accum, [cluster, clusterstatus]) => {
-      // namespace doesn't contain a clusteer
+      // namespace doesn't contain a cluster
       if (!cluster) {
         return accum;
       }
@@ -80,6 +80,7 @@ export default class ClusterModel {
       const result = {
         createdAt: cluster.metadata.creationTimestamp,
         labels: cluster.metadata.labels,
+        metadata: cluster.metadata,
         name: cluster.metadata.name,
         namespace: cluster.metadata.namespace,
         uid: cluster.metadata.uid,
@@ -119,6 +120,7 @@ export default class ClusterModel {
       result.push({
         createdAt: cluster.metadata.creationTimestamp,
         labels: cluster.metadata.labels,
+        metadata: cluster.metadata,
         name: cluster.metadata.name,
         namespace: cluster.metadata.namespace,
         uid: cluster.metadata.uid,

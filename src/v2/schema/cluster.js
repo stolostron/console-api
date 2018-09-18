@@ -8,19 +8,20 @@
  ****************************************************************************** */
 
 export const typeDef = `
-type Cluster {
-  createdAt: String
+type Cluster implements K8sObject {
+  createdAt: String @deprecated(reason: "Use metadata.creationTimestamp field.")
   clusterip: String
-  labels: JSON
-  name: String
-  namespace: String
+  labels: JSON @deprecated(reason: "Use metadata.labels field.")
+  metadata: Metadata
+  name: String @deprecated(reason: "Use metadata.name field.")
+  namespace: String @deprecated(reason: "Use metadata.namespace field.")
   nodes: Int
   status: String
   # Returns % of memory used.
   totalMemory: String
   # Returns % of storage used.
   totalStorage: String
-  uid: String,
+  uid: String @deprecated(reason: "Use metadata.uid field.")
 }
 `;
 
