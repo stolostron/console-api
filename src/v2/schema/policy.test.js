@@ -19,8 +19,10 @@ describe('Policy Resolver', () => {
         {
           policies {
             enforcement
-            name
-            namespace
+            metadata {
+              name
+              namespace
+            }
             status
           }
         }
@@ -40,9 +42,24 @@ describe('Policy Resolver', () => {
         {
           policies(name:"policy-xz-1",namespace:"default") {
             enforcement
-            name
-            namespace
+            metadata {
+              name
+              namespace
+            }
             status
+            detail {
+              exclude_namespace
+              include_namespace
+            }
+            rules {
+              ruleUID
+            }
+            templates {
+              name
+            }
+            violations {
+              name
+            }
           }
         }
       `,

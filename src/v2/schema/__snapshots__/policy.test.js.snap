@@ -118,14 +118,18 @@ Object {
     "policies": Array [
       Object {
         "enforcement": "inform",
-        "name": "policy-xz-1",
-        "namespace": "mycluster",
+        "metadata": Object {
+          "name": "policy-xz-1",
+          "namespace": "mycluster",
+        },
         "status": "NonCompliant",
       },
       Object {
         "enforcement": "enforce",
-        "name": "policy-xz-2",
-        "namespace": "mycluster",
+        "metadata": Object {
+          "name": "policy-xz-2",
+          "namespace": "mycluster",
+        },
         "status": "Compliant",
       },
     ],
@@ -138,10 +142,35 @@ Object {
   "data": Object {
     "policies": Array [
       Object {
+        "detail": Object {
+          "exclude_namespace": Array [
+            "kube*",
+          ],
+          "include_namespace": Array [
+            "default",
+          ],
+        },
         "enforcement": "inform",
-        "name": "policy-xz-1",
-        "namespace": "mycluster",
+        "metadata": Object {
+          "name": "policy-xz-1",
+          "namespace": "mycluster",
+        },
+        "rules": Array [
+          Object {
+            "ruleUID": "role-xz-1-rule-0",
+          },
+        ],
         "status": "NonCompliant",
+        "templates": Array [
+          Object {
+            "name": "role-xz-1",
+          },
+        ],
+        "violations": Array [
+          Object {
+            "name": "role-xz-1",
+          },
+        ],
       },
     ],
   },

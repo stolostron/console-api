@@ -18,9 +18,10 @@ describe('Compliance Resolver', () => {
         query: `
         {
           compliances {
-            name
-            namespace
-            kind
+            metadata {
+              name
+              namespace
+            }
             clusterSelector
             policyCompliant
             clusterCompliant
@@ -41,12 +42,18 @@ describe('Compliance Resolver', () => {
         query: `
         {
           compliances(name:"compliance-xz",namespace:"mcm") {
-            name
-            namespace
-            kind
+            metadata {
+              name
+              namespace
+            }
             clusterSelector
             policyCompliant
             clusterCompliant
+            complianceStatus {
+              clusterNamespace
+              localCompliantStatus
+              localValidStatus
+            }
           }
         }
       `,

@@ -7,6 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import ComplianceModel from '../models/compliance';
+
 export const typeDef = `
 type Policy implements K8sObject {
   metadata: Metadata
@@ -66,6 +68,14 @@ export const resolver = {
   Query: {
     policies: (root, args, { complianceModel }) =>
       complianceModel.getPolicies(args.name, args.namespace),
+  },
+  Policy: {
+    detail: parent => ComplianceModel.resolvePolicyDetails(parent),
+    enforcement: parent => ComplianceModel.resolvePolicyEnforcement(parent),
+    templates: parent => ComplianceModel.resolvePolicyTemplates(parent),
+    rules: parent => ComplianceModel.resolvePolicyRules(parent),
+    status: parent => ComplianceModel.resolvePolicyStatus(parent),
+    violations: parent => ComplianceModel.resolvePolicyViolations(parent),
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),
