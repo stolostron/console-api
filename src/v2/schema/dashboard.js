@@ -16,9 +16,11 @@ type TableRow {
   link: String
   resourceName: String
   percentage: Int
+  namespace: String
 }
 type DashboardCardItem {
   name: String
+  type: String
   healthy: Int
   critical: Int
   warning: Int
@@ -67,6 +69,7 @@ const genericStatus = (resource) => {
         return 'critical';
       // TODO: Return warning status - 06/11/18 09:35:53 sidney.wijngaarde1@ibm.com
       case 'pending':
+      case 'deleting':
         return 'warning';
       case 'ok':
       case 'running':
@@ -100,7 +103,7 @@ const percentageStatus = field => (resource) => {
 };
 
 function getDashboardCard({
-  name, statusData, clusterData, transform, status = genericStatus,
+  name, statusData, clusterData, transform, status = genericStatus, type,
 }) {
   const cardData = statusData.reduce((accum, curr, idx) => {
     let stat = '';
@@ -113,7 +116,7 @@ function getDashboardCard({
     accum.table.push(transform(curr, stat));
     return accum;
   }, {
-    name, healthy: 0, critical: 0, warning: 0, table: [], error: null,
+    name, healthy: 0, critical: 0, warning: 0, table: [], error: null, type,
   });
   cardData.table = sortTable(cardData.table).slice(0, 5);
   return cardData;
@@ -203,6 +206,7 @@ const transformPercentage = field => (cluster, status) => ({
 const transformRelease = (release, status) => ({
   link: '',
   resourceName: release.name,
+  namespace: release.namespace,
   status,
 });
 
@@ -223,6 +227,7 @@ export const resolver = {
             {
               name: 'clusters',
               transform: transformCluster,
+              type: 'clusters',
             },
             {
               name: 'cpu',
@@ -251,14 +256,14 @@ export const resolver = {
         }),
         getDashboardItems({
           cards: [
-            { name: 'helm releases', transform: transformRelease },
+            { name: 'helm releases', transform: transformRelease, type: 'releases' },
           ],
           statusQuery: () => helmModel.getReleases(args),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
         getDashboardItems({
           cards: [
-            { name: 'pods', transform: transformPod },
+            { name: 'pods', transform: transformPod, type: 'pods' },
           ],
           statusQuery: () => resourceViewModel.getPods(args),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
