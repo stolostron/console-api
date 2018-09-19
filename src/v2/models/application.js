@@ -128,12 +128,13 @@ export default class ApplicationModel {
     const applications = name ? [response] : response.items;
 
     return applications.map(app => ({
-      metadata: app.metadata,
       dashboard: app.status.Dashboard,
       details: {
         dashboard: app.status.Dashboard, // TODO Jorge: Remove, use dashboard.
         ...app.metadata, // TODO Jorge: Remove, use metadata.
       },
+      metadata: app.metadata,
+      raw: app,
       selector: app.spec.selector,
     }));
   }
@@ -146,13 +147,14 @@ export default class ApplicationModel {
     }
 
     return getSelected(selector, response.items).map(deployable => ({
-      metadata: deployable.metadata,
       name: deployable.metadata.name, // TODO Jorge: Remove, use metadata.
       dependencies: deployable.spec.dependencies && deployable.spec.dependencies.map(dep => ({
         name: dep.destination.name,
         kind: dep.destination.kind,
       })),
       deployer: deployable.spec.deployer && deployable.spec.deployer.helm,
+      metadata: deployable.metadata,
+      raw: deployable,
     }));
   }
 
@@ -163,14 +165,15 @@ export default class ApplicationModel {
       return [];
     }
 
-    return getSelected(selector, response.items).map(({ metadata, spec }) => ({
-      metadata,
-      name: metadata.name, // TODO Jorge: Remove, use metadata.
-      namespace: metadata.namespace, // TODO Jorge: Remove, use metadata.
-      annotations: metadata.annotations, // TODO Jorge: Remove, use metadata.
-      clusterSelector: spec.clusterSelector,
-      replicas: spec.replicas,
-      resourceSelector: spec.resourceSelector,
+    return getSelected(selector, response.items).map(pp => ({
+      annotations: pp.metadata.annotations, // TODO Jorge: Remove, use metadata.
+      clusterSelector: pp.spec.clusterSelector,
+      metadata: pp.metadata,
+      name: pp.metadata.name, // TODO Jorge: Remove, use metadata.
+      namespace: pp.metadata.namespace, // TODO Jorge: Remove, use metadata.
+      raw: pp,
+      replicas: pp.spec.replicas,
+      resourceSelector: pp.spec.resourceSelector,
     }));
   }
 }

@@ -10,12 +10,14 @@
 export const typeDef = `
 # HCM Application
 type Application implements K8sObject {
-  metadata: Metadata
   # URL to Grafana Dashboard
   dashboard: String
   details: ApplicationDetails @deprecated(reason: "Use metadata or dashboard fields.")
   deployables: [Deployable]
+  metadata: Metadata
   placementPolicies: [PlacementPolicy]
+  # The object's yaml definition in JSON format.
+  raw: JSON
   selector: JSON
 }
 
@@ -34,15 +36,19 @@ type ApplicationDetails {
 }
 
 type Deployable implements K8sObject {
-  metadata: Metadata
   dependencies: [DeployableDependency]
   deployer: HelmDeployer
+  metadata: Metadata
+  # The object's yaml definition in JSON format.
+  raw: JSON
   name: String @deprecated(reason: "Use metadata.name field.")
 }
 
 type PlacementPolicy implements K8sObject {
-  metadata: Metadata
   clusterSelector: JSON
+  metadata: Metadata
+  # The object's yaml definition in JSON format.
+  raw: JSON
   replicas: Int
   resourceSelector: JSON
   annotations: JSON @deprecated(reason: "Use metadata.annotations field.")
