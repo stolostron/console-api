@@ -13,10 +13,10 @@ import config from '../../../config';
 export const typeDef = `
 type TableRow {
   status: String
-  link: String
   resourceName: String
   percentage: Int
   namespace: String
+  clusterIP: String
 }
 type DashboardCardItem {
   name: String
@@ -113,7 +113,7 @@ function getDashboardCard({
       stat = status(statusData[idx]);
     }
     accum[stat] += 1;
-    accum.table.push(transform(curr, stat));
+    accum.table.push(transform(curr, stat, clusterData));
     return accum;
   }, {
     name, healthy: 0, critical: 0, warning: 0, table: [], error: null, type,
@@ -191,27 +191,27 @@ const transformTotalCluster = (curr, status, currentData) => {
 };
 
 const transformCluster = (cluster, status) => ({
-  link: cluster.ip,
+  clusterIP: cluster.ip,
   resourceName: cluster.name,
   status,
 });
 
 const transformPercentage = field => (cluster, status) => ({
-  link: cluster.ip,
+  clusterIP: cluster.ip,
   percentage: Math.round(cluster[field]),
   resourceName: cluster.name,
   status,
 });
 
-const transformRelease = (release, status) => ({
-  link: '',
+const transformRelease = (release, status, clusterData) => ({
   resourceName: release.name,
   namespace: release.namespace,
   status,
+  clusterIP: _.get(clusterData.find(item => item.name === release.cluster), 'clusterip'),
 });
 
 const transformPod = (pod, status) => ({
-  link: '',
+  clusterIP: '',
   resourceName: pod.name,
   status,
 });

@@ -12,31 +12,31 @@ Object {
           "name": "pods",
           "table": Array [
             Object {
-              "link": "",
+              "clusterIP": "",
               "percentage": null,
               "resourceName": "ibm-cert-manager-cert-manager-9c6944dc5-6xgtx",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": "",
               "percentage": null,
               "resourceName": "audit-logging-fluentd-ds-jz2vs",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": "",
               "percentage": null,
               "resourceName": "audit-logging-fluentd-ds-kghsh",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": "",
               "percentage": null,
               "resourceName": "audit-logging-fluentd-ds-xvcgr",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": "",
               "percentage": null,
               "resourceName": "auth-apikeys-8m4pl",
               "status": "healthy",
@@ -51,31 +51,31 @@ Object {
           "name": "helm releases",
           "table": Array [
             Object {
-              "link": "",
+              "clusterIP": null,
               "percentage": null,
               "resourceName": "audit-logging",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": null,
               "percentage": null,
               "resourceName": "auth-apikeys",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": null,
               "percentage": null,
               "resourceName": "auth-idp",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": null,
               "percentage": null,
               "resourceName": "auth-pap",
               "status": "healthy",
             },
             Object {
-              "link": "",
+              "clusterIP": null,
               "percentage": null,
               "resourceName": "auth-pdp",
               "status": "healthy",
@@ -90,7 +90,7 @@ Object {
           "name": "clusters",
           "table": Array [
             Object {
-              "link": "9.42.23.230",
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "mycluster",
               "status": "healthy",
@@ -105,7 +105,7 @@ Object {
           "name": "cpu",
           "table": Array [
             Object {
-              "link": "9.42.23.230",
+              "clusterIP": "9.42.23.230",
               "percentage": 41,
               "resourceName": "mycluster",
               "status": "healthy",
@@ -120,7 +120,7 @@ Object {
           "name": "memory",
           "table": Array [
             Object {
-              "link": "9.42.23.230",
+              "clusterIP": "9.42.23.230",
               "percentage": 21,
               "resourceName": "mycluster",
               "status": "healthy",
@@ -135,7 +135,7 @@ Object {
           "name": "storage",
           "table": Array [
             Object {
-              "link": "9.42.23.230",
+              "clusterIP": "9.42.23.230",
               "percentage": 75,
               "resourceName": "mycluster",
               "status": "healthy",

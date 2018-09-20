@@ -25,7 +25,7 @@ describe('Dashboard Resolver', () => {
               warning
               table {
                 status
-                link
+                clusterIP
                 resourceName
                 percentage
               }
