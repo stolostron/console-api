@@ -35,6 +35,6 @@ export const typeDef = `
 
 export const resolver = {
   Query: {
-    pods: (root, args, { resourceViewModel }) => resourceViewModel.getPods(args),
+    pods: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'pods' }),
   },
 };

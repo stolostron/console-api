@@ -10,21 +10,17 @@
 import _ from 'lodash';
 import yaml from 'js-yaml';
 import { unflatten } from 'flat';
+import KubeModel from './kube';
 import logger from '../lib/logger';
 
 function selectNamespace(namespaces) {
   return namespaces.find(ns => ns === 'default') || namespaces[0];
 }
 
-export default class HelmModel {
-  constructor({ kubeConnector, namespaces }) {
-    if (!kubeConnector) {
-      throw new Error('kubeConnector is a required parameter');
-    }
-
-    this.kubeConnector = kubeConnector;
-    this.namespaces = namespaces;
-    this.resourceViewNamespace = selectNamespace(namespaces);
+export default class HelmModel extends KubeModel {
+  constructor(params) {
+    super(params);
+    this.resourceViewNamespace = selectNamespace(this.namespaces);
   }
 
   async getReleases() {

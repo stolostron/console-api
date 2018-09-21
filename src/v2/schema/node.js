@@ -28,6 +28,7 @@ type Node implements K8sObject {
 
 export const resolver = {
   Query: {
-    nodes: (root, args, { resourceViewModel }) => resourceViewModel.getNodes(args),
+    nodes: (root, args, { resourceViewModel }) =>
+      resourceViewModel.fetchResources({ type: 'nodes' }),
   },
 };

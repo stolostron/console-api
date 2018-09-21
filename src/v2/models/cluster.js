@@ -8,6 +8,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import KubeModel from './kube';
 import logger from '../lib/logger';
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
@@ -24,15 +25,7 @@ function getStatus(cluster) {
   return status === '' ? 'unknown' : status.toLowerCase();
 }
 
-export default class ClusterModel {
-  constructor({ kubeConnector }) {
-    if (!kubeConnector) {
-      throw new Error('kubeConnector is a required parameter');
-    }
-
-    this.kubeConnector = kubeConnector;
-  }
-
+export default class ClusterModel extends KubeModel {
   async getClusterByNamespace(namespace) {
     const response = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters`);
     if (response.code || response.message) {
@@ -63,10 +56,10 @@ export default class ClusterModel {
     return response.items[0];
   }
 
-  async getClusters({ user }) {
-    const clusterQueries = user.namespaces.map(({ namespaceId }) => Promise.all([
-      this.getClusterByNamespace(namespaceId),
-      this.getClusterStatusByNamespace(namespaceId),
+  async getClusters() {
+    const clusterQueries = this.namespaces.map(ns => Promise.all([
+      this.getClusterByNamespace(ns),
+      this.getClusterStatusByNamespace(ns),
     ]));
 
     const clusterData = await Promise.all(clusterQueries);
@@ -103,9 +96,9 @@ export default class ClusterModel {
     return results;
   }
 
-  async getClusterStatus({ user }) {
-    const clusterstatusQueries = await Promise.all(user.namespaces.map(({ namespaceId }) =>
-      this.getClusterStatusByNamespace(namespaceId)));
+  async getClusterStatus() {
+    const clusterstatusQueries = await Promise.all(this.namespaces.map(ns =>
+      this.getClusterStatusByNamespace(ns)));
 
     return clusterstatusQueries.reduce((accum, cluster) => {
       if (!cluster) {

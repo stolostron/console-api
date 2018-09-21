@@ -7,17 +7,12 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-export const typeDef = `
-type Namespace implements K8sObject {
-  cluster: String
-  metadata: Metadata
-  status: String
-}
-`;
+import { isRequired } from '../lib/utils';
 
-export const resolver = {
-  Query: {
-    namespaces: (root, args, { resourceViewModel }) =>
-      resourceViewModel.fetchResources({ type: 'namespaces' }),
-  },
-};
+// Abstract class for models that communicate with the kubernetes api
+export default class Kube {
+  constructor({ kubeConnector = isRequired('kubeConnector'), namespaces = isRequired('namespaces') }) {
+    this.kubeConnector = kubeConnector;
+    this.namespaces = namespaces;
+  }
+}

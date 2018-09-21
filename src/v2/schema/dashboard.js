@@ -265,7 +265,7 @@ export const resolver = {
           cards: [
             { name: 'pods', transform: transformPod, type: 'pods' },
           ],
-          statusQuery: () => resourceViewModel.getPods(args),
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
       ]);

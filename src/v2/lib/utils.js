@@ -7,17 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-export const typeDef = `
-type Namespace implements K8sObject {
-  cluster: String
-  metadata: Metadata
-  status: String
+export function isRequired(paramName) {
+  throw new Error(`${paramName} is required`);
 }
-`;
 
-export const resolver = {
-  Query: {
-    namespaces: (root, args, { resourceViewModel }) =>
-      resourceViewModel.fetchResources({ type: 'namespaces' }),
-  },
-};
+export default {};
