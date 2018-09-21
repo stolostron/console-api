@@ -19,9 +19,11 @@ describe('Namespace Resolver', () => {
         {
           namespaces {
             cluster
-            createdAt
-            name
-            uid
+            metadata {
+              creationTimestamp
+              name
+              uid
+            }
             status
           }
         }

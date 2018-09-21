@@ -106,7 +106,9 @@ Object {
           "repository": "google",
           "version": "0.3.1",
         },
-        "name": "deployable02-a",
+        "metadata": Object {
+          "name": "deployable02-a",
+        },
       },
       Object {
         "dependencies": null,
@@ -116,7 +118,9 @@ Object {
           "repository": "google",
           "version": "0.3.1",
         },
-        "name": "deployable02-b",
+        "metadata": Object {
+          "name": "deployable02-b",
+        },
       },
     ],
   },
@@ -128,17 +132,19 @@ Object {
   "data": Object {
     "placementPolicies": Array [
       Object {
-        "annotations": Object {
-          "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
-          "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
-        },
         "clusterSelector": Object {
           "matchLabels": Object {
             "name": "mycluster.icp",
           },
         },
-        "name": "placement02",
-        "namespace": "default",
+        "metadata": Object {
+          "annotations": Object {
+            "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
+            "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
+          },
+          "name": "placement02",
+          "namespace": "default",
+        },
         "replicas": 1,
         "resourceSelector": Object {},
       },

@@ -192,14 +192,14 @@ const transformTotalCluster = (curr, status, currentData) => {
 
 const transformCluster = (cluster, status) => ({
   clusterIP: cluster.ip,
-  resourceName: cluster.name,
+  resourceName: cluster.metadata.name,
   status,
 });
 
 const transformPercentage = field => (cluster, status) => ({
   clusterIP: cluster.ip,
   percentage: Math.round(cluster[field]),
-  resourceName: cluster.name,
+  resourceName: cluster.metadata.name,
   status,
 });
 
@@ -207,12 +207,12 @@ const transformRelease = (release, status, clusterData) => ({
   resourceName: release.name,
   namespace: release.namespace,
   status,
-  clusterIP: _.get(clusterData.find(item => item.name === release.cluster), 'clusterip'),
+  clusterIP: _.get(clusterData.find(item => item.metadata.name === release.cluster), 'clusterip'),
 });
 
 const transformPod = (pod, status) => ({
   clusterIP: '',
-  resourceName: pod.name,
+  resourceName: pod.metadata.name,
   status,
 });
 

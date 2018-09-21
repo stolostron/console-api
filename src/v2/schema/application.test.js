@@ -59,7 +59,6 @@ describe('Application Resolver', () => {
               hcmapp: "app02"
             }
           }) {
-            name
             deployer {
               chartName
               namespace
@@ -68,6 +67,9 @@ describe('Application Resolver', () => {
             }
             dependencies {
               kind
+              name
+            }
+            metadata {
               name
             }
           }
@@ -89,12 +91,14 @@ describe('Application Resolver', () => {
           placementPolicies(selector:{
              matchLabels:{
               hcmapp:"app02"
-            } 
+            }
           }) {
-            annotations
             clusterSelector
-            name
-            namespace
+            metadata {
+              annotations
+              name
+              namespace
+            }
             replicas
             resourceSelector
           }

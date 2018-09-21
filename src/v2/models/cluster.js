@@ -78,12 +78,7 @@ export default class ClusterModel {
       }
 
       const result = {
-        createdAt: cluster.metadata.creationTimestamp,
-        labels: cluster.metadata.labels,
         metadata: cluster.metadata,
-        name: cluster.metadata.name,
-        namespace: cluster.metadata.namespace,
-        uid: cluster.metadata.uid,
         status: getStatus(cluster),
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
@@ -118,12 +113,7 @@ export default class ClusterModel {
       }
 
       accum.push({
-        createdAt: cluster.metadata.creationTimestamp,
-        labels: cluster.metadata.labels,
         metadata: cluster.metadata,
-        name: cluster.metadata.name,
-        namespace: cluster.metadata.namespace,
-        uid: cluster.metadata.uid,
         nodes: cluster.spec.capacity.nodes,
         pods: cluster.spec.usage.pods,
         ip: cluster.spec.masterAddresses[0].ip,

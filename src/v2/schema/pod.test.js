@@ -19,15 +19,17 @@ describe('Pods Resolver', () => {
         {
           pods {
             cluster
-            createdAt
             hostIP
-            labels
-            name
-            namespace
+            metadata {
+              creationTimestamp
+              labels
+              name
+              namespace
+              uid
+            }
             podIP
             startedAt
             status
-            uid
           }
         }
       `,

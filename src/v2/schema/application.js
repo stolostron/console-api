@@ -12,7 +12,6 @@ export const typeDef = `
 type Application implements K8sObject {
   # URL to Grafana Dashboard
   dashboard: String
-  details: ApplicationDetails @deprecated(reason: "Use metadata or dashboard fields.")
   deployables: [Deployable]
   metadata: Metadata
   placementPolicies: [PlacementPolicy]
@@ -21,27 +20,12 @@ type Application implements K8sObject {
   selector: JSON
 }
 
-type ApplicationDetails {
-  annotations: JSON @deprecated(reason: "Use metadata.annotations field.")
-  creationTimestamp: String @deprecated(reason: "Use metadata.creationTimestamp field.")
-  # URL to Grafana Dashboard
-  dashboard: String @deprecated(reason: "Use dashboard field in application.")
-  labels: JSON @deprecated(reason: "Use metadata.labels field.")
-  name: String @deprecated(reason: "Use metadata.name field.")
-  namespace: String @deprecated(reason: "Use metadata.namespace field.")
-  resourceVersion: String @deprecated(reason: "Use metadata.resourceVersion field.")
-  selfLink: String @deprecated(reason: "Use metadata.selfLink field.")
-  status: String @deprecated(reason: "Use metadata.status field.")
-  uid: String @deprecated(reason: "Use metadata.uid field.")
-}
-
 type Deployable implements K8sObject {
   dependencies: [DeployableDependency]
   deployer: HelmDeployer
   metadata: Metadata
   # The object's yaml definition in JSON format.
   raw: JSON
-  name: String @deprecated(reason: "Use metadata.name field.")
 }
 
 type PlacementPolicy implements K8sObject {
@@ -51,15 +35,11 @@ type PlacementPolicy implements K8sObject {
   raw: JSON
   replicas: Int
   resourceSelector: JSON
-  annotations: JSON @deprecated(reason: "Use metadata.annotations field.")
-  name: String @deprecated(reason: "Use metadata.name field.")
-  namespace: String @deprecated(reason: "Use metadata.namespace field.")
 }
 
-type DeployableDependency implements K8sObject {
-  metadata: Metadata
+type DeployableDependency {
   kind: String
-  name: String @deprecated(reason: "Use metadata.annotations field.")
+  name: String
 }
 
 type HelmDeployer {

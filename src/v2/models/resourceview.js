@@ -37,17 +37,12 @@ export default class ResourceView {
       pods.map(pod => accum.push({
         cluster: clusterName,
         containers: pod.spec.containers,
-        createdAt: pod.metadata.creationTimestamp, // TODO Jorge: Remove, use metadata.
         hostIP: pod.status.hostIP,
-        labels: pod.metadata.labels, // TODO Jorge: Remove, use metadata.
         metadata: pod.metadata,
-        name: pod.metadata.name, // TODO Jorge: Remove, use metadata.
-        namespace: pod.metadata.namespace, // TODO Jorge: Remove, use metadata.
         owners: pod.metadata.ownerReferences,
         podIP: pod.status.podIP,
         startedAt: pod.status.startTime,
         status: pod.status.phase,
-        uid: pod.metadata.uid, // TODO Jorge: Remove, use metadata.
       }));
 
       return accum;
@@ -65,10 +60,7 @@ export default class ResourceView {
         architecture: node.status.nodeInfo.architecture,
         capacity: node.status.capacity,
         cluster: clusterName,
-        createdAt: node.metadata.creationTimestamp, // TODO Jorge: Remove, use metadata.
-        labels: node.metadata.labels, // TODO Jorge: Remove, use metadata.
         metadata: node.metadata,
-        name: node.metadata.name, // TODO Jorge: Remove, use metadata.
         images: node.status.images.reduce((imageNames, curr) => {
           imageNames.push(...curr.names);
           return imageNames;
@@ -77,7 +69,6 @@ export default class ResourceView {
         osImage: node.status.nodeInfo.osImage,
         startedAt: node.status.startTime,
         status: node.status.phase,
-        uid: node.metadata.uid, // TODO Jorge: Remove, use metadata.
       }));
 
       return accum;
@@ -92,12 +83,8 @@ export default class ResourceView {
 
       namespaces.map(namespace => accum.push({
         cluster: clusterName,
-        createdAt: namespace.metadata.creationTimestamp, // TODO Jorge: Remove, use metadata.
-        labels: namespace.metadata.labels, // TODO Jorge: Remove, use metadata.
         metadata: namespace.metadata,
-        name: namespace.metadata.name, // TODO Jorge: Remove, use metadata.
         status: namespace.status.phase,
-        uid: namespace.metadata.uid, // TODO Jorge: Remove, use metadata.
       }));
 
       return accum;

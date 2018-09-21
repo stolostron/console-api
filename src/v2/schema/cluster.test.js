@@ -18,16 +18,18 @@ describe('Cluster Resolver', () => {
         query: `
         {
           clusters {
-            createdAt
             clusterip
-            labels
-            name
-            namespace
+            metadata {
+              creationTimestamp
+              labels
+              name
+              namespace
+              uid
+            }
             nodes
             status
             totalMemory
             totalStorage
-            uid
           }
         }
       `,

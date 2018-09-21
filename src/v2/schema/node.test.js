@@ -20,12 +20,14 @@ describe('Nodes Resolver', () => {
           nodes {
             architecture
             cluster
-            createdAt
-            labels
-            name
+            metadata {
+              creationTimestamp
+              labels
+              name
+              uid
+            }
             operatingSystem
             osImage
-            uid
           }
         }
       `,

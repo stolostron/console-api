@@ -11,17 +11,12 @@ export const typeDef = `
   type Pod implements K8sObject {
     cluster: String
     containers: [Container]
-    createdAt: String @deprecated(reason: "Use metadata.creationTimestamp field.")
     hostIP: String
-    labels: JSON @deprecated(reason: "Use metadata.labels field.")
     metadata: Metadata
-    name: String @deprecated(reason: "Use metadata.name field.")
-    namespace: String @deprecated(reason: "Use metadata.namespace field.")
     owners: [Owner]
     podIP: String
     startedAt: String
     status: String
-    uid: String @deprecated(reason: "Use metadata.uid field.")
   }
 
   type Owner {

@@ -43,7 +43,7 @@ export default class ComplianceModel {
         .catch(err => Error(err));
     }));
     result.forEach((item) => {
-      if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
+      if (item.code >= 400 || item.status === POLICY_FAILURE_STATUS) {
         errorMessage += `${item.message}\n`;
       }
     });
@@ -63,7 +63,7 @@ export default class ComplianceModel {
         .catch(err => Error(err));
     }));
     result.forEach((item) => {
-      if (item.code > 300 || item.status === POLICY_FAILURE_STATUS) {
+      if (item.code >= 400 || item.status === POLICY_FAILURE_STATUS) {
         errorMessage += `${item.message}\n`;
       }
     });
@@ -116,8 +116,6 @@ export default class ComplianceModel {
     return compliances.map(compliance => ({
       ...compliance,
       clusterSelector: _.get(compliance, 'spec.clusterSelector', {}),
-      name: _.get(compliance, 'metadata.name', '-'), // TODO: Remove, use metadata.name
-      namespace: _.get(compliance, 'metadata.namespace', '-'), // TODO: Remove, use metadata.namespace
     }));
   }
 
@@ -137,14 +135,14 @@ export default class ComplianceModel {
           compliant: _.get(value, 'Compliant', '-'),
           enforcement: _.get(policy, 'spec.remediationAction', 'unknown'),
           name: key,
-          rules: this.resolvePolicyRules(policy), // FIXME: Use resolver.
+          rules: this.resolvePolicyRules(policy), // TODO: Use resolver.
           status: _.get(value, 'Valid', false) === false ? 'invalid' : _.get(value, 'Compliant', 'unknown'),
-          templates: this.resolvePolicyTemplates(policy), // FIXME: Use resolver.
+          templates: this.resolvePolicyTemplates(policy), // TODO: Use resolver.
           valid: _.get(value, 'Valid', '-'),
-          violations: this.resolvePolicyViolations(policy), // FIXME: Use resolver.
+          violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
           metadata: {
+            ...parent.metadata,
             name: key,
-            namespace: _.get(cluster, 'clustername', parent.metadata.namespace),
           },
         };
 

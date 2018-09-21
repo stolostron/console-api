@@ -93,7 +93,7 @@ export default class ApplicationModel {
 
     const errors = [];
     result.forEach((item) => {
-      if (item.code > 400 || item.status === 'Failure') {
+      if (item.code >= 400 || item.status === 'Failure') {
         errors.push({ message: item.message });
       }
     });
@@ -129,10 +129,6 @@ export default class ApplicationModel {
 
     return applications.map(app => ({
       dashboard: app.status.Dashboard,
-      details: {
-        dashboard: app.status.Dashboard, // TODO Jorge: Remove, use dashboard.
-        ...app.metadata, // TODO Jorge: Remove, use metadata.
-      },
       metadata: app.metadata,
       raw: app,
       selector: app.spec.selector,
@@ -147,7 +143,6 @@ export default class ApplicationModel {
     }
 
     return getSelected(selector, response.items).map(deployable => ({
-      name: deployable.metadata.name, // TODO Jorge: Remove, use metadata.
       dependencies: deployable.spec.dependencies && deployable.spec.dependencies.map(dep => ({
         name: dep.destination.name,
         kind: dep.destination.kind,
@@ -166,11 +161,8 @@ export default class ApplicationModel {
     }
 
     return getSelected(selector, response.items).map(pp => ({
-      annotations: pp.metadata.annotations, // TODO Jorge: Remove, use metadata.
       clusterSelector: pp.spec.clusterSelector,
       metadata: pp.metadata,
-      name: pp.metadata.name, // TODO Jorge: Remove, use metadata.
-      namespace: pp.metadata.namespace, // TODO Jorge: Remove, use metadata.
       raw: pp,
       replicas: pp.spec.replicas,
       resourceSelector: pp.spec.resourceSelector,
