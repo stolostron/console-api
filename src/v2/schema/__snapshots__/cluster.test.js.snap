@@ -18,10 +18,10 @@ Object {
         },
         "name": "managed-cluster",
         "namespace": "default",
-        "nodes": 3,
+        "nodes": 2,
         "status": "ok",
         "totalMemory": "21",
-        "totalStorage": "75",
+        "totalStorage": "60",
         "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
       },
       Object {

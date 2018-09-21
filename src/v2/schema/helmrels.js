@@ -27,9 +27,6 @@ input DeleteHelmReleaseInput {
 
 export const resolver = {
   Query: {
-    releases: (root, args, { helmModel }) => helmModel.getReleases(args),
+    releases: (root, args, { helmModel, req }) => helmModel.getReleases({ user: req.user }),
   },
-  // Mutation: {
-  //   deleteHelmRelease: (root, { input }, { helmModel }) => helmModel.deleteRelease(input),
-  // },
 };

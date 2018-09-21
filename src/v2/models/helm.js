@@ -12,17 +12,23 @@ import yaml from 'js-yaml';
 import { unflatten } from 'flat';
 import logger from '../lib/logger';
 
+function selectNamespace(namespaces) {
+  return namespaces.find(ns => ns === 'default') || namespaces[0];
+}
+
 export default class HelmModel {
-  constructor({ kubeConnector }) {
+  constructor({ kubeConnector, namespaces }) {
     if (!kubeConnector) {
       throw new Error('kubeConnector is a required parameter');
     }
 
     this.kubeConnector = kubeConnector;
+    this.namespaces = namespaces;
+    this.resourceViewNamespace = selectNamespace(namespaces);
   }
 
   async getReleases() {
-    const response = await this.kubeConnector.resourceViewQuery('releases');
+    const response = await this.kubeConnector.resourceViewQuery('releases', this.resourceViewNamespace);
     const results = _.get(response, 'status.results', {});
     return Object.keys(results).reduce((accum, clusterName) => {
       const rels = response.status.results[clusterName].items;

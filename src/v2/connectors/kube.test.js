@@ -101,7 +101,7 @@ describe('KubeConnector', () => {
         uid: () => '1234',
       });
 
-      const workset = await connector.createResourceView('pods');
+      const workset = await connector.createResourceView('pods', 'default');
 
       expect(mockHttp.mock.calls[0]).toHaveLength(1);
       expect(mockHttp.mock.calls[0]).toMatchSnapshot();

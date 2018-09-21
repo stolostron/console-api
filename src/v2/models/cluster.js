@@ -108,16 +108,16 @@ export default class ClusterModel {
     return results;
   }
 
-  async getClusterStatus() {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/clusterstatuses');
-    if (response.code || response.message) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
+  async getClusterStatus({ user }) {
+    const clusterstatusQueries = await Promise.all(user.namespaces.map(({ namespaceId }) =>
+      this.getClusterStatusByNamespace(namespaceId)));
 
-    const result = [];
-    response.items.forEach((cluster) => {
-      result.push({
+    return clusterstatusQueries.reduce((accum, cluster) => {
+      if (!cluster) {
+        return accum;
+      }
+
+      accum.push({
         createdAt: cluster.metadata.creationTimestamp,
         labels: cluster.metadata.labels,
         metadata: cluster.metadata,
@@ -140,7 +140,8 @@ export default class ClusterModel {
           cluster.spec.capacity.cpu,
         ),
       });
-    });
-    return result;
+
+      return accum;
+    }, []);
   }
 }

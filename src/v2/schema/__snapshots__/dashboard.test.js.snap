@@ -86,13 +86,19 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 1,
+          "healthy": 2,
           "name": "clusters",
           "table": Array [
             Object {
               "clusterIP": "9.42.23.230",
               "percentage": null,
-              "resourceName": "mycluster",
+              "resourceName": "managed-cluster",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "9.42.23.230",
+              "percentage": null,
+              "resourceName": "hub-cluster",
               "status": "healthy",
             },
           ],
@@ -101,13 +107,19 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 1,
+          "healthy": 2,
           "name": "cpu",
           "table": Array [
             Object {
               "clusterIP": "9.42.23.230",
+              "percentage": 37,
+              "resourceName": "managed-cluster",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "9.42.23.230",
               "percentage": 41,
-              "resourceName": "mycluster",
+              "resourceName": "hub-cluster",
               "status": "healthy",
             },
           ],
@@ -116,13 +128,19 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 1,
+          "healthy": 2,
           "name": "memory",
           "table": Array [
             Object {
               "clusterIP": "9.42.23.230",
               "percentage": 21,
-              "resourceName": "mycluster",
+              "resourceName": "managed-cluster",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "9.42.23.230",
+              "percentage": 21,
+              "resourceName": "hub-cluster",
               "status": "healthy",
             },
           ],
@@ -131,13 +149,19 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 1,
+          "healthy": 2,
           "name": "storage",
           "table": Array [
             Object {
               "clusterIP": "9.42.23.230",
+              "percentage": 60,
+              "resourceName": "managed-cluster",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "9.42.23.230",
               "percentage": 75,
-              "resourceName": "mycluster",
+              "resourceName": "hub-cluster",
               "status": "healthy",
             },
           ],
@@ -149,7 +173,7 @@ Object {
           "data": Array [
             Array [
               "healthy",
-              "1",
+              "2",
             ],
             Array [
               "warning",

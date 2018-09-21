@@ -251,7 +251,7 @@ export const resolver = {
               transform: transformTotalCluster,
             },
           ],
-          statusQuery: () => clusterModel.getClusterStatus(args),
+          statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
         getDashboardItems({

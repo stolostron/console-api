@@ -58,17 +58,18 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
     const kubeConnector = new KubeConnector({ token: req.kubeToken });
 
+    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
     return {
       formatError,
       schema,
       context: {
         req,
-        helmModel: new HelmModel({ kubeConnector }),
+        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
         complianceModel: new ComplianceModel({ kubeConnector }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
-        resourceViewModel: new ResourceViewModel({ kubeConnector }),
+        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
       },
     };
   }));
@@ -82,16 +83,17 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress((req) => {
     const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: mockKube });
 
+    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
     return {
       formatError,
       schema,
       context: {
         req,
-        helmModel: new HelmModel({ kubeConnector }),
+        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
         complianceModel: new ComplianceModel({ kubeConnector }),
-        resourceViewModel: new ResourceViewModel({ kubeConnector }),
+        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
       },
     };
   }));
@@ -104,16 +106,17 @@ if (process.env.NODE_ENV === 'production') {
   graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
     const kubeConnector = new KubeConnector({ token: req.kubeToken });
 
+    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
     return {
       formatError,
       schema,
       context: {
         req,
-        helmModel: new HelmModel({ kubeConnector }),
+        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
         applicationModel: new ApplicationModel({ kubeConnector }),
         clusterModel: new ClusterModel({ kubeConnector }),
         complianceModel: new ComplianceModel({ kubeConnector }),
-        resourceViewModel: new ResourceViewModel({ kubeConnector }),
+        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
         mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
       },
     };
