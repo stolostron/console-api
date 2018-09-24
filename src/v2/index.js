@@ -34,6 +34,9 @@ import authMiddleware from './lib/auth-middleware';
 export const GRAPHQL_PATH = `${config.get('contextPath')}/graphql`;
 export const GRAPHIQL_PATH = `${config.get('contextPath')}/graphiql`;
 
+const isProd = config.get('NODE_ENV') === 'production';
+const isTest = config.get('NODE_ENV') === 'test';
+
 const formatError = (error) => {
   const { originalError } = error;
   if (isApolloErrorInstance(originalError)) {
@@ -43,84 +46,51 @@ const formatError = (error) => {
 };
 
 const graphQLServer = express();
-graphQLServer.use('*', helmet());
 
-if (process.env.NODE_ENV === 'production') {
-  graphQLServer.use(
-    '*',
-    morgan('combined', {
-      skip: (req, res) => res.statusCode < 400,
-    }),
-  );
+const requestLogger = isProd ?
+  morgan('combined', {
+    skip: (req, res) => res.statusCode < 400,
+  })
+  : morgan('dev');
+
+graphQLServer.use('*', helmet(), requestLogger, cookieParser());
+
+const auth = [];
+
+if (isProd) {
   logger.info('Authentication enabled');
-  graphQLServer.use(cookieParser(), inspect, authMiddleware());
-
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
-    const kubeConnector = new KubeConnector({ token: req.kubeToken });
-
-    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
-    return {
-      formatError,
-      schema,
-      context: {
-        req,
-        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
-        applicationModel: new ApplicationModel({ kubeConnector }),
-        clusterModel: new ClusterModel({ kubeConnector, namespaces: nsNames }),
-        complianceModel: new ComplianceModel({ kubeConnector }),
-        mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
-        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
-      },
-    };
-  }));
-} else if (process.env.NODE_ENV === 'test') {
-  logger.info('RUNNING MOCK SERVER');
-  const mockKube = createMockKubeHTTP();
-  graphQLServer.use('*', morgan('dev'));
-  // disable security check and enable graphiql only for local dev
-  graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
-  graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress((req) => {
-    const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: mockKube });
-
-    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
-    return {
-      formatError,
-      schema,
-      context: {
-        req,
-        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
-        applicationModel: new ApplicationModel({ kubeConnector }),
-        clusterModel: new ClusterModel({ kubeConnector, namespaces: nsNames }),
-        complianceModel: new ComplianceModel({ kubeConnector }),
-        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
-      },
-    };
-  }));
+  auth.push(inspect, authMiddleware());
 } else {
-  graphQLServer.use('*', morgan('dev'));
-  // disable security check and enable graphiql only for local dev
-  graphQLServer.use(cookieParser(), authMiddleware({ shouldLocalAuth: true }));
+  auth.push(authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
-
-  graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
-    const kubeConnector = new KubeConnector({ token: req.kubeToken });
-
-    const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
-    return {
-      formatError,
-      schema,
-      context: {
-        req,
-        helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
-        applicationModel: new ApplicationModel({ kubeConnector }),
-        clusterModel: new ClusterModel({ kubeConnector, namespaces: nsNames }),
-        complianceModel: new ComplianceModel({ kubeConnector }),
-        resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
-        mongoModel: new MongoModel(config.get('mongodbUrl') || 'mongodb://localhost:27017/weave'),
-      },
-    };
-  }));
 }
+
+graphQLServer.use(...auth);
+graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
+  let kubeHTTP;
+  if (isTest) {
+    logger.info('Running in mock mode');
+    kubeHTTP = createMockKubeHTTP();
+  }
+
+  const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: kubeHTTP });
+  const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
+
+  const context = {
+    req,
+    helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
+    applicationModel: new ApplicationModel({ kubeConnector }),
+    clusterModel: new ClusterModel({ kubeConnector, namespaces: nsNames }),
+    complianceModel: new ComplianceModel({ kubeConnector }),
+    resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
+  };
+
+  if (!isTest) {
+    context.mongoModel = new MongoModel(config.get('mongodbUrl')
+      || 'mongodb://localhost:27017/weave');
+  }
+
+  return { formatError, schema, context };
+}));
 
 export default graphQLServer;
