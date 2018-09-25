@@ -19,7 +19,12 @@ describe('Nodes Resolver', () => {
         {
           nodes {
             architecture
-            cluster
+            cluster {
+              clusterip
+              metadata {
+                name
+              }
+            }
             metadata {
               creationTimestamp
               labels

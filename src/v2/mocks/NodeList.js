@@ -67,7 +67,7 @@ export const mockResponse = {
         },
       ],
       results: {
-        mycluster: {
+        'hub-cluster': {
           apiVersion: 'v1',
           items: [
             {

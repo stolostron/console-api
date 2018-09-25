@@ -18,17 +18,43 @@ type Node implements K8sObject {
   allocatable: NodeResources
   architecture: String
   capacity: NodeResources
-  cluster: String
+  cluster: Cluster
   images: [String]
   metadata: Metadata
   operatingSystem: String
   osImage: String
+  # Values: proxy, management, masater, va, etcd
+  roles: [String]
 }
 `;
+
+
+async function resolveRoles(parent) {
+  const { metadata: { labels } } = parent;
+  const roles = [];
+  if (labels['node-role.kubernetes.io/proxy'] === 'true') {
+    roles.push('proxy');
+  }
+  if (labels['node-role.kubernetes.io/management'] === 'true') {
+    roles.push('management');
+  }
+  if (labels['node-role.kubernetes.io/master'] === 'true') {
+    roles.push('master');
+  }
+  if (labels['node-role.kubernetes.io/va'] === 'true') {
+    roles.push('va');
+  }
+  return roles.length > 0 ? roles : ['worker'];
+}
 
 export const resolver = {
   Query: {
     nodes: (root, args, { resourceViewModel }) =>
       resourceViewModel.fetchResources({ type: 'nodes' }),
+  },
+  Node: {
+    cluster: async (parent, args, { clusterModel, req }) =>
+      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+    roles: parent => resolveRoles(parent),
   },
 };

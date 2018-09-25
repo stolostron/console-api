@@ -56,7 +56,7 @@ export default class ClusterModel extends KubeModel {
     return response.items[0];
   }
 
-  async getClusters() {
+  async getClusters(args) {
     const clusterQueries = this.namespaces.map(ns => Promise.all([
       this.getClusterByNamespace(ns),
       this.getClusterStatusByNamespace(ns),
@@ -93,6 +93,10 @@ export default class ClusterModel extends KubeModel {
       return accum;
     }, []);
 
+
+    if (args.name) {
+      return results.filter(c => c.metadata.name === args.name)[0];
+    }
     return results;
   }
 

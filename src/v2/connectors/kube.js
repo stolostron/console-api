@@ -8,6 +8,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import lru from 'lru-cache';
 import logger from '../lib/logger';
 import config from '../../../config';
 import requestLib from '../lib/request';
@@ -27,9 +28,21 @@ export default class KubeConnector {
     this.pollTimeout = pollTimeout;
     this.pollInterval = pollInterval;
     this.uid = uid;
+    // Caches requests for a single query.
+    this.cache = lru({
+      max: 1000,
+      maxAge: 1000, // 1 second
+    });
   }
 
-  get(path = '', opts = {}) {
+  /**
+   * Excecute Kube API GET requests.
+   *
+   * @param {*} path - API path
+   * @param {*} opts - HTTP request options
+   * @param {*} noCache - Don't use a previously cached request.
+   */
+  get(path = '', opts = {}, noCache) {
     const defaults = {
       url: `${this.kubeApiEndpoint}${path}`,
       method: 'GET',
@@ -38,7 +51,20 @@ export default class KubeConnector {
       },
     };
 
-    return this.http(_.merge(defaults, opts)).then(res => res.body);
+    const cacheKey = path;
+
+    const cachedRequest = this.cache.get(cacheKey);
+    if ((noCache === undefined || noCache === false) && cachedRequest) {
+      logger.debug('Kubeconnector: Using cached GET request.');
+      return cachedRequest;
+    }
+
+    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
+
+    if (noCache === undefined || noCache === false) {
+      this.cache.set(cacheKey, newRequest);
+    }
+    return newRequest;
   }
 
   post(path, jsonBody, opts = {}) {
@@ -106,7 +132,7 @@ export default class KubeConnector {
       // eslint-disable-next-line consistent-return
       setInterval(async () => {
         try {
-          const response = await this.get(resourceViewLink);
+          const response = await this.get(resourceViewLink, {}, false);
 
           if (response.code || response.message) {
             clearInterval(intervalID);
