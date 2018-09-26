@@ -51,17 +51,6 @@ const sortTable = table => _.sortBy(table, [(row) => {
   }
 }]);
 
-const sortCards = dashboardCards => _.sortBy(dashboardCards, [(card) => {
-  switch (true) {
-    case card.critical > 0:
-      return -card.critical * 100;
-    case card.warning > 0:
-      return -card.warning * 1;
-    default:
-      return 0;
-  }
-}]);
-
 const genericStatus = (resource) => {
   if (resource.status) {
     switch (resource.status.toLowerCase()) {
@@ -180,16 +169,6 @@ async function getDashboardItems({
   }
 }
 
-const transformTotalCluster = (curr, status, currentData) => {
-  const currentMap = currentData;
-  if (Object.prototype.hasOwnProperty.call(currentMap, status)) {
-    currentMap[status] += 1;
-  } else {
-    currentMap[status] = 1;
-  }
-  return currentMap;
-};
-
 const transformCluster = (cluster, status) => ({
   clusterIP: cluster.ip,
   resourceName: cluster.metadata.name,
@@ -225,11 +204,6 @@ export const resolver = {
         getDashboardItems({
           cards: [
             {
-              name: 'clusters',
-              transform: transformCluster,
-              type: 'clusters',
-            },
-            {
               name: 'cpu',
               transform: transformPercentage('cpuUtilization'),
               status: percentageStatus('cpuUtilization'),
@@ -245,28 +219,33 @@ export const resolver = {
               status: percentageStatus('storageUtilization'),
             },
           ],
-          pieCharts: [
-            {
-              name: 'totalClusterHealth',
-              transform: transformTotalCluster,
-            },
-          ],
-          statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
         }),
         getDashboardItems({
           cards: [
             { name: 'helm releases', transform: transformRelease, type: 'releases' },
           ],
-          statusQuery: () => helmModel.getReleases(args),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          statusQuery: () => helmModel.getReleases(args),
         }),
         getDashboardItems({
           cards: [
             { name: 'pods', transform: transformPod, type: 'pods' },
           ],
-          statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
+        }),
+        getDashboardItems({
+          cards: [
+            {
+              name: 'clusters',
+              transform: transformCluster,
+              type: 'clusters',
+            },
+          ],
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
         }),
       ]);
       let allCards = [];
@@ -282,7 +261,7 @@ export const resolver = {
         });
       }
       return {
-        cardItems: sortCards(_.flatten(allCards)),
+        cardItems: _.flatten(allCards),
         pieChartItems,
       };
     },
