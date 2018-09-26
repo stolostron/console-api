@@ -90,12 +90,12 @@ export default function createAuthMiddleWare({
 
     req.kubeToken = `Bearer ${idToken}`;
     const userName = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
-
+    const iamToken = _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
     req.user = {
       name: userName,
       namespaces: await getNamespaces({
         // cookies field doesn't exist on test case requests
-        iamToken: _.get(req, "cookies['cfc-access-token-cookie']"),
+        iamToken,
         user: userName,
       }),
     };
