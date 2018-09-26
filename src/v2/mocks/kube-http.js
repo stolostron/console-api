@@ -25,6 +25,7 @@ export default function createMockHttp() {
     repoMutations: require('./RepoMutationsList').default,
     relMutations: require('./RelMutationList').default,
     pods: require('./PodList'),
+    pvs: require('./PVsList'),
     nodes: require('./NodeList'),
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
@@ -43,6 +44,10 @@ export default function createMockHttp() {
           return state.namespace.mockResourceView;
         case params.json.metadata.name.includes('releases'):
           return state.release.mockResourceView;
+        case params.json.metadata.name.includes('persistentvolumes'):
+          return state.pvs.mockPVsResourceView;
+        case params.json.metadata.name.includes('persistentvolumeclaim'):
+          return state.pvs.mockPVsClaimResourceView;
         case params.url.includes('default/helmrepos'):
           return state.repoMutations;
         case params.json.metadata.name.includes('test-weave-scope'):
@@ -83,6 +88,10 @@ export default function createMockHttp() {
         return state.repos;
       case params.url.includes('resourceviews/pods'):
         return state.pods.mockResponse;
+      case params.url.includes('resourceviews/persistentvolumes'):
+        return state.pvs.mockPVsResponse;
+      case params.url.includes('resourceviews/persistentvolumeclaims'):
+        return state.pvs.mockPVsClaimResponse;
       case params.url.includes('resourceviews/nodes'):
         return state.nodes.mockResponse;
       case params.url.includes('resourceviews/namespace'):

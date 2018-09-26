@@ -55,6 +55,7 @@ const genericStatus = (resource) => {
   if (resource.status) {
     switch (resource.status.toLowerCase()) {
       case 'failed':
+      case 'unbound':
         return 'critical';
       // TODO: Return warning status - 06/11/18 09:35:53 sidney.wijngaarde1@ibm.com
       case 'pending':
@@ -65,6 +66,8 @@ const genericStatus = (resource) => {
       case 'succeeded':
       case 'healthy':
       case 'deployed':
+      case 'available':
+      case 'bound':
         return 'healthy';
       default:
         return 'critical';
@@ -246,6 +249,13 @@ export const resolver = {
           ],
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
           statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
+        }),
+        getDashboardItems({
+          cards: [
+            { name: 'pvs', transform: transformPod, type: 'storage' },
+          ],
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
       ]);
       let allCards = [];

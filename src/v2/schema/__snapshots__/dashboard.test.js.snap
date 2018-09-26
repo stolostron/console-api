@@ -8,6 +8,45 @@ Object {
         Object {
           "critical": 0,
           "error": null,
+          "healthy": 6,
+          "name": "pvs",
+          "table": Array [
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "helm-repo-pv",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "image-manager-9.42.23.230",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "logging-datanode-9.42.23.230",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "mariadb-9.42.23.230",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "mgmt-repo-pv",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
           "healthy": 2,
           "name": "clusters",
           "table": Array [

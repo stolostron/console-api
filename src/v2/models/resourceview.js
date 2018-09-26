@@ -26,6 +26,32 @@ const formatPod = (clusterName, pod) => ({
   status: pod.status.phase,
 });
 
+const formatPVs = (clusterName, pvs) => ({
+  accessModes: _.get(pvs, 'spec.accessModes', ['-']),
+  capacity: _.get(pvs, 'spec.capacity.storage', '-'),
+  claim: pvs.spec.local
+    ? _.get(pvs, 'spec.local.path', '-')
+    : _.get(pvs, 'spec.hostPath.path', '-'),
+  claimRef: {
+    name: _.get(pvs, 'spec.claimRef.name', null),
+    namespace: _.get(pvs, 'spec.claimRef.namespace', null),
+  },
+  cluster: clusterName,
+  metadata: pvs.metadata,
+  reclaimPolicy: _.get(pvs, 'spec.persistentVolumeReclaimPolicy', '-'),
+  status: _.get(pvs, 'status.phase', '-'),
+  type: pvs.spec.local ? 'LocalVolume' : 'Hostpath',
+});
+
+const formatPVsClaims = (clusterName, claim) => ({
+  accessModes: _.get(claim, 'spec.accessModes', ['-']),
+  cluster: clusterName,
+  metadata: claim.metadata,
+  persistentVolume: _.get(claim, 'spec.volumeName', '-'),
+  requests: _.get(claim, 'spec.resources.requests.storage', '-'),
+  status: _.get(claim, 'status.phase', '-'),
+});
+
 const formatNode = (clusterName, node) => ({
   allocatable: node.status.allocatable,
   architecture: node.status.nodeInfo.architecture,
@@ -57,6 +83,8 @@ export default class ResourceView extends KubeModel {
       namespaces: formatNamespace,
       nodes: formatNode,
       pods: formatPod,
+      persistentvolumes: formatPVs,
+      persistentvolumeclaims: formatPVsClaims,
     };
   }
 

@@ -18,6 +18,8 @@ type Query {
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]
+  pvs: [PVs]
+  pvsClaims: [PVsClaims]
   releases: [HelmRel]
   repos: [HelmRepo]
 
