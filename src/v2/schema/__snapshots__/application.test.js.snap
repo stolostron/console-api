@@ -18,6 +18,20 @@ Object {
           },
         },
       },
+      Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "hcmapp": "app01",
+          },
+        },
+      },
+      Object {
+        "selector": Object {
+          "matchLabels": Object {
+            "hcmapp": "app02",
+          },
+        },
+      },
     ],
   },
 }

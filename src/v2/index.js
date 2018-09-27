@@ -74,15 +74,15 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   }
 
   const kubeConnector = new KubeConnector({ token: req.kubeToken, httpLib: kubeHTTP });
-  const nsNames = req.user.namespaces.map(ns => ns.namespaceId);
+  const namespaces = req.user.namespaces.map(ns => ns.namespaceId);
 
   const context = {
     req,
-    helmModel: new HelmModel({ kubeConnector, namespaces: nsNames }),
-    applicationModel: new ApplicationModel({ kubeConnector }),
-    clusterModel: new ClusterModel({ kubeConnector, namespaces: nsNames }),
+    applicationModel: new ApplicationModel({ kubeConnector, namespaces }),
+    clusterModel: new ClusterModel({ kubeConnector, namespaces }),
     complianceModel: new ComplianceModel({ kubeConnector }),
-    resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces: nsNames }),
+    helmModel: new HelmModel({ kubeConnector, namespaces }),
+    resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces }),
   };
 
   if (!isTest) {

@@ -9,8 +9,7 @@
 
 import _ from 'lodash';
 import logger from '../lib/logger';
-import requestLib from '../lib/request';
-import KubeConnector from '../connectors/kube';
+import KubeModel from './kube';
 
 // use selector to filter objects by labels
 const getSelected = (selector, items) => {
@@ -49,18 +48,7 @@ const getSelected = (selector, items) => {
   });
 };
 
-export default class ApplicationModel {
-  constructor({ kubeConnector, token, httpLib = requestLib }) {
-    if (kubeConnector) {
-      this.kubeConnector = kubeConnector;
-    } else if (token && httpLib) {
-      this.kubeConnector = new KubeConnector({ token, httpLib });
-    } else {
-      throw new Error('Either initialize with KubeConnector or token + httpLib');
-    }
-  }
-
-
+export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
     const appKinds = {
       Application: 'applications',
@@ -116,18 +104,33 @@ export default class ApplicationModel {
     return response.metadata.name;
   }
 
-  async getApplications(name, namespace = 'default') {
-    const response = name ?
-      await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`) :
-      await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/applications');
-
+  async getApplicationsByNamespace(namespace) {
+    const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications`);
     if (response.code || response.message) {
       logger.error(`MCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
-    const applications = name ? [response] : response.items;
 
-    return applications.map(app => ({
+    return response.items;
+  }
+
+  async getApplications(name, namespace = 'default') {
+    let apps;
+    if (name) {
+      const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`);
+      if (response.code || response.message) {
+        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+      apps = [response];
+    } else {
+      const appPromises = this.namespaces.map(ns => this.getApplicationsByNamespace(ns));
+      const response = await Promise.all(appPromises);
+
+      apps = _.flatten(response);
+    }
+
+    return apps.map(app => ({
       dashboard: app.status.Dashboard,
       metadata: app.metadata,
       raw: app,
