@@ -9,7 +9,6 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
-import logger from '../lib/logger';
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -26,49 +25,19 @@ function getStatus(cluster) {
 }
 
 export default class ClusterModel extends KubeModel {
-  async getClusterByNamespace(namespace) {
-    const response = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return null;
-    }
-
-    if (response.items.length > 1) {
-      logger.error('MCMM ERROR - cluster query return more than one cluster for a namespace');
-      return null;
-    }
-
-    return response.items[0];
-  }
-
-  async getClusterStatusByNamespace(namespace) {
-    const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return null;
-    }
-
-    if (response.items.length > 1) {
-      logger.error('MCMM ERROR - cluster query return more than one cluster for a namespace');
-      return null;
-    }
-
-    return response.items[0];
-  }
-
   async getClusters(args) {
-    const clusterQueries = this.namespaces.map(ns => Promise.all([
-      this.getClusterByNamespace(ns),
-      this.getClusterStatusByNamespace(ns),
-    ]));
+    const [clusters, clusterstatuses] = await Promise.all([
+      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
+      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
+    ]);
 
-    const clusterData = await Promise.all(clusterQueries);
-
-    const results = clusterData.reduce((accum, [cluster, clusterstatus]) => {
+    const results = clusters.reduce((accum, cluster, idx) => {
       // namespace doesn't contain a cluster
       if (!cluster) {
         return accum;
       }
+
+      const clusterstatus = clusterstatuses[idx];
 
       const result = {
         metadata: cluster.metadata,
@@ -101,10 +70,9 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getClusterStatus() {
-    const clusterstatusQueries = await Promise.all(this.namespaces.map(ns =>
-      this.getClusterStatusByNamespace(ns)));
+    const clusterstatuses = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
 
-    return clusterstatusQueries.reduce((accum, cluster) => {
+    return clusterstatuses.reduce((accum, cluster) => {
       if (!cluster) {
         return accum;
       }
