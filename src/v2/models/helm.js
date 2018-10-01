@@ -13,18 +13,9 @@ import { unflatten } from 'flat';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
-function selectNamespace(namespaces) {
-  return namespaces.find(ns => ns === 'default') || namespaces[0];
-}
-
 export default class HelmModel extends KubeModel {
-  constructor(params) {
-    super(params);
-    this.resourceViewNamespace = selectNamespace(this.namespaces);
-  }
-
   async getReleases() {
-    const response = await this.kubeConnector.resourceViewQuery('releases', this.resourceViewNamespace);
+    const response = await this.kubeConnector.resourceViewQuery('releases');
     const results = _.get(response, 'status.results', {});
     return Object.keys(results).reduce((accum, clusterName) => {
       const rels = response.status.results[clusterName].items;

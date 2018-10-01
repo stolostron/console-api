@@ -11,8 +11,7 @@ import { isRequired } from '../lib/utils';
 
 // Abstract class for models that communicate with the kubernetes api
 export default class Kube {
-  constructor({ kubeConnector = isRequired('kubeConnector'), namespaces = isRequired('namespaces') }) {
+  constructor({ kubeConnector = isRequired('kubeConnector') }) {
     this.kubeConnector = kubeConnector;
-    this.namespaces = namespaces;
   }
 }

@@ -11,10 +11,6 @@ import _ from 'lodash';
 import KubeModel from './kube';
 import { isRequired } from '../lib/utils';
 
-function selectNamespace(namespaces) {
-  return namespaces.find(ns => ns === 'default') || namespaces[0];
-}
-
 const formatPod = (clusterName, pod) => ({
   cluster: clusterName,
   containers: pod.spec.containers,
@@ -78,7 +74,6 @@ export default class ResourceView extends KubeModel {
   constructor(params) {
     super(params);
 
-    this.resourceViewNamespace = selectNamespace(this.namespaces);
     this.transforms = {
       namespaces: formatNamespace,
       nodes: formatNode,
@@ -89,7 +84,7 @@ export default class ResourceView extends KubeModel {
   }
 
   async fetchResources({ type = isRequired('type') }) {
-    const response = await this.kubeConnector.resourceViewQuery(type, this.resourceViewNamespace);
+    const response = await this.kubeConnector.resourceViewQuery(type);
     const results = _.get(response, 'status.results', {});
 
     const transform = this.transforms[type];

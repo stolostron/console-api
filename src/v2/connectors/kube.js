@@ -14,6 +14,10 @@ import { isRequired } from '../lib/utils';
 import config from '../../../config';
 import requestLib from '../lib/request';
 
+function selectNamespace(namespaces) {
+  return namespaces.find(ns => ns === 'default') || namespaces[0];
+}
+
 export default class KubeConnector {
   constructor({
     token = 'Bearer localdev',
@@ -34,6 +38,7 @@ export default class KubeConnector {
     this.namespaces = namespaces;
     this.pollInterval = pollInterval;
     this.pollTimeout = pollTimeout;
+    this.resourceViewNamespace = selectNamespace(namespaces);
     this.token = token;
     this.uid = uid;
   }
@@ -125,11 +130,7 @@ export default class KubeConnector {
   }
 
   // TODO: Allow filtering - 07/25/18 10:48:31 sidney.wijngaarde1@ibm.com
-  createResourceView(resourceType, namespace) {
-    if (!namespace) {
-      throw new Error('createResourceView error - must specify namespace');
-    }
-
+  createResourceView(resourceType) {
     const name = `${resourceType}-${this.uid()}`;
     const body = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
@@ -148,7 +149,7 @@ export default class KubeConnector {
       },
     };
 
-    return this.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/resourceviews`, body);
+    return this.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.resourceViewNamespace}/resourceviews`, body);
   }
 
   timeout() {
@@ -193,8 +194,8 @@ export default class KubeConnector {
     return { cancel, promise };
   }
 
-  async resourceViewQuery(resourceType, namespace = 'default') {
-    const resource = await this.createResourceView(resourceType, namespace);
+  async resourceViewQuery(resourceType) {
+    const resource = await this.createResourceView(resourceType);
     if (resource.status === 'Failure' || resource.code >= 400) {
       throw new Error(`Create Resource View Failed [${resource.code}] - ${resource.message}`);
     }

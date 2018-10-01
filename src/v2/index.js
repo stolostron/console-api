@@ -83,11 +83,11 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
 
   const context = {
     req,
-    applicationModel: new ApplicationModel({ kubeConnector, namespaces }),
-    clusterModel: new ClusterModel({ kubeConnector, namespaces }),
+    applicationModel: new ApplicationModel({ kubeConnector }),
+    clusterModel: new ClusterModel({ kubeConnector }),
     complianceModel: new ComplianceModel({ kubeConnector }),
-    helmModel: new HelmModel({ kubeConnector, namespaces }),
-    resourceViewModel: new ResourceViewModel({ kubeConnector, namespaces }),
+    helmModel: new HelmModel({ kubeConnector }),
+    resourceViewModel: new ResourceViewModel({ kubeConnector }),
   };
 
   if (!isTest) {
