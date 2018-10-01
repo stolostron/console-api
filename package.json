@@ -16,8 +16,8 @@
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix .",
     "watch": "nodemon --inspect ./src/index.js --exec babel-node",
-    "test": "jest --forceExit",
-    "test:watch": "jest --watch --forceExit"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",

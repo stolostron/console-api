@@ -136,6 +136,30 @@ Object {
           "name": "deployable02-b",
         },
       },
+      Object {
+        "dependencies": null,
+        "deployer": Object {
+          "chartName": "nginx-lego",
+          "namespace": "default",
+          "repository": "google",
+          "version": "0.3.1",
+        },
+        "metadata": Object {
+          "name": "deployable02-a",
+        },
+      },
+      Object {
+        "dependencies": null,
+        "deployer": Object {
+          "chartName": "nginx-lego",
+          "namespace": "default",
+          "repository": "google",
+          "version": "0.3.1",
+        },
+        "metadata": Object {
+          "name": "deployable02-b",
+        },
+      },
     ],
   },
 }
@@ -145,6 +169,23 @@ exports[`Application Resolver Correctly Resolves Placement Policies Query 1`] = 
 Object {
   "data": Object {
     "placementPolicies": Array [
+      Object {
+        "clusterSelector": Object {
+          "matchLabels": Object {
+            "name": "mycluster.icp",
+          },
+        },
+        "metadata": Object {
+          "annotations": Object {
+            "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
+            "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
+          },
+          "name": "placement02",
+          "namespace": "default",
+        },
+        "replicas": 1,
+        "resourceSelector": Object {},
+      },
       Object {
         "clusterSelector": Object {
           "matchLabels": Object {

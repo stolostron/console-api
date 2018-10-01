@@ -59,7 +59,12 @@ describe('KubeConnector', () => {
     test('calls httpLib with correct arguments', async () => {
       const mockHttp = jest.fn(() => asyncReturn({ body: { test: 'value' } }, 200));
 
-      const connector = new KubeConnector({ kubeApiEndpoint: 'kubernetes', httpLib: mockHttp });
+      const connector = new KubeConnector({
+        kubeApiEndpoint: 'kubernetes',
+        httpLib: mockHttp,
+        namespaces: ['default'],
+      });
+
       await connector.get('/api/test');
 
       expect(mockHttp.mock.calls).toHaveLength(1);
@@ -71,7 +76,12 @@ describe('KubeConnector', () => {
         new Promise(res =>
           setTimeout(res, 200, { body: { test: 'value' } })));
 
-      const connector = new KubeConnector({ kubeApiEndpoint: 'kubernetes', httpLib: mockHttp });
+      const connector = new KubeConnector({
+        kubeApiEndpoint: 'kubernetes',
+        httpLib: mockHttp,
+        namespaces: ['default'],
+      });
+
       await connector.get('/api/test', { headers: { 'x-custom-header': 'test-value' } });
 
       expect(mockHttp.mock.calls[0]).toHaveLength(1);
@@ -83,7 +93,12 @@ describe('KubeConnector', () => {
     test('calls httpLib with correct arguments', async () => {
       const mockHttp = jest.fn(() => asyncReturn({ body: { test: 'value' } }, 200));
 
-      const connector = new KubeConnector({ kubeApiEndpoint: 'kubernetes', httpLib: mockHttp });
+      const connector = new KubeConnector({
+        kubeApiEndpoint: 'kubernetes',
+        httpLib: mockHttp,
+        namespaces: ['default'],
+      });
+
       await connector.post('/api/test', { body: 'test-value' });
 
       expect(mockHttp.mock.calls[0]).toHaveLength(1);
@@ -99,6 +114,7 @@ describe('KubeConnector', () => {
         kubeApiEndpoint: 'kubernetes',
         httpLib: mockHttp,
         uid: () => '1234',
+        namespaces: ['default'],
       });
 
       const workset = await connector.createResourceView('pods', 'default');
@@ -122,6 +138,7 @@ describe('KubeConnector', () => {
         kubeApiEndpoint: 'kubernetes',
         httpLib: mockHttp,
         uid: () => '1234',
+        namespaces: ['default'],
       });
 
       const result = await connector.resourceViewQuery('pods');
@@ -138,6 +155,7 @@ describe('KubeConnector', () => {
         httpLib: mockHttp,
         uid: () => '1234',
         pollTimeout: 1000,
+        namespaces: ['default'],
       });
 
       await expect(connector.resourceViewQuery('pods')).rejects.toMatchSnapshot();
@@ -152,7 +170,8 @@ describe('KubeConnector', () => {
         kubeApiEndpoint: 'kubernetes',
         httpLib: mockHttp,
         uid: () => '1234',
-        pollTimeout: 1000,
+        pollTimeout: 100,
+        namespaces: ['default'],
       });
 
       await expect(connector.resourceViewQuery('pods')).rejects.toMatchSnapshot();

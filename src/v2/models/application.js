@@ -8,7 +8,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import logger from '../lib/logger';
 import KubeModel from './kube';
 
 // use selector to filter objects by labels
@@ -104,30 +103,15 @@ export default class ApplicationModel extends KubeModel {
     return response.metadata.name;
   }
 
-  async getApplicationsByNamespace(namespace) {
-    const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-
-    return response.items;
-  }
-
   async getApplications(name, namespace = 'default') {
     let apps;
     if (name) {
-      const response = await this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`);
-      if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-        return [];
-      }
-      apps = [response];
+      apps = await this.kubeConnector.getResources(
+        ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applications/${name}`,
+        { namespaces: [namespace] },
+      );
     } else {
-      const appPromises = this.namespaces.map(ns => this.getApplicationsByNamespace(ns));
-      const response = await Promise.all(appPromises);
-
-      apps = _.flatten(response);
+      apps = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applications`);
     }
 
     return apps.map(app => ({
@@ -139,13 +123,9 @@ export default class ApplicationModel extends KubeModel {
   }
 
   async getDeployables(selector) {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/deployables');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`);
 
-    return getSelected(selector, response.items).map(deployable => ({
+    return getSelected(selector, response).map(deployable => ({
       dependencies: deployable.spec.dependencies && deployable.spec.dependencies.map(dep => ({
         name: dep.destination.name,
         kind: dep.destination.kind,
@@ -157,13 +137,9 @@ export default class ApplicationModel extends KubeModel {
   }
 
   async getPlacementPolicies(selector) {
-    const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/placementpolicies');
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`);
 
-    return getSelected(selector, response.items).map(pp => ({
+    return getSelected(selector, response).map(pp => ({
       clusterSelector: pp.spec.clusterSelector,
       metadata: pp.metadata,
       raw: pp,

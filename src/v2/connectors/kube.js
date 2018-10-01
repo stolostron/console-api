@@ -10,6 +10,7 @@
 import _ from 'lodash';
 import lru from 'lru-cache';
 import logger from '../lib/logger';
+import { isRequired } from '../lib/utils';
 import config from '../../../config';
 import requestLib from '../lib/request';
 
@@ -18,21 +19,23 @@ export default class KubeConnector {
     token = 'Bearer localdev',
     httpLib = requestLib,
     kubeApiEndpoint = `${config.get('cfcRouterUrl')}/kubernetes`,
+    namespaces = isRequired('namespaces'),
     pollTimeout = config.get('hcmPollTimeout'),
     pollInterval = config.get('hcmPollInterval'),
     uid = Date.now,
   } = {}) {
-    this.token = token;
-    this.http = httpLib;
-    this.kubeApiEndpoint = kubeApiEndpoint;
-    this.pollTimeout = pollTimeout;
-    this.pollInterval = pollInterval;
-    this.uid = uid;
     // Caches requests for a single query.
     this.cache = lru({
       max: 1000,
       maxAge: 1000, // 1 second
     });
+    this.http = httpLib;
+    this.kubeApiEndpoint = kubeApiEndpoint;
+    this.namespaces = namespaces;
+    this.pollInterval = pollInterval;
+    this.pollTimeout = pollTimeout;
+    this.token = token;
+    this.uid = uid;
   }
 
   /**
@@ -65,6 +68,35 @@ export default class KubeConnector {
       this.cache.set(cacheKey, newRequest);
     }
     return newRequest;
+  }
+
+  /**
+   * Excecute Kube API GET requests for namespaces resources.
+   *
+   * @param {*} urlTemplate - function from namespace to url path
+   * @param {*} opts - default namespace list override
+   */
+  async getResources(urlTemplate, { namespaces } = {}) {
+    const namespaceList = (namespaces || this.namespaces);
+
+    const requests = namespaceList.map(async (ns) => {
+      let response;
+      try {
+        response = await this.get(urlTemplate(ns));
+      } catch (err) {
+        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        return [];
+      }
+
+      if (response.code || response.message) {
+        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+
+      return response.items ? response.items : [response];
+    });
+
+    return _.flatten(await Promise.all(requests));
   }
 
   post(path, jsonBody, opts = {}) {
