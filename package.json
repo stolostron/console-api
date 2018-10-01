@@ -63,6 +63,7 @@
     "eslint-plugin-jest": "^21.17.0",
     "jest": "^23.1.0",
     "jest-tap-reporter": "^1.9.0",
+    "mongodb-memory-server": "^2.4.1",
     "nodemon": "^1.17.3",
     "supertest": "^3.1.0"
   }

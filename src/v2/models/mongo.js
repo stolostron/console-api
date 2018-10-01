@@ -31,7 +31,7 @@ const resourceSchema = Schema({
   uid: String,
 });
 
-const ResourceModel = mongooseLib.model('Resource', resourceSchema);
+export const ResourceModel = mongooseLib.model('Resource', resourceSchema);
 
 const wait = ms => new Promise((resolve) => {
   setTimeout(resolve, ms);

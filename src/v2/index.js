@@ -93,6 +93,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   if (!isTest) {
     context.mongoModel = new MongoModel(config.get('mongodbUrl')
       || 'mongodb://localhost:27017/weave');
+  } else {
+    context.mongoModel = new MongoModel('mongodb://localhost:27017/weave');
   }
 
   return { formatError, schema, context };
