@@ -75,39 +75,6 @@ export default class ClusterModel extends KubeModel {
     return results;
   }
 
-  async updateClusterLabels(args) {
-    /*
-    update cluster labels
-    the Content-Type is 'application/json-patch+json'
-    the request body should look like:
-    [{
-     "op": "replace", "path": "/metadata/labels", "value": {
-            "cloud": "IBM",
-            "datacenter": "toronto",
-            "environment": "Dev"
-        }
-     }]
-    */
-
-    const { namespace, name, labels } = args;
-
-    const requestBody = {
-      body: [
-        {
-          op: 'replace',
-          path: '/metadata/labels',
-          value: labels,
-        },
-      ],
-    };
-    const response = await this.kubeConnector.patch(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`, requestBody);
-    if (response.code || response.message) {
-      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
-    }
-
-    return response;
-  }
-
   async getClusterStatus() {
     const clusterstatuses = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
 
