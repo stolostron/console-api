@@ -23,7 +23,7 @@ const getSelected = (selector, items) => {
                      labels[key] === matchLabels[key]));
       } else if (matchExpressions) {
         for (let j = 0; j < matchExpressions.length && !r;) {
-          const { key: k, operator = '', values = [] } = matchExpressions[i];
+          const { key: k, operator = '', values = [] } = matchExpressions[j];
           switch (operator.toLowerCase()) {
             case 'in':
               if (labels[k] && values.indexOf(labels[k]) !== -1) {
