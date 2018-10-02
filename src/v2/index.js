@@ -20,6 +20,7 @@ import logger from './lib/logger';
 
 import ApplicationModel from './models/application';
 import ClusterModel from './models/cluster';
+import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import KubeConnector from './connectors/kube';
@@ -85,6 +86,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
+    genericModel: new GenericModel({ kubeConnector, namespaces }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),

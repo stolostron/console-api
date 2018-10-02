@@ -17,6 +17,8 @@ type Cluster implements K8sObject {
   totalMemory: String
   # Returns % of storage used.
   totalStorage: String
+  # Returns % of CPU used.
+  totalCPU: String
 }
 `;
 
@@ -24,5 +26,10 @@ export const resolver = {
   Query: {
     clusters: (root, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, user: req.user }),
+  },
+  Mutation: {
+    // patch cluster labels
+    updateLabels: (root, args, { genericModel }) =>
+      genericModel.updateLabels(args),
   },
 };

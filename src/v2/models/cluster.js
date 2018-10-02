@@ -58,6 +58,12 @@ export default class ClusterModel extends KubeModel {
         result.totalStorage = parseInt(getPercentage(storageUsage, storageCapacity), 10);
       }
 
+      const cpuUsage = _.get(clusterstatus, 'spec.usage.cpu');
+      const cpuCapacity = _.get(clusterstatus, 'spec.capacity.cpu');
+      if (cpuUsage && cpuCapacity) {
+        result.totalCPU = parseInt(getCPUPercentage(cpuUsage, cpuCapacity), 10);
+      }
+
       accum.push(result);
       return accum;
     }, []);
@@ -67,6 +73,39 @@ export default class ClusterModel extends KubeModel {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
     return results;
+  }
+
+  async updateClusterLabels(args) {
+    /*
+    update cluster labels
+    the Content-Type is 'application/json-patch+json'
+    the request body should look like:
+    [{
+     "op": "replace", "path": "/metadata/labels", "value": {
+            "cloud": "IBM",
+            "datacenter": "toronto",
+            "environment": "Dev"
+        }
+     }]
+    */
+
+    const { namespace, name, labels } = args;
+
+    const requestBody = {
+      body: [
+        {
+          op: 'replace',
+          path: '/metadata/labels',
+          value: labels,
+        },
+      ],
+    };
+    const response = await this.kubeConnector.patch(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`, requestBody);
+    if (response.code || response.message) {
+      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
+    }
+
+    return response;
   }
 
   async getClusterStatus() {

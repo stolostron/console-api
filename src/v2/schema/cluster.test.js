@@ -40,3 +40,22 @@ describe('Cluster Resolver', () => {
       });
   });
 });
+
+describe('Cluster Mutation', () => {
+  test('Correctly Resolves Update Cluster Labels', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          updateLabels(name:"my-remote-cluster-1-xz",namespace:"my-remote-cluster-1", labels:{}, resourceType: "HCMCluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+});
+

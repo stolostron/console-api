@@ -129,6 +129,21 @@ export default class KubeConnector {
     return this.http(_.merge(defaults, opts)).then(res => res.body);
   }
 
+  patch(path = '', opts = {}) {
+    const defaults = {
+      url: `${this.kubeApiEndpoint}${path}`,
+      method: 'PATCH',
+      headers: {
+        Authorization: this.token,
+        'Content-Type': 'application/json-patch+json',
+      },
+    };
+
+    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
+
+    return newRequest;
+  }
+
   // TODO: Allow filtering - 07/25/18 10:48:31 sidney.wijngaarde1@ibm.com
   createResourceView(resourceType) {
     const name = `${resourceType}-${this.uid()}`;
