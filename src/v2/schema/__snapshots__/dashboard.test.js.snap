@@ -33,31 +33,31 @@ Object {
           "name": "helm releases",
           "table": Array [
             Object {
-              "clusterIP": null,
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "audit-logging",
               "status": "healthy",
             },
             Object {
-              "clusterIP": null,
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "auth-apikeys",
               "status": "healthy",
             },
             Object {
-              "clusterIP": null,
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "auth-idp",
               "status": "healthy",
             },
             Object {
-              "clusterIP": null,
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "auth-pap",
               "status": "healthy",
             },
             Object {
-              "clusterIP": null,
+              "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "auth-pdp",
               "status": "healthy",

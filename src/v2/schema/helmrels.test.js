@@ -24,7 +24,12 @@ describe('Helm Release Resolver', () => {
             status
             version
             name
-            cluster
+            cluster {
+              clusterip
+              metadata {
+                name
+              }
+            }
             lastDeployed
           }
         }

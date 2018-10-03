@@ -15,7 +15,7 @@ type HelmRel {
   status: String
   version: Int
   name: String
-  cluster: String
+  cluster: Cluster
   lastDeployed: String
 }
 
@@ -28,5 +28,9 @@ input DeleteHelmReleaseInput {
 export const resolver = {
   Query: {
     releases: (root, args, { helmModel, req }) => helmModel.getReleases({ user: req.user }),
+  },
+  HelmRel: {
+    cluster: (parent, args, { clusterModel, req }) =>
+      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
   },
 };

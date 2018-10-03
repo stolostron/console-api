@@ -67,7 +67,7 @@ export const mockResponse = {
         },
       ],
       results: {
-        'mycluster-icp': {
+        'hub-cluster': {
           metadata: {},
           items: [
             {
