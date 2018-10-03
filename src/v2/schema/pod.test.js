@@ -18,7 +18,12 @@ describe('Pods Resolver', () => {
         query: `
         {
           pods {
-            cluster
+            cluster {
+              clusterip
+              metadata {
+                name
+              }
+            }
             hostIP
             metadata {
               creationTimestamp

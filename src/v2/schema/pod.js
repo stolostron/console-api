@@ -9,9 +9,10 @@
 
 export const typeDef = `
   type Pod implements K8sObject {
-    cluster: String
+    cluster: Cluster
     containers: [Container]
     hostIP: String
+    images: [String]
     metadata: Metadata
     owners: [Owner]
     podIP: String
@@ -33,8 +34,17 @@ export const typeDef = `
   }
 `;
 
+function resolveImages({ containers }) {
+  return Object.keys(containers).map(key => containers[key].image);
+}
+
 export const resolver = {
   Query: {
     pods: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'pods' }),
+  },
+  Pod: {
+    cluster: (parent, args, { clusterModel, req }) =>
+      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+    images: parent => resolveImages(parent),
   },
 };
