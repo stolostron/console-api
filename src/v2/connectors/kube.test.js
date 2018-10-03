@@ -127,7 +127,6 @@ describe('KubeConnector', () => {
 
   describe('WorksetResourceQuery', () => {
     test('creates and polls workset api', async () => {
-      const mockCache = { get: jest.fn().mockReturnValue(null), set: jest.fn() };
       const mockHttp = jest.fn()
         .mockImplementationOnce(() => asyncReturn(mockWorkset))
         .mockImplementationOnce(() => asyncReturn(mockWorksetPollIncomplete))
@@ -136,7 +135,6 @@ describe('KubeConnector', () => {
         .mockImplementation(() => asyncReturn(mockWorksetPollComplete));
 
       const connector = new KubeConnector({
-        cache: mockCache,
         kubeApiEndpoint: 'kubernetes',
         httpLib: mockHttp,
         uid: () => '1234',

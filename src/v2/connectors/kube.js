@@ -20,7 +20,6 @@ function selectNamespace(namespaces) {
 
 export default class KubeConnector {
   constructor({
-    cache = lru(),
     token = 'Bearer localdev',
     httpLib = requestLib,
     kubeApiEndpoint = `${config.get('cfcRouterUrl')}/kubernetes`,
@@ -30,7 +29,10 @@ export default class KubeConnector {
     uid = Date.now,
   } = {}) {
     // Caches requests for a single query.
-    this.cache = cache;
+    this.cache = lru({
+      max: 1000,
+      maxAge: 1000, // 1 second
+    });
     this.http = httpLib;
     this.kubeApiEndpoint = kubeApiEndpoint;
     this.namespaces = namespaces;
@@ -49,15 +51,15 @@ export default class KubeConnector {
    * @param {*} noCache - Don't use a previously cached request.
    */
   get(path = '', opts = {}, noCache) {
-    const options = _.merge({
+    const defaults = {
       url: `${this.kubeApiEndpoint}${path}`,
       method: 'GET',
       headers: {
         Authorization: this.token,
       },
-    }, opts);
+    };
 
-    const cacheKey = `${path}/${JSON.stringify(options.body)}`;
+    const cacheKey = path;
 
     const cachedRequest = this.cache.get(cacheKey);
     if ((noCache === undefined || noCache === false) && cachedRequest) {
@@ -65,12 +67,11 @@ export default class KubeConnector {
       return cachedRequest;
     }
 
-    const newRequest = this.http(options).then(res => res.body);
+    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
 
     if (noCache === undefined || noCache === false) {
       this.cache.set(cacheKey, newRequest);
     }
-
     return newRequest;
   }
 
