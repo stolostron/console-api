@@ -20,8 +20,8 @@ function getCPUPercentage(usage, capacity) {
 }
 
 function getStatus(cluster) {
-  const status = _.get(cluster, 'status.conditions[0].type', 'unknown');
-  return status === '' ? 'unknown' : status.toLowerCase();
+  const status = _.get(cluster, 'status.conditions[0].type', 'offline');
+  return status === '' ? 'offline' : status.toLowerCase();
 }
 
 export default class ClusterModel extends KubeModel {

@@ -55,18 +55,20 @@ const genericStatus = (resource) => {
   if (resource.status) {
     switch (resource.status.toLowerCase()) {
       case 'failed':
+      case 'offline':
       case 'unbound':
         return 'critical';
       // TODO: Return warning status - 06/11/18 09:35:53 sidney.wijngaarde1@ibm.com
+      case 'available':
       case 'pending':
       case 'deleting':
         return 'warning';
       case 'ok':
+      case 'ready':
       case 'running':
       case 'succeeded':
       case 'healthy':
       case 'deployed':
-      case 'available':
       case 'bound':
         return 'healthy';
       default:
@@ -87,7 +89,7 @@ const percentageStatus = field => (resource) => {
   switch (true) {
     case percent > 90:
       return 'critical';
-    case percent > 75:
+    case percent >= 75:
       return 'warning';
     default:
       return 'healthy';
@@ -227,10 +229,10 @@ export const resolver = {
         }),
         getDashboardItems({
           cards: [
-            { name: 'helm releases', transform: transformRelease, type: 'releases' },
+            { name: 'pvs', transform: transformPod, type: 'storage' },
           ],
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
-          statusQuery: () => helmModel.getReleases(args),
         }),
         getDashboardItems({
           cards: [
@@ -238,6 +240,13 @@ export const resolver = {
           ],
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
           statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
+        }),
+        getDashboardItems({
+          cards: [
+            { name: 'helm releases', transform: transformRelease, type: 'releases' },
+          ],
+          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          statusQuery: () => helmModel.getReleases(args),
         }),
         getDashboardItems({
           cards: [
@@ -249,13 +258,6 @@ export const resolver = {
           ],
           clusterQuery: () => clusterModel.getClusters({ user: req.user }),
           statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
-        }),
-        getDashboardItems({
-          cards: [
-            { name: 'pvs', transform: transformPod, type: 'storage' },
-          ],
-          statusQuery: () => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
         }),
       ]);
       let allCards = [];

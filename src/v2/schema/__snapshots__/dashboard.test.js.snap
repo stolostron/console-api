@@ -8,45 +8,6 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 6,
-          "name": "pvs",
-          "table": Array [
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "helm-repo-pv",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "image-manager-9.42.23.230",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "logging-datanode-9.42.23.230",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "mariadb-9.42.23.230",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "mgmt-repo-pv",
-              "status": "healthy",
-            },
-          ],
-          "warning": 0,
-        },
-        Object {
-          "critical": 0,
-          "error": null,
           "healthy": 2,
           "name": "clusters",
           "table": Array [
@@ -60,45 +21,6 @@ Object {
               "clusterIP": "9.42.23.230",
               "percentage": null,
               "resourceName": "hub-cluster",
-              "status": "healthy",
-            },
-          ],
-          "warning": 0,
-        },
-        Object {
-          "critical": 0,
-          "error": null,
-          "healthy": 79,
-          "name": "pods",
-          "table": Array [
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "ibm-cert-manager-cert-manager-9c6944dc5-6xgtx",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "audit-logging-fluentd-ds-jz2vs",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "audit-logging-fluentd-ds-kghsh",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "audit-logging-fluentd-ds-xvcgr",
-              "status": "healthy",
-            },
-            Object {
-              "clusterIP": "",
-              "percentage": null,
-              "resourceName": "auth-apikeys-8m4pl",
               "status": "healthy",
             },
           ],
@@ -146,6 +68,84 @@ Object {
         Object {
           "critical": 0,
           "error": null,
+          "healthy": 79,
+          "name": "pods",
+          "table": Array [
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "ibm-cert-manager-cert-manager-9c6944dc5-6xgtx",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-jz2vs",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-kghsh",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "audit-logging-fluentd-ds-xvcgr",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "auth-apikeys-8m4pl",
+              "status": "healthy",
+            },
+          ],
+          "warning": 0,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
+          "healthy": 5,
+          "name": "pvs",
+          "table": Array [
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "logging-datanode-9.42.23.230",
+              "status": "warning",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "helm-repo-pv",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "image-manager-9.42.23.230",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "mariadb-9.42.23.230",
+              "status": "healthy",
+            },
+            Object {
+              "clusterIP": "",
+              "percentage": null,
+              "resourceName": "mgmt-repo-pv",
+              "status": "healthy",
+            },
+          ],
+          "warning": 1,
+        },
+        Object {
+          "critical": 0,
+          "error": null,
           "healthy": 2,
           "name": "cpu",
           "table": Array [
@@ -188,23 +188,23 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 2,
+          "healthy": 1,
           "name": "storage",
           "table": Array [
+            Object {
+              "clusterIP": "9.42.23.230",
+              "percentage": 75,
+              "resourceName": "hub-cluster",
+              "status": "warning",
+            },
             Object {
               "clusterIP": "9.42.23.230",
               "percentage": 60,
               "resourceName": "managed-cluster",
               "status": "healthy",
             },
-            Object {
-              "clusterIP": "9.42.23.230",
-              "percentage": 75,
-              "resourceName": "hub-cluster",
-              "status": "healthy",
-            },
           ],
-          "warning": 0,
+          "warning": 1,
         },
       ],
       "pieChartItems": Array [],
