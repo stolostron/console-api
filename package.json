@@ -16,7 +16,7 @@
     "lint": "eslint --ext ,.js .",
     "lint:fix": "eslint --ext .jsx,.js --fix .",
     "watch": "nodemon --inspect ./src/index.js --exec babel-node",
-    "test": "jest",
+    "test": "jest --verbose",
     "test:update-snapshot": "jest --updateSnapshot",
     "test:watch": "jest --watch"
   },
@@ -29,6 +29,15 @@
   "engines": {
     "node": "8.12.0",
     "npm": "5.6.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test -- -o"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,json}": ["eslint --fix", "git add"]
   },
   "dependencies": {
     "@icp/security-middleware": "^2.0.19",
@@ -62,8 +71,10 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jest": "^21.17.0",
+    "husky": "^1.1.0",
     "jest": "^23.1.0",
     "jest-tap-reporter": "^1.9.0",
+    "lint-staged": "^7.3.0",
     "mongodb-memory-server": "^2.4.1",
     "nodemon": "^1.17.3",
     "supertest": "^3.1.0"
