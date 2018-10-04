@@ -39,6 +39,8 @@ type CompliancePolicy implements K8sObject {
   templates: [PolicyTemplates]
   valid: String
   violations: [Violations]
+  roleRef: [RoleRef]
+  roleSubjects: [RoleSubject]
 }
 
 `;

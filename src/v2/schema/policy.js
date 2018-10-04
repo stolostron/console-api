@@ -20,6 +20,8 @@ type Policy implements K8sObject {
   status: String
   templates: [PolicyTemplates]
   violations: [Violations]
+  roleRef: [RoleRef]
+  roleSubjects: [RoleSubject]
 }
 
 type PolicyDetail {
@@ -56,6 +58,17 @@ type Violations {
   status: String
 }
 
+type RoleRef {
+  apiGroup: String
+  kind: String
+  name: String
+}
+
+type RoleSubject {
+  apiGroup: String
+  kind: String
+  name: String
+}
 `;
 
 export const resolver = {
@@ -70,6 +83,8 @@ export const resolver = {
     rules: parent => ComplianceModel.resolvePolicyRules(parent),
     status: parent => ComplianceModel.resolvePolicyStatus(parent),
     violations: parent => ComplianceModel.resolvePolicyViolations(parent),
+    roleRef: parent => ComplianceModel.resolveRoleRef(parent),
+    roleSubjects: parent => ComplianceModel.resolveRoleSubjects(parent),
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),

@@ -86,7 +86,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
-    genericModel: new GenericModel({ kubeConnector, namespaces }),
+    genericModel: new GenericModel({ kubeConnector }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),

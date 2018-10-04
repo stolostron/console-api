@@ -140,6 +140,8 @@ export default class ComplianceModel {
           templates: this.resolvePolicyTemplates(policy), // TODO: Use resolver.
           valid: _.get(value, 'Valid', '-'),
           violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
+          roleRef: this.resolveRoleRef(policy),
+          roleSubjects: this.resolveRoleSubjects(policy),
           metadata: {
             ...parent.metadata,
             name: key,
@@ -261,6 +263,26 @@ export default class ComplianceModel {
     return rules;
   }
 
+  static resolveRoleSubjects(parent) {
+    let roleSubjects = [];
+    getTemplates(parent).forEach((res) => {
+      if (_.get(res, 'templateType') === 'roleBinding-templates') {
+        roleSubjects = [..._.get(res, 'roleBinding.subjects', [])];
+      }
+    });
+    return roleSubjects;
+  }
+
+  static resolveRoleRef(parent) {
+    const roleRef = [];
+    getTemplates(parent).forEach((res) => {
+      if (_.get(res, 'templateType') === 'roleBinding-templates') {
+        roleRef.push(_.get(res, 'roleBinding.roleRef', {}));
+      }
+    });
+    return roleRef;
+  }
+
 
   static resolvePolicyStatus(parent) {
     return _.get(parent, 'status.Valid', false) === false ? 'invalid' : _.get(parent, 'status.Compliant', 'unknown');
@@ -268,30 +290,48 @@ export default class ComplianceModel {
 
 
   static resolvePolicyTemplates(parent) {
-    return getTemplates(parent).map(res => ({
-      name: _.get(res, 'metadata.name', '-'),
-      lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
-      complianceType: _.get(res, 'complianceType', ''),
-      apiVersion: _.get(res, 'apiVersion', ''),
-      compliant: _.get(res, 'status.Compliant', ''),
-      validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
-      selector: _.get(res, 'selector', ''),
-      templateType: _.get(res, 'templateType', ''),
-    }));
+    return getTemplates(parent).map((res) => {
+      if (_.get(res, 'templateType') === 'roleBinding-templates') {
+        return ({
+          name: _.get(res, 'roleBinding.metadata.name', '-'),
+          lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+          complianceType: _.get(res, 'complianceType', ''),
+          apiVersion: _.get(res, 'roleBinding.apiVersion', ''),
+          compliant: _.get(res, 'status.Compliant', ''),
+          validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+          selector: _.get(res, 'selector', ''),
+          templateType: _.get(res, 'templateType', ''),
+        });
+      }
+      return ({
+        name: _.get(res, 'metadata.name', '-'),
+        lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+        complianceType: _.get(res, 'complianceType', ''),
+        apiVersion: _.get(res, 'apiVersion', ''),
+        compliant: _.get(res, 'status.Compliant', ''),
+        validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+        selector: _.get(res, 'selector', ''),
+        templateType: _.get(res, 'templateType', ''),
+      });
+    });
   }
 
 
   static resolvePolicyViolations(parent) {
-    return getTemplates(parent).map((res) => {
+    const violationArray = [];
+    getTemplates(parent).forEach((res) => {
       const templateCondition = _.get(res, 'status.conditions[0]');
-      return {
-        name: _.get(res, 'metadata.name', '-'),
-        cluster: 'local', // local means the cluster that this policy is applied
-        status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
-        message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
-        reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
-        selector: _.get(res, 'selector', ''),
-      };
+      if (_.get(res, 'templateType') !== 'roleBinding-templates') {
+        violationArray.push({
+          name: _.get(res, 'metadata.name', '-'),
+          cluster: 'local', // local means the cluster that this policy is applied
+          status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
+          message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
+          reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
+          selector: _.get(res, 'selector', ''),
+        });
+      }
     });
+    return violationArray;
   }
 }
