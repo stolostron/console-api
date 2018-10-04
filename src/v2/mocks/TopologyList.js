@@ -12,7 +12,7 @@ import { ResourceModel } from '../models/mongo';
 export const clusterModel = new ResourceModel({
   cluster: null,
   labels: [],
-  name: 'mycluster',
+  name: 'managed-cluster',
   namespace: null,
   relationships: [],
   topology: 'cluster',

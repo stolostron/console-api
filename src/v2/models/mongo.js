@@ -7,8 +7,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import mongooseLib, { Schema } from 'mongoose';
 import logger from '../lib/logger';
+import { isRequired } from '../lib/utils';
 
 const relationshipSchema = Schema({
   cluster: { type: Schema.ObjectId, ref: 'Resource' },
@@ -38,10 +40,15 @@ const wait = ms => new Promise((resolve) => {
 });
 
 export default class MongoModel {
-  constructor(mongoURI, { mongoose = mongooseLib, Resource = ResourceModel } = {}) {
+  constructor(mongoURI, {
+    mongoose = mongooseLib,
+    namespaces = isRequired('namespaces'),
+    Resource = ResourceModel,
+  } = {}) {
     this.mongoURI = mongoURI;
     this.mongoose = mongoose;
     this.Resource = Resource;
+    this.namespaces = namespaces;
   }
 
   async connect(numRetries = 5) {
@@ -72,35 +79,29 @@ export default class MongoModel {
     return this;
   }
 
-  async getResourceQuery(args) {
+  async getResourceQuery({ clusters, filter }) {
     await this.connect();
-    if (args.filter) {
-      const filters = [];
 
-      // Special case for filtering by cluster.
-      // The filter object receives the cluster names to filter, but need to use the mongo doc id
-      // in the search query.
-      if (args.filter.cluster && args.filter.cluster[0]) {
-        const clusterDocs = await this.Resource.find({ type: 'cluster' });
-        if (clusterDocs.length > 0) {
-          filters.push({
-            cluster: {
-              $in: args.filter.cluster.map(f => (clusterDocs.find(c => c.name === f) || {}).id),
-            },
-          });
-        }
-      }
+    const filters = [];
 
-      Object.keys(args.filter).forEach((filterType) => {
-        if (args.filter[filterType] && args.filter[filterType][0]) {
+    const clusterNames = _.get(filter, 'cluster[0]')
+      ? filter.cluster.filter(clus => clusters.includes(clus))
+      : clusters;
+
+    const clusterDocs = await this.Resource.find({ type: 'cluster', name: { $in: clusterNames } });
+
+    filters.push({ cluster: { $in: clusterDocs.map(doc => doc.id) } });
+    if (filter) {
+      Object.keys(filter).forEach((filterType) => {
+        if (filter[filterType] && filter[filterType][0]) {
           if (filterType === 'label') {
             filters.push({
-              $or: args.filter[filterType].map(label => (
+              $or: filter[filterType].map(label => (
                 { 'labels.name': label.name, 'labels.value': label.value }
               )),
             });
           } else if (filterType !== 'cluster') { // Cluster is a special type, handled above.
-            filters.push({ [filterType]: { $in: args.filter[filterType] } });
+            filters.push({ [filterType]: { $in: filter[filterType] } });
           }
         }
       });

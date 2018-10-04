@@ -51,8 +51,12 @@ export const resolver = {
     resourceTypes: async (root, args, { mongoModel }) => mongoModel.type(),
 
     // objects in topology view
-    topology: async (root, args, { mongoModel }) => {
-      const resources = await mongoModel.resource(args);
+    topology: async (root, args, { mongoModel, clusterModel }) => {
+      const clusters = await clusterModel.getClusters();
+      const resources = await mongoModel.resource({
+        ...args,
+        clusters: clusters.map(c => c.metadata.name),
+      });
       const resourceUids = new Set(resources.map(res => res.uid));
       const relationships = resources.reduce((accum, res) => {
         if (res.relationships && res.relationships.length) {

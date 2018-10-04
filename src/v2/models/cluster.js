@@ -25,7 +25,7 @@ function getStatus(cluster) {
 }
 
 export default class ClusterModel extends KubeModel {
-  async getClusters(args) {
+  async getClusters(args = {}) {
     const [clusters, clusterstatuses] = await Promise.all([
       this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
       this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
