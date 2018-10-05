@@ -47,17 +47,17 @@ describe('Application Resolver', () => {
       });
   });
 
-  // TODO: another test with MatchExpressions - deployables & placementPolicies
-  test('Correctly Resolves Deployables Query - MatchLabels', (done) => {
+
+  test('Correctly Resolves Deployables Query - MatchNames', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         {
           deployables(selector:{
-            matchLabels: {
-              hcmapp: "app02"
-            }
+            matchNames:[{
+              name: "deployable01"
+            }]
           }) {
             deployer {
               chartName
@@ -89,9 +89,9 @@ describe('Application Resolver', () => {
         query: `
         {
           placementPolicies(selector:{
-             matchLabels:{
-              hcmapp:"app02"
-            }
+             matchNames:[{
+              name:"placement02"
+            }]
           }) {
             clusterSelector
             metadata {

@@ -10,42 +10,8 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
-// use selector to filter objects by labels
-const getSelected = (selector, items) => {
-  const { matchLabels, matchExpressions } = selector;
-  return items.filter(({ metadata: { labels } }) => {
-    let r = false;
-    const keys = Object.keys(labels);
-    for (let i = 0; i < keys.length && !r;) {
-      const key = keys[i];
-      if (matchLabels) {
-        r = ((Object.keys(matchLabels).lastIndexOf(key) > -1 &&
-                     labels[key] === matchLabels[key]));
-      } else if (matchExpressions) {
-        for (let j = 0; j < matchExpressions.length && !r;) {
-          const { key: k, operator = '', values = [] } = matchExpressions[j];
-          switch (operator.toLowerCase()) {
-            case 'in':
-              if (labels[k] && values.indexOf(labels[k]) !== -1) {
-                r = true;
-              }
-              break;
-
-            case 'notin':
-              // TODO
-              break;
-
-            default:
-              break;
-          }
-          j += 1;
-        }
-      }
-      i += 1;
-    }
-    return r;
-  });
-};
+const filterByName = (names, items) =>
+  items.filter(item => names.find(name => name.name === item.metadata.name));
 
 export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
@@ -115,17 +81,38 @@ export default class ApplicationModel extends KubeModel {
     }
 
     return apps.map(app => ({
+      applicationRelationships: app.status.ApplicationRelationships,
       dashboard: app.status.Dashboard,
+      deployableNames: app.status.Deployables,
+      placementPolicyNames: app.status.PlacementPolicies,
       metadata: app.metadata,
       raw: app,
       selector: app.spec.selector,
     }));
   }
 
-  async getDeployables(selector) {
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`);
+  async getApplicationRelationships(selector = {}) {
+    const { matchNames } = selector;
 
-    return getSelected(selector, response).map(deployable => ({
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applicationrelationships`);
+    const appRelationships = matchNames ? filterByName(matchNames, response) : response;
+
+    return appRelationships.map(ar => ({
+      destination: ar.spec.destination,
+      metadata: ar.metadata,
+      raw: ar,
+      source: ar.spec.source,
+      type: ar.spec.type,
+    }));
+  }
+
+  async getDeployables(selector = {}) {
+    const { matchNames } = selector;
+
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`);
+    const deployables = matchNames ? filterByName(matchNames, response) : response;
+
+    return deployables.map(deployable => ({
       dependencies: deployable.spec.dependencies && deployable.spec.dependencies.map(dep => ({
         name: dep.destination.name,
         kind: dep.destination.kind,
@@ -136,10 +123,13 @@ export default class ApplicationModel extends KubeModel {
     }));
   }
 
-  async getPlacementPolicies(selector) {
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`);
+  async getPlacementPolicies(selector = {}) {
+    const { matchNames } = selector;
 
-    return getSelected(selector, response).map(pp => ({
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`);
+    const placementPolicies = matchNames ? filterByName(matchNames, response) : response;
+
+    return placementPolicies.map(pp => ({
       clusterSelector: pp.spec.clusterSelector,
       metadata: pp.metadata,
       raw: pp,

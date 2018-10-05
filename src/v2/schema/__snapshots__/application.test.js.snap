@@ -108,7 +108,7 @@ Object {
 }
 `;
 
-exports[`Application Resolver Correctly Resolves Deployables Query - MatchLabels 1`] = `
+exports[`Application Resolver Correctly Resolves Deployables Query - MatchNames 1`] = `
 Object {
   "data": Object {
     "deployables": Array [
@@ -121,7 +121,7 @@ Object {
           "version": "0.3.1",
         },
         "metadata": Object {
-          "name": "deployable02-a",
+          "name": "deployable01",
         },
       },
       Object {
@@ -133,31 +133,7 @@ Object {
           "version": "0.3.1",
         },
         "metadata": Object {
-          "name": "deployable02-b",
-        },
-      },
-      Object {
-        "dependencies": null,
-        "deployer": Object {
-          "chartName": "nginx-lego",
-          "namespace": "default",
-          "repository": "google",
-          "version": "0.3.1",
-        },
-        "metadata": Object {
-          "name": "deployable02-a",
-        },
-      },
-      Object {
-        "dependencies": null,
-        "deployer": Object {
-          "chartName": "nginx-lego",
-          "namespace": "default",
-          "repository": "google",
-          "version": "0.3.1",
-        },
-        "metadata": Object {
-          "name": "deployable02-b",
+          "name": "deployable01",
         },
       },
     ],

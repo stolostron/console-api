@@ -155,17 +155,17 @@ export const mockSingleAppResponse = {
       },
     },
     status: {
-      Deployable: {
-        metadata: {
-          creationTimestamp: null,
+      Dashboard: 'https://9.42.81.167:8443/grafana/dashboard/db/jorge-sample-01-dashboard-via-federated-prometheus',
+      Deployables: [
+        {
+          name: 'deployable01',
         },
-        spec: {
-          deployer: {
-            helm: {},
-          },
+      ],
+      PlacementPolicies: [
+        {
+          name: 'placement01',
         },
-        status: {},
-      },
+      ],
     },
   },
 };

@@ -8,8 +8,9 @@
  ****************************************************************************** */
 
 export const typeDef = `
-# HCM Application
+# MCM Application
 type Application implements K8sObject {
+  applicationRelationships: [ApplicationRelationship]
   # URL to Grafana Dashboard
   dashboard: String
   deployables: [Deployable]
@@ -18,6 +19,15 @@ type Application implements K8sObject {
   # The object's yaml definition in JSON format.
   raw: JSON
   selector: JSON
+}
+
+type ApplicationRelationship implements K8sObject {
+  destination: DeployableDependency
+  metadata: Metadata
+  source: DeployableDependency
+  type: String
+  # The object's yaml definition in JSON format.
+  raw: JSON
 }
 
 type Deployable implements K8sObject {
@@ -59,8 +69,12 @@ export const resolver = {
     placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
   },
   Application: {
-    deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(root.selector),
-    placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(root.selector),
+    applicationRelationships: (parent, args, { applicationModel }) =>
+      applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
+    deployables: (parent, args, { applicationModel }) =>
+      applicationModel.getDeployables({ matchNames: parent.deployableNames }),
+    placementPolicies: (parent, args, { applicationModel }) =>
+      applicationModel.getPlacementPolicies({ matchNames: parent.placementPolicyNames }),
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args.resources),
