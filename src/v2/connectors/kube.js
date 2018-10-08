@@ -79,8 +79,9 @@ export default class KubeConnector {
    *
    * @param {*} urlTemplate - function from namespace to url path
    * @param {*} opts - default namespace list override
+   * @param {*} opts - kind of returned items--used to create valid k8s yaml
    */
-  async getResources(urlTemplate, { namespaces } = {}) {
+  async getResources(urlTemplate, { namespaces, kind } = {}) {
     const namespaceList = (namespaces || this.namespaces);
 
     const requests = namespaceList.map(async (ns) => {
@@ -97,7 +98,10 @@ export default class KubeConnector {
         return [];
       }
 
-      return response.items ? response.items : [response];
+      return (response.items ? response.items : [response]).map(item => (kind ? Object.assign({
+        apiVersion: response.apiVersion,
+        kind,
+      }, item) : item));
     });
 
     return _.flatten(await Promise.all(requests));

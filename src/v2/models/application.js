@@ -109,7 +109,10 @@ export default class ApplicationModel extends KubeModel {
   async getDeployables(selector = {}) {
     const { matchNames } = selector;
 
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`);
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`,
+      { kind: 'Deployable' },
+    );
     const deployables = matchNames ? filterByName(matchNames, response) : response;
 
     return deployables.map(deployable => ({
@@ -126,7 +129,10 @@ export default class ApplicationModel extends KubeModel {
   async getPlacementPolicies(selector = {}) {
     const { matchNames } = selector;
 
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`);
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
+      { kind: 'PlacementPolicy' },
+    );
     const placementPolicies = matchNames ? filterByName(matchNames, response) : response;
 
     return placementPolicies.map(pp => ({

@@ -37,7 +37,10 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,json}": ["eslint --fix", "git add"]
+    "*.{js,jsx,json}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "dependencies": {
     "@icp/security-middleware": "^2.0.19",
