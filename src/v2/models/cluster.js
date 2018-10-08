@@ -44,6 +44,7 @@ export default class ClusterModel extends KubeModel {
         status: getStatus(cluster),
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
+        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
       };
 
       const memoryUsage = _.get(clusterstatus, 'spec.usage.memory');

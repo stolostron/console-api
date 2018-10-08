@@ -10,6 +10,7 @@
 export const typeDef = `
 type Cluster implements K8sObject {
   clusterip: String
+  consoleURL: String
   metadata: Metadata
   nodes: Int
   status: String
