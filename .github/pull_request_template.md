@@ -1,5 +1,5 @@
-*Related Issue*: IBMPrivateCloud/roadmap/issues/<ISSUE_NUMBER>
+**Related Issue:** [closes|resolves|fixes] IBMPrivateCloud/roadmap/issues/<ISSUE_NUMBER>
 
-*Description of Changes*
+**Description of Changes**
 
 - [ ] I wrote test cases to cover new code

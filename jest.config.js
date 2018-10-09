@@ -35,6 +35,7 @@ const jestConfig = {
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
+    '!src/**/mocks/*.js',
   ],
   testEnvironment: 'node',
 };
