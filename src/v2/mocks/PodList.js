@@ -205,8 +205,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://47f0f774f50c49b4c1eeddb1da0d05af9528dff863af2b1b17e633d629da88a7',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-mariadb',
                     ready: true,
@@ -271,8 +271,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://779be17a3c2d7e334dbfb35e228593d28a03662ffeec305fcabef49eb26dbd93',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-auth-service',
                     ready: true,
@@ -289,8 +289,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://654f46f1e89990274ec1d4b72059161eefa59ce9ad61413e4600cd9782e1f7cd',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-identity-provider',
                     ready: true,
@@ -307,8 +307,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://0b66495bda28e8b09e2d445870157d62827ce17bfdec90d0071a31a6f83dc556',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-identity-manager',
                     ready: true,
@@ -325,8 +325,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://fee90055bc80fe7be3680e22cb5122b41e9772a99056a9cd399bf562fffcb909',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-token-service',
                     ready: true,
@@ -343,8 +343,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://8e2e28f54f16090e35235fe7b2757ccf8474a4b61ae11f838c63aa9b1c782f3c',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-pap',
                     ready: true,
@@ -501,8 +501,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://08b0b691e8b02b640aeda5820fc234252c15c94d02657771f906a930d379616a',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/curl:4.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/curl@sha256:aad05b4e4529f7e70516d8d3028cae6cd1d50de738ce164f2a532ce2470ac43f',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/curl:4.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/curl@sha256:aad05b4e4529f7e70516d8d3028cae6cd1d50de738ce164f2a532ce2470ac43f',
                     lastState: {},
                     name: 'init-adapter',
                     ready: true,
@@ -613,8 +613,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://9cb372fa6ceb39c72551dc12e331918b902e15fdee96c89e1562364e7236c4e8',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-repo-init:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-repo-init@sha256:d3ecde67a30db99d10a32173cc2fee8766bb42430feb2f819179c8dcf494dac1',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-repo-init:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-repo-init@sha256:d3ecde67a30db99d10a32173cc2fee8766bb42430feb2f819179c8dcf494dac1',
                     lastState: {},
                     name: 'helm-repo-init',
                     ready: true,
@@ -702,8 +702,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://d8cb2983e3898a00f83bff098d48af8722e2db6a4fd99f68952b0433bff6d794',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb-install:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb-install@sha256:2af230c02246f0405a8174b32970426cfac83a8e9341a0a831069c15ed6a2d88',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb-install:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb-install@sha256:2af230c02246f0405a8174b32970426cfac83a8e9341a0a831069c15ed6a2d88',
                     lastState: {},
                     name: 'install',
                     ready: true,
@@ -720,8 +720,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://ef96c69e9cee747f0ba9997bb2a264b1b84b787a43b606ae2041f01581cfe16e',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb@sha256:a305ae8bc309898d86bf60aee968846db3602f77b25924640d5f08a2389ee99d',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb@sha256:a305ae8bc309898d86bf60aee968846db3602f77b25924640d5f08a2389ee99d',
                     lastState: {},
                     name: 'bootstrap',
                     ready: true,
@@ -924,8 +924,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://81f6804827de2e5f93d386c79c54da5d3d54a781d59da2629d7788d17b901b13',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'sysctl',
                     ready: true,
@@ -942,8 +942,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://96b489db8e022622d1a25c04d5532d3b7ecaaf869f335eac16f9cabcdbadaae8',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
                     lastState: {},
                     name: 'plugin-bundle',
                     ready: true,
@@ -985,8 +985,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://4e7cebce062c51c706e456d646a02fd0e327aacfa9a0db52dc64fb21cafc7bfb',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'chmod',
                     ready: true,
@@ -1003,8 +1003,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://6e697b1c35675c4b76d1008ca543618c70397574e8027a6ac4a407fea0681e83',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'sysctl',
                     ready: true,
@@ -1021,8 +1021,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://73341275f004dcdcdcc84a2c2c57b9365232d8bc194c126f559f6e3693a27563',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
                     lastState: {},
                     name: 'plugin-bundle',
                     ready: true,
@@ -1202,8 +1202,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://fb1c89425c7b646605a46de71b5b687a77b4444501003701d920a39095eacb49',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'sysctl',
                     ready: true,
@@ -1220,8 +1220,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://556960484c041dfd82bc535477e97ca5523897de485969a9f2b7907a3ace29fa',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard:2.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/elasticsearch-plugin-searchguard@sha256:28f88d06bbbc073162702064c1be4ad06272e9021cbc0f929ba8c6da2ca25ae6',
                     lastState: {},
                     name: 'plugin-bundle',
                     ready: true,
@@ -1559,8 +1559,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://5e76c2d64a73bfac2835036943fa5415822c8a75d811104e4bcb2a637802e02f',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
                     lastState: {},
                     name: 'metering-dm-init',
                     ready: true,
@@ -1602,8 +1602,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://ba09f9d8aae1beecfd637e7bd786897e369c5ded81492e4a7808dba89be7765e',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
                     lastState: {},
                     name: 'metering-reader-init',
                     ready: true,
@@ -1645,8 +1645,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://250d08c4fc71c849947357b9eac5f3ff2d3744cca9ce3b942682ce929ec10008',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
                     lastState: {},
                     name: 'metering-reader-init',
                     ready: true,
@@ -1688,8 +1688,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://f835f47bb87d8305de2ecdca295fdb7507f423e80285cd7c3b1ac458cccacd40',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
                     lastState: {},
                     name: 'metering-reader-init',
                     ready: true,
@@ -1731,8 +1731,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://11ea8b206992663d81eb9a394c89e11203301c6bf8b0b1848d1955d4b20f7f22',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:7462cf0021420e0c8f1667f0c79cd50fb432dbcdb543b7bd8e908f45fb4f8541',
                     lastState: {},
                     name: 'metering-ui-init',
                     ready: true,
@@ -1797,8 +1797,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://d7dd74c852721148362ca53e6ff6109c70927bf7885a12f0fbaf846959db6913',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-repo-init:latest',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-repo-init@sha256:d3ecde67a30db99d10a32173cc2fee8766bb42430feb2f819179c8dcf494dac1',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-repo-init:latest',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-repo-init@sha256:d3ecde67a30db99d10a32173cc2fee8766bb42430feb2f819179c8dcf494dac1',
                     lastState: {},
                     name: 'mgmt-repo-init',
                     ready: true,
@@ -1840,8 +1840,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://fe8406d0e08a43b7406045c7104d599e8fe3e680c1cb66e5387e7dc5d8c63e73',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'init-container',
                     ready: true,
@@ -1883,8 +1883,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://47d6c60239e642151c76550ea7461fb400eac529fc293766d4a0812cadcacbb9',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer:1.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer:1.0.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-initcontainer@sha256:d6eda1410b93902ac84bdd775167c84ab59e5abadad88791d742fea93b161e93',
                     lastState: {},
                     name: 'init-container',
                     ready: true,
@@ -2087,8 +2087,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://e6d631089964fb5597d744706f4612142b313926a8fda03f6ab958b691cfdc01',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/defaultbackend:1.2.1',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/defaultbackend@sha256:3e1b41e424a55a35c891807b5e8145d0ba864870e530b31b6486fe5b57dd4b67',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/defaultbackend:1.2.1',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/defaultbackend@sha256:3e1b41e424a55a35c891807b5e8145d0ba864870e530b31b6486fe5b57dd4b67',
                     lastState: {},
                     name: 'sysctl',
                     ready: true,
@@ -2130,8 +2130,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://90425e2a55b284030c7ee378c7d0b22be24c9465a2dd5304a59bf7c215808ccb',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin:1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin:1.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
                     lastState: {},
                     name: 'nvidia-driver-collector',
                     ready: true,
@@ -2173,8 +2173,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://69663bb5cbe18828662b7e5c5a0305a5ba96a8104e4dc0fc43deac3f1614cb3e',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin:1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin:1.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
                     lastState: {},
                     name: 'nvidia-driver-collector',
                     ready: true,
@@ -2216,8 +2216,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://8c3918acdad3debefd1eeb5a50be2415cc3b022c5f19ef42a71ac613ad0d3a26',
-                    image: 'hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin:1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-stable-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
+                    image: 'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin:1.0',
+                    imageID: 'docker-pullable://mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin@sha256:942409442ce419e829286a1163c68c11d2cd9c22337403ce30eddffd2705e1bc',
                     lastState: {},
                     name: 'nvidia-driver-collector',
                     ready: true,

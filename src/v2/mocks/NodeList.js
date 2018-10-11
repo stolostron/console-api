@@ -188,8 +188,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
                     ],
                     sizeBytes: 625360968,
                   },
@@ -322,15 +322,15 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd:latest',
                     ],
                     sizeBytes: 263074524,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     ],
                     sizeBytes: 248202699,
                   },
@@ -642,8 +642,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
                     ],
                     sizeBytes: 625360968,
                   },
@@ -721,15 +721,15 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd:latest',
                     ],
                     sizeBytes: 263074524,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     ],
                     sizeBytes: 248202699,
                   },
@@ -847,15 +847,15 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin@sha256:d10d32c8da9e2a84d1b24c119860c182a2f4012920ae95ca2b568183c8fecc28',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin:1.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin@sha256:d10d32c8da9e2a84d1b24c119860c182a2f4012920ae95ca2b568183c8fecc28',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin:1.0',
                     ],
                     sizeBytes: 131957096,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:b7090dbc413337c0cd2202e11268e5a78d66f463bce1cd0762dacfcff4ae4720',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:b7090dbc413337c0cd2202e11268e5a78d66f463bce1cd0762dacfcff4ae4720',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
                     ],
                     sizeBytes: 121836595,
                   },
@@ -1079,29 +1079,29 @@ export const mockResponse = {
                 images: [
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:80c45aa6622414f6f1e6ce70f91a31866206bf3f3ab0ec381cdc94760b053afb',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:80c45aa6622414f6f1e6ce70f91a31866206bf3f3ab0ec381cdc94760b053afb',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-auth:latest',
                     ],
                     sizeBytes: 1027982284,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-token-service@sha256:99ad42b79892b944f3f7cfc03e6e358859eb8141e47174e5eb58f57c585b6e94',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-token-service:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-token-service@sha256:99ad42b79892b944f3f7cfc03e6e358859eb8141e47174e5eb58f57c585b6e94',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-token-service:latest',
                     ],
                     sizeBytes: 1020060844,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-inception@sha256:5def88182f3402bb64a5ee978cb85005ff724b55c67700af0482a992f3258e9d',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-inception:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-inception@sha256:5def88182f3402bb64a5ee978cb85005ff724b55c67700af0482a992f3258e9d',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-inception:latest',
                     ],
                     sizeBytes: 738410806,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-administration@sha256:78688702a1bf006d6124af8e23259461cb910d19a6fc16cf14947980c8e1bea8',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-administration:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-policy-administration@sha256:78688702a1bf006d6124af8e23259461cb910d19a6fc16cf14947980c8e1bea8',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-policy-administration:latest',
                     ],
                     sizeBytes: 713412769,
                   },
@@ -1114,29 +1114,29 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube@sha256:af41d0acf265ac11e8b76947d5c05fa6a0f273ff2b04ccf8c9f6357d7814c127',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/hyperkube:v1.11.1-ee',
                     ],
                     sizeBytes: 625360968,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-api@sha256:434baceb922084d6b98fd097eb4c95b5cd30757c738e1ffb12970efaee35152c',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-api:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-api@sha256:434baceb922084d6b98fd097eb4c95b5cd30757c738e1ffb12970efaee35152c',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-api:latest',
                     ],
                     sizeBytes: 601136564,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-decision@sha256:120e9056131a9f8e5c63bdb839432739f2bf90653b931dcadde3146a2ad2967a',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-decision:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-policy-decision@sha256:120e9056131a9f8e5c63bdb839432739f2bf90653b931dcadde3146a2ad2967a',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/iam-policy-decision:latest',
                     ],
                     sizeBytes: 561570578,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/mariadb@sha256:7ae15760bc26d232feefcd6b085bc5abc765b144c079e7b95ad48a0055c720b7',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/mariadb:10.2.14',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/mariadb@sha256:7ae15760bc26d232feefcd6b085bc5abc765b144c079e7b95ad48a0055c720b7',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/mariadb:10.2.14',
                     ],
                     sizeBytes: 445733061,
                   },
@@ -1149,77 +1149,77 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-ui@sha256:07b78b936c6de5607251e8d6724a1d0346e1857d23b0f40a142911a711bde5ce',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-ui:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-ui@sha256:07b78b936c6de5607251e8d6724a1d0346e1857d23b0f40a142911a711bde5ce',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-ui:latest',
                     ],
                     sizeBytes: 385091881,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb@sha256:a305ae8bc309898d86bf60aee968846db3602f77b25924640d5f08a2389ee99d',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb@sha256:a305ae8bc309898d86bf60aee968846db3602f77b25924640d5f08a2389ee99d',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb:latest',
                     ],
                     sizeBytes: 379353410,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-ui@sha256:b7050b6080978c47e846891619f7d80bd29be424e185e96ec06edaea54be6117',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-ui:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-ui@sha256:b7050b6080978c47e846891619f7d80bd29be424e185e96ec06edaea54be6117',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-ui:latest',
                     ],
                     sizeBytes: 361686937,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nginx-ingress-controller@sha256:63b48dd3ba635aa65409f7d6a319e293697810c1b9e885e6255bebf36a2506ab',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nginx-ingress-controller:0.16.2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nginx-ingress-controller@sha256:63b48dd3ba635aa65409f7d6a319e293697810c1b9e885e6255bebf36a2506ab',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nginx-ingress-controller:0.16.2',
                     ],
                     sizeBytes: 361632894,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-manager@sha256:95b0a7db314200186ffb060540c7f0b50b9986fe221260644d877661b897c987',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-manager:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-identity-manager@sha256:95b0a7db314200186ffb060540c7f0b50b9986fe221260644d877661b897c987',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-identity-manager:latest',
                     ],
                     sizeBytes: 269418178,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd@sha256:78202eba44723660b3b12597fb79487cd6a00612721f84d6373ea66c8121e5e2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/fluentd:latest',
                     ],
                     sizeBytes: 263074524,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     ],
                     sizeBytes: 248202699,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/grafana@sha256:dc3566257a0c716caedfb33127d8ee385290c1dda006bebfb75c376d56b30c88',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/grafana:5.2.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/grafana@sha256:dc3566257a0c716caedfb33127d8ee385290c1dda006bebfb75c376d56b30c88',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/grafana:5.2.0',
                     ],
                     sizeBytes: 245297582,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service@sha256:8bd160a67d3fc9ea6d80f4fdcb535c007479a224afc7941a2ee4c1217ffb7130',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-audit-service@sha256:8bd160a67d3fc9ea6d80f4fdcb535c007479a224afc7941a2ee4c1217ffb7130',
                     ],
                     sizeBytes: 236831824,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service@sha256:c5ffd3a80bb1e6382b1b080ee0bd8228eef81f95a8645ed88e2af8f822c1ec74',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-audit-service@sha256:c5ffd3a80bb1e6382b1b080ee0bd8228eef81f95a8645ed88e2af8f822c1ec74',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-audit-service:latest',
                     ],
                     sizeBytes: 236831717,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-provider@sha256:4596276c9865b743c75a8213e6afa9d27ea6e7ece5570ecd80b8c19c875cad3c',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-provider:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-identity-provider@sha256:4596276c9865b743c75a8213e6afa9d27ea6e7ece5570ecd80b8c19c875cad3c',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-identity-provider:latest',
                     ],
                     sizeBytes: 223635697,
                   },
@@ -1233,54 +1233,54 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-deploy@sha256:56967a581ce6503981da69a429c13f10cf41e504ea9fb3fae00d71991cf9fa05',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-deploy:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-deploy@sha256:56967a581ce6503981da69a429c13f10cf41e504ea9fb3fae00d71991cf9fa05',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-platform-deploy:latest',
                     ],
                     sizeBytes: 140448414,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-api@sha256:edec9fabcc7a7c0036e5a01eb4a74881abe2de89d7eab72f1af36e999bed0a01',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-api:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-api@sha256:edec9fabcc7a7c0036e5a01eb4a74881abe2de89d7eab72f1af36e999bed0a01',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-api:latest',
                     ],
                     sizeBytes: 140382349,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin@sha256:d10d32c8da9e2a84d1b24c119860c182a2f4012920ae95ca2b568183c8fecc28',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/nvidia-device-plugin:1.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin@sha256:d10d32c8da9e2a84d1b24c119860c182a2f4012920ae95ca2b568183c8fecc28',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/nvidia-device-plugin:1.0',
                     ],
                     sizeBytes: 131957096,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager@sha256:b7090dbc413337c0cd2202e11268e5a78d66f463bce1cd0762dacfcff4ae4720',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metering-data-manager:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager@sha256:b7090dbc413337c0cd2202e11268e5a78d66f463bce1cd0762dacfcff4ae4720',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metering-data-manager:latest',
                     ],
                     sizeBytes: 121836595,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-management-ingress@sha256:5eed3f651381d88d053598c6712f9799a75b6be67edf64ec28f998ba91f40a11',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-management-ingress@sha256:5eed3f651381d88d053598c6712f9799a75b6be67edf64ec28f998ba91f40a11',
                       'registry.ng.bluemix.net/mdelder/icp-management-ingress@sha256:011ce3956aa9c3e304f03145631407b53eed17a20c02fb1c85edcf1d8e9cb6fa',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-management-ingress:2.2.1',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-management-ingress:2.2.1',
                       'registry.ng.bluemix.net/mdelder/icp-management-ingress:2.2.0',
                     ],
                     sizeBytes: 74427848,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/heapster@sha256:9fb15b54720e1ee1522b946c35d3c30ef027666ddaa74f563668568ecb8ab77f',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/heapster@sha256:9fb15b54720e1ee1522b946c35d3c30ef027666ddaa74f563668568ecb8ab77f',
                       'registry.ng.bluemix.net/mdelder/heapster@sha256:3f09bf1a06d40a65b16cf2de708d35072b5991d1d99433a83ab9056c429ec982',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/heapster:v1.4.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/heapster:v1.4.0',
                       'registry.ng.bluemix.net/mdelder/heapster:v1.4.0',
                     ],
                     sizeBytes: 73395475,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
                     ],
                     sizeBytes: 68849270,
                   },
@@ -1293,8 +1293,8 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/tiller@sha256:e0ace1f8e62fce2329e9ade315e483ad3240c7384afa0ad5878f96d9a8521e04',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/tiller:v2.9.1-icp',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/tiller@sha256:e0ace1f8e62fce2329e9ade315e483ad3240c7384afa0ad5878f96d9a8521e04',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/tiller:v2.9.1-icp',
                     ],
                     sizeBytes: 60063986,
                   },
@@ -1307,135 +1307,135 @@ export const mockResponse = {
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-kube-controllers@sha256:0517bb47bc0f1f79695cbb244a033f00f45613cd9d4df3b49cab384cecdab63c',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-kube-controllers@sha256:0517bb47bc0f1f79695cbb244a033f00f45613cd9d4df3b49cab384cecdab63c',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
                     ],
                     sizeBytes: 54985151,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/k8s-prometheus-adapter@sha256:836b00cb9848b3843a957d6bdde1bb0827ab47195a1faf3c553a692342e2abfa',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/k8s-prometheus-adapter@sha256:836b00cb9848b3843a957d6bdde1bb0827ab47195a1faf3c553a692342e2abfa',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1',
                     ],
                     sizeBytes: 52134773,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19291',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19291',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
                     ],
                     sizeBytes: 51824801,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/unified-router@sha256:4cbaae5103bb0cc547874d7c268818c085ce347b06f27d226048f06ad926ce82',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/unified-router@sha256:4cbaae5103bb0cc547874d7c268818c085ce347b06f27d226048f06ad926ce82',
                       'registry.ng.bluemix.net/mdelder/unified-router@sha256:d2d40536739fdd5edc086120b74bf9dbe3e911bd56240d4ce4d0cae466f5688c',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/unified-router:2.2.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/unified-router:2.2.0',
                       'registry.ng.bluemix.net/mdelder/unified-router:2.2.0',
                     ],
                     sizeBytes: 48739310,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/coredns@sha256:ab8aec91742937058f6b307efbd411ba8b49c5392a757431b00fda4bdd4fa588',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/coredns:1.1.3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/coredns@sha256:ab8aec91742937058f6b307efbd411ba8b49c5392a757431b00fda4bdd4fa588',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/coredns:1.1.3',
                     ],
                     sizeBytes: 45587362,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/service-catalog-service-catalog@sha256:f9afa14edf6263868caea1a40b4df3ae03eb90f0318b73de3505ffc8316d4915',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/service-catalog-service-catalog:v0.1.26-icp',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/service-catalog-service-catalog@sha256:f9afa14edf6263868caea1a40b4df3ae03eb90f0318b73de3505ffc8316d4915',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/service-catalog-service-catalog:v0.1.26-icp',
                     ],
                     sizeBytes: 42868920,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metrics-server@sha256:220c0ed3451cb95e4b2f72dd5dc8d9d39d9f529722e5b29d8286373ce27b117e',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metrics-server@sha256:220c0ed3451cb95e4b2f72dd5dc8d9d39d9f529722e5b29d8286373ce27b117e',
                       'registry.ng.bluemix.net/mdelder/metrics-server@sha256:f4d4d642cc9ca7cc4e4ca7d68afdf5adf62e6f1d01fa02d60310eefb573830af',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/metrics-server:v0.2.1',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/metrics-server:v0.2.1',
                       'registry.ng.bluemix.net/mdelder/metrics-server:v0.2.1',
                     ],
                     sizeBytes: 42541759,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/ibmcloud-image-enforcement@sha256:bb1aef5d62ff20e0eab07da0341b8377c7b617d402f7f1799a62883be70a0e81',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/ibmcloud-image-enforcement:0.2.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/ibmcloud-image-enforcement@sha256:bb1aef5d62ff20e0eab07da0341b8377c7b617d402f7f1799a62883be70a0e81',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/ibmcloud-image-enforcement:0.2.0',
                     ],
                     sizeBytes: 40040099,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/etcd@sha256:eef4e8dde97cc2f02a4fcafa7e15a9e0a4ab55c203e758f9ccf735fae06a0f1e',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/etcd:v3.2.18',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/etcd@sha256:eef4e8dde97cc2f02a4fcafa7e15a9e0a4ab55c203e758f9ccf735fae06a0f1e',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/etcd:v3.2.18',
                     ],
                     sizeBytes: 37232444,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/alertmanager@sha256:55c0d339205048ba46522ac3495bfcf9848669d39ea71b950bf6da86fc2d4f1b',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/alertmanager:v0.15.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/alertmanager@sha256:55c0d339205048ba46522ac3495bfcf9848669d39ea71b950bf6da86fc2d4f1b',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/alertmanager:v0.15.0',
                     ],
                     sizeBytes: 36095602,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/kube-state-metrics@sha256:5b1c49bf1e47ea731db9b162115e847278de9a0c4ce390f96b22e8b373880cc9',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/kube-state-metrics:v1.3.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/kube-state-metrics@sha256:5b1c49bf1e47ea731db9b162115e847278de9a0c4ce390f96b22e8b373880cc9',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/kube-state-metrics:v1.3.0',
                     ],
                     sizeBytes: 35646776,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-secret-watcher@sha256:d87f6ac5bbe4fb314fbb5da82e72f518d5db1cc3dd8055f1eb662d5a2ee1058c',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-secret-watcher:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-secret-watcher@sha256:d87f6ac5bbe4fb314fbb5da82e72f518d5db1cc3dd8055f1eb662d5a2ee1058c',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-secret-watcher:latest',
                     ],
                     sizeBytes: 33967521,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/registry@sha256:feb40d14cd33e646b9985e2d6754ed66616fedb840226c4d917ef53d616dcd6c',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/registry@sha256:feb40d14cd33e646b9985e2d6754ed66616fedb840226c4d917ef53d616dcd6c',
                       'registry.ng.bluemix.net/mdelder/registry@sha256:1de51579c6fa8db2957e77f024bd330d6a698a5ea868ea9bdb52431b8166482d',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/registry:2.6.2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/registry:2.6.2',
                       'registry.ng.bluemix.net/mdelder/registry:2.6.2',
                     ],
                     sizeBytes: 33281203,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-rudder@sha256:21c9ed4f96db88465ebafc1342ab031bf6df7ed9e29ce5c5d52b9c35af8ddbb0',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-helm-rudder:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-rudder@sha256:21c9ed4f96db88465ebafc1342ab031bf6df7ed9e29ce5c5d52b9c35af8ddbb0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-helm-rudder:latest',
                     ],
                     sizeBytes: 28943198,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-image-manager@sha256:641a85eda6db2a6916b5c148198faa4aefa5908b066a61b543d33e1841e8de0e',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-image-manager@sha256:641a85eda6db2a6916b5c148198faa4aefa5908b066a61b543d33e1841e8de0e',
                       'registry.ng.bluemix.net/mdelder/icp-image-manager@sha256:376efb561200186fc6a0390d934a05f7eac1c9199c0506607da5b9fe51b26200',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-image-manager:2.2.2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-image-manager:2.2.2',
                       'registry.ng.bluemix.net/mdelder/icp-image-manager:2.2.2',
                     ],
                     sizeBytes: 25606758,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/node-exporter@sha256:55302581333c43d540db0e144cf9e7735423117a733cdec27716d87254221086',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/node-exporter:v0.16.0',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/node-exporter@sha256:55302581333c43d540db0e144cf9e7735423117a733cdec27716d87254221086',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/node-exporter:v0.16.0',
                     ],
                     sizeBytes: 22915749,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/configmap-reload@sha256:befec9f23d2a9da86a298d448cc9140f56a457362a7d9eecddba192db1ab489e',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/configmap-reload:v0.2.2',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/configmap-reload@sha256:befec9f23d2a9da86a298d448cc9140f56a457362a7d9eecddba192db1ab489e',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/configmap-reload:v0.2.2',
                     ],
                     sizeBytes: 22381476,
                   },
                   {
                     names: [
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb-install@sha256:9a52135768e697b0ae8f1862abddf9724067eef62e2378f78d9619dccb67f2c3',
-                      'hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-mongodb-install:latest',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb-install@sha256:9a52135768e697b0ae8f1862abddf9724067eef62e2378f78d9619dccb67f2c3',
+                      'mock-private-edge-docker.test.ibm.com/ibmcom-amd64/icp-mongodb-install:latest',
                     ],
                     sizeBytes: 15655450,
                   },
