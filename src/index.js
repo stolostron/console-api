@@ -22,8 +22,8 @@ const CONTEXT_PATH = config.get('contextPath');
 
 const graphQLServer = require('./v2').default;
 
-const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/hcmuiapi.key', 'utf8');
-const certificate = fs.readFileSync(process.env.serverCert || './sslcert/hcmuiapi.crt', 'utf8');
+const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/mcmuiapi.key', 'utf8');
+const certificate = fs.readFileSync(process.env.serverCert || './sslcert/mcmuiapi.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const server = https.createServer(credentials, graphQLServer);

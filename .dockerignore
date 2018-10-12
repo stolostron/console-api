@@ -20,7 +20,6 @@ manifest.yaml
 state
 test-output
 travis-env.sh
-.bablerc
 .dockerignore
 .eslint*
 .nvmrc
