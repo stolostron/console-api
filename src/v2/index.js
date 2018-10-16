@@ -14,6 +14,7 @@ import bodyParser from 'body-parser';
 import { app as inspect } from '@icp/security-middleware';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
@@ -47,6 +48,7 @@ const formatError = (error) => {
 };
 
 const graphQLServer = express();
+graphQLServer.use(compression());
 
 const requestLogger = isProd ?
   morgan('combined', {
