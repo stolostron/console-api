@@ -19,7 +19,6 @@ describe('Pods Resolver', () => {
         {
           pods {
             cluster {
-              clusterip
               metadata {
                 name
               }

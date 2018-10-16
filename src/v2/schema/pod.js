@@ -43,8 +43,6 @@ export const resolver = {
     pods: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'pods' }),
   },
   Pod: {
-    cluster: (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
     images: parent => resolveImages(parent),
   },
 };

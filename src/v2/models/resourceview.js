@@ -12,7 +12,7 @@ import KubeModel from './kube';
 import { isRequired } from '../lib/utils';
 
 const formatPod = (clusterName, pod) => ({
-  cluster: clusterName,
+  cluster: { metadata: { name: clusterName } },
   containers: pod.spec.containers,
   hostIP: pod.status.hostIP,
   metadata: pod.metadata,
