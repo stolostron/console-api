@@ -86,8 +86,8 @@ export default class ClusterModel extends KubeModel {
 
       accum.push({
         metadata: cluster.metadata,
-        nodes: cluster.spec.capacity.nodes,
-        pods: cluster.spec.usage.pods,
+        nodes: _.get(cluster, 'spec.capacity.nodes'),
+        pods: _.get(cluster, 'spec.usage.pods'),
         ip: cluster.spec.masterAddresses[0].ip,
         memoryUtilization: getPercentage(
           cluster.spec.usage.memory,

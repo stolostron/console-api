@@ -222,7 +222,7 @@ export default class KubeConnector {
     if (resource.status === 'Failure' || resource.code >= 400) {
       throw new Error(`Create Resource View Failed [${resource.code}] - ${resource.message}`);
     }
-    const { cancel, promise: pollPromise } = this.pollView(resource.metadata.selfLink);
+    const { cancel, promise: pollPromise } = this.pollView(_.get(resource, 'metadata.selfLink'));
 
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);

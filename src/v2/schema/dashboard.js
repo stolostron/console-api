@@ -11,32 +11,16 @@ import { GenericError } from '../../v2/lib/errors';
 import config from '../../../config';
 
 export const typeDef = `
-type TableRow {
-  status: String
-  resourceName: String
-  percentage: Int
-  namespace: String
-  clusterIP: String
-}
 type DashboardCardItem {
   name: String
   type: String
   healthy: Int
   critical: Int
   warning: Int
-  table: [TableRow]
-  error: String
-}
-type DashboardChartItem {
-  name: String
-  # return something looks like [ [[value1, value2, value3], title1] , [[valueA, valueB, valueC], title2] ]
-  # issue created against Carbon: https://github.com/carbon-design-system/carbon-addons-data-viz-react/issues/112
-  data: [[String]]
   error: String
 }
 type DashboardData {
   cardItems: [DashboardCardItem]
-  pieChartItems: [DashboardChartItem]
 }
 `;
 
@@ -116,60 +100,33 @@ function getDashboardCard({
   return cardData;
 }
 
-function getDashboardPieChart({
-  name, statusData, clusterData, transform, status = genericStatus,
-}) {
-  const chartData = statusData.reduce((accum, curr, idx) => {
-    const stat = status(clusterData[idx]);
-    accum.data = (transform(curr, stat, accum.data));
-    return accum;
-  }, {
-    data: { healthy: 0, warning: 0, critical: 0 },
-  });
-  const result = [];
-  // dirty code for supporting Carbon data schema
-  // issue created against Carbon: https://github.com/carbon-design-system/carbon-addons-data-viz-react/issues/112
-  // update this part once Carbon fixed the issue
-  Object.keys(chartData.data).forEach((key) => {
-    const tempResult = [];
-    tempResult.push(key);
-    tempResult.push(chartData.data[key].toString());
-    result.push(tempResult);
-  });
-  return { name, data: result };
-}
-
 const timeout = time => new Promise((resolve, reject) => {
   setTimeout(reject, time, new GenericError({ data: { error: 'Request timed out' } }));
 });
 
 async function getDashboardItems({
-  statusQuery, clusterQuery, cards = [], pieCharts = [],
+  statusQuery, clusterQuery, cards = [],
 }) {
   try {
+    let clusterData = [];
     const statusData = await Promise.race([statusQuery(), timeout(config.get('hcmPollTimeout'))]);
     if (statusData.code || statusData.message) {
       return new GenericError({ data: { error: 'An error occured while getting status data' } });
     }
-    const clusterData = await Promise.race([clusterQuery(), timeout(config.get('hcmPollTimeout'))]);
+    if (clusterQuery) {
+      clusterData = await Promise.race([clusterQuery(), timeout(config.get('hcmPollTimeout'))]);
+    }
     const cardsMap = cards.map(card => getDashboardCard({
       statusData,
       clusterData,
       ...card,
     }));
-    const pieChartsItems = pieCharts.map(chart => getDashboardPieChart({
-      statusData,
-      clusterData,
-      ...chart,
-    }));
     return {
       cardsMap,
-      pieChartsItems,
     };
   } catch (error) {
     return {
       cardsMap: cards.map(({ name }) => ({ name, error })),
-      pieChartsItems: pieCharts.map(({ name }) => ({ name, error })),
     };
   }
 }
@@ -208,6 +165,24 @@ export const resolver = {
       const dashboardItems = await Promise.all([
         getDashboardItems({
           cards: [
+            { name: 'pvs', transform: transformPod, type: 'storage' },
+          ],
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
+        }),
+        getDashboardItems({
+          cards: [
+            { name: 'pods', transform: transformPod, type: 'pods' },
+          ],
+          statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
+        }),
+        getDashboardItems({
+          cards: [
+            { name: 'helm releases', transform: transformRelease, type: 'releases' },
+          ],
+          statusQuery: () => helmModel.getReleases(args),
+        }),
+        getDashboardItems({
+          cards: [
             {
               name: 'cpu',
               transform: transformPercentage('cpuUtilization'),
@@ -223,33 +198,6 @@ export const resolver = {
               transform: transformPercentage('storageUtilization'),
               status: percentageStatus('storageUtilization'),
             },
-          ],
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
-          statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
-        }),
-        getDashboardItems({
-          cards: [
-            { name: 'pvs', transform: transformPod, type: 'storage' },
-          ],
-          statusQuery: () => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
-        }),
-        getDashboardItems({
-          cards: [
-            { name: 'pods', transform: transformPod, type: 'pods' },
-          ],
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
-          statusQuery: () => resourceViewModel.fetchResources({ type: 'pods' }),
-        }),
-        getDashboardItems({
-          cards: [
-            { name: 'helm releases', transform: transformRelease, type: 'releases' },
-          ],
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
-          statusQuery: () => helmModel.getReleases(args),
-        }),
-        getDashboardItems({
-          cards: [
             {
               name: 'clusters',
               transform: transformCluster,
@@ -261,20 +209,15 @@ export const resolver = {
         }),
       ]);
       let allCards = [];
-      let pieChartItems = [];
       if (dashboardItems && dashboardItems.length > 0) {
         dashboardItems.forEach((result) => {
           if (result.cardsMap && result.cardsMap.length > 0) {
             allCards = [...result.cardsMap, ...allCards];
           }
-          if (result.pieChartsItems && result.pieChartsItems.length > 0) {
-            pieChartItems = [...result.pieChartsItems, ...pieChartItems];
-          }
         });
       }
       return {
         cardItems: _.flatten(allCards),
-        pieChartItems,
       };
     },
   },

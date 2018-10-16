@@ -23,17 +23,6 @@ describe('Dashboard Resolver', () => {
               healthy
               critical
               warning
-              table {
-                status
-                clusterIP
-                resourceName
-                percentage
-              }
-              error
-            }
-            pieChartItems {
-              name
-              data
               error
             }
           }
