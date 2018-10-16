@@ -179,26 +179,31 @@ export default class KubeConnector {
     let cancel;
 
     const promise = new Promise(async (resolve, reject) => {
+      let pendingRequest = false;
       const intervalID =
       // eslint-disable-next-line consistent-return
       setInterval(async () => {
-        try {
-          const response = await this.get(resourceViewLink, {}, true);
+        if (!pendingRequest) {
+          pendingRequest = true;
+          try {
+            const response = await this.get(resourceViewLink, {}, true);
+            pendingRequest = false;
 
-          if (response.code || response.message) {
+            if (response.code || response.message) {
+              clearInterval(intervalID);
+              return reject(response);
+            }
+
+            const isComplete = _.get(response, 'status.conditions[0].type', 'NO');
+
+            if (isComplete === 'Completed') {
+              clearInterval(intervalID);
+              resolve(response);
+            }
+          } catch (err) {
             clearInterval(intervalID);
-            return reject(response);
+            reject(err);
           }
-
-          const isComplete = (response.status && response.status.conditions && response.status.conditions[0].type) || 'NO';
-
-          if (isComplete === 'Completed') {
-            clearInterval(intervalID);
-            resolve(response);
-          }
-        } catch (err) {
-          clearInterval(intervalID);
-          reject(err);
         }
       }, this.pollInterval);
 
