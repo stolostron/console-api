@@ -3,3 +3,4 @@ build
 coverage
 package.json
 npm-shrinkwrap.json
+config/config-defaults.json

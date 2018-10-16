@@ -4,7 +4,7 @@
   "hcmUrl": "",
   "localKubeToken": "",
   "mongodbUrl": "",
-  "hcmPollInterval": 500,
-  "hcmPollTimeout": 30000,
+  "hcmPollInterval": 100,
+  "hcmPollTimeout": 50000,
   "complianceNamespace": "mcm"
 }
