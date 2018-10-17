@@ -30,13 +30,31 @@ const mockWorksetError = {
 
 const mockWorksetPollIncomplete = {
   body: {
-    status: {
-      status: 'Not Finished',
-    },
+    items: [
+      {
+        status: {
+          status: 'Not Finished',
+        },
+      },
+    ],
   },
 };
 
 const mockWorksetPollComplete = {
+  body: {
+    items: [
+      {
+        status: {
+          conditions: [
+            { type: 'Completed', lastUpdateTime: '2018-08-15T18:44:41Z' },
+          ],
+        },
+      },
+    ],
+  },
+};
+
+const mockWorksetResults = {
   body: {
     status: {
       conditions: [
@@ -133,7 +151,8 @@ describe('KubeConnector', () => {
         .mockImplementationOnce(() => asyncReturn(mockWorksetPollIncomplete))
         .mockImplementationOnce(() => asyncReturn(mockWorksetPollIncomplete))
         .mockImplementationOnce(() => asyncReturn(mockWorksetPollIncomplete))
-        .mockImplementation(() => asyncReturn(mockWorksetPollComplete));
+        .mockImplementationOnce(() => asyncReturn(mockWorksetPollComplete))
+        .mockImplementation(() => asyncReturn(mockWorksetResults));
 
       const connector = new KubeConnector({
         cache: mockCache,

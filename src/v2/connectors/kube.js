@@ -186,19 +186,27 @@ export default class KubeConnector {
         if (!pendingRequest) {
           pendingRequest = true;
           try {
-            const response = await this.get(resourceViewLink, {}, true);
-            pendingRequest = false;
+            const links = resourceViewLink.split('/');
+            const resourceViewName = links.pop();
+            const link = `${links.join('/')}?fieldSelector=metadata.name=${resourceViewName}`;
 
+            logger.debug('start polling: ', new Date(), link);
+            const response = await this.get(link, {}, true);
+            pendingRequest = false;
             if (response.code || response.message) {
               clearInterval(intervalID);
               return reject(response);
             }
-
-            const isComplete = _.get(response, 'status.conditions[0].type', 'NO');
+            const isComplete = _.get(response, 'items[0].status.conditions[0].type', 'NO');
 
             if (isComplete === 'Completed') {
               clearInterval(intervalID);
-              resolve(response);
+              logger.debug('start to get resource view: ', new Date(), resourceViewLink);
+              const result = await this.get(resourceViewLink, {}, true);
+              if (result.code || result.message) {
+                return reject(result);
+              }
+              resolve(result);
             }
           } catch (err) {
             clearInterval(intervalID);
@@ -227,7 +235,7 @@ export default class KubeConnector {
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
       if (result) {
-        this.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/${resource.metadata.name}`)
+        this.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.resourceViewNamespace}/resourceviews/${resource.metadata.name}`)
           .catch(e => logger.error(`Error deleting resourceviews ${resource.metadata.name}`, e.message));
       }
       return result;

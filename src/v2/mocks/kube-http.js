@@ -31,6 +31,7 @@ export default function createMockHttp() {
     release: require('./RelsList'),
     policies: require('./PolicyList'),
     compliances: require('./ComplianceList'),
+    resourceViews: require('./ResourceView'),
   };
 
   return async function MockLib(params) {
@@ -110,6 +111,8 @@ export default function createMockHttp() {
         return state.compliances.mockDeleteResponse;
       case params.url.includes('compliances'):
         return state.compliances.mockComplianceListResponse;
+      case params.url.includes('resourceviews?fieldSelector'):
+        return state.resourceViews.mockWorksetPollComplete;
       default:
         return state.clusters;
     }
