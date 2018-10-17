@@ -7,6 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import ClusterModel from '../models/cluster';
+
 export const typeDef = `
 type Cluster implements K8sObject {
   clusterip: String
@@ -25,12 +27,17 @@ type Cluster implements K8sObject {
 
 export const resolver = {
   Query: {
-    clusters: (root, args, { clusterModel, req }) =>
+    clusters: (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, user: req.user }),
+  },
+  Cluster: {
+    totalCPU: parent => ClusterModel.resolveUsage('cpu', parent.rawStatus),
+    totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
+    totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
   Mutation: {
     // patch cluster labels
-    updateLabels: (root, args, { genericModel }) =>
+    updateLabels: (parent, args, { genericModel }) =>
       genericModel.updateLabels(args),
   },
 };

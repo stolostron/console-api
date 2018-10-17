@@ -45,25 +45,8 @@ export default class ClusterModel extends KubeModel {
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
+        rawStatus: clusterstatus,
       };
-
-      const memoryUsage = _.get(clusterstatus, 'spec.usage.memory');
-      const memoryCapacity = _.get(clusterstatus, 'spec.capacity.memory');
-      if (memoryUsage && memoryCapacity) {
-        result.totalMemory = parseInt(getPercentage(memoryUsage, memoryCapacity), 10);
-      }
-
-      const storageUsage = _.get(clusterstatus, 'spec.usage.storage');
-      const storageCapacity = _.get(clusterstatus, 'spec.capacity.storage');
-      if (storageUsage && storageCapacity) {
-        result.totalStorage = parseInt(getPercentage(storageUsage, storageCapacity), 10);
-      }
-
-      const cpuUsage = _.get(clusterstatus, 'spec.usage.cpu');
-      const cpuCapacity = _.get(clusterstatus, 'spec.capacity.cpu');
-      if (cpuUsage && cpuCapacity) {
-        result.totalCPU = parseInt(getCPUPercentage(cpuUsage, cpuCapacity), 10);
-      }
 
       accum.push(result);
       return accum;
@@ -74,6 +57,16 @@ export default class ClusterModel extends KubeModel {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
     return results;
+  }
+
+  static resolveUsage(kind, clusterstatus) {
+    const usage = _.get(clusterstatus, `spec.usage.${kind}`, '0000Mi');
+    const capacity = _.get(clusterstatus, `spec.capacity.${kind}`, '0001Mi');
+    if (kind === 'cpu') {
+      return parseInt(getCPUPercentage(usage, capacity), 10);
+    }
+
+    return parseInt(getPercentage(usage, capacity), 10);
   }
 
   async getClusterStatus() {
