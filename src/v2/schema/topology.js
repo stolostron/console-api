@@ -55,7 +55,7 @@ export const resolver = {
       const clusters = await clusterModel.getClusters();
       const resources = await mongoModel.resource({
         ...args,
-        clusters: clusters.map(c => c.metadata.name),
+        clusters: clusters.filter(c => !!c.metadata).map(c => c.metadata.name),
       });
       const resourceUids = new Set(resources.map(res => res.uid));
       const relationships = resources.reduce((accum, res) => {
