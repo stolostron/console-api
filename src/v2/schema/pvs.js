@@ -34,15 +34,7 @@ export const typeDef = `
 
 export const resolver = {
   Query: {
-    pvs: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
-    pvsClaims: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'persistentvolumeclaims' }),
-  },
-  PVs: {
-    cluster: async (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
-  },
-  PVsClaims: {
-    cluster: async (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+    pvs: (parent, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'persistentvolumes' }),
+    pvsClaims: (parent, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'persistentvolumeclaims' }),
   },
 };

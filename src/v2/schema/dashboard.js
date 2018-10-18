@@ -204,7 +204,7 @@ export const resolver = {
               type: 'clusters',
             },
           ],
-          clusterQuery: () => clusterModel.getClusters({ user: req.user }),
+          clusterQuery: () => clusterModel.getAllClusters({ user: req.user }),
           statusQuery: () => clusterModel.getClusterStatus({ user: req.user }),
         }),
       ]);

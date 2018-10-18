@@ -14,7 +14,11 @@ Object {
           "name": "helm-repo-pvc",
           "namespace": "kube-system",
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "helm-repo-pv",
           "namespace": null,
@@ -33,7 +37,11 @@ Object {
           "name": "image-manager-image-manager-0",
           "namespace": "kube-system",
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "image-manager-9.42.23.230",
           "namespace": null,
@@ -52,7 +60,11 @@ Object {
           "name": null,
           "namespace": null,
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "logging-datanode-9.42.23.230",
           "namespace": null,
@@ -71,7 +83,11 @@ Object {
           "name": "mysqldata-mariadb-0",
           "namespace": "kube-system",
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mariadb-9.42.23.230",
           "namespace": null,
@@ -90,7 +106,11 @@ Object {
           "name": "mgmt-repo-pvc",
           "namespace": "kube-system",
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mgmt-repo-pv",
           "namespace": null,
@@ -109,7 +129,11 @@ Object {
           "name": "mongodbdir-icp-mongodb-0",
           "namespace": "kube-system",
         },
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mongodb-9.42.23.230",
           "namespace": null,
@@ -131,7 +155,11 @@ Object {
         "accessModes": Array [
           "ReadWriteOnce",
         ],
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "helm-repo-pvc",
           "namespace": "kube-system",
@@ -144,7 +172,11 @@ Object {
         "accessModes": Array [
           "ReadWriteOnce",
         ],
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "image-manager-image-manager-0",
           "namespace": "kube-system",
@@ -157,7 +189,11 @@ Object {
         "accessModes": Array [
           "ReadWriteOnce",
         ],
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mgmt-repo-pvc",
           "namespace": "kube-system",
@@ -170,7 +206,11 @@ Object {
         "accessModes": Array [
           "ReadWriteOnce",
         ],
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mongodbdir-icp-mongodb-0",
           "namespace": "kube-system",
@@ -183,7 +223,11 @@ Object {
         "accessModes": Array [
           "ReadWriteOnce",
         ],
-        "cluster": null,
+        "cluster": Object {
+          "metadata": Object {
+            "name": "mycluster",
+          },
+        },
         "metadata": Object {
           "name": "mysqldata-mariadb-0",
           "namespace": "kube-system",

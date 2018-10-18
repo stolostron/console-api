@@ -23,6 +23,7 @@ const formatPod = (clusterName, pod) => ({
 });
 
 const formatPVs = (clusterName, pvs) => ({
+  cluster: { metadata: { name: clusterName } },
   accessModes: _.get(pvs, 'spec.accessModes', ['-']),
   capacity: _.get(pvs, 'spec.capacity.storage', '-'),
   claim: pvs.spec.local
@@ -32,7 +33,6 @@ const formatPVs = (clusterName, pvs) => ({
     name: _.get(pvs, 'spec.claimRef.name', null),
     namespace: _.get(pvs, 'spec.claimRef.namespace', null),
   },
-  cluster: clusterName,
   metadata: pvs.metadata,
   reclaimPolicy: _.get(pvs, 'spec.persistentVolumeReclaimPolicy', '-'),
   status: _.get(pvs, 'status.phase', '-'),
@@ -40,8 +40,8 @@ const formatPVs = (clusterName, pvs) => ({
 });
 
 const formatPVsClaims = (clusterName, claim) => ({
+  cluster: { metadata: { name: clusterName } },
   accessModes: _.get(claim, 'spec.accessModes', ['-']),
-  cluster: clusterName,
   metadata: claim.metadata,
   persistentVolume: _.get(claim, 'spec.volumeName', '-'),
   requests: _.get(claim, 'spec.resources.requests.storage', '-'),

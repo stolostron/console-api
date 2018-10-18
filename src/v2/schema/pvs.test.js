@@ -23,11 +23,9 @@ describe('PVs Resolver', () => {
             claim
             claimRef
             cluster {
-              clusterip
-              nodes
-              status
-              totalMemory
-              totalStorage
+              metadata {
+                name
+              }
             }
             metadata{
               name
@@ -55,11 +53,9 @@ describe('PVs Resolver', () => {
           pvsClaims {
             accessModes
             cluster {
-              clusterip
-              nodes
-              status
-              totalMemory
-              totalStorage
+              metadata {
+                name
+              }
             }
             metadata {
               name

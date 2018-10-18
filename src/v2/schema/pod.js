@@ -40,7 +40,7 @@ function resolveImages({ containers }) {
 
 export const resolver = {
   Query: {
-    pods: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'pods' }),
+    pods: (rparent, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'pods' }),
   },
   Pod: {
     images: parent => resolveImages(parent),

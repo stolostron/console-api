@@ -26,6 +26,36 @@ function getStatus(cluster) {
 
 export default class ClusterModel extends KubeModel {
   async getClusters(args = {}) {
+    const clusterstatuses = await
+    this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
+
+    const results = clusterstatuses.reduce((accum, clusterstatus) => {
+      // namespace doesn't contain a cluster
+      if (!clusterstatus) {
+        return accum;
+      }
+
+      const result = {
+        metadata: clusterstatus.metadata,
+        nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
+        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
+        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
+        rawStatus: clusterstatus,
+      };
+
+      accum.push(result);
+      return accum;
+    }, []);
+
+
+    if (args.name) {
+      return results.filter(c => c.metadata.name === args.name)[0];
+    }
+    return results;
+  }
+
+  // temporary function for dashboard schema
+  async getAllClusters(args = {}) {
     const [clusters, clusterstatuses] = await Promise.all([
       this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
       this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
@@ -45,6 +75,7 @@ export default class ClusterModel extends KubeModel {
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
+        rawCluster: cluster,
         rawStatus: clusterstatus,
       };
 
@@ -69,6 +100,16 @@ export default class ClusterModel extends KubeModel {
     return parseInt(getPercentage(usage, capacity), 10);
   }
 
+  async getStatus(clusterstatus) {
+    const [cluster] = await this.kubeConnector.getResources(
+      ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
+      { namespaces: [clusterstatus.metadata.namespace] },
+    );
+
+    const status = _.get(cluster, 'status.conditions[0].type', 'offline');
+    return status === '' ? 'offline' : status.toLowerCase();
+  }
+
   async getClusterStatus() {
     const clusterstatuses = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
 
@@ -82,18 +123,9 @@ export default class ClusterModel extends KubeModel {
         nodes: _.get(cluster, 'spec.capacity.nodes'),
         pods: _.get(cluster, 'spec.usage.pods'),
         ip: cluster.spec.masterAddresses[0].ip,
-        memoryUtilization: getPercentage(
-          cluster.spec.usage.memory,
-          cluster.spec.capacity.memory,
-        ),
-        storageUtilization: getPercentage(
-          cluster.spec.usage.storage,
-          cluster.spec.capacity.storage,
-        ),
-        cpuUtilization: getCPUPercentage(
-          cluster.spec.usage.cpu,
-          cluster.spec.capacity.cpu,
-        ),
+        memoryUtilization: this.constructor.resolveUsage('memory', cluster),
+        storageUtilization: this.constructor.resolveUsage('storage', cluster),
+        cpuUtilization: this.constructor.resolveUsage('cpu', cluster),
       });
 
       return accum;
