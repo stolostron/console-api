@@ -38,7 +38,7 @@ export default class ComplianceModel {
     // combine policy and compliance into one mutation
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
-      const namespace = _.get(resource, 'metadata.namespace', 'default');
+      const namespace = _.get(resource, 'metadata.namespace', (config.get('complianceNamespace') || 'mcm'));
       return this.kubeConnector.post(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
         .catch(err => Error(err));
     }));
@@ -58,7 +58,7 @@ export default class ComplianceModel {
   async createCompliance(resources) {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
-      const namespace = _.get(resource, 'metadata.namespace', 'default');
+      const namespace = _.get(resource, 'metadata.namespace', (config.get('complianceNamespace') || 'mcm'));
       return this.kubeConnector.post(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
         .catch(err => Error(err));
     }));
