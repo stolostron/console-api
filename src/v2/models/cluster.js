@@ -26,17 +26,18 @@ function getStatus(cluster) {
 
 export default class ClusterModel extends KubeModel {
   async getClusters(args = {}) {
-    const clusterstatuses = await
-    this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
-
-    const results = clusterstatuses.reduce((accum, clusterstatus) => {
+    const [clusters, clusterstatuses] = await Promise.all([
+      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
+      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
+    ]);
+    const results = clusterstatuses.reduce((accum, clusterstatus, idx) => {
       // namespace doesn't contain a cluster
       if (!clusterstatus) {
         return accum;
       }
 
       const result = {
-        metadata: clusterstatus.metadata,
+        metadata: clusters[idx].metadata,
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
