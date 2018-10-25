@@ -51,7 +51,7 @@ export default function createMockHttp() {
           return state.pvs.mockPVsClaimResourceView;
         case params.url.includes('default/helmrepos'):
           return state.repoMutations;
-        case params.json.metadata.name.includes('test-weave-scope'):
+        case params.json.metadata.name.includes('test-acs-engine'):
           return state.relMutations;
         case params.url.includes('policies'):
           return state.policies.mockCreatePolicy;

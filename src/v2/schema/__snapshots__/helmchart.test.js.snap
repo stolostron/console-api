@@ -38,9 +38,9 @@ Object {
   "data": Object {
     "installHelmChart": Array [
       Object {
-        "cluster": "mycluster",
-        "name": "test-weave-scope",
-        "namespace": "default",
+        "cluster": "hub-cluster",
+        "name": "test-acs-engine",
+        "namespace": "kube-system",
         "status": "Completed",
       },
     ],

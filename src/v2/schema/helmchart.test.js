@@ -39,11 +39,11 @@ describe('Helm Chart Resolver', () => {
         query: `
         mutation {
           installHelmChart(input:{
-            chartURL:"https://kubernetes-charts.storage.googleapis.com/weave-scope-0.9.2.tgz",
-            namespace:"default",
-            releaseName:"test-weave-scope",
-            destinationClusters:[{name:"mycluster",namespace:"mycluster"}]
-            values: "{'global.image.repository':'weaveworks/scope','global.image.tag':'1.6.5','global.image.pullPolicy':'IfNotPresent','global.service.port':80,'global.service.type':'ClusterIP','weave-scope-frontend.enabled':true,'weave-scope-agent.enabled':true,'weave-scope-agent.dockerBridge':'docker0','weave-scope-agent.scopeFrontendAddr':'','weave-scope-agent.probeToken':'','weave-scope-agent.rbac.create':true,'weave-scope-agent.serviceAccount.create':true,'selectedReleaseName':'weave-test','selectedNamespace':'default'}"
+            chartURL:"https://kubernetes-charts.storage.googleapis.com/acs-engine-autoscaler-2.2.0.tgz",
+            namespace:"kube-system",
+            releaseName:"test-acs-engine",
+            destinationClusters:[{name:"hub-cluster",namespace:"mycluster"}]
+            values: "{'replicaCount':1,'resources':{},'nodeSelector':{},'podAnnotations':{},'deploymentAnnotations':{},'tolerations':[],'affinity':{},'image.repository':'wbuchwalter/kubernetes-acs-engine-autoscaler','image.tag':'2.1.1','image.pullPolicy':'IfNotPresent','acsenginecluster.resourcegroup':'','acsenginecluster.azurespappid':'','acsenginecluster.azurespsecret':'','acsenginecluster.azuresptenantid':'','acsenginecluster.kubeconfigprivatekey':'','acsenginecluster.clientprivatekey':'','acsenginecluster.caprivatekey':'','selectedReleaseName':'selenium-acs-1540476559092','selectedNamespace':'kube-system'}"
           }) {
             name
             namespace
