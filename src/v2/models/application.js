@@ -80,15 +80,16 @@ export default class ApplicationModel extends KubeModel {
       apps = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applications`);
     }
 
-    return apps.map(app => ({
-      applicationRelationships: app.status.ApplicationRelationships,
-      dashboard: app.status.Dashboard,
-      deployableNames: app.status.Deployables,
-      placementPolicyNames: app.status.PlacementPolicies,
-      metadata: app.metadata,
-      raw: app,
-      selector: app.spec.selector,
-    }));
+    return apps
+      .map(app => ({
+        applicationRelationships: app.status.ApplicationRelationships || [],
+        dashboard: app.status.Dashboard || {},
+        deployableNames: app.status.Deployables || [],
+        placementPolicyNames: app.status.PlacementPolicies || [],
+        metadata: app.metadata,
+        raw: app,
+        selector: app.spec.selector,
+      }));
   }
 
   async getApplicationRelationships(selector = {}) {

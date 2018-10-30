@@ -98,7 +98,20 @@ export default class KubeConnector {
         return [];
       }
 
-      return (response.items ? response.items : [response]).map(item => (kind ? Object.assign({
+      // if all responses aren't objects, throw error
+      const strs = [];
+      const items = (response.items ? response.items : [response]);
+      items.forEach((item) => {
+        if (typeof item === 'string') {
+          strs.push(item);
+        }
+      });
+      if (strs.length > 0) {
+        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        return [];
+      }
+
+      return items.map(item => (kind ? Object.assign({
         apiVersion: response.apiVersion,
         kind,
       }, item) : item));
