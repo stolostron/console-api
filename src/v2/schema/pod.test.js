@@ -32,6 +32,7 @@ describe('Pods Resolver', () => {
               uid
             }
             podIP
+            restarts
             startedAt
             status
           }

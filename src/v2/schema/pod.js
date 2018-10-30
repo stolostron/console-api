@@ -16,6 +16,7 @@ export const typeDef = `
     metadata: Metadata
     owners: [Owner]
     podIP: String
+    restarts: Int
     startedAt: String
     status: String
   }

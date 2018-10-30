@@ -18,6 +18,7 @@ const formatPod = (clusterName, pod) => ({
   metadata: pod.metadata,
   owners: pod.metadata.ownerReferences,
   podIP: pod.status.podIP,
+  restarts: _.get(pod, 'status.containerStatuses[0].restartCount', 0),
   startedAt: pod.status.startTime,
   status: pod.status.phase,
 });
