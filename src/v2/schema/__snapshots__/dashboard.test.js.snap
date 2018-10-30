@@ -43,7 +43,7 @@ Object {
         Object {
           "critical": 0,
           "error": null,
-          "healthy": 79,
+          "healthy": 16,
           "name": "pods",
           "warning": 0,
         },
