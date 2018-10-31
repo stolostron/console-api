@@ -110,7 +110,7 @@ export default class ComplianceModel {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
-      compliances = [response];
+      compliances = [{ ...response, raw: response }];
     }
 
     return compliances.map(compliance => ({
@@ -140,8 +140,10 @@ export default class ComplianceModel {
           templates: this.resolvePolicyTemplates(policy), // TODO: Use resolver.
           valid: _.get(value, 'Valid', '-'),
           violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
-          roleRef: this.resolveRoleRef(policy),
-          roleSubjects: this.resolveRoleSubjects(policy),
+          roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
+          roleBindingTemplates: this.resolvePolicyTemplates(policy, 'roleBinding-templates'),
+          objectTemplates: this.resolvePolicyTemplates(policy, 'object-templates'),
+          raw: policy,
           metadata: {
             ...parent.metadata,
             name: key,
@@ -214,7 +216,7 @@ export default class ComplianceModel {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
-      return [response];
+      return [{ ...response, raw: response }];
     }
 
     // for getting policy list
@@ -289,41 +291,62 @@ export default class ComplianceModel {
   }
 
 
-  static resolvePolicyTemplates(parent) {
-    return getTemplates(parent).map((res) => {
-      if (_.get(res, 'templateType') === 'roleBinding-templates') {
-        return ({
-          name: _.get(res, 'roleBinding.metadata.name', '-'),
-          lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
-          complianceType: _.get(res, 'complianceType', ''),
-          apiVersion: _.get(res, 'roleBinding.apiVersion', ''),
-          compliant: _.get(res, 'status.Compliant', ''),
-          validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
-          selector: _.get(res, 'selector', ''),
-          templateType: _.get(res, 'templateType', ''),
-        });
+  static resolvePolicyTemplates(parent, type) {
+    const tempArray = [];
+    getTemplates(parent).forEach((res) => {
+      if (_.get(res, 'templateType') === type) {
+        if (type === 'roleBinding-templates') {
+          tempArray.push({
+            name: _.get(res, 'roleBinding.metadata.name', '-'),
+            lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+            complianceType: _.get(res, 'complianceType', ''),
+            apiVersion: _.get(res, 'roleBinding.apiVersion', ''),
+            compliant: _.get(res, 'status.Compliant', ''),
+            validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+            raw: res,
+          });
+        } else if (type === 'object-templates') {
+          tempArray.push({
+            name: _.get(res, 'objectDefinition.metadata.name', '-'),
+            lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+            complianceType: _.get(res, 'complianceType', ''),
+            apiVersion: _.get(res, 'objectDefinition.apiVersion', ''),
+            compliant: _.get(res, 'status.Compliant', ''),
+            validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+            raw: res,
+          });
+        } else {
+          tempArray.push({
+            name: _.get(res, 'metadata.name', '-'),
+            lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
+            complianceType: _.get(res, 'complianceType', ''),
+            apiVersion: _.get(res, 'apiVersion', ''),
+            compliant: _.get(res, 'status.Compliant', ''),
+            validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
+            raw: res,
+          });
+        }
       }
-      return ({
-        name: _.get(res, 'metadata.name', '-'),
-        lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
-        complianceType: _.get(res, 'complianceType', ''),
-        apiVersion: _.get(res, 'apiVersion', ''),
-        compliant: _.get(res, 'status.Compliant', ''),
-        validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
-        selector: _.get(res, 'selector', ''),
-        templateType: _.get(res, 'templateType', ''),
-      });
     });
+    return tempArray;
   }
-
 
   static resolvePolicyViolations(parent) {
     const violationArray = [];
     getTemplates(parent).forEach((res) => {
       const templateCondition = _.get(res, 'status.conditions[0]');
-      if (_.get(res, 'templateType') !== 'roleBinding-templates') {
+      if (_.get(res, 'templateType') === 'role-templates') {
         violationArray.push({
           name: _.get(res, 'metadata.name', '-'),
+          cluster: 'local', // local means the cluster that this policy is applied
+          status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
+          message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
+          reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
+          selector: _.get(res, 'selector', ''),
+        });
+      } else if (_.get(res, 'templateType') === 'object-templates') {
+        violationArray.push({
+          name: _.get(res, 'objectDefinition.metadata.name', '-'),
           cluster: 'local', // local means the cluster that this policy is applied
           status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
           message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',

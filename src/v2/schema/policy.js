@@ -18,10 +18,11 @@ type Policy implements K8sObject {
   rules: [PolicyRules]
   # Possible values are: compliant, notcompliant, invalid
   status: String
-  templates: [PolicyTemplates]
+  roleTemplates: [PolicyTemplates]
+  roleBindingTemplates: [PolicyTemplates]
+  objectTemplates: [PolicyTemplates]
   violations: [Violations]
-  roleRef: [RoleRef]
-  roleSubjects: [RoleSubject]
+  raw: JSON
 }
 
 type PolicyDetail {
@@ -35,9 +36,8 @@ type PolicyTemplates {
   compliant: String
   lastTransition: String
   name: String
-  selector: JSON
-  templateType: String
   validity: String
+  raw: JSON
 }
 
 type PolicyRules {
@@ -57,18 +57,6 @@ type Violations {
   selector: JSON
   status: String
 }
-
-type RoleRef {
-  apiGroup: String
-  kind: String
-  name: String
-}
-
-type RoleSubject {
-  apiGroup: String
-  kind: String
-  name: String
-}
 `;
 
 export const resolver = {
@@ -79,12 +67,12 @@ export const resolver = {
   Policy: {
     detail: parent => ComplianceModel.resolvePolicyDetails(parent),
     enforcement: parent => ComplianceModel.resolvePolicyEnforcement(parent),
-    templates: parent => ComplianceModel.resolvePolicyTemplates(parent),
+    roleTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'role-templates'),
+    roleBindingTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'roleBinding-templates'),
+    objectTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'object-templates'),
     rules: parent => ComplianceModel.resolvePolicyRules(parent),
     status: parent => ComplianceModel.resolvePolicyStatus(parent),
     violations: parent => ComplianceModel.resolvePolicyViolations(parent),
-    roleRef: parent => ComplianceModel.resolveRoleRef(parent),
-    roleSubjects: parent => ComplianceModel.resolveRoleSubjects(parent),
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),

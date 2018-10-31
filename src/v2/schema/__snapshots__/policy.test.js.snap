@@ -155,17 +155,73 @@ Object {
           "name": "policy-xz-1",
           "namespace": "mycluster",
         },
+        "roleTemplates": Array [
+          Object {
+            "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+            "complianceType": "musthave",
+            "compliant": "NonCompliant",
+            "lastTransition": "2018-09-06T15:14:44Z",
+            "name": "role-xz-1",
+            "raw": Object {
+              "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+              "complianceType": "musthave",
+              "kind": "RoleTemplate",
+              "metadata": Object {
+                "creationTimestamp": null,
+                "name": "role-xz-1",
+              },
+              "rules": Array [
+                Object {
+                  "complianceType": "musthave",
+                  "policyRule": Object {
+                    "apiGroups": Array [
+                      "extensions",
+                      "apps",
+                    ],
+                    "resources": Array [
+                      "deployments",
+                    ],
+                    "verbs": Array [
+                      "get",
+                      "list",
+                      "watch",
+                      "create",
+                      "delete",
+                      "patch",
+                    ],
+                  },
+                },
+              ],
+              "selector": Object {
+                "matchLabels": Object {
+                  "cloud": "IBM",
+                },
+              },
+              "status": Object {
+                "Compliant": "NonCompliant",
+                "Validity": Object {
+                  "valid": true,
+                },
+                "conditions": Array [
+                  Object {
+                    "lastTransitionTime": "2018-09-06T15:14:44Z",
+                    "message": "k8s RBAC role is missing: role-xz-1",
+                    "reason": "K8s RBAC role is missing",
+                    "status": "True",
+                    "type": "completed",
+                  },
+                ],
+              },
+              "templateType": "role-templates",
+            },
+          },
+        ],
         "rules": Array [
           Object {
             "ruleUID": "role-xz-1-rule-0",
           },
         ],
         "status": "NonCompliant",
-        "templates": Array [
-          Object {
-            "name": "role-xz-1",
-          },
-        ],
         "violations": Array [
           Object {
             "name": "role-xz-1",

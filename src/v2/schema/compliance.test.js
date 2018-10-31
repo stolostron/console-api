@@ -46,6 +46,7 @@ describe('Compliance Resolver', () => {
               name
               namespace
             }
+            raw
             clusterSelector
             policyCompliant
             clusterCompliant
@@ -53,6 +54,63 @@ describe('Compliance Resolver', () => {
               clusterNamespace
               localCompliantStatus
               localValidStatus
+            }
+            compliancePolicies {
+              name
+              metadata {
+                annotations
+                creationTimestamp
+                name
+                namespace
+                resourceVersion
+                selfLink
+                uid
+              }
+              cluster
+              compliant
+              complianceName
+              complianceNamespace
+              valid
+              enforcement
+              status
+              raw
+              roleTemplates {
+                name
+                lastTransition
+                complianceType
+                apiVersion
+                compliant
+                raw
+              }
+              roleBindingTemplates {
+                name
+                lastTransition
+                complianceType
+                apiVersion
+                compliant
+                raw
+              }
+              objectTemplates {
+                name
+                lastTransition
+                complianceType
+                apiVersion
+                compliant
+                raw
+              }
+              rules {
+                complianceType
+                templateType
+                ruleUID
+              }
+              violations {
+                name
+                cluster
+                status
+                message
+                reason
+                selector
+              }
             }
           }
         }

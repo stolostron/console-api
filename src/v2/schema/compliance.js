@@ -17,6 +17,7 @@ type Compliance implements K8sObject {
   complianceStatus: [CompliantStatus]
   metadata: Metadata
   policyCompliant: String
+  raw: JSON
 }
 
 type CompliantStatus {
@@ -39,8 +40,10 @@ type CompliancePolicy implements K8sObject {
   templates: [PolicyTemplates]
   valid: String
   violations: [Violations]
-  roleRef: [RoleRef]
-  roleSubjects: [RoleSubject]
+  roleTemplates: [PolicyTemplates]
+  roleBindingTemplates: [PolicyTemplates]
+  objectTemplates: [PolicyTemplates]
+  raw: JSON
 }
 
 `;

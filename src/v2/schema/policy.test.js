@@ -54,8 +54,13 @@ describe('Policy Resolver', () => {
             rules {
               ruleUID
             }
-            templates {
+            roleTemplates {
               name
+              lastTransition
+              complianceType
+              apiVersion
+              compliant
+              raw
             }
             violations {
               name
