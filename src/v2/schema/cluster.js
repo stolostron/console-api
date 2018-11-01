@@ -38,7 +38,7 @@ export const resolver = {
   },
   Mutation: {
     // patch cluster labels
-    updateLabels: (parent, args, { genericModel }) =>
-      genericModel.updateLabels(args),
+    updateResourceLabels: (parent, args, { genericModel }) =>
+      genericModel.patchResource(args),
   },
 };

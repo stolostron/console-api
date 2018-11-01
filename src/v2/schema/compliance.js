@@ -18,6 +18,7 @@ type Compliance implements K8sObject {
   metadata: Metadata
   policyCompliant: String
   raw: JSON
+  apiVersion: String
 }
 
 type CompliantStatus {
@@ -44,6 +45,7 @@ type CompliancePolicy implements K8sObject {
   roleBindingTemplates: [PolicyTemplates]
   objectTemplates: [PolicyTemplates]
   raw: JSON
+  message: String
 }
 
 `;
@@ -64,5 +66,7 @@ export const resolver = {
       complianceModel.createCompliance(args.resources),
     deleteCompliance: (root, args, { complianceModel }) =>
       complianceModel.deleteCompliance(args),
+    updateResource: (parent, args, { genericModel }) =>
+      genericModel.putResource(args),
   },
 };

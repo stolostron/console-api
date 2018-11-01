@@ -3,62 +3,205 @@
 exports[`Cluster Mutation Correctly Resolves Update Cluster Labels 1`] = `
 Object {
   "data": Object {
-    "updateLabels": Object {
-      "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-      "items": Array [
-        Object {
-          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "kind": "Cluster",
-          "metadata": Object {
-            "annotations": Object {
-              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+    "updateResourceLabels": Object {
+      "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
+      "kind": "Compliance",
+      "metadata": Object {
+        "creationTimestamp": "2018-09-04T16:13:50Z",
+        "deletionGracePeriodSeconds": 0,
+        "deletionTimestamp": "2018-09-06T18:34:31Z",
+        "finalizers": Array [
+          "finalizer.mcm.ibm.com",
+        ],
+        "generation": 2,
+        "name": "compliance-xz",
+        "namespace": "mcm",
+        "resourceVersion": "4411502",
+        "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-xz",
+        "uid": "82dc7a02-b05d-11e8-9a12-005056a0d11b",
+      },
+      "spec": Object {
+        "clusterSelector": Object {
+          "matchNames": Array [
+            "mycluster",
+          ],
+        },
+        "runtime-rules": Array [
+          Object {
+            "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+            "kind": "Policy",
+            "metadata": Object {
+              "creationTimestamp": null,
+              "name": "policy-xz-1",
             },
-            "creationTimestamp": "2018-08-13T16:56:41Z",
-            "finalizers": Array [
-              "finalizer.hcm.ibm.com",
-            ],
-            "labels": Object {
-              "cloud": "IBM",
-              "datacenter": "toronto",
-              "environment": "Dev",
-              "name": "mycluster.icp",
-              "owner": "marketing",
-              "region": "US",
-              "vendor": "ICP",
-            },
-            "name": "mycluster.icp",
-            "namespace": "default",
-            "resourceVersion": "136558",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-          },
-          "spec": Object {
-            "authInfo": Object {},
-            "kubernetesApiEndpoints": Object {
-              "serverEndpoints": Array [
+            "spec": Object {
+              "complianceType": "",
+              "namespaces": Object {
+                "exclude": Array [
+                  "kube*",
+                ],
+                "include": Array [
+                  "default",
+                ],
+              },
+              "remediationAction": "inform",
+              "role-templates": Array [
                 Object {
-                  "serverAddress": "9.42.80.212:8001",
+                  "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                  "complianceType": "musthave",
+                  "kind": "RoleTemplate",
+                  "metadata": Object {
+                    "creationTimestamp": null,
+                    "name": "role-xz-1",
+                  },
+                  "rules": Array [
+                    Object {
+                      "complianceType": "musthave",
+                      "policyRule": Object {
+                        "apiGroups": Array [
+                          "extensions",
+                          "apps",
+                        ],
+                        "resources": Array [
+                          "deployments",
+                        ],
+                        "verbs": Array [
+                          "get",
+                          "list",
+                          "watch",
+                          "create",
+                          "delete",
+                          "patch",
+                        ],
+                      },
+                    },
+                  ],
+                  "selector": Object {
+                    "matchLabels": Object {
+                      "cloud": "IBM",
+                    },
+                  },
+                  "status": Object {
+                    "Validity": Object {},
+                  },
                 },
               ],
             },
+            "status": Object {},
           },
-          "status": Object {
-            "conditions": Array [
-              Object {
-                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                "lastTransitionTime": null,
-                "status": "",
-                "type": "OK",
+          Object {
+            "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+            "kind": "Policy",
+            "metadata": Object {
+              "creationTimestamp": null,
+              "name": "policy-xz-2",
+            },
+            "spec": Object {
+              "complianceType": "",
+              "namespaces": Object {
+                "exclude": Array [
+                  "kube*",
+                ],
+                "include": Array [
+                  "default",
+                ],
               },
-            ],
+              "remediationAction": "enforce",
+              "role-templates": Array [
+                Object {
+                  "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                  "complianceType": "musthave",
+                  "kind": "RoleTemplate",
+                  "metadata": Object {
+                    "creationTimestamp": null,
+                    "name": "role-xz-2",
+                  },
+                  "rules": Array [
+                    Object {
+                      "complianceType": "musthave",
+                      "policyRule": Object {
+                        "apiGroups": Array [
+                          "extensions",
+                          "apps",
+                        ],
+                        "resources": Array [
+                          "deployments",
+                        ],
+                        "verbs": Array [
+                          "get",
+                          "list",
+                          "watch",
+                          "delete",
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "mustnothave",
+                      "policyRule": Object {
+                        "apiGroups": Array [
+                          "core",
+                        ],
+                        "resources": Array [
+                          "pods",
+                        ],
+                        "verbs": Array [
+                          "create",
+                          "update",
+                          "patch",
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "",
+                      "policyRule": Object {
+                        "apiGroups": Array [
+                          "core",
+                        ],
+                        "resources": Array [
+                          "secrets",
+                        ],
+                        "verbs": Array [
+                          "get",
+                          "watch",
+                          "list",
+                          "create",
+                          "delete",
+                          "update",
+                          "patch",
+                        ],
+                      },
+                    },
+                  ],
+                  "selector": Object {
+                    "matchLabels": Object {
+                      "cloud": "IBM",
+                    },
+                  },
+                  "status": Object {
+                    "Validity": Object {},
+                  },
+                },
+              ],
+            },
+            "status": Object {},
           },
+        ],
+      },
+      "status": Object {
+        "mycluster": Object {
+          "aggregatePoliciesStatus": Object {
+            "policy-xz-1": Object {
+              "Compliant": "NonCompliant",
+              "Valid": true,
+            },
+            "policy-xz-2": Object {
+              "Compliant": "Compliant",
+              "Valid": true,
+            },
+          },
+          "clustername": "mycluster",
+          "compliant": "NonCompliant",
         },
-      ],
-      "kind": "ClusterList",
-      "metadata": Object {
-        "resourceVersion": "136667",
-        "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
       },
     },
   },

@@ -23,6 +23,7 @@ type Policy implements K8sObject {
   objectTemplates: [PolicyTemplates]
   violations: [Violations]
   raw: JSON
+  message: String
 }
 
 type PolicyDetail {
@@ -73,6 +74,7 @@ export const resolver = {
     rules: parent => ComplianceModel.resolvePolicyRules(parent),
     status: parent => ComplianceModel.resolvePolicyStatus(parent),
     violations: parent => ComplianceModel.resolvePolicyViolations(parent),
+    message: parent => ComplianceModel.resolvePolicyMessage(parent),
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),

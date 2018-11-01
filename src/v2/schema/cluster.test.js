@@ -48,7 +48,7 @@ describe('Cluster Mutation', () => {
       .send({
         query: `
         mutation {
-          updateLabels(name:"my-remote-cluster-1-xz",namespace:"my-remote-cluster-1", labels:{}, resourceType: "HCMCluster")
+          updateResourceLabels(resourceType:"HCMCompliance",namespace:"my-remote-cluster-1", name:"my-remote-cluster-1-xz", body:{cloud:"IBMs"}, selfLink:"apis/compliance.mcm.ibm.com/v1alpha1/namespaces/my-remote-cluster-1/compliances/compliance-xz", resourcePath:"/metadata/spec")
         }
       `,
       })

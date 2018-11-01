@@ -154,9 +154,20 @@ export default class KubeConnector {
         'Content-Type': 'application/json-patch+json',
       },
     };
-
     const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
+    return newRequest;
+  }
 
+  put(path = '', opts = {}) {
+    const defaults = {
+      url: `${this.kubeApiEndpoint}${path}`,
+      method: 'PUT',
+      headers: {
+        Authorization: this.token,
+        'Content-Type': 'application/json',
+      },
+    };
+    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
     return newRequest;
   }
 

@@ -93,7 +93,7 @@ export default class ComplianceModel {
 
 
   async getCompliances(name, namespace) {
-    let compliances;
+    let compliances = [];
 
     if (!name) {
       // for getting compliance list
@@ -115,6 +115,9 @@ export default class ComplianceModel {
 
     return compliances.map(compliance => ({
       ...compliance,
+      raw: compliance,
+      selfLink: _.get(compliance, 'metadata.selfLink', ''),
+      apiVersion: _.get(compliance, 'apiVersion', ''),
       clusterSelector: _.get(compliance, 'spec.clusterSelector', {}),
     }));
   }
@@ -134,10 +137,10 @@ export default class ComplianceModel {
           complianceNamespace: parent.metadata.namespace,
           compliant: _.get(value, 'Compliant', '-'),
           enforcement: _.get(policy, 'spec.remediationAction', 'unknown'),
+          message: _.get(value, 'message', '-'),
           name: key,
           rules: this.resolvePolicyRules(policy), // TODO: Use resolver.
           status: _.get(value, 'Valid', false) === false ? 'invalid' : _.get(value, 'Compliant', 'unknown'),
-          templates: this.resolvePolicyTemplates(policy), // TODO: Use resolver.
           valid: _.get(value, 'Valid', '-'),
           violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
           roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
@@ -221,7 +224,7 @@ export default class ComplianceModel {
 
     // for getting policy list
     const response = await this.kubeConnector.get('/apis/policy.mcm.ibm.com/v1alpha1/policies');
-    if (response.code || response.message) {
+    if (response.code || response.message || (response && !response.items)) {
       logger.error(`HCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
@@ -287,9 +290,15 @@ export default class ComplianceModel {
 
 
   static resolvePolicyStatus(parent) {
-    return _.get(parent, 'status.Valid', false) === false ? 'invalid' : _.get(parent, 'status.Compliant', 'unknown');
+    if (_.get(parent, 'status.Compliant')) {
+      return _.get(parent, 'status.Compliant');
+    }
+    return _.get(parent, 'status.Valid', false) === false ? 'invalid' : 'unknown';
   }
 
+  static resolvePolicyMessage(parent) {
+    return _.get(parent, 'status.message', '-');
+  }
 
   static resolvePolicyTemplates(parent, type) {
     const tempArray = [];
@@ -339,7 +348,7 @@ export default class ComplianceModel {
         violationArray.push({
           name: _.get(res, 'metadata.name', '-'),
           cluster: 'local', // local means the cluster that this policy is applied
-          status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
+          status: this.resolvePolicyStatus(res),
           message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
           reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
           selector: _.get(res, 'selector', ''),
@@ -348,7 +357,7 @@ export default class ComplianceModel {
         violationArray.push({
           name: _.get(res, 'objectDefinition.metadata.name', '-'),
           cluster: 'local', // local means the cluster that this policy is applied
-          status: _.get(res, 'status.Validity.valid', false) ? _.get(parent, 'status.Compliant', '-') : 'invalid',
+          status: this.resolvePolicyStatus(res),
           message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
           reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
           selector: _.get(res, 'selector', ''),

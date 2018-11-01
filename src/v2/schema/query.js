@@ -50,8 +50,11 @@ type Mutation {
   # Creates Kubernetes Compliance
   createCompliance(resources: [JSON]): JSON
 
-  # Update Kubernetes Cluster Labels
-  updateLabels(namespace: String!, name: String!, resourceType: String!, labels: JSON): JSON
+  # Update Kubernetes resources
+  updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String): JSON
+  
+  # Update Kubernetes resources labels
+  updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
   
   # Delete Kubernetes Compliance
   deleteCompliance(namespace: String, name: String!): String
