@@ -33,6 +33,7 @@ export default class ComplianceModel {
     this.kubeConnector = kubeConnector;
   }
 
+
   async createPolicy(resources) {
     // TODO: revist this, do something like application,
     // combine policy and compliance into one mutation
@@ -55,6 +56,7 @@ export default class ComplianceModel {
     }
   }
 
+
   async createCompliance(resources) {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
@@ -75,6 +77,7 @@ export default class ComplianceModel {
     }
   }
 
+
   async deletePolicy(input) {
     const response = await this.kubeConnector.delete(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/policies/${input.name}`);
     if (response.code || response.message) {
@@ -82,6 +85,7 @@ export default class ComplianceModel {
     }
     return response.metadata.name;
   }
+
 
   async deleteCompliance(input) {
     const response = await this.kubeConnector.delete(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
@@ -135,13 +139,13 @@ export default class ComplianceModel {
           cluster: _.get(cluster, 'clustername', parent.metadata.namespace),
           complianceName: parent.metadata.name,
           complianceNamespace: parent.metadata.namespace,
-          compliant: _.get(value, 'Compliant', '-'),
+          compliant: this.resolveStatus(value),
           enforcement: _.get(policy, 'spec.remediationAction', 'unknown'),
           message: _.get(value, 'message', '-'),
           name: key,
           rules: this.resolvePolicyRules(policy), // TODO: Use resolver.
-          status: _.get(value, 'Valid', false) === false ? 'invalid' : _.get(value, 'Compliant', 'unknown'),
-          valid: _.get(value, 'Valid', '-'),
+          status: this.resolveStatus(value),
+          valid: this.resolveValid(value),
           violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
           roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
           roleBindingTemplates: this.resolvePolicyTemplates(policy, 'roleBinding-templates'),
@@ -160,6 +164,19 @@ export default class ComplianceModel {
     return compliancePolicies;
   }
 
+  static resolveStatus(parent) {
+    return _.get(parent, 'Compliant') || _.get(parent, 'compliant', 'unknown');
+  }
+
+  static resolveValid(parent) {
+    if (_.get(parent, 'Valid') !== undefined) {
+      return _.get(parent, 'Valid') ? true : 'invalid';
+    }
+    if (_.get(parent, 'valid') !== undefined) {
+      return _.get(parent, 'valid') ? true : 'invalid';
+    }
+    return 'unknown';
+  }
 
   static resolveComplianceStatus(parent) {
     const complianceStatus = [];
@@ -172,8 +189,8 @@ export default class ComplianceModel {
         let compliantNum = 0;
         let policyNum = 0;
         Object.values(aggregatedStatus).forEach((object) => {
-          if (_.get(object, 'Compliant', '') === 'Compliant') compliantNum += 1;
-          if (_.get(object, 'Valid')) validNum += 1;
+          if (this.resolveStatus(object) === 'Compliant') compliantNum += 1;
+          if (this.resolveValid(object)) validNum += 1;
           policyNum += 1;
         });
         complianceStatus.push({
@@ -195,7 +212,7 @@ export default class ComplianceModel {
     Object.values(status || []).forEach((cluster) => {
       Object.values(cluster.aggregatePoliciesStatus || {}).forEach((policyValue) => {
         totalPolicies += 1;
-        if (_.get(policyValue, 'Compliant', '').toLowerCase() === 'compliant') compliantPolicies += 1;
+        if (this.resolveStatus(policyValue).toLowerCase() === 'compliant') compliantPolicies += 1;
       });
     });
 
@@ -239,11 +256,9 @@ export default class ComplianceModel {
     };
   }
 
-
   static resolvePolicyEnforcement(parent) {
     return _.get(parent, 'spec.remediationAction', 'unknown');
   }
-
 
   static resolvePolicyRules(parent) {
     const rules = [];
@@ -288,12 +303,17 @@ export default class ComplianceModel {
     return roleRef;
   }
 
-
   static resolvePolicyStatus(parent) {
-    if (_.get(parent, 'status.Compliant')) {
-      return _.get(parent, 'status.Compliant');
+    if (_.get(parent, 'status.Compliant') || _.get(parent, 'status.compliant')) {
+      return _.get(parent, 'status.Compliant') || _.get(parent, 'status.compliant');
     }
-    return _.get(parent, 'status.Valid', false) === false ? 'invalid' : 'unknown';
+    if (_.get(parent, 'status.Valid') !== undefined) {
+      return _.get(parent, 'status.Valid') ? 'valid' : 'invalid';
+    }
+    if (_.get(parent, 'status.valid') !== undefined) {
+      return _.get(parent, 'status.valid') ? 'valid' : 'invalid';
+    }
+    return 'unknown';
   }
 
   static resolvePolicyMessage(parent) {
