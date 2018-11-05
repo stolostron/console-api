@@ -95,7 +95,10 @@ export default class ApplicationModel extends KubeModel {
   async getApplicationRelationships(selector = {}) {
     const { matchNames } = selector;
 
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applicationrelationships`);
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applicationrelationships`,
+      { kind: 'ApplicationRelationship' },
+    );
     const appRelationships = matchNames ? filterByName(matchNames, response) : response;
 
     return appRelationships.map(ar => ({
