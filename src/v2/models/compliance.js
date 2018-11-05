@@ -150,6 +150,7 @@ export default class ComplianceModel {
           roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
           roleBindingTemplates: this.resolvePolicyTemplates(policy, 'roleBinding-templates'),
           objectTemplates: this.resolvePolicyTemplates(policy, 'object-templates'),
+          detail: this.resolvePolicyDetails(policy),
           raw: policy,
           metadata: {
             ...parent.metadata,

@@ -30,6 +30,7 @@ type CompliantStatus {
 type CompliancePolicy implements K8sObject {
   cluster: String
   complianceName: String
+  detail: JSON
   complianceNamespace: String
   compliant: String
   # Possible values are: enforce, inform
