@@ -154,13 +154,13 @@ describe('Application Resolver', () => {
       });
   });
 
-  test('Correctly Resolves Delete Application Mutation', (done) => {
+  test('Correctly Resolves Delete Application Mutation - with no child resources selected', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         mutation {
-          deleteApplication(name:"testapp",namespace:"default")
+          deleteApplication(path:"/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/testapp",resources:[{}])
         }
       `,
       })

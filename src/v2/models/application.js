@@ -9,6 +9,7 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 const filterByName = (names, items) =>
   items.filter(item => names.find(name => name.name === item.metadata.name));
@@ -58,15 +59,43 @@ export default class ApplicationModel extends KubeModel {
   }
 
   /**
-   * NOTE: This only deletes the top level Application object. Related objects like Deployable,
-   * PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
+   * NOTE: This deletes the top level Application and any child resources the user has selected.
+   * Child resources: Deployables, PlacementPolicies, AppRelationships and DeployableOverrides.
    */
-  async deleteApplication(namespace = 'default', name) {
-    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/applications/${name}`);
+  async deleteApplication(path, resources) {
+    const errors = await this.deleteAppResource(resources);
+    if (errors && errors.length > 0) {
+      throw new Error(`MCM ERROR: Unable to delete application resource(s) - ${JSON.stringify(errors)}`);
+    }
+
+    const response = await this.kubeConnector.delete(path);
     if (response.code || response.message) {
       throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
     }
     return response.metadata.name;
+  }
+
+  async deleteAppResource(resources) {
+    if (resources.length < 1) {
+      logger.info('No Application resources selected for deletion');
+      return [];
+    }
+
+    const result = await Promise.all(resources.map(resource =>
+      this.kubeConnector.delete(resource.selfLink)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }))));
+
+    const errors = [];
+    result.forEach((item) => {
+      if (item.code >= 400 || item.status === 'Failure') {
+        errors.push({ message: item.message });
+      }
+    });
+
+    return errors;
   }
 
   async getApplications(name, namespace = 'default') {
@@ -82,7 +111,7 @@ export default class ApplicationModel extends KubeModel {
 
     return apps
       .map(app => ({
-        applicationRelationships: app.status.ApplicationRelationships || [],
+        applicationRelationshipNames: app.status.ApplicationRelationships || [],
         dashboard: app.status.Dashboard || {},
         deployableNames: app.status.Deployables || [],
         placementPolicyNames: app.status.PlacementPolicies || [],

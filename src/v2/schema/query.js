@@ -59,9 +59,9 @@ type Mutation {
   # Delete Kubernetes Compliance
   deleteCompliance(namespace: String, name: String!): String
 
-  # NOTE: This only deletes the top level Application object. Related objects like Deployable,
-  # PlacementPolicy, ConfigMap, or DeployableOverride aren't deleted yet.
-  deleteApplication(namespace: String, name: String!): String
+  # NOTE: This deletes the top level Application object and any child resources the user has selected.
+  # Child resources include Deployables, PlacementPolicies, ConfigMaps, ApplicationRelationships and DeployableOverrides.
+  deleteApplication(path: String!, resources: JSON): String
 
   # Delete helm release on specific cluster
   # deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]

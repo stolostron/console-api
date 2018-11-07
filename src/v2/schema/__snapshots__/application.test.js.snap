@@ -100,7 +100,7 @@ Object {
 }
 `;
 
-exports[`Application Resolver Correctly Resolves Delete Application Mutation 1`] = `
+exports[`Application Resolver Correctly Resolves Delete Application Mutation - with no child resources selected 1`] = `
 Object {
   "data": Object {
     "deleteApplication": "testapp",
