@@ -57,6 +57,7 @@ type HelmDeployer {
   namespace: String
   repository: String
   version: String
+  chartURL: String
 }
 
 `;
