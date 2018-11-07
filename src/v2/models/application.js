@@ -174,6 +174,7 @@ export default class ApplicationModel extends KubeModel {
       raw: pp,
       replicas: pp.spec.replicas,
       resourceSelector: pp.spec.resourceSelector,
+      status: pp.status,
     }));
   }
 }

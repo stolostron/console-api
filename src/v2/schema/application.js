@@ -45,6 +45,7 @@ type PlacementPolicy implements K8sObject {
   raw: JSON
   replicas: Int
   resourceSelector: JSON
+  status: JSON
 }
 
 type DeployableDependency {
