@@ -112,6 +112,7 @@ export default class ApplicationModel extends KubeModel {
     return apps
       .map(app => ({
         applicationRelationshipNames: app.status.ApplicationRelationships || [],
+        applicationWorkNames: app.metadata.name || '',
         dashboard: app.status.Dashboard || {},
         deployableNames: app.status.Deployables || [],
         placementPolicyNames: app.status.PlacementPolicies || [],
@@ -175,6 +176,20 @@ export default class ApplicationModel extends KubeModel {
       replicas: pp.spec.replicas,
       resourceSelector: pp.spec.resourceSelector,
       status: pp.status,
+    }));
+  }
+
+  async getApplicationWorks(selector = {}) {
+    const { appName } = selector;
+
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable=${appName},placementPolicy=${appName}`);
+
+    return response.map(work => ({
+      metadata: work.metadata,
+      release: _.get(work, 'status.result.metadata.name', '-'),
+      cluster: work.spec.cluster.name,
+      status: work.status.type,
+      reason: work.status.reason || '-',
     }));
   }
 }
