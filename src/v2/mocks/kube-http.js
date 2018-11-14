@@ -65,12 +65,20 @@ export default function createMockHttp() {
     }
 
     switch (true) {
-      case params.url.includes('applications/app02'):
+      case params.url.includes('applications/gbapp-gbapp'):
         return state.apps.mockSingleAppResponse;
       case params.url.includes('applications/testapp'):
         return state.apps.mockDeleteAppResponse;
-      case params.url.includes('applications'):
+      case params.url.includes('default/applications'):
         return state.apps.mockAppsResponse;
+      case params.url.includes('kube-system/application'):
+        return { body: { items: [] } };
+      case params.url.includes('/applicationrelationships'):
+        return state.apps.mockAppRelationships;
+      case params.url.includes('kube-system/works?labelSelector=deployable=gbapp-gbapp,placementPolicy=gbapp-gbapp'):
+        return { body: { items: [] } };
+      case params.url.includes('works?labelSelector=deployable=gbapp-gbapp,placementPolicy=gbapp-gbapp'):
+        return state.apps.mockAppDeployables;
       case params.url.includes('namespaces/default/clusterstatuses'):
         return state.clusterstatusesByNamespace.default;
       case params.url.includes('namespaces/kube-system/clusterstatuses'):
@@ -81,6 +89,8 @@ export default function createMockHttp() {
         return state.clustersByNamespace.default;
       case params.url.includes('namespaces/kube-system/clusters'):
         return state.clustersByNamespace.kubeSystem;
+      case params.url.includes('kube-system/deployables'):
+        return { body: { items: [] } };
       case params.url.includes('deployables'):
         return state.apps.mockDeployablesResponse;
       case params.url.includes('default/helmrepos'):
@@ -101,6 +111,8 @@ export default function createMockHttp() {
         return state.release.mockResponse;
       case params.url.includes('default/policies/test-policy'):
         return state.policies.mockDeleteResponse;
+      case params.url.includes('kube-system/placementpolicies'):
+        return { body: { items: [] } };
       case params.url.includes('placementpolicies'):
         return state.apps.mockPlacementPoliciesResponse;
       case params.url.includes('policies/policy-xz-1'):

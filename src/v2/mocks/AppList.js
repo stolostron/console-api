@@ -12,105 +12,79 @@ export const mockAppsResponse = {
     kind: 'ApplicationList',
     apiVersion: 'mcm.ibm.com/v1alpha1',
     metadata: {
-      selfLink: '/apis/mcm.ibm.com/v1alpha1/applications',
-      resourceVersion: '54525',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications',
+      resourceVersion: '77111',
     },
     items: [
       {
         metadata: {
-          name: 'app01',
+          name: 'gbapp-gbapp',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/app01',
-          uid: '9167fa5d-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1385',
-          creationTimestamp: '2018-09-04T16:07:05Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp',
+          uid: '8301b18b-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '281',
+          creationTimestamp: '2018-11-12T18:48:14Z',
           labels: {
-            deployable: 'deployable01',
-            hcmapp: 'app01',
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            heritage: 'Tiller',
+            name: 'gbapp-gbapp',
+            release: 'gbapp',
           },
           annotations: {
-            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
-            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
           },
         },
         spec: {
           componentKinds: [
             {
-              group: 'mcm.ibm.com/v1alpha1',
-              kind: 'PlacementPolicy',
-            },
-            {
-              group: 'mcm.ibm.com/v1alpha1',
-              kind: 'Deployable',
+              group: 'core',
+              kind: 'Pods',
             },
           ],
           descriptor: {},
           selector: {
-            matchLabels: {
-              hcmapp: 'app01',
-            },
+            matchExpressions: [
+              {
+                key: 'app',
+                operator: 'In',
+                values: [
+                  'gbapp',
+                  'gbf',
+                  'gbrm',
+                  'gbrs',
+                ],
+              },
+            ],
           },
         },
         status: {
-          Deployable: {
-            metadata: {
-              creationTimestamp: null,
-            },
-            spec: {
-              deployer: {
-                helm: {},
-              },
-            },
-            status: {},
-          },
-        },
-      },
-      {
-        metadata: {
-          name: 'app02',
-          namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/app02',
-          uid: '9992d3aa-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1389',
-          creationTimestamp: '2018-09-04T16:07:19Z',
-          labels: {
-            name: 'app02',
-          },
-          annotations: {
-            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
-            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
-          },
-        },
-        spec: {
-          componentKinds: [
+          Dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+          Deployables: [
             {
-              group: 'mcm.ibm.com/v1alpha1',
-              kind: 'PlacementPolicy',
+              name: 'gbapp-gbapp',
             },
             {
-              group: 'mcm.ibm.com/v1alpha1',
-              kind: 'Deployable',
+              name: 'gbapp-gbapp-redismaster',
+            },
+            {
+              name: 'gbapp-gbapp-redisslave',
             },
           ],
-          descriptor: {},
-          selector: {
-            matchLabels: {
-              hcmapp: 'app02',
+          PlacementPolicies: [
+            {
+              name: 'gbapp-gbapp',
             },
-          },
-        },
-        status: {
-          Deployable: {
-            metadata: {
-              creationTimestamp: null,
+          ],
+          ApplicationRelationships: [
+            {
+              name: 'gbapp-gbapp-master',
             },
-            spec: {
-              deployer: {
-                helm: {},
-              },
+            {
+              name: 'gbapp-gbapp-slave',
             },
-            status: {},
-          },
+          ],
         },
       },
     ],
@@ -122,51 +96,414 @@ export const mockSingleAppResponse = {
     kind: 'Application',
     apiVersion: 'mcm.ibm.com/v1alpha1',
     metadata: {
-      name: 'app02',
+      name: 'gbapp-gbapp',
       namespace: 'default',
-      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/app02',
-      uid: '9992d3aa-b05c-11e8-bd43-b69970856045',
-      resourceVersion: '1389',
-      creationTimestamp: '2018-09-04T16:07:19Z',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp',
+      uid: '8301b18b-e6ab-11e8-b778-9e17a0ceb481',
+      resourceVersion: '281',
+      creationTimestamp: '2018-11-12T18:48:14Z',
       labels: {
-        name: 'app02',
+        app: 'gbapp',
+        chart: 'gbapp-0.1.0',
+        heritage: 'Tiller',
+        name: 'gbapp-gbapp',
+        release: 'gbapp',
       },
       annotations: {
-        'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
-        'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+        'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+        'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
       },
     },
     spec: {
       componentKinds: [
         {
-          group: 'mcm.ibm.com/v1alpha1',
-          kind: 'PlacementPolicy',
-        },
-        {
-          group: 'mcm.ibm.com/v1alpha1',
-          kind: 'Deployable',
+          group: 'core',
+          kind: 'Pods',
         },
       ],
       descriptor: {},
       selector: {
-        matchLabels: {
-          hcmapp: 'app02',
-        },
+        matchExpressions: [
+          {
+            key: 'app',
+            operator: 'In',
+            values: [
+              'gbapp',
+              'gbf',
+              'gbrm',
+              'gbrs',
+            ],
+          },
+        ],
       },
     },
     status: {
-      Dashboard: 'https://9.42.81.167:8443/grafana/dashboard/db/jorge-sample-01-dashboard-via-federated-prometheus',
+      Dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
       Deployables: [
         {
-          name: 'deployable01',
+          name: 'gbapp-gbapp',
+        },
+        {
+          name: 'gbapp-gbapp-redismaster',
+        },
+        {
+          name: 'gbapp-gbapp-redisslave',
         },
       ],
       PlacementPolicies: [
         {
-          name: 'placement01',
+          name: 'gbapp-gbapp',
+        },
+      ],
+      ApplicationRelationships: [
+        {
+          name: 'gbapp-gbapp-master',
+        },
+        {
+          name: 'gbapp-gbapp-slave',
         },
       ],
     },
+  },
+};
+
+export const mockAppRelationships = {
+  body: {
+    kind: 'ApplicationRelationshipList',
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    metadata: {
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships',
+      resourceVersion: '130498',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'bookinfo[]--usesCreated-->details[]',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/bookinfo%5B%5D--usesCreated--%3Edetails%5B%5D',
+          uid: 'ed8997c7-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '21',
+          creationTimestamp: '2018-11-12T18:44:03Z',
+          labels: {
+            destinationKind: 'Deployable',
+            destinationName: 'details',
+            hcmapp: 'mcmappdemo',
+            placementpolicy: 'bookinfo',
+            servicekind: 'ApplicationService',
+            sourceKind: 'Deployable',
+            sourceName: 'bookinfo',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          source: {
+            name: 'bookinfo',
+            kind: 'Deployable',
+          },
+          type: 'usesCreated',
+          destination: {
+            name: 'details',
+            kind: 'Deployable',
+          },
+          livenessProbe: {},
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'bookinfo[]--usesCreated-->reviews[]',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/bookinfo%5B%5D--usesCreated--%3Ereviews%5B%5D',
+          uid: 'ede373ca-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '24',
+          creationTimestamp: '2018-11-12T18:44:04Z',
+          labels: {
+            destinationKind: 'Deployable',
+            destinationName: 'reviews',
+            hcmapp: 'mcmappdemo',
+            placementpolicy: 'bookinfo',
+            servicekind: 'ApplicationService',
+            sourceKind: 'Deployable',
+            sourceName: 'bookinfo',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          source: {
+            name: 'bookinfo',
+            kind: 'Deployable',
+          },
+          type: 'usesCreated',
+          destination: {
+            name: 'reviews',
+            kind: 'Deployable',
+          },
+          livenessProbe: {},
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-master',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-master',
+          uid: '8303a19d-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '240',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+          labels: {
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            destinationKind: 'Deployable',
+            destinationName: 'gbapp-gbapp-redismaster',
+            heritage: 'Tiller',
+            release: 'gbapp',
+            sourceKind: 'Deployable',
+            sourceName: 'gbapp-gbapp',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          source: {
+            name: 'gbapp-gbapp',
+            kind: 'Deployable',
+          },
+          type: 'usesCreated',
+          destination: {
+            name: 'gbapp-gbapp-redismaster',
+            kind: 'Deployable',
+          },
+          livenessProbe: {},
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-slave',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-slave',
+          uid: '83058fb8-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '244',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+          labels: {
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            destinationKind: 'Deployable',
+            destinationName: 'gbapp-gbapp-redisslave',
+            heritage: 'Tiller',
+            release: 'gbapp',
+            sourceKind: 'Deployable',
+            sourceName: 'gbapp-gbapp',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          source: {
+            name: 'gbapp-gbapp',
+            kind: 'Deployable',
+          },
+          type: 'usesCreated',
+          destination: {
+            name: 'gbapp-gbapp-redisslave',
+            kind: 'Deployable',
+          },
+          livenessProbe: {},
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'reviews[]--usesCreated-->ratings[]',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/reviews%5B%5D--usesCreated--%3Eratings%5B%5D',
+          uid: 'f0a049af-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '27',
+          creationTimestamp: '2018-11-12T18:44:09Z',
+          labels: {
+            destinationKind: 'Deployable',
+            destinationName: 'ratings',
+            hcmapp: 'mcmappdemo',
+            placementpolicy: 'bookinfo',
+            servicekind: 'ApplicationService',
+            sourceKind: 'Deployable',
+            sourceName: 'reviews',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          source: {
+            name: 'reviews',
+            kind: 'Deployable',
+          },
+          type: 'usesCreated',
+          destination: {
+            name: 'ratings',
+            kind: 'Deployable',
+          },
+          livenessProbe: {},
+        },
+        status: {},
+      },
+    ],
+  },
+};
+
+export const mockAppDeployables = {
+  body: {
+    kind: 'WorkList',
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    metadata: {
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works',
+      resourceVersion: '79740',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'gbapp-gbapp-cluster1',
+          namespace: 'cluster1',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-cluster1',
+          uid: '8ae796f6-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '258',
+          creationTimestamp: '2018-11-12T18:48:27Z',
+          labels: {
+            clusterName: 'cluster1',
+            deployable: 'gbapp-gbapp',
+            placementPolicy: 'gbapp-gbapp',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'aGNtOmNsdXN0ZXJzLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'aGNtOmNsdXN0ZXJzOmNsdXN0ZXIxOmNsdXN0ZXIx',
+          },
+          ownerReferences: [
+            {
+              apiVersion: 'mcm.ibm.com/__internal',
+              kind: 'placementpolicy',
+              name: 'gbapp-gbapp',
+              uid: '830687cb-e6ab-11e8-b778-9e17a0ceb481',
+              controller: true,
+              blockOwnerDeletion: true,
+            },
+          ],
+        },
+        spec: {
+          cluster: {
+            name: 'cluster1',
+          },
+          type: 'Deployer',
+          scope: {},
+          helm: {
+            chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbf-0.1.0.tgz',
+            namespace: 'default',
+          },
+        },
+        status: {
+          type: 'Completed',
+          lastUpdateTime: '2018-11-12T18:48:30Z',
+        },
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-redismaster-cluster1',
+          namespace: 'cluster1',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redismaster-cluster1',
+          uid: '8d49a01f-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '265',
+          creationTimestamp: '2018-11-12T18:48:31Z',
+          labels: {
+            clusterName: 'cluster1',
+            deployable: 'gbapp-gbapp',
+            placementPolicy: 'gbapp-gbapp',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'aGNtOmNsdXN0ZXJzLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'aGNtOmNsdXN0ZXJzOmNsdXN0ZXIxOmNsdXN0ZXIx',
+          },
+          ownerReferences: [
+            {
+              apiVersion: 'mcm.ibm.com/__internal',
+              kind: 'placementpolicy',
+              name: 'gbapp-gbapp-redismaster',
+              uid: '8307a1ec-e6ab-11e8-b778-9e17a0ceb481',
+              controller: true,
+              blockOwnerDeletion: true,
+            },
+          ],
+        },
+        spec: {
+          cluster: {
+            name: 'cluster1',
+          },
+          type: 'Deployer',
+          scope: {},
+          helm: {
+            chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrm-0.1.0.tgz',
+            namespace: 'default',
+          },
+        },
+        status: {
+          type: 'Completed',
+          lastUpdateTime: '2018-11-12T18:48:32Z',
+        },
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-redisslave-cluster1',
+          namespace: 'cluster1',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redisslave-cluster1',
+          uid: '8fab98b3-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '276',
+          creationTimestamp: '2018-11-12T18:48:35Z',
+          labels: {
+            clusterName: 'cluster1',
+            deployable: 'gbapp-gbapp',
+            placementPolicy: 'gbapp-gbapp',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'aGNtOmNsdXN0ZXJzLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'aGNtOmNsdXN0ZXJzOmNsdXN0ZXIxOmNsdXN0ZXIx',
+          },
+          ownerReferences: [
+            {
+              apiVersion: 'mcm.ibm.com/__internal',
+              kind: 'placementpolicy',
+              name: 'gbapp-gbapp-redisslave',
+              uid: '830a0150-e6ab-11e8-b778-9e17a0ceb481',
+              controller: true,
+              blockOwnerDeletion: true,
+            },
+          ],
+        },
+        spec: {
+          cluster: {
+            name: 'cluster1',
+          },
+          type: 'Deployer',
+          scope: {},
+          helm: {
+            chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrs-0.1.0.tgz',
+            namespace: 'default',
+          },
+        },
+        status: {
+          type: 'Completed',
+          lastUpdateTime: '2018-11-12T18:48:36Z',
+        },
+      },
+    ],
   },
 };
 
@@ -175,21 +512,21 @@ export const mockDeployablesResponse = {
     kind: 'DeployableList',
     apiVersion: 'mcm.ibm.com/v1alpha1',
     metadata: {
-      selfLink: '/apis/mcm.ibm.com/v1alpha1/deployables',
-      resourceVersion: '54593',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables',
+      resourceVersion: '78753',
     },
     items: [
       {
         metadata: {
-          name: 'deployable01',
+          name: 'app04',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/deployable01',
-          uid: '9142e8d6-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1383',
-          creationTimestamp: '2018-09-04T16:07:05Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/app04',
+          uid: 'f65064f3-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '29',
+          creationTimestamp: '2018-11-12T18:44:18Z',
           labels: {
-            hcmapp: 'app01',
-            placementpolicy: 'placement01',
+            hcmapp: 'app04',
+            placementpolicy: 'app04',
             servicekind: 'ApplicationService',
           },
           annotations: {
@@ -201,9 +538,9 @@ export const mockDeployablesResponse = {
           deployer: {
             kind: 'helm',
             helm: {
-              chartName: 'nginx-lego',
-              repository: 'google',
-              version: '0.3.1',
+              chartName: 'ibm-nginx-dev',
+              repository: 'ibm-charts',
+              version: '1.0.1',
               namespace: 'default',
             },
           },
@@ -212,14 +549,16 @@ export const mockDeployablesResponse = {
       },
       {
         metadata: {
-          name: 'deployable02-a',
+          name: 'bookinfo',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/deployable02-a',
-          uid: '9992de86-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1388',
-          creationTimestamp: '2018-09-04T16:07:19Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/bookinfo',
+          uid: 'ed6e5202-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '17',
+          creationTimestamp: '2018-11-12T18:44:03Z',
           labels: {
-            hcmapp: 'app02',
+            hcmapp: 'mcmappdemo',
+            name: 'bookinfo',
+            placementpolicy: 'bookinfo',
             servicekind: 'ApplicationService',
           },
           annotations: {
@@ -231,9 +570,59 @@ export const mockDeployablesResponse = {
           deployer: {
             kind: 'helm',
             helm: {
-              chartName: 'nginx-lego',
-              repository: 'google',
-              version: '0.3.1',
+              chartName: 'productpage-mcm',
+              repository: 'custom-local',
+              version: '0.1.5',
+              namespace: 'default',
+            },
+          },
+          dependencies: [
+            {
+              type: 'usesCreated',
+              destination: {
+                name: 'details',
+                kind: 'Deployable',
+              },
+              livenessProbe: {},
+            },
+            {
+              type: 'usesCreated',
+              destination: {
+                name: 'reviews',
+                kind: 'Deployable',
+              },
+              livenessProbe: {},
+            },
+          ],
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'details',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/details',
+          uid: 'ed9139d6-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '23',
+          creationTimestamp: '2018-11-12T18:44:03Z',
+          labels: {
+            hcmapp: 'mcmappdemo',
+            name: 'details',
+            placementpolicy: 'bookinfo',
+            servicekind: 'ApplicationService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+          },
+        },
+        spec: {
+          deployer: {
+            kind: 'helm',
+            helm: {
+              chartName: 'details-mcm',
+              repository: 'custom-local',
+              version: '0.1.5',
               namespace: 'default',
             },
           },
@@ -242,14 +631,112 @@ export const mockDeployablesResponse = {
       },
       {
         metadata: {
-          name: 'deployable02-b',
+          name: 'gbapp-gbapp',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/deployable02-b',
-          uid: '9992c569-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1387',
-          creationTimestamp: '2018-09-04T16:07:19Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp',
+          uid: '830687cb-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '236',
+          creationTimestamp: '2018-11-12T18:48:14Z',
           labels: {
-            hcmapp: 'app02',
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            heritage: 'Tiller',
+            name: 'gbapp-gbapp',
+            release: 'gbapp',
+            servicekind: 'ApplicationService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+            'mcm.ibm.com/user-identity': 'YWRtaW4=',
+          },
+        },
+        spec: {
+          deployer: {
+            kind: 'helm',
+            helm: {
+              chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbf-0.1.0.tgz',
+              namespace: 'default',
+            },
+          },
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-redismaster',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redismaster',
+          uid: '8307a1ec-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '237',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+          labels: {
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            heritage: 'Tiller',
+            name: 'gbapp-gbapp-redismaster',
+            release: 'gbapp',
+            servicekind: 'CacheService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+            'mcm.ibm.com/user-identity': 'YWRtaW4=',
+          },
+        },
+        spec: {
+          deployer: {
+            kind: 'helm',
+            helm: {
+              chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrm-0.1.0.tgz',
+              namespace: 'default',
+            },
+          },
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp-redisslave',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redisslave',
+          uid: '830a0150-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '238',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+          labels: {
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            heritage: 'Tiller',
+            name: 'gbapp-gbapp-redisslave',
+            release: 'gbapp',
+            servicekind: 'CacheService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+            'mcm.ibm.com/user-identity': 'YWRtaW4=',
+          },
+        },
+        spec: {
+          deployer: {
+            kind: 'helm',
+            helm: {
+              chartURL: 'https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrs-0.1.0.tgz',
+              namespace: 'default',
+            },
+          },
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'ratings',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/ratings',
+          uid: 'ed91178b-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '22',
+          creationTimestamp: '2018-11-12T18:44:03Z',
+          labels: {
+            hcmapp: 'mcmappdemo',
+            name: 'ratings',
+            placementpolicy: 'bookinfo',
             servicekind: 'ApplicationService',
           },
           annotations: {
@@ -261,12 +748,54 @@ export const mockDeployablesResponse = {
           deployer: {
             kind: 'helm',
             helm: {
-              chartName: 'nginx-lego',
-              repository: 'google',
-              version: '0.3.1',
+              chartName: 'ratings-mcm',
+              repository: 'custom-local',
+              version: '0.1.5',
               namespace: 'default',
             },
           },
+        },
+        status: {},
+      },
+      {
+        metadata: {
+          name: 'reviews',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/reviews',
+          uid: 'ed7015f5-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '18',
+          creationTimestamp: '2018-11-12T18:44:03Z',
+          labels: {
+            hcmapp: 'mcmappdemo',
+            name: 'reviews',
+            placementpolicy: 'bookinfo',
+            servicekind: 'ApplicationService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+          },
+        },
+        spec: {
+          deployer: {
+            kind: 'helm',
+            helm: {
+              chartName: 'reviews-mcm',
+              repository: 'custom-local',
+              version: '0.1.5',
+              namespace: 'default',
+            },
+          },
+          dependencies: [
+            {
+              type: 'usesCreated',
+              destination: {
+                name: 'ratings',
+                kind: 'Deployable',
+              },
+              livenessProbe: {},
+            },
+          ],
         },
         status: {},
       },
@@ -279,63 +808,123 @@ export const mockPlacementPoliciesResponse = {
     kind: 'PlacementPolicyList',
     apiVersion: 'mcm.ibm.com/v1alpha1',
     metadata: {
-      selfLink: '/apis/mcm.ibm.com/v1alpha1/placementpolicies',
-      resourceVersion: '55453',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies',
+      resourceVersion: '78936',
     },
     items: [
       {
         metadata: {
-          name: 'placement01',
+          name: 'app04',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/placement01',
-          uid: '9142f75c-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1384',
-          creationTimestamp: '2018-09-04T16:07:05Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/app04',
+          uid: 'f65197a2-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '62',
+          creationTimestamp: '2018-11-12T18:44:18Z',
           labels: {
-            hcmapp: 'app01',
+            hcmapp: 'app04',
           },
           annotations: {
-            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
-            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
           },
         },
         spec: {
           replicas: 1,
           clusterSelector: {
             matchLabels: {
-              name: 'mycluster.icp',
+              name: 'cluster2',
             },
           },
           resourceSelector: {},
         },
-        status: {},
+        status: {
+          decisions: [
+            {
+              clusterName: 'cluster2',
+              clusterNamespace: 'cluster2',
+            },
+          ],
+        },
       },
       {
         metadata: {
-          name: 'placement02',
+          name: 'bookinfo',
           namespace: 'default',
-          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/placement02',
-          uid: '99933832-b05c-11e8-bd43-b69970856045',
-          resourceVersion: '1390',
-          creationTimestamp: '2018-09-04T16:07:19Z',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/bookinfo',
+          uid: 'ed6e751c-e6aa-11e8-b778-9e17a0ceb481',
+          resourceVersion: '46',
+          creationTimestamp: '2018-11-12T18:44:03Z',
           labels: {
-            hcmapp: 'app02',
+            hcmapp: 'mcmappdemo',
+            name: 'bookinfo',
           },
           annotations: {
-            'mcm.ibm.com/user-group': 'c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
-            'mcm.ibm.com/user-identity': 'aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==',
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
           },
         },
         spec: {
           replicas: 1,
           clusterSelector: {
             matchLabels: {
-              name: 'mycluster.icp',
+              environment: 'Dev',
             },
           },
           resourceSelector: {},
         },
-        status: {},
+        status: {
+          decisions: [
+            {
+              clusterName: 'cluster2',
+              clusterNamespace: 'cluster2',
+            },
+          ],
+        },
+      },
+      {
+        metadata: {
+          name: 'gbapp-gbapp',
+          namespace: 'default',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/gbapp-gbapp',
+          uid: '830b0e5f-e6ab-11e8-b778-9e17a0ceb481',
+          resourceVersion: '278',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+          labels: {
+            app: 'gbapp',
+            chart: 'gbapp-0.1.0',
+            heritage: 'Tiller',
+            name: 'gbapp-gbapp',
+            release: 'gbapp',
+            servicekind: 'CacheService',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          replicas: 2,
+          clusterSelector: {
+            matchLabels: {
+              environment: 'Dev',
+            },
+          },
+          resourceSelector: {
+            type: 'cpu',
+          },
+        },
+        status: {
+          decisions: [
+            {
+              clusterName: 'cluster2',
+              clusterNamespace: 'cluster2',
+            },
+            {
+              clusterName: 'cluster1',
+              clusterNamespace: 'cluster1',
+            },
+          ],
+        },
       },
     ],
   },

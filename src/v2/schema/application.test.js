@@ -18,7 +18,39 @@ describe('Application Resolver', () => {
         query: `
         {
           applications {
-            selector
+            applicationRelationships {
+              metadata {
+                name
+                selfLink
+              }
+            }
+            applicationWorks {
+              metadata {
+                name
+                selfLink
+              }
+            }
+            dashboard
+            deployables {
+              metadata {
+                name
+                selfLink
+              }
+            }
+            metadata {
+              name
+              namespace
+              creationTimestamp
+              labels
+              selfLink
+            }
+            placementPolicies {
+              metadata {
+                name
+                selfLink
+              }
+              status
+            }
           }
         }
       `,
@@ -35,7 +67,88 @@ describe('Application Resolver', () => {
       .send({
         query: `
         {
-          applications(name:"app02",namespace:"default") {
+          applications(name:"gbapp-gbapp",namespace:"default") {
+            dashboard
+            metadata {
+              annotations
+              creationTimestamp
+              labels
+              name
+              namespace
+              resourceVersion
+              selfLink
+              uid
+            }
+            applicationRelationships {
+              destination {
+                kind
+                name
+              }
+              metadata {
+                annotations
+                creationTimestamp
+                labels
+                name
+                namespace
+                resourceVersion
+                selfLink
+                status
+                uid
+              }
+              raw
+              source {
+                kind
+                name
+              }
+              type
+            }
+            applicationWorks {
+              metadata {
+                name
+                namespace
+                creationTimestamp
+                labels
+                selfLink
+              }
+              release
+              status
+              reason
+              cluster
+            }
+            deployables {
+              dependencies {
+                kind
+                name
+              }
+              deployer {
+                chartName
+                namespace
+                repository
+                version
+                chartURL
+              }
+              metadata {
+                name
+                namespace
+                creationTimestamp
+              }
+              raw
+            }
+            placementPolicies {
+              metadata {
+                annotations
+                name
+                namespace
+                creationTimestamp
+                selfLink
+              }
+              clusterSelector
+              replicas
+              resourceSelector
+              status
+              raw
+            }
+            raw
             selector
           }
         }
@@ -55,23 +168,29 @@ describe('Application Resolver', () => {
         query: `
         {
           deployables(selector:{
-            matchNames:[{
-              name: "deployable01"
-            }]
+            matchNames:[
+              {name: "gbapp-gbapp"},
+              {name: "gbapp-gbapp-redismaster"},
+              {name: "gbapp-gbapp-redisslave"}
+            ]
           }) {
+            dependencies {
+              kind
+              name
+            }
             deployer {
               chartName
               namespace
               repository
               version
-            }
-            dependencies {
-              kind
-              name
+              chartURL
             }
             metadata {
               name
+              namespace
+              creationTimestamp
             }
+            raw
           }
         }
       `,
@@ -90,17 +209,21 @@ describe('Application Resolver', () => {
         {
           placementPolicies(selector:{
              matchNames:[{
-              name:"placement02"
+              name:"gbapp-gbapp"
             }]
           }) {
-            clusterSelector
             metadata {
               annotations
               name
               namespace
+              creationTimestamp
+              selfLink
             }
+            clusterSelector
             replicas
             resourceSelector
+            status
+            raw
           }
         }
       `,
