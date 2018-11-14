@@ -22,6 +22,8 @@ describe('Policy Resolver', () => {
             metadata {
               name
               namespace
+              selfLink
+              creationTimestamp
             }
             status
           }
@@ -45,6 +47,8 @@ describe('Policy Resolver', () => {
             metadata {
               name
               namespace
+              selfLink
+              creationTimestamp
             }
             status
             detail {

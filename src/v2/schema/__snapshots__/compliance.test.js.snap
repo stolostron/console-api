@@ -12,8 +12,10 @@ Object {
           ],
         },
         "metadata": Object {
+          "creationTimestamp": "2018-09-04T16:13:50Z",
           "name": "compliance-xz",
           "namespace": "mcm",
+          "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-xz",
         },
         "policyCompliant": "1/2",
       },
@@ -608,8 +610,10 @@ Object {
           },
         ],
         "metadata": Object {
+          "creationTimestamp": "2018-09-04T16:13:50Z",
           "name": "compliance-xz",
           "namespace": "mcm",
+          "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-xz",
         },
         "policyCompliant": "1/2",
         "raw": Object {

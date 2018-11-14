@@ -122,7 +122,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       exec: {
@@ -249,8 +249,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://ab0f80c77b48a8d0e634c633d1627ca7cc716340f8f0a48ee9959997c6cb9a20',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19291',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19291',
                     lastState: {},
                     name: 'ibm-cert-manager',
                     ready: true,
@@ -263,8 +263,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://ab0f80c77b48a8d0e634c633d1627ca7cc716340f8f0a48ee9959997c6cb9a21',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19292',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-cert-manager-controller:0.3.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-cert-manager-controller@sha256:1df7fd78a0a2b73c12c11a65ff75dd3191c3733bbec9d0e8131634a969b19292',
                     lastState: {},
                     name: 'ibm-cert-manager-1',
                     ready: true,
@@ -456,7 +456,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'fluentd',
                     resources: {},
@@ -616,8 +616,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://4bd833d89eb8811c37fd86dbff002387c1ad9787e53b6dada476851dc6bd2480',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
                     lastState: {},
                     name: 'fluentd',
                     ready: true,
@@ -688,7 +688,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'fluentd',
                     resources: {},
@@ -848,8 +848,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://8c2148b9cfcc721de5c3b2d5f0756712f641a3b98b536854917f0ce0ddc78b67',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
                     lastState: {},
                     name: 'fluentd',
                     ready: true,
@@ -920,7 +920,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'fluentd',
                     resources: {},
@@ -1080,8 +1080,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://f21acff5af5ea5b9dfd7c6a9900baf6920fd9b5dbdda7da0058a93b72d6025f0',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd:v1.2.2-icp',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
+                    image: 'www.ibm.com/ibmcom-amd64/fluentd:v1.2.2-icp',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/fluentd@sha256:384a99b8d941c93f96ee5b5cbae5b70500219a3f71c73cf4eddd20d9d693e3b3',
                     lastState: {},
                     name: 'fluentd',
                     ready: true,
@@ -1224,7 +1224,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-token-service:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-token-service:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'auth-apikeys',
                     readinessProbe: {
@@ -1369,8 +1369,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://1d30265a502de9cb044e4773d4b45eb8e435e6f1b03a4656940cab43aa494f43',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-token-service:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-token-service@sha256:9211161e5b5b9d892a99b46fad4429333ceb7143b4039419df7ea0efa36381a9',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-token-service:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/iam-token-service@sha256:9211161e5b5b9d892a99b46fad4429333ceb7143b4039419df7ea0efa36381a9',
                     lastState: {},
                     name: 'auth-apikeys',
                     ready: true,
@@ -1425,7 +1425,7 @@ export const mockResponse = {
               spec: {
                 containers: [
                   {
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-audit-service:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'icp-audit-service',
                     resources: {
@@ -1651,7 +1651,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'platform-auth-service',
                     ports: [
@@ -1943,7 +1943,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-provider:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-identity-provider:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'platform-identity-provider',
                     readinessProbe: {
@@ -2148,7 +2148,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-manager:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-identity-manager:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'platform-identity-manager',
                     readinessProbe: {
@@ -2212,7 +2212,7 @@ export const mockResponse = {
                       '-c',
                       'until curl  mariadb:3306 --output dummy.txt ; do sleep 2; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-mariadb',
                     resources: {},
@@ -2424,8 +2424,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://3f4159449cc10a609b8bf519063302bb847409bc79deacc6cfbe6275be5c9fdc',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service@sha256:9add202c06a43da647380c860d9139fa059701fe103c1f229281215bf99dbbd3',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-audit-service:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-audit-service@sha256:9add202c06a43da647380c860d9139fa059701fe103c1f229281215bf99dbbd3',
                     lastState: {},
                     name: 'icp-audit-service',
                     ready: true,
@@ -2438,8 +2438,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://5abb68a972437711721b774a8b895de44311e91cf620ba08641620285382713f',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'platform-auth-service',
                     ready: true,
@@ -2452,8 +2452,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://ad7a3b8016beade78f3d5f446b92a14f5876abfa8dbe56ba20c5f8e39c8017ec',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-manager:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-manager@sha256:632f31acd0fcfc3d0cebea31cfb71018f6712bd1a1b4da7476942b3c23aa3521',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-identity-manager:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-identity-manager@sha256:632f31acd0fcfc3d0cebea31cfb71018f6712bd1a1b4da7476942b3c23aa3521',
                     lastState: {},
                     name: 'platform-identity-manager',
                     ready: true,
@@ -2466,8 +2466,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://f030229fbde1569778af499dc19eac255d53c0fec0a1ec7bb671a86ce44b7e8d',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-provider:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-identity-provider@sha256:24dba8b07c8295eef99abbf8d83041908516e4e50e4e4cfbbbcd53bdf415dda1',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-identity-provider:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-identity-provider@sha256:24dba8b07c8295eef99abbf8d83041908516e4e50e4e4cfbbbcd53bdf415dda1',
                     lastState: {},
                     name: 'platform-identity-provider',
                     ready: true,
@@ -2483,8 +2483,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://cf80c8db4e9d7a4a225107f877c088ae33475c0df7794b27e5c3d45e34dbeada',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-mariadb',
                     ready: true,
@@ -2636,7 +2636,7 @@ export const mockResponse = {
                         value: 'http://platform-identity-management:4500',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-administration:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-policy-administration:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'auth-pap',
                     readinessProbe: {
@@ -2802,8 +2802,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://c0692c7f001dd510be8efee5d0c00dcae601982f044d720330274801198c4ac1',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-administration:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-administration@sha256:e1941aa09a5b692505cb3be3e497d3ff9acb900786b9a2c8c4c00d0243b37dd0',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-policy-administration:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/iam-policy-administration@sha256:e1941aa09a5b692505cb3be3e497d3ff9acb900786b9a2c8c4c00d0243b37dd0',
                     lastState: {},
                     name: 'auth-pap',
                     ready: true,
@@ -2858,7 +2858,7 @@ export const mockResponse = {
               spec: {
                 containers: [
                   {
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-audit-service:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'icp-audit-service',
                     resources: {
@@ -3018,7 +3018,7 @@ export const mockResponse = {
                         value: 'http://iam-pap:39001',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-decision:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-policy-decision:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'auth-pdp',
                     readinessProbe: {
@@ -3074,7 +3074,7 @@ export const mockResponse = {
                       '-c',
                       'until curl -k -i -fsS https://platform-auth-service:9443/oidc/endpoint/OP/.well-known/openid-configuration | grep "200 OK"; do sleep 3; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-auth-service',
                     resources: {},
@@ -3094,7 +3094,7 @@ export const mockResponse = {
                       '-c',
                       'until curl -k -i -fsS http://platform-identity-provider:4300 | grep "200 OK"; do sleep 3; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-identity-provider',
                     resources: {},
@@ -3114,7 +3114,7 @@ export const mockResponse = {
                       '-c',
                       'until curl -k -i -fsS http://platform-identity-management:4500 | grep "200 OK"; do sleep 3; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-identity-manager',
                     resources: {},
@@ -3134,7 +3134,7 @@ export const mockResponse = {
                       '-c',
                       'until curl -k -i -fsS https://iam-token-service:10443/oidc/keys | grep "200 OK"; do sleep 3; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-token-service',
                     resources: {},
@@ -3154,7 +3154,7 @@ export const mockResponse = {
                       '-c',
                       'until curl -k -i -fsS http://iam-pap:39001/v1/health | grep "200 OK"; do sleep 3; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-pap',
                     resources: {},
@@ -3302,8 +3302,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://41da476c77754444eb5dd82dd0f246d765bc3323be469e62ce7e0d7216f18e17',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-decision:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/iam-policy-decision@sha256:d49eb3845c57bb8370a477949d92da10a178b81ade50f0e9d970981fadd6686d',
+                    image: 'www.ibm.com/ibmcom-amd64/iam-policy-decision:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/iam-policy-decision@sha256:d49eb3845c57bb8370a477949d92da10a178b81ade50f0e9d970981fadd6686d',
                     lastState: {},
                     name: 'auth-pdp',
                     ready: true,
@@ -3316,8 +3316,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://b15efc68e699b87b515721f201c5558095be37c08d5f68dd30cc529681d11353',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-audit-service@sha256:9add202c06a43da647380c860d9139fa059701fe103c1f229281215bf99dbbd3',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-audit-service:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-audit-service@sha256:9add202c06a43da647380c860d9139fa059701fe103c1f229281215bf99dbbd3',
                     lastState: {},
                     name: 'icp-audit-service',
                     ready: true,
@@ -3333,8 +3333,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://d9f1df1e05e57675e66309c20459298d3f68e0077ba6bd0316af49b9e34e1aad',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-auth-service',
                     ready: true,
@@ -3351,8 +3351,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://0a7a4f8df64416a936bd70ef0a85da56ceaaecb5363051cd6a6542ab5c0b3389',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-identity-provider',
                     ready: true,
@@ -3369,8 +3369,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://2c58ebff854d561a30cf32ef171bb01c7da9de19e63a1a1b83bfe0148e21dfe5',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-identity-manager',
                     ready: true,
@@ -3387,8 +3387,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://a510cf095ec7592564e909991a7209e030fbd1ac773d93f2b7fbd0130679c068',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-token-service',
                     ready: true,
@@ -3405,8 +3405,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://b7998409964352012416a14318484bf44faa550d0771a0e86ec5d43760f44f0b',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth:3.1.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
+                    image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/icp-platform-auth@sha256:abc258009b8696a83214b7a9d9df63f6d83e19cfca2987c4836b0eadfa4c99c7',
                     lastState: {},
                     name: 'init-pap',
                     ready: true,
@@ -3502,7 +3502,7 @@ export const mockResponse = {
                         value: 'policy,profile,workloadendpoint,node',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'calico-kube-controllers',
                     resources: {
@@ -3611,8 +3611,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://0a431d2cff58540c8f1ea2359f2cbcc57abc6d1c38b357146400b1242b6da299',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-kube-controllers@sha256:0517bb47bc0f1f79695cbb244a033f00f45613cd9d4df3b49cab384cecdab63c',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-kube-controllers:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-kube-controllers@sha256:0517bb47bc0f1f79695cbb244a033f00f45613cd9d4df3b49cab384cecdab63c',
                     lastState: {},
                     name: 'calico-kube-controllers',
                     ready: true,
@@ -3784,7 +3784,7 @@ export const mockResponse = {
                         value: 'true',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       failureThreshold: 6,
@@ -3882,7 +3882,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'install-cni',
                     resources: {
@@ -4048,8 +4048,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://a0753579b0cea2f6262863f9ebaf8be99cdc99206c18397394cdc6b27c94ea0a',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
                     lastState: {},
                     name: 'calico-node',
                     ready: true,
@@ -4062,8 +4062,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://7a11e33728050b955d17e61fb69310622db056ae66a9fb6acb30deb3663aa207',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
                     lastState: {},
                     name: 'install-cni',
                     ready: true,
@@ -4235,7 +4235,7 @@ export const mockResponse = {
                         value: 'true',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       failureThreshold: 6,
@@ -4333,7 +4333,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'install-cni',
                     resources: {
@@ -4499,8 +4499,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://239ef5c4ef7d9093e8eab1dd9b490d968ef9b3c7c1f48fe3a92b3e5e58c0a60d',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
                     lastState: {},
                     name: 'calico-node',
                     ready: true,
@@ -4513,8 +4513,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://09f8905e9db7c95ec2c9f245dc36e32ef56c92f0d50b59ba1b71736a7c41a7fe',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
                     lastState: {},
                     name: 'install-cni',
                     ready: true,
@@ -4686,7 +4686,7 @@ export const mockResponse = {
                         value: 'true',
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       failureThreshold: 6,
@@ -4784,7 +4784,7 @@ export const mockResponse = {
                         },
                       },
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'install-cni',
                     resources: {
@@ -4950,8 +4950,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://f07636a97995df19899ce5ee4e08bfdb8882d8b30f66fff10e1551e8e3c07e4c',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-node:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-node@sha256:284b7823a38d58a79605b35eb508976b3302ef87d0b51ff274540b67536b8be5',
                     lastState: {},
                     name: 'calico-node',
                     ready: true,
@@ -4964,8 +4964,8 @@ export const mockResponse = {
                   },
                   {
                     containerID: 'docker://dec02e86c3b0f2c7f0751e4c53e474a64ed49f6594ec4b3001eeb069e7a49c41',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni:v3.1.3',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
+                    image: 'www.ibm.com/ibmcom-amd64/calico-cni:v3.1.3',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/calico-cni@sha256:0b4eb34f955f35f8d1b182267f7ae9e2be83ca6fe1b1ade63116125feb8d07b9',
                     lastState: {},
                     name: 'install-cni',
                     ready: true,
@@ -5235,7 +5235,7 @@ export const mockResponse = {
                       '--v=1',
                       '--prometheus-auth-config=/prometheus/prometheus-auth-config',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1.1',
+                    image: 'www.ibm.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1.1',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       failureThreshold: 3,
@@ -5310,7 +5310,7 @@ export const mockResponse = {
                       '-c',
                       'until curl --connect-timeout 5  -k https://monitoring-prometheus:9090 --output /dev/null ; do sleep 2; done;',
                     ],
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/curl:4.0.0',
+                    image: 'www.ibm.com/ibmcom-amd64/curl:4.0.0',
                     imagePullPolicy: 'IfNotPresent',
                     name: 'init-adapter',
                     resources: {},
@@ -5426,8 +5426,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://17efce5d41d144a6209bae7c9601d89aa8008fd9591a1758787a5f64a94d307d',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1.1',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/k8s-prometheus-adapter@sha256:836b00cb9848b3843a957d6bdde1bb0827ab47195a1faf3c553a692342e2abfa',
+                    image: 'www.ibm.com/ibmcom-amd64/k8s-prometheus-adapter:v0.2.1.1',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/k8s-prometheus-adapter@sha256:836b00cb9848b3843a957d6bdde1bb0827ab47195a1faf3c553a692342e2abfa',
                     lastState: {},
                     name: 'custom-metrics-adapter',
                     ready: true,
@@ -5443,8 +5443,8 @@ export const mockResponse = {
                 initContainerStatuses: [
                   {
                     containerID: 'docker://969977de969ea12ad5c98222b134466e0766a92e672d61735d6f0cd98ad8452e',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/curl:4.0.0',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/curl@sha256:aad05b4e4529f7e70516d8d3028cae6cd1d50de738ce164f2a532ce2470ac43f',
+                    image: 'www.ibm.com/ibmcom-amd64/curl:4.0.0',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/curl@sha256:aad05b4e4529f7e70516d8d3028cae6cd1d50de738ce164f2a532ce2470ac43f',
                     lastState: {},
                     name: 'init-adapter',
                     ready: true,
@@ -5501,7 +5501,7 @@ export const mockResponse = {
               spec: {
                 containers: [
                   {
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/defaultbackend:1.2.1',
+                    image: 'www.ibm.com/ibmcom-amd64/defaultbackend:1.2.1',
                     imagePullPolicy: 'IfNotPresent',
                     livenessProbe: {
                       failureThreshold: 3,
@@ -5625,8 +5625,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://c81f5631af6dd2364a4216531a272b26c36a4bf5192a35aceff09b412cdfcb15',
-                    image: 'hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/defaultbackend:1.2.1',
-                    imageID: 'docker-pullable://hyc-cloud-private-release-docker-local.artifactory.swg-devops.com/ibmcom-amd64/defaultbackend@sha256:3e1b41e424a55a35c891807b5e8145d0ba864870e530b31b6486fe5b57dd4b67',
+                    image: 'www.ibm.com/ibmcom-amd64/defaultbackend:1.2.1',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom-amd64/defaultbackend@sha256:3e1b41e424a55a35c891807b5e8145d0ba864870e530b31b6486fe5b57dd4b67',
                     lastState: {},
                     name: 'default-backend',
                     ready: true,

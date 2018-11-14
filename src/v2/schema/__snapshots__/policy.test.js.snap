@@ -119,16 +119,20 @@ Object {
       Object {
         "enforcement": "inform",
         "metadata": Object {
+          "creationTimestamp": "2018-09-04T16:13:50Z",
           "name": "policy-xz-1",
           "namespace": "mycluster",
+          "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mycluster/policies/policy-xz-1",
         },
         "status": "NonCompliant",
       },
       Object {
         "enforcement": "enforce",
         "metadata": Object {
+          "creationTimestamp": "2018-09-04T16:13:50Z",
           "name": "policy-xz-2",
           "namespace": "mycluster",
+          "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mycluster/policies/policy-xz-2",
         },
         "status": "Compliant",
       },
@@ -152,8 +156,10 @@ Object {
         },
         "enforcement": "inform",
         "metadata": Object {
+          "creationTimestamp": "2018-09-04T16:13:50Z",
           "name": "policy-xz-1",
           "namespace": "mycluster",
+          "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mycluster/policies/policy-xz-1",
         },
         "roleTemplates": Array [
           Object {

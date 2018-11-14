@@ -25,6 +25,9 @@ Object {
         },
         "operatingSystem": "linux",
         "osImage": "Ubuntu 16.04.4 LTS",
+        "roles": Array [
+          "worker",
+        ],
       },
       Object {
         "architecture": "amd64",
@@ -47,6 +50,9 @@ Object {
         },
         "operatingSystem": "linux",
         "osImage": "Ubuntu 16.04.4 LTS",
+        "roles": Array [
+          "worker",
+        ],
       },
       Object {
         "architecture": "amd64",
@@ -77,6 +83,11 @@ Object {
         },
         "operatingSystem": "linux",
         "osImage": "Ubuntu 16.04.4 LTS",
+        "roles": Array [
+          "proxy",
+          "management",
+          "master",
+        ],
       },
     ],
   },

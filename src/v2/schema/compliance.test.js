@@ -21,6 +21,8 @@ describe('Compliance Resolver', () => {
             metadata {
               name
               namespace
+              selfLink
+              creationTimestamp
             }
             clusterSelector
             policyCompliant
@@ -45,6 +47,8 @@ describe('Compliance Resolver', () => {
             metadata {
               name
               namespace
+              selfLink
+              creationTimestamp
             }
             raw
             clusterSelector

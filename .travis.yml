@@ -33,7 +33,6 @@ install:
   - make install
 
 before_script:
-  - docker ps
   - make test
 
 script:

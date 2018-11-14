@@ -38,6 +38,7 @@ const jestConfig = {
     '!src/**/mocks/*.js',
   ],
   testEnvironment: 'node',
+  setupTestFrameworkScriptFile: './jest.setup.js',
 };
 
 jestConfig.reporters = process.env.TRAVIS ? ['default', tapReporter] : ['default'];

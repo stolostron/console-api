@@ -33,6 +33,7 @@ describe('Nodes Resolver', () => {
             }
             operatingSystem
             osImage
+            roles
           }
         }
       `,

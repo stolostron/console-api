@@ -35,6 +35,7 @@ describe('Pods Resolver', () => {
             restarts
             startedAt
             status
+            images
           }
         }
       `,
