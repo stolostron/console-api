@@ -37,6 +37,7 @@ type PolicyTemplates {
   compliant: String
   lastTransition: String
   name: String
+  kind: String
   validity: String
   raw: JSON
 }

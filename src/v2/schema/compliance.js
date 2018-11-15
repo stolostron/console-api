@@ -13,7 +13,7 @@ export const typeDef = `
 type Compliance implements K8sObject {
   clusterCompliant: String
   clusterSelector: JSON
-  compliancePolicies: [CompliancePolicy]
+  compliancePolicies: [CompliancePolicies]
   complianceStatus: [CompliantStatus]
   metadata: Metadata
   policyCompliant: String
@@ -25,6 +25,14 @@ type CompliantStatus {
   clusterNamespace: String
   localCompliantStatus: String
   localValidStatus: String
+}
+
+
+type CompliancePolicies {
+  name: String
+  clusterCompliant: [String]
+  clusterNotCompliant: [String]
+  policies: [CompliancePolicy]
 }
 
 type CompliancePolicy implements K8sObject {

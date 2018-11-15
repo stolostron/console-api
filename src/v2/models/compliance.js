@@ -114,7 +114,7 @@ export default class ComplianceModel {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
-      compliances = [{ ...response, raw: response }];
+      compliances.push(response);
     }
 
     return compliances.map(compliance => ({
@@ -146,7 +146,7 @@ export default class ComplianceModel {
           rules: this.resolvePolicyRules(policy), // TODO: Use resolver.
           status: this.resolveStatus(value),
           valid: this.resolveValid(value),
-          violations: this.resolvePolicyViolations(policy), // TODO: Use resolver.
+          violations: this.resolvePolicyViolations(policy, cluster), // TODO: Use resolver.
           roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
           roleBindingTemplates: this.resolvePolicyTemplates(policy, 'roleBinding-templates'),
           objectTemplates: this.resolvePolicyTemplates(policy, 'object-templates'),
@@ -162,7 +162,24 @@ export default class ComplianceModel {
       });
     });
 
-    return compliancePolicies;
+    const tempResult = {};
+    Object.values(compliancePolicies).forEach((policy) => {
+      if (!tempResult[policy.name]) {
+        tempResult[policy.name] = {
+          name: _.get(policy, 'name'),
+          clusterCompliant: [],
+          clusterNotCompliant: [],
+          policies: [],
+        };
+      }
+      tempResult[policy.name].policies.push(policy);
+      if (_.get(policy, 'compliant', '').toLowerCase() === 'compliant') {
+        tempResult[policy.name].clusterCompliant.push(_.get(policy, 'cluster'));
+      } else {
+        tempResult[policy.name].clusterNotCompliant.push(_.get(policy, 'cluster'));
+      }
+    });
+    return Object.values(tempResult);
   }
 
   static resolveStatus(parent) {
@@ -341,6 +358,7 @@ export default class ComplianceModel {
             lastTransition: _.get(res, 'status.conditions[0].lastTransitionTime', ''),
             complianceType: _.get(res, 'complianceType', ''),
             apiVersion: _.get(res, 'objectDefinition.apiVersion', ''),
+            kind: _.get(res, 'objectDefinition.kind', ''),
             compliant: _.get(res, 'status.Compliant', ''),
             validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
             raw: res,
@@ -361,14 +379,14 @@ export default class ComplianceModel {
     return tempArray;
   }
 
-  static resolvePolicyViolations(parent) {
+  static resolvePolicyViolations(parent, cluster) {
     const violationArray = [];
     getTemplates(parent).forEach((res) => {
       const templateCondition = _.get(res, 'status.conditions[0]');
       if (_.get(res, 'templateType') === 'role-templates') {
         violationArray.push({
           name: _.get(res, 'metadata.name', '-'),
-          cluster: 'local', // local means the cluster that this policy is applied
+          cluster: _.get(cluster, 'clustername', '-'),
           status: this.resolvePolicyStatus(res),
           message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
           reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
@@ -377,7 +395,7 @@ export default class ComplianceModel {
       } else if (_.get(res, 'templateType') === 'object-templates') {
         violationArray.push({
           name: _.get(res, 'objectDefinition.metadata.name', '-'),
-          cluster: 'local', // local means the cluster that this policy is applied
+          cluster: _.get(cluster, 'clustername', '-'),
           status: this.resolvePolicyStatus(res),
           message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
           reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',

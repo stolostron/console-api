@@ -44,16 +44,16 @@ describe('Compliance Resolver', () => {
         query: `
         {
           compliances(name:"compliance-xz",namespace:"mcm") {
+            clusterSelector
+            raw
             metadata {
+              creationTimestamp
               name
               namespace
+              resourceVersion
               selfLink
-              creationTimestamp
+              uid
             }
-            raw
-            clusterSelector
-            policyCompliant
-            clusterCompliant
             complianceStatus {
               clusterNamespace
               localCompliantStatus
@@ -61,61 +61,71 @@ describe('Compliance Resolver', () => {
             }
             compliancePolicies {
               name
-              metadata {
-                annotations
-                creationTimestamp
-                name
-                namespace
-                resourceVersion
-                selfLink
-                uid
-              }
-              cluster
-              compliant
-              complianceName
-              complianceNamespace
-              valid
-              enforcement
-              status
-              raw
-              roleTemplates {
-                name
-                lastTransition
-                complianceType
-                apiVersion
-                compliant
-                raw
-              }
-              roleBindingTemplates {
-                name
-                lastTransition
-                complianceType
-                apiVersion
-                compliant
-                raw
-              }
-              objectTemplates {
-                name
-                lastTransition
-                complianceType
-                apiVersion
-                compliant
-                raw
-              }
-              rules {
-                complianceType
-                templateType
-                ruleUID
-              }
-              violations {
+              clusterCompliant
+              clusterNotCompliant
+              policies {
                 name
                 cluster
+                compliant
+                complianceName
+                complianceNamespace
+                valid
+                enforcement
                 status
-                message
-                reason
-                selector
+                raw
+                metadata {
+                  annotations
+                  creationTimestamp
+                  name
+                  resourceVersion
+                  selfLink
+                  uid
+                }
+                roleTemplates {
+                  name
+                  lastTransition
+                  complianceType
+                  apiVersion
+                  compliant
+                  raw
+                }
+                roleBindingTemplates {
+                  name
+                  lastTransition
+                  complianceType
+                  apiVersion
+                  compliant
+                  raw
+                }
+                objectTemplates {
+                  name
+                  lastTransition
+                  complianceType
+                  apiVersion
+                  compliant
+                  kind
+                  raw
+                }
+                rules {
+                  complianceType
+                  templateType
+                  ruleUID
+                  apiGroups
+                  verbs
+                  resources
+                }
+                violations {
+                  name
+                  cluster
+                  status
+                  message
+                  reason
+                  selector
+                }
               }
             }
+            policyCompliant
+            clusterCompliant
           }
         }
       `,

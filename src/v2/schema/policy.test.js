@@ -43,21 +43,23 @@ describe('Policy Resolver', () => {
         query: `
         {
           policies(name:"policy-xz-1",namespace:"default") {
-            enforcement
             metadata {
               name
               namespace
               selfLink
               creationTimestamp
+              annotations
+              resourceVersion
+              uid
             }
             status
+            message
+            enforcement
             detail {
               exclude_namespace
               include_namespace
             }
-            rules {
-              ruleUID
-            }
+            raw
             roleTemplates {
               name
               lastTransition
@@ -66,8 +68,37 @@ describe('Policy Resolver', () => {
               compliant
               raw
             }
+            roleBindingTemplates {
+              name
+              lastTransition
+              complianceType
+              apiVersion
+              compliant
+              raw
+            }
+            objectTemplates {
+              name
+              lastTransition
+              complianceType
+              apiVersion
+              compliant
+              raw
+            }
+            rules {
+              complianceType
+              templateType
+              ruleUID
+              apiGroups
+              verbs
+              resources
+            }
             violations {
               name
+              cluster
+              status
+              message
+              reason
+              selector
             }
           }
         }
