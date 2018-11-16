@@ -87,6 +87,7 @@ Object {
           "proxy",
           "management",
           "master",
+          "etcd",
         ],
       },
     ],

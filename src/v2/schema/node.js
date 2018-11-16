@@ -44,6 +44,12 @@ async function resolveRoles(parent) {
   if (labels['node-role.kubernetes.io/va'] === 'true') {
     roles.push('va');
   }
+  if (labels['node-role.kubernetes.io/etcd'] === 'true') {
+    roles.push('etcd');
+  }
+  if (labels['node-role.kubernetes.io/worker'] === 'true') {
+    roles.push('worker');
+  }
   return roles.length > 0 ? roles : ['worker'];
 }
 
