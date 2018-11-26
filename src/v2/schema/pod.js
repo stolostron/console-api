@@ -46,4 +46,7 @@ export const resolver = {
   Pod: {
     images: parent => resolveImages(parent),
   },
+  Mutation: {
+    deletePod: (root, args, { genericModel }) => genericModel.resourceAction('pod', 'Delete', args.name, args.namespace, args.cluster),
+  },
 };

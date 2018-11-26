@@ -7,7 +7,9 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 export default class GenericModel extends KubeModel {
   async patchResource(args) {
@@ -105,5 +107,60 @@ export default class GenericModel extends KubeModel {
       throw new Error(`${response.code} - ${response.message}`);
     }
     return response;
+  }
+
+  async resourceAction(resourceType, actionType, resourceName, resourceNamespace, clusterName) {
+    const name = `${resourceType}-workset-${this.kubeConnector.uid()}`;
+    const body = {
+      apiVersion: 'mcm.ibm.com/v1alpha1',
+      kind: 'WorkSet',
+      metadata: {
+        name,
+      },
+      spec: {
+        clusterSelector: {
+          matchLabels: {
+            name: clusterName,
+          },
+        },
+        template: {
+          spec: {
+            type: 'Action',
+            kube: {
+              resource: resourceType,
+              name: resourceName,
+              namespace: resourceNamespace,
+              actionType,
+            },
+          },
+        },
+      },
+    };
+
+    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterName}/worksets`, body);
+    if (response.status === 'Failure' || response.code >= 400) {
+      throw new Error(`Create Resource Action Failed [${response.code}] - ${response.message}`);
+    }
+
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
+
+    try {
+      const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
+      logger.debug('result:', result);
+      if (result) {
+        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterName}/worksets/${response.metadata.name}`)
+          .catch(e => logger.error(`Error deleting workset ${response.metadata.name}`, e.message));
+      }
+      const reason = _.get(result, 'status.reason');
+      if (reason) {
+        throw new Error(`Failed to delete ${resourceName}: ${reason}`);
+      } else {
+        return _.get(result, 'metadata.name');
+      }
+    } catch (e) {
+      logger.error('Resource Action Error:', e.message);
+      cancel();
+      throw e;
+    }
   }
 }

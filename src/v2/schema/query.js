@@ -69,6 +69,9 @@ type Mutation {
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
+
+  # Delete Kubernetes pod on managed cluster
+  deletePod(name: String!, namespace: String!, cluster: String!): JSON
 }
 
 # Common fields for all Kubernetes objects
