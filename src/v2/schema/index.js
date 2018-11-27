@@ -25,6 +25,7 @@ import * as pvs from './pvs';
 import * as query from './query';
 import * as releases from './helmrels';
 import * as repo from './helmrepo';
+import * as search from './search';
 import * as topology from './topology';
 
 const modules = [
@@ -43,6 +44,7 @@ const modules = [
   query,
   releases,
   repo,
+  search,
   topology,
 ];
 

@@ -22,6 +22,10 @@ type Query {
   pvsClaims: [PVsClaims]
   releases: [HelmRel]
   repos: [HelmRepo]
+  search(keywords: [String], filters: [SearchFilter]): SearchResult
+  searchComplete(field: String!, matchText: String): [String]
+  searchSchema: JSON
+
 
   # Policies and Compliances
   policies(name: String, namespace: String): [Policy]
@@ -52,10 +56,10 @@ type Mutation {
 
   # Update Kubernetes resources
   updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String): JSON
-  
+
   # Update Kubernetes resources labels
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
-  
+
   # Delete Kubernetes Compliance
   deleteCompliance(namespace: String, name: String!): String
 

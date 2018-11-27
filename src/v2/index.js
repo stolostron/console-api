@@ -19,14 +19,17 @@ import cookieParser from 'cookie-parser';
 
 import logger from './lib/logger';
 
+import KubeConnector from './connectors/kube';
+import SearchConnector from './connectors/search';
+
 import ApplicationModel from './models/application';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
-import KubeConnector from './connectors/kube';
 import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
+import SearchModel from './models/search';
 
 import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
@@ -83,6 +86,10 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     httpLib: kubeHTTP,
     namespaces,
   });
+  const searchConnector = new SearchConnector({
+    token: req.kubeToken,
+    httpLib: kubeHTTP,
+  });
 
   const context = {
     req,
@@ -92,6 +99,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
+    searchModel: new SearchModel({ searchConnector }),
   };
 
   const mongodbUrl = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
