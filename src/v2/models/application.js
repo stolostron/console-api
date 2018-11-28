@@ -183,13 +183,16 @@ export default class ApplicationModel extends KubeModel {
     const { appName } = selector;
 
     const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable=${appName},placementPolicy=${appName}`);
-
     return response.map(work => ({
       metadata: work.metadata,
       release: _.get(work, 'status.result.metadata.name', '-'),
       cluster: work.spec.cluster.name,
       status: work.status.type,
       reason: work.status.reason || '-',
+      result: Object.assign(
+        _.get(work, 'spec.helm', {}),
+        _.get(work, 'status.result.spec', {}),
+      ),
     }));
   }
 }

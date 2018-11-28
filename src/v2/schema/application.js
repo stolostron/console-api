@@ -28,6 +28,7 @@ type ApplicationWorks implements K8sObject {
   cluster: String
   status: String
   reason: String
+  result: WorkResult
 }
 
 type ApplicationRelationship implements K8sObject {
@@ -60,6 +61,18 @@ type PlacementPolicy implements K8sObject {
 type DeployableDependency {
   kind: String
   name: String
+}
+
+type WorkResult {
+  chartURL: String
+  namespace: String
+  chartName: String
+  chartVersion: String
+  description: String
+  firstDeployed: String
+  lastDeployed: String
+  status: String
+  version: String
 }
 
 type HelmDeployer {
