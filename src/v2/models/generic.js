@@ -137,7 +137,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterName}/worksets`, body);
+    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets`, body);
     if (response.status === 'Failure' || response.code >= 400) {
       throw new Error(`Create Resource Action Failed [${response.code}] - ${response.message}`);
     }
@@ -148,7 +148,7 @@ export default class GenericModel extends KubeModel {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       logger.debug('result:', result);
       if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterName}/worksets/${response.metadata.name}`)
+        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets/${response.metadata.name}`)
           .catch(e => logger.error(`Error deleting workset ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
