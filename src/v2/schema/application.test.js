@@ -142,8 +142,8 @@ describe('Application Resolver', () => {
                 creationTimestamp
                 selfLink
               }
-              clusterSelector
-              replicas
+              clusterLabels
+              clusterReplicas
               resourceSelector
               status
               raw
@@ -219,8 +219,8 @@ describe('Application Resolver', () => {
               creationTimestamp
               selfLink
             }
-            clusterSelector
-            replicas
+            clusterLabels
+            clusterReplicas
             resourceSelector
             status
             raw

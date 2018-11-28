@@ -331,11 +331,12 @@ Object {
   "data": Object {
     "placementPolicies": Array [
       Object {
-        "clusterSelector": Object {
+        "clusterLabels": Object {
           "matchLabels": Object {
             "environment": "Dev",
           },
         },
+        "clusterReplicas": 2,
         "metadata": Object {
           "annotations": Object {
             "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
@@ -370,12 +371,12 @@ Object {
             "uid": "830b0e5f-e6ab-11e8-b778-9e17a0ceb481",
           },
           "spec": Object {
-            "clusterSelector": Object {
+            "clusterLabels": Object {
               "matchLabels": Object {
                 "environment": "Dev",
               },
             },
-            "replicas": 2,
+            "clusterReplicas": 2,
             "resourceSelector": Object {
               "type": "cpu",
             },
@@ -393,7 +394,6 @@ Object {
             ],
           },
         },
-        "replicas": 2,
         "resourceSelector": Object {
           "type": "cpu",
         },
@@ -792,11 +792,12 @@ Object {
         },
         "placementPolicies": Array [
           Object {
-            "clusterSelector": Object {
+            "clusterLabels": Object {
               "matchLabels": Object {
                 "environment": "Dev",
               },
             },
+            "clusterReplicas": 2,
             "metadata": Object {
               "annotations": Object {
                 "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
@@ -831,12 +832,12 @@ Object {
                 "uid": "830b0e5f-e6ab-11e8-b778-9e17a0ceb481",
               },
               "spec": Object {
-                "clusterSelector": Object {
+                "clusterLabels": Object {
                   "matchLabels": Object {
                     "environment": "Dev",
                   },
                 },
-                "replicas": 2,
+                "clusterReplicas": 2,
                 "resourceSelector": Object {
                   "type": "cpu",
                 },
@@ -854,7 +855,6 @@ Object {
                 ],
               },
             },
-            "replicas": 2,
             "resourceSelector": Object {
               "type": "cpu",
             },

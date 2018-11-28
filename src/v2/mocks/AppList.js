@@ -829,8 +829,8 @@ export const mockPlacementPoliciesResponse = {
           },
         },
         spec: {
-          replicas: 1,
-          clusterSelector: {
+          clusterReplicas: 1,
+          clusterLabels: {
             matchLabels: {
               name: 'cluster2',
             },
@@ -864,8 +864,8 @@ export const mockPlacementPoliciesResponse = {
           },
         },
         spec: {
-          replicas: 1,
-          clusterSelector: {
+          clusterReplicas: 1,
+          clusterLabels: {
             matchLabels: {
               environment: 'Dev',
             },
@@ -903,8 +903,8 @@ export const mockPlacementPoliciesResponse = {
           },
         },
         spec: {
-          replicas: 2,
-          clusterSelector: {
+          clusterReplicas: 2,
+          clusterLabels: {
             matchLabels: {
               environment: 'Dev',
             },

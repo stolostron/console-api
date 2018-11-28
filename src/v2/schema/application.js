@@ -49,11 +49,11 @@ type Deployable implements K8sObject {
 }
 
 type PlacementPolicy implements K8sObject {
-  clusterSelector: JSON
+  clusterLabels: JSON
   metadata: Metadata
   # The object's yaml definition in JSON format.
   raw: JSON
-  replicas: Int
+  clusterReplicas: Int
   resourceSelector: JSON
   status: JSON
 }

@@ -170,10 +170,10 @@ export default class ApplicationModel extends KubeModel {
     const placementPolicies = matchNames ? filterByName(matchNames, response) : response;
 
     return placementPolicies.map(pp => ({
-      clusterSelector: pp.spec.clusterSelector,
+      clusterLabels: pp.spec.clusterLabels,
       metadata: pp.metadata,
       raw: pp,
-      replicas: pp.spec.replicas,
+      clusterReplicas: pp.spec.clusterReplicas,
       resourceSelector: pp.spec.resourceSelector,
       status: pp.status,
     }));
