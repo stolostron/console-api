@@ -128,9 +128,63 @@ export default class ComplianceModel {
 
 
   static resolveCompliancePolicies(parent) {
-    const compliancePolicies = [];
-    const aggregatedStatus = _.get(parent, 'status', {});
+    const aggregatedStatus = _.get(parent, 'status');
+    // compliance that has aggregatedStatus
+    if (aggregatedStatus) return this.resolvePolicyFromStatus(aggregatedStatus, parent);
+    // in this case, a compliance doesn't connect with a
+    // placementPolicy may not have aggregatedStatus
+    return this.resolvePolicyFromSpec(parent);
+  }
 
+  static resolveCompliancePolicy(parent) {
+    const aggregatedStatus = _.get(parent, 'status');
+    return this.resolveCompliancePoliciesFromSpec(parent, aggregatedStatus);
+  }
+
+  static resolveCompliancePoliciesFromSpec(parent, aggregatedStatus) {
+    const compliancePolicies = [];
+    const policies = _.get(parent, 'spec.runtime-rules', []);
+    policies.forEach((policy) => {
+      compliancePolicies.push({
+        name: _.get(policy, 'metadata.name'),
+        complianceName: _.get(parent, 'metadata.name'),
+        complianceNamespace: _.get(parent, 'metadata.namespace'),
+        complianceSelfLink: _.get(parent, 'metadata.selfLink'),
+        roleTemplates: this.resolvePolicyTemplates(policy, 'role-templates'),
+        roleBindingTemplates: this.resolvePolicyTemplates(policy, 'roleBinding-templates'),
+        objectTemplates: this.resolvePolicyTemplates(policy, 'object-templates'),
+        detail: this.resolvePolicyDetails(policy),
+        raw: policy,
+      });
+    });
+
+    if (aggregatedStatus) {
+      Object.values(aggregatedStatus).forEach((cluster) => {
+        Object.entries(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach(([key, value]) => {
+          const policy = parent.spec['runtime-rules'].find(p => p.metadata.name === key);
+
+          const policyObject = {
+            compliant: this.resolveStatus(value),
+            enforcement: _.get(policy, 'spec.remediationAction', 'unknown'),
+            message: _.get(value, 'message', '-'),
+            rules: this.resolvePolicyRules(policy), // TODO: Use resolver.
+            status: this.resolveStatus(value),
+            violations: this.resolvePolicyViolations(policy, cluster), // TODO: Use resolver.
+            metadata: {
+              ...parent.metadata,
+              name: key,
+            },
+          };
+
+          compliancePolicies[key] = { ...compliancePolicies[key], ...policyObject };
+        });
+      });
+    }
+    return Object.values(compliancePolicies);
+  }
+
+  static resolvePolicyFromStatus(aggregatedStatus, parent) {
+    const compliancePolicies = [];
     Object.values(aggregatedStatus).forEach((cluster) => {
       Object.entries(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach(([key, value]) => {
         const policy = parent.spec['runtime-rules'].find(p => p.metadata.name === key);
@@ -167,6 +221,8 @@ export default class ComplianceModel {
       if (!tempResult[policy.name]) {
         tempResult[policy.name] = {
           name: _.get(policy, 'name'),
+          complianceName: _.get(policy, 'complianceName'),
+          complianceNamespace: _.get(policy, 'complianceNamespace'),
           clusterCompliant: [],
           clusterNotCompliant: [],
           policies: [],
@@ -180,6 +236,20 @@ export default class ComplianceModel {
       }
     });
     return Object.values(tempResult);
+  }
+
+
+  static resolvePolicyFromSpec(parent) {
+    const compliancePolicies = [];
+    const policies = _.get(parent, 'spec.runtime-rules', []);
+    policies.forEach((policy) => {
+      compliancePolicies.push({
+        name: _.get(policy, 'metadata.name'),
+        complianceName: _.get(parent, 'metadata.name'),
+        complianceNamespace: _.get(parent, 'metadata.namespace'),
+      });
+    });
+    return Object.values(compliancePolicies);
   }
 
   static resolveStatus(parent) {

@@ -36,9 +36,4 @@ export const resolver = {
     totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
     totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
-  Mutation: {
-    // patch cluster labels
-    updateResourceLabels: (parent, args, { genericModel }) =>
-      genericModel.patchResource(args),
-  },
 };

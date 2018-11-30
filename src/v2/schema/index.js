@@ -22,6 +22,7 @@ import * as node from './node';
 import * as pod from './pod';
 import * as policy from './policy';
 import * as pvs from './pvs';
+import * as genericResources from './generic-resources';
 import * as query from './query';
 import * as releases from './helmrels';
 import * as repo from './helmrepo';
@@ -42,6 +43,7 @@ const modules = [
   policy,
   pvs,
   query,
+  genericResources,
   releases,
   repo,
   search,

@@ -53,10 +53,13 @@ type Mutation {
 
   # Creates Kubernetes Compliance
   createCompliance(resources: [JSON]): JSON
+  
+  # Creates Kubernetes Resources
+  createResources(resources: [JSON]): JSON
 
   # Update Kubernetes resources
-  updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String): JSON
-
+  updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
+  
   # Update Kubernetes resources labels
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 

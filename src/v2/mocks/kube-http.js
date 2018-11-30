@@ -20,6 +20,10 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
+    apiList: {
+      mockResponse: require('./APIList').mockResponse,
+      apiPath: require('./APIList').apiPath,
+    },
     clusterStatus: require('./ClusterStatusList').default,
     repos: require('./ReposList').default,
     repoMutations: require('./RepoMutationsList').default,
@@ -125,8 +129,12 @@ export default function createMockHttp() {
         return state.compliances.mockComplianceListResponse;
       case params.url.includes('resourceviews?fieldSelector'):
         return state.resourceViews.mockWorksetPollComplete;
-      default:
+      case params.url.includes('clusters'):
         return state.clusters;
+      case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
+        return state.apiList.apiPath;
+      default:
+        return state.apiList.mockResponse;
     }
   };
 }

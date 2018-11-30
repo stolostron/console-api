@@ -14,6 +14,7 @@ type Compliance implements K8sObject {
   clusterCompliant: String
   clusterSelector: JSON
   compliancePolicies: [CompliancePolicies]
+  compliancePolicy: [CompliancePolicyDetail]
   complianceStatus: [CompliantStatus]
   metadata: Metadata
   policyCompliant: String
@@ -30,9 +31,27 @@ type CompliantStatus {
 
 type CompliancePolicies {
   name: String
+  complianceName: String
+  complianceNamespace: String
   clusterCompliant: [String]
   clusterNotCompliant: [String]
   policies: [CompliancePolicy]
+}
+
+type CompliancePolicyDetail {
+  name: String
+  complianceName: String
+  complianceNamespace: String
+  complianceSelfLink: String
+  raw: JSON
+  message: String
+  detail: JSON
+  status: String
+  enforcement: String
+  rules: [PolicyRules]
+  roleTemplates: [PolicyTemplates]
+  roleBindingTemplates: [PolicyTemplates]
+  objectTemplates: [PolicyTemplates]
 }
 
 type CompliancePolicy implements K8sObject {
@@ -66,6 +85,7 @@ export const resolver = {
   },
   Compliance: {
     compliancePolicies: parent => ComplianceModel.resolveCompliancePolicies(parent),
+    compliancePolicy: parent => ComplianceModel.resolveCompliancePolicy(parent),
     complianceStatus: parent => ComplianceModel.resolveComplianceStatus(parent),
     policyCompliant: parent => ComplianceModel.resolvePolicyCompliant(parent),
     clusterCompliant: parent => ComplianceModel.resolveClusterCompliant(parent),
@@ -75,7 +95,5 @@ export const resolver = {
       complianceModel.createCompliance(args.resources),
     deleteCompliance: (root, args, { complianceModel }) =>
       complianceModel.deleteCompliance(args),
-    updateResource: (parent, args, { genericModel }) =>
-      genericModel.putResource(args),
   },
 };
