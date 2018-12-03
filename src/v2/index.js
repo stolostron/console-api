@@ -61,6 +61,14 @@ const requestLogger = isProd ?
 
 graphQLServer.use('*', helmet(), requestLogger, cookieParser());
 
+graphQLServer.get('/livenessProbe', (req, res) => {
+  res.send(`Testing livenessProbe --> ${new Date().toLocaleString()}`);
+});
+
+graphQLServer.get('/readinessProbe', (req, res) => {
+  res.send(`Testing readinessProbe --> ${new Date().toLocaleString()}`);
+});
+
 const auth = [];
 
 if (isProd) {
