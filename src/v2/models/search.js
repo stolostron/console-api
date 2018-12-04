@@ -24,13 +24,20 @@ export default class SearchModel {
     });
   }
 
-  async searchComplete(field, match = '') {
+  async searchComplete({ field, matchText }) {
     logger.warn('SearchComplete: Returning mocked results!');
-    const mockNames = ['cluster-name-1', 'pod-name-1', 'node-name-1'];
+    const mockNames = ['cluster-name-1', 'cluster-name-2', 'pod-name-1', 'node-name-1'];
+    const mockOther = ['abc', 'def', 'ghi'];
     if (field === 'name') {
-      return match === '' ? mockNames : mockNames.filter(r => r.indexOf(match) === 0);
+      return matchText === '' ? mockNames : mockNames.filter(r => r.indexOf(matchText) === 0);
     }
-    return ['aaa', 'bbb', 'ccc'];
+    if (field === 'namespace') {
+      return matchText === '' ? mockOther : mockOther.filter(r => r.indexOf(matchText) === 0);
+    }
+    if (field === 'status') {
+      return matchText === '' ? mockOther : mockOther.filter(r => r.indexOf(matchText) === 0);
+    }
+    return [];
   }
 
   async searchSchema() {
