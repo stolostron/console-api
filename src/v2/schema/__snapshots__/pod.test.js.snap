@@ -378,7 +378,7 @@ Object {
         },
         "hostIP": "9.42.82.240",
         "images": Array [
-          "hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm",
+          "www.ibm.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm",
         ],
         "metadata": Object {
           "creationTimestamp": "2018-10-12T12:42:39Z",

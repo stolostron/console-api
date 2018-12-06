@@ -5054,7 +5054,7 @@ export const mockResponse = {
                         value: 'http://localhost:3000/auth/liberty/callback',
                       },
                     ],
-                    image: 'hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm',
+                    image: 'www.ibm.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm',
                     imagePullPolicy: 'Always',
                     name: 'catalog-ui',
                     resources: {
@@ -5166,8 +5166,8 @@ export const mockResponse = {
                 containerStatuses: [
                   {
                     containerID: 'docker://e2781804b8caefb902c03188875b9b68189348edce4a642ae998cce8a6222fb7',
-                    image: 'hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm',
-                    imageID: 'docker-pullable://hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com/ibmcom/icp-catalog-ui-amd64@sha256:552ca61f749781480ceda93c811000455108c4cd4012ef2ea06b9d13a9985469',
+                    image: 'www.ibm.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm',
+                    imageID: 'docker-pullable://www.ibm.com/ibmcom/icp-catalog-ui-amd64@sha256:552ca61f749781480ceda93c811000455108c4cd4012ef2ea06b9d13a9985469',
                     lastState: {},
                     name: 'catalog-ui',
                     ready: true,
