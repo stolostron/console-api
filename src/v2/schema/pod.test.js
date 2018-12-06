@@ -45,4 +45,20 @@ describe('Pods Resolver', () => {
         done();
       });
   });
+
+  test('Correctly Resolves Pod log query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          logs(containerName: "hcm-ui", podName:"mcm-ibm-mcm-prod-mcmui-67f7f87d9d-5zr2b", podNamespace:"kube-system", clusterName:"cluster1")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });

@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Pods Resolver Correctly Resolves Pod log query 1`] = `
+Object {
+  "data": Object {
+    "logs": "here is the logs",
+  },
+}
+`;
+
 exports[`Pods Resolver Correctly Resolves Pods Query 1`] = `
 Object {
   "data": Object {

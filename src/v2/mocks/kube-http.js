@@ -36,6 +36,7 @@ export default function createMockHttp() {
     policies: require('./PolicyList'),
     compliances: require('./ComplianceList'),
     resourceViews: require('./ResourceView'),
+    logs: require('./Logs'),
   };
 
   return async function MockLib(params) {
@@ -83,6 +84,12 @@ export default function createMockHttp() {
         return { body: { items: [] } };
       case params.url.includes('works?labelSelector=deployable=gbapp-gbapp,placementPolicy=gbapp-gbapp'):
         return state.apps.mockAppDeployables;
+      case params.url.endsWith('default/clusters/cluster1'):
+        return state.logs.mockClusterResponse;
+      case params.url.endsWith('kube-system/clusters/cluster1'):
+        return { body: { items: [] } };
+      case params.url.endsWith('clusterstatuses/cluster1/log/kube-system/mcm-ibm-mcm-prod-mcmui-67f7f87d9d-5zr2b/hcm-ui?tailLines=1000'):
+        return state.logs.mockLogsResponse;
       case params.url.includes('namespaces/default/clusterstatuses'):
         return state.clusterstatusesByNamespace.default;
       case params.url.includes('namespaces/kube-system/clusterstatuses'):

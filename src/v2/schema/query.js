@@ -22,6 +22,7 @@ type Query {
   pvsClaims: [PVsClaims]
   releases: [HelmRel]
   repos: [HelmRepo]
+  logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
   search(keywords: [String], filters: [SearchFilter]): SearchResult
   searchComplete(field: String!, matchText: String): [String]
   searchSchema: JSON
