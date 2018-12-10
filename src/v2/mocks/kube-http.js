@@ -20,6 +20,7 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
+    userQuery: require('./UserQuery').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
@@ -41,6 +42,9 @@ export default function createMockHttp() {
 
   return async function MockLib(params) {
     if (params.json) {
+      if (params.json.userQueries) {
+        return state.userQuery;
+      }
       switch (true) {
         case params.json.metadata.name.includes('pods'):
           return state.pods.mockResourceView;
@@ -68,7 +72,6 @@ export default function createMockHttp() {
           return state.pods;
       }
     }
-
     switch (true) {
       case params.url.includes('applications/gbapp-gbapp'):
         return state.apps.mockSingleAppResponse;
@@ -138,6 +141,8 @@ export default function createMockHttp() {
         return state.resourceViews.mockWorksetPollComplete;
       case params.url.includes('clusters'):
         return state.clusters;
+      case params.url.includes('api/v1/userpreferences'):
+        return state.userQuery;
       case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
         return state.apiList.apiPath;
       default:

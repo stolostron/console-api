@@ -28,6 +28,7 @@ import * as releases from './helmrels';
 import * as repo from './helmrepo';
 import * as search from './search';
 import * as topology from './topology';
+import * as userQuery from './user-query';
 
 const modules = [
   applications,
@@ -48,6 +49,7 @@ const modules = [
   repo,
   search,
   topology,
+  userQuery,
 ];
 
 const mainDefs = [`

@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Query Resolver Correctly Resolves Add User Query 1`] = `
+Object {
+  "data": Object {
+    "saveQuery": Object {
+      "userQueries": Array [
+        Object {
+          "description": "test",
+          "name": "test",
+          "searchText": "test",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`User Query Resolver Correctly Resolves Get User Query 1`] = `
+Object {
+  "data": Object {
+    "items": Array [
+      Object {
+        "description": "test",
+        "name": "test",
+        "searchText": "test",
+      },
+    ],
+  },
+}
+`;
+
+exports[`User Query Resolver Correctly Resolves Remove User Query 1`] = `
+Object {
+  "data": Object {
+    "deleteQuery": Object {
+      "userQueries": Array [
+        Object {
+          "description": "test",
+          "name": "test",
+          "searchText": "test",
+        },
+      ],
+    },
+  },
+}
+`;

@@ -26,6 +26,7 @@ type Query {
   search(keywords: [String], filters: [SearchFilter]): SearchResult
   searchComplete(field: String!, matchText: String): [String]
   searchSchema: JSON
+  userQueries: [userQuery]
 
 
   # Policies and Compliances
@@ -48,6 +49,12 @@ type Mutation {
 
   # Creates a Kubernetes Policy
   createPolicy(resources: [JSON]): JSON
+  
+  # Save a user query
+  saveQuery(resource: JSON): JSON
+  
+  # Delete a user query
+  deleteQuery(resource: JSON): JSON
 
   # Delete Kubernetes Policy
   deletePolicy(namespace: String, name: String!): String

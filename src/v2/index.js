@@ -25,6 +25,7 @@ import SearchConnector from './connectors/search';
 import ApplicationModel from './models/application';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
+import QueryModel from './models/userquery';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import MongoModel from './models/mongo';
@@ -104,6 +105,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     applicationModel: new ApplicationModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
+    queryModel: new QueryModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
