@@ -23,8 +23,10 @@ type Query {
   releases: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
-  search(keywords: [String], filters: [SearchFilter]): SearchResult
-  searchComplete(field: String!, matchText: String): [String]
+
+  search(input: [SearchInput]): [SearchResult]
+
+  searchComplete(property: String!): [String]
   searchSchema: JSON
   userQueries: [userQuery]
 
@@ -49,10 +51,10 @@ type Mutation {
 
   # Creates a Kubernetes Policy
   createPolicy(resources: [JSON]): JSON
-  
+
   # Save a user query
   saveQuery(resource: JSON): JSON
-  
+
   # Delete a user query
   deleteQuery(resource: JSON): JSON
 
@@ -61,13 +63,13 @@ type Mutation {
 
   # Creates Kubernetes Compliance
   createCompliance(resources: [JSON]): JSON
-  
+
   # Creates Kubernetes Resources
   createResources(resources: [JSON]): JSON
 
   # Update Kubernetes resources
   updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
-  
+
   # Update Kubernetes resources labels
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 

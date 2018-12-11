@@ -7,30 +7,41 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-
 export const typeDef = `
   input SearchFilter {
     filter: String!
-    value: String!
+    values: [String]
   }
 
-  type SearchResult {
-    items: JSON
-    relatedResources: [SearchRelatedResult]
+  input SearchRelatedInput {
+    kind: String!
+    count: Int
   }
 
   type SearchRelatedResult {
     kind: String!
     count: Int
   }
+
+  input SearchInput {
+    keywords: [String]
+    filters: [SearchFilter]
+    relationship: [SearchRelatedInput]
+    count: Boolean
+  }
+
+  type SearchResult {
+    items: JSON
+    headers: [String]
+    related: [SearchRelatedResult]
+  }
 `;
 
 export const resolver = {
   Query: {
-    search: (parent, { keywords, filters }, { searchModel }) =>
-      searchModel.search({ keywords, filters }),
-    searchComplete: (parent, { field, matchText }, { searchModel }) =>
-      searchModel.searchComplete({ field, matchText }),
+    search: (parent, args, { searchModel }) => searchModel.multiSearch(args),
+    searchComplete: (parent, { field, property }, { searchModel }) =>
+      searchModel.searchComplete({ field, property }),
     searchSchema: (parent, args, { searchModel }) => searchModel.searchSchema(),
   },
 };

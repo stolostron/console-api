@@ -12,32 +12,44 @@ import logger from '../lib/logger';
 
 /* eslint-disable class-methods-use-this */
 export default class SearchModel {
-  async search({ keywords = [''], filters = [] }) {
-    logger.info('Search keywords: ', keywords);
-    logger.info('Search filters:', filters);
-
-    logger.warn('Search: Returning mocked results!');
-    return mockSearch.mock({
-      cluster: 2,
-      node: 3,
-      pod: 23,
-    });
+  async multiSearch({ input }) {
+    return Promise.all(input.map(i => this.search(i)));
   }
 
-  async searchComplete({ field, matchText }) {
+  async search({
+    keywords = [''],
+    filters = [],
+    relation,
+    count = false,
+  }) {
+    logger.info('Search keywords: ', keywords);
+    logger.info('Search filters:', filters);
+    logger.info('Search relation:', relation);
+
+    logger.warn('Search: Returning mocked results!');
+
+    const result = {
+      // contains "items" and "headers"
+      ...mockSearch.mock({ cluster: 2, node: 3, pod: 23 }),
+      related: mockSearch.mock({ cluster: 1 }).relatedResources,
+    };
+
+    if (count) {
+      result.items = result.items.length;
+    }
+
+    return result;
+  }
+
+  async searchComplete({ property }) {
     logger.warn('SearchComplete: Returning mocked results!');
-    const mockNames = ['cluster-name-1', 'cluster-name-2', 'pod-name-1', 'node-name-1'];
-    const mockOther = ['abc', 'def', 'ghi'];
-    if (field === 'name') {
-      return matchText === '' ? mockNames : mockNames.filter(r => r.indexOf(matchText) === 0);
+    const mockNames = ['cluster-name-1', 'cluster-name-2', 'pod-name-1', 'node-name-1', 'abc', 'def', 'ghi'];
+
+    if (property) {
+      return mockNames.filter(r => r.indexOf(property) === 0);
     }
-    if (field === 'namespace') {
-      return matchText === '' ? mockOther : mockOther.filter(r => r.indexOf(matchText) === 0);
-    }
-    if (field === 'status') {
-      return matchText === '' ? mockOther : mockOther.filter(r => r.indexOf(matchText) === 0);
-    }
-    return [];
+
+    return mockNames;
   }
 
   async searchSchema() {
@@ -85,7 +97,15 @@ export default class SearchModel {
           fields: ['name', 'namespace'],
         },
         pod: {
-          fields: ['name', 'namespace', 'status', 'podIP', 'hostIP', 'creationTimestamp', 'restarts'],
+          fields: [
+            'name',
+            'namespace',
+            'status',
+            'podIP',
+            'hostIP',
+            'creationTimestamp',
+            'restarts',
+          ],
         },
         replicaset: {
           fields: ['name', 'namespace'],
