@@ -55,7 +55,6 @@ export default class ClusterModel extends KubeModel {
     return results;
   }
 
-  // temporary function for dashboard schema
   async getAllClusters(args = {}) {
     const [clusters, clusterstatuses] = await Promise.all([
       this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
@@ -73,9 +72,10 @@ export default class ClusterModel extends KubeModel {
       const result = {
         metadata: cluster.metadata,
         status: getStatus(cluster),
-        nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
+        capacity: _.get(clusterstatus, 'spec.capacity'),
+        usage: _.get(clusterstatus, 'spec.usage'),
         rawCluster: cluster,
         rawStatus: clusterstatus,
       };

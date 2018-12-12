@@ -1,0 +1,358 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Overview Resolver Correctly Resolves Overview Query 1`] = `
+Object {
+  "data": Object {
+    "overview": Object {
+      "applications": Array [
+        Object {
+          "metadata": Object {
+            "name": "gbapp-gbapp",
+            "namespace": "default",
+          },
+          "raw": Object {
+            "metadata": Object {
+              "annotations": Object {
+                "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+                "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+              },
+              "creationTimestamp": "2018-11-12T18:48:14Z",
+              "labels": Object {
+                "app": "gbapp",
+                "chart": "gbapp-0.1.0",
+                "heritage": "Tiller",
+                "name": "gbapp-gbapp",
+                "release": "gbapp",
+              },
+              "name": "gbapp-gbapp",
+              "namespace": "default",
+              "resourceVersion": "281",
+              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
+              "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
+            },
+            "spec": Object {
+              "componentKinds": Array [
+                Object {
+                  "group": "core",
+                  "kind": "Pods",
+                },
+              ],
+              "descriptor": Object {},
+              "selector": Object {
+                "matchExpressions": Array [
+                  Object {
+                    "key": "app",
+                    "operator": "In",
+                    "values": Array [
+                      "gbapp",
+                      "gbf",
+                      "gbrm",
+                      "gbrs",
+                    ],
+                  },
+                ],
+              },
+            },
+            "status": Object {
+              "ApplicationRelationships": Array [
+                Object {
+                  "name": "gbapp-gbapp-master",
+                },
+                Object {
+                  "name": "gbapp-gbapp-slave",
+                },
+              ],
+              "Dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
+              "Deployables": Array [
+                Object {
+                  "name": "gbapp-gbapp",
+                },
+                Object {
+                  "name": "gbapp-gbapp-redismaster",
+                },
+                Object {
+                  "name": "gbapp-gbapp-redisslave",
+                },
+              ],
+              "PlacementPolicies": Array [
+                Object {
+                  "name": "gbapp-gbapp",
+                },
+              ],
+            },
+          },
+          "selector": Object {
+            "matchExpressions": Array [
+              Object {
+                "key": "app",
+                "operator": "In",
+                "values": Array [
+                  "gbapp",
+                  "gbf",
+                  "gbrm",
+                  "gbrs",
+                ],
+              },
+            ],
+          },
+        },
+      ],
+      "clusters": Array [
+        Object {
+          "capacity": Object {
+            "cpu": "18",
+            "memory": "32013Mi",
+            "nodes": 2,
+            "storage": "100Gi",
+          },
+          "metadata": Object {
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "toronto",
+              "environment": "Dev",
+              "name": "managed-cluster",
+              "owner": "marketing",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "managed-cluster",
+            "namespace": "default",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+          },
+          "status": "ok",
+          "usage": Object {
+            "cpu": "6598m",
+            "memory": "6728Mi",
+            "pods": 5071,
+            "storage": "60Gi",
+          },
+        },
+        Object {
+          "capacity": Object {
+            "cpu": "16",
+            "memory": "32013Mi",
+            "nodes": 3,
+            "storage": "80Gi",
+          },
+          "metadata": Object {
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "hub-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "hub-cluster",
+            "namespace": "kube-system",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+          },
+          "status": "ok",
+          "usage": Object {
+            "cpu": "6598m",
+            "memory": "6728Mi",
+            "pods": 5071,
+            "storage": "60Gi",
+          },
+        },
+      ],
+      "pods": Array [
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "ibm-cert-manager-cert-manager-749ffc8bbc-grfrg",
+            "namespace": "cert-manager",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "nginx",
+            "namespace": "default",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "audit-logging-fluentd-ds-lgjpj",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "audit-logging-fluentd-ds-qzvth",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "audit-logging-fluentd-ds-v7r5b",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "auth-apikeys-rsfrx",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "auth-idp-nl5s5",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "auth-pap-dqsnz",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "auth-pdp-brpms",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "calico-kube-controllers-78d477cf58-82dhs",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "calico-node-fzxmv",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "calico-node-k8xb6",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "calico-node-mhz49",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "catalog-ui-jc5v5",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "custom-metrics-adapter-5dfb859b4b-2xr86",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+        Object {
+          "cluster": Object {
+            "metadata": Object {
+              "name": "hub-cluster",
+            },
+          },
+          "metadata": Object {
+            "name": "default-backend-5c6c964bf5-fws56",
+            "namespace": "kube-system",
+          },
+          "status": "Running",
+        },
+      ],
+      "services": Array [],
+    },
+  },
+}
+`;

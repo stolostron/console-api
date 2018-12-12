@@ -13,7 +13,7 @@ type Query {
   applications(name: String, namespace: String): [Application]
   charts: [HelmChart]
   clusters: [Cluster]
-  dashboard: DashboardData
+  overview: Overview
   deployables (selector: JSON): [Deployable]
   namespaces: [Namespace]
   nodes: [Node]

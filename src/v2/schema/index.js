@@ -15,7 +15,7 @@ import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as compliance from './compliance';
 import * as filter from './filter';
-import * as dashboard from './dashboard';
+import * as overview from './overview';
 import * as json from './json';
 import * as namespace from './namespace';
 import * as node from './node';
@@ -36,7 +36,7 @@ const modules = [
   cluster,
   compliance,
   filter,
-  dashboard,
+  overview,
   json,
   namespace,
   node,
