@@ -9,8 +9,10 @@
 
 export const typeDef = `
   input SearchFilter {
-    filter: String!
+    property: String
     values: [String]
+    # Deprecated, use "property" instead.
+    filter: String
   }
 
   input SearchRelatedInput {
@@ -27,12 +29,11 @@ export const typeDef = `
     keywords: [String]
     filters: [SearchFilter]
     relationship: [SearchRelatedInput]
-    count: Boolean
   }
 
   type SearchResult {
+    count: Int
     items: JSON
-    headers: [String]
     related: [SearchRelatedResult]
   }
 `;
@@ -43,5 +44,10 @@ export const resolver = {
     searchComplete: (parent, { field, property }, { searchModel }) =>
       searchModel.searchComplete({ field, property }),
     searchSchema: (parent, args, { searchModel }) => searchModel.searchSchema(),
+  },
+  SearchResult: {
+    count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(args),
+    items: (parent, args, { searchModel }) => searchModel.resolveSearch(args),
+    related: (parent, args, { searchModel }) => searchModel.resolveRelated(args),
   },
 };

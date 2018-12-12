@@ -7,39 +7,38 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import casual from 'casual';
 import mockSearch from '../mocks/search';
 import logger from '../lib/logger';
 
 /* eslint-disable class-methods-use-this */
 export default class SearchModel {
   async multiSearch({ input }) {
-    return Promise.all(input.map(i => this.search(i)));
+    return input.map((i) => {
+      logger.info('Search keywords: ', i.keywords);
+      logger.info('Search filters:', i.filters);
+      logger.info('Search relation:', i.relation);
+
+      logger.warn('!!! Search Returning mocked results !!!');
+      return i;
+    });
   }
 
-  async search({
-    keywords = [''],
-    filters = [],
-    relation,
-    count = false,
-  }) {
-    logger.info('Search keywords: ', keywords);
-    logger.info('Search filters:', filters);
-    logger.info('Search relation:', relation);
-
-    logger.warn('Search: Returning mocked results!');
-
-    const result = {
-      // contains "items" and "headers"
-      ...mockSearch.mock({ cluster: 2, node: 3, pod: 23 }),
-      related: mockSearch.mock({ cluster: 1 }).relatedResources,
-    };
-
-    if (count) {
-      result.items = result.items.length;
-    }
-
-    return result;
+  async resolveSearch() {
+    logger.warn('Resolving search count. RETURNING MOCK RESULTS.');
+    return mockSearch.mock({ cluster: 2, node: 3, pod: 23 });
   }
+
+  async resolveSearchCount() {
+    logger.warn('Resolving search query. RETURNING MOCK RESULTS.');
+    return casual.integer(0, 1100);
+  }
+
+  async resolveRelated() {
+    logger.warn('Resolving search related resources query. RETURNING MOCK RESULTS.');
+    return mockSearch.mock({ cluster: 1 }).relatedResources;
+  }
+
 
   async searchComplete({ property }) {
     logger.warn('SearchComplete: Returning mocked results!');
