@@ -94,4 +94,23 @@ export const mockSearchResult = {
   },
 };
 
-export default mockSearchResult;
+// export default mockSearchResult;
+
+/* eslint-disable class-methods-use-this */
+export default class MockSearchConnector {
+  async runSearchQuery() {
+    return mockSearchResult.mock({ cluster: 2, node: 3, pod: 5 });
+  }
+
+  async runSearchQueryCountOnly() {
+    return casual.integer(0, 1500);
+  }
+
+  async getAllProperties() {
+    return ['name', 'namespace'];
+  }
+
+  async getAllValues(property) {
+    return [`${property}-0`, `${property}-1`, `${property}-2`];
+  }
+}

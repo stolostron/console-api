@@ -33,6 +33,7 @@ import ResourceViewModel from './models/resourceview';
 import SearchModel from './models/search';
 
 import createMockKubeHTTP from './mocks/kube-http';
+import MockSearchConnector from './mocks/search';
 import schema from './schema/';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
@@ -95,10 +96,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     httpLib: kubeHTTP,
     namespaces,
   });
-  const searchConnector = new SearchConnector({
-    token: req.kubeToken,
-    httpLib: kubeHTTP,
-  });
+  const searchConnector = isTest ? new MockSearchConnector() : new SearchConnector();
 
   const context = {
     req,
@@ -108,12 +106,10 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     queryModel: new QueryModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
+    mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     searchModel: new SearchModel({ searchConnector }),
   };
-
-  const mongodbUrl = config.get('mongodbUrl') || 'mongodb://localhost:27017/weave';
-  context.mongoModel = new MongoModel(mongodbUrl, { namespaces });
 
   return { formatError, schema, context };
 }));

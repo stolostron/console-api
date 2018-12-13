@@ -9,10 +9,8 @@
 
 export const typeDef = `
   input SearchFilter {
-    property: String
+    property: String!
     values: [String]
-    # Deprecated, use "property" instead.
-    filter: String
   }
 
   input SearchRelatedInput {
@@ -41,13 +39,13 @@ export const typeDef = `
 export const resolver = {
   Query: {
     search: (parent, args, { searchModel }) => searchModel.multiSearch(args),
-    searchComplete: (parent, { field, property }, { searchModel }) =>
-      searchModel.searchComplete({ field, property }),
+    searchComplete: (parent, { property }, { searchModel }) =>
+      searchModel.resolveSearchComplete({ property }),
     searchSchema: (parent, args, { searchModel }) => searchModel.searchSchema(),
   },
   SearchResult: {
-    count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(args),
-    items: (parent, args, { searchModel }) => searchModel.resolveSearch(args),
-    related: (parent, args, { searchModel }) => searchModel.resolveRelated(args),
+    count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(parent),
+    items: (parent, args, { searchModel }) => searchModel.resolveSearch(parent),
+    related: (parent, args, { searchModel }) => searchModel.resolveRelated(parent),
   },
 };

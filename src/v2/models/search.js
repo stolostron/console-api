@@ -7,109 +7,54 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import casual from 'casual';
-import mockSearch from '../mocks/search';
 import logger from '../lib/logger';
+import { isRequired } from '../lib/utils';
 
 /* eslint-disable class-methods-use-this */
 export default class SearchModel {
+  constructor({ searchConnector = isRequired('searchConnector') }) {
+    this.searchConnector = searchConnector;
+  }
+
   async multiSearch({ input }) {
     return input.map((i) => {
-      logger.info('Search keywords: ', i.keywords);
-      logger.info('Search filters:', i.filters);
-      logger.info('Search relation:', i.relation);
+      logger.info('Running search with input:\n\t', i);
 
-      logger.warn('!!! Search Returning mocked results !!!');
       return i;
     });
   }
 
-  async resolveSearch() {
-    logger.warn('Resolving search count. RETURNING MOCK RESULTS.');
-    return mockSearch.mock({ cluster: 2, node: 3, pod: 23 });
+  async resolveSearch(parent) {
+    return this.searchConnector.runSearchQuery(parent.filters);
   }
 
-  async resolveSearchCount() {
-    logger.warn('Resolving search query. RETURNING MOCK RESULTS.');
-    return casual.integer(0, 1100);
+  async resolveSearchCount(parent) {
+    return this.searchConnector.runSearchQueryCountOnly(parent.filters);
+  }
+
+  async resolveSearchComplete({ property }) {
+    return this.searchConnector.getAllValues(property);
   }
 
   async resolveRelated() {
-    logger.warn('Resolving search related resources query. RETURNING MOCK RESULTS.');
-    return mockSearch.mock({ cluster: 1 }).relatedResources;
+    logger.warn('TODO: Resolving search related resources query. RETURNING MOCK RESULTS.');
+    return [
+      {
+        kind: 'cluster',
+        count: 5,
+      },
+      {
+        kind: 'application',
+        count: 3,
+      },
+    ];
   }
 
-
-  async searchComplete({ property }) {
-    logger.warn('SearchComplete: Returning mocked results!');
-    const mockNames = ['cluster-name-1', 'cluster-name-2', 'pod-name-1', 'node-name-1', 'abc', 'def', 'ghi'];
-
-    if (property) {
-      return mockNames.filter(r => r.indexOf(property) === 0);
-    }
-
-    return mockNames;
-  }
 
   async searchSchema() {
-    logger.warn('SearchSchema: Returning mocked results!');
     return {
-      allKinds: [
-        'application',
-        'cluster',
-        'deployable',
-        'deployment',
-        'namespace',
-        'node',
-        'placementpolicy',
-        'pod',
-        'replicaset',
-      ],
-      allFields: [
-        'name',
-        'namespace',
-        'status',
-        'cpu',
-        'memory',
-        'storage',
-        'hostIP',
-        'podIP',
-        'restarts',
-      ],
-      resourceSchema: {
-        cluster: {
-          fields: ['name', 'namespace', 'status', 'nodes', 'cpu', 'memory', 'storage'],
-        },
-        deployable: {
-          fields: ['name', 'namespace'],
-        },
-        deployment: {
-          fields: ['name', 'namespace'],
-        },
-        namespace: {
-          fields: ['name'],
-        },
-        node: {
-          fields: ['name', 'status', 'cpu', 'memory', 'storage'],
-        },
-        placementpolicy: {
-          fields: ['name', 'namespace'],
-        },
-        pod: {
-          fields: [
-            'name',
-            'namespace',
-            'status',
-            'podIP',
-            'hostIP',
-            'creationTimestamp',
-            'restarts',
-          ],
-        },
-        replicaset: {
-          fields: ['name', 'namespace'],
-        },
-      },
+      allProperties: await this.searchConnector.getAllProperties(),
+      allFields: await this.searchConnector.getAllProperties(), // TODO: Deprecated, remove
     };
   }
 }

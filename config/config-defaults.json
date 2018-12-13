@@ -2,8 +2,9 @@
   "contextPath": "/hcmuiapi",
   "httpPort": 4000,
   "hcmUrl": "",
+  "gremlinEndpoint": "ws://localhost:8182/gremlin",
   "localKubeToken": "",
-  "mongodbUrl": "",
+  "mongodbUrl": "mongodb://localhost:27017/weave",
   "hcmPollInterval": 100,
   "hcmPollTimeout": 50000,
   "complianceNamespace": "mcm"
