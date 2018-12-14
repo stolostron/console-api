@@ -39,17 +39,6 @@ describe('Overview Resolver', () => {
             }
             status
           }
-          services {
-            cluster
-            name
-            namespace
-            labels {
-              name
-              value
-            }
-            type
-            uid
-          }
           applications {
             metadata {
               name

@@ -10,9 +10,9 @@
 export const typeDef = `
 type Overview {
   clusters: [ClusterOverview]
-  services: [ServiceOverview]
   applications: [ApplicationOverview]
   pods: [PodOverview]
+  timestamp: String
 }
 
 type ClusterOverview implements K8sObject {
@@ -34,15 +34,6 @@ type ClusterUsage {
   memory: String
   pods: Int
   storage: String
-}
-
-type ServiceOverview {
-  cluster: String
-  labels: [Label]
-  name: String
-  namespace: String
-  type: String
-  uid: String
 }
 
 type ApplicationOverview implements K8sObject {
@@ -74,8 +65,13 @@ export const resolver = {
 
       // number, what cluster and status
       const pods = await resourceViewModel.fetchResources({ type: 'pods' });
+
+      // what time these values were fetched
+      // also forces apollo query to continially update the component even if nothing else changed
+      const timestamp = new Date().toString();
+
       return {
-        clusters, services: [], applications, pods,
+        clusters, applications, pods, timestamp,
       };
     },
   },
