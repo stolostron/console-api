@@ -18,11 +18,6 @@ type HelmRel {
   cluster: Cluster
   lastDeployed: String
 }
-
-input DeleteHelmReleaseInput {
-  cluster: String!
-  name: String!
-}
 `;
 
 export const resolver = {
@@ -32,5 +27,8 @@ export const resolver = {
   HelmRel: {
     cluster: (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+  },
+  Mutation: {
+    deleteHelm: (root, args, { genericModel }) => genericModel.resourceAction('helm', 'Delete', args.name, args.namespace, args.cluster),
   },
 };

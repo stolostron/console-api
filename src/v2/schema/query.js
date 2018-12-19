@@ -81,7 +81,7 @@ type Mutation {
   deleteApplication(path: String!, resources: JSON): String
 
   # Delete helm release on specific cluster
-  # deleteHelmRelease(input: DeleteHelmReleaseInput): [HelmChartResponse]
+  deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
   deleteHelmRepository(input: HelmRepoInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]

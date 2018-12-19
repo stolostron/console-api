@@ -42,21 +42,24 @@ export default class HelmModel extends KubeModel {
     const valuesUnflat = unflatten(vals);
     const valuesYaml = yaml.safeDump(valuesUnflat);
     const valuesEncoded = Buffer.from(valuesYaml).toString('base64');
+    const name = `${releaseName}-helm-install-${this.kubeConnector.uid()}`;
 
     return destinationClusters.map(async ({ name: clusterName, namespace: workNamespace }) => {
       const jsonBody = {
         apiVersion: 'mcm.ibm.com/v1alpha1',
         kind: 'Work',
         metadata: {
-          name: releaseName,
+          name,
           namespace: workNamespace,
         },
         spec: {
           cluster: {
             name: clusterName,
           },
-          type: 'Deployer',
+          type: 'Action',
+          actionType: 'Create',
           helm: {
+            releaseName,
             chartURL,
             namespace,
             values: valuesEncoded,
@@ -80,30 +83,6 @@ export default class HelmModel extends KubeModel {
         cluster: response.spec.cluster.name,
       };
     });
-  }
-
-  // FIXME: This is not currently implemented as we are unable to delete the
-  // "default" cluster releases To avoid confusion the remove action has been
-  // removed from releases table.
-  async deleteRelease(input) {
-    // TODO: Zack L - Need to make sure releases installed remotly always begin with md- in name.
-    // currently have to strip the md- so name matches the work created for the release
-    const deploymentName = input.name.substring(3);
-    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/mcm-${input.cluster}/works/${deploymentName}`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [{
-        code: response.code,
-        message: response.message,
-      }];
-    }
-
-    return [{
-      name: response.metadata.name,
-      namespace: response.spec.helm.namespace,
-      status: response.status.type,
-      cluster: response.spec.cluster.name,
-    }];
   }
 
   async getCharts() {

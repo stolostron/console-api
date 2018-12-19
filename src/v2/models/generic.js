@@ -189,16 +189,23 @@ export default class GenericModel extends KubeModel {
         template: {
           spec: {
             type: 'Action',
-            kube: {
-              resource: resourceType,
-              name: resourceName,
-              namespace: resourceNamespace,
-              actionType,
-            },
+            actionType,
           },
         },
       },
     };
+    if (resourceType === 'helm') {
+      body.spec.template.spec.helm = {
+        releaseName: resourceName,
+        namespace: resourceNamespace,
+      };
+    } else {
+      body.spec.template.spec.kube = {
+        resource: resourceType,
+        name: resourceName,
+        namespace: resourceNamespace,
+      };
+    }
 
     const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets`, body);
     if (response.status === 'Failure' || response.code >= 400) {
