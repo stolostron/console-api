@@ -56,6 +56,8 @@ export default function createMockHttp() {
           return state.release.mockResourceView;
         case params.json.metadata.name.includes('persistentvolumes'):
           return state.pvs.mockPVsResourceView;
+        case params.json.metadata.name.includes('policy'):
+          return state.policies.mockPolicyListResponse;
         case params.json.metadata.name.includes('persistentvolumeclaim'):
           return state.pvs.mockPVsClaimResourceView;
         case params.url.includes('default/helmrepos'):

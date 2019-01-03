@@ -32,7 +32,7 @@ type Query {
 
 
   # Policies and Compliances
-  policies(name: String, namespace: String): [Policy]
+  policies(name: String, clusterName: String): [Policy]
   compliances(name: String, namespace: String): [Compliance]
   placementPolicies (selector: JSON): [PlacementPolicy]
 

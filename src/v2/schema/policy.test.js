@@ -42,7 +42,8 @@ describe('Policy Resolver', () => {
       .send({
         query: `
         {
-          policies(name:"policy-xz-1",namespace:"default") {
+          policies(name:"policy-all", clusterName:"cluster1") {
+            cluster
             metadata {
               name
               namespace
@@ -53,7 +54,6 @@ describe('Policy Resolver', () => {
               uid
             }
             status
-            message
             enforcement
             detail {
               exclude_namespace
@@ -65,7 +65,7 @@ describe('Policy Resolver', () => {
               lastTransition
               complianceType
               apiVersion
-              compliant
+              status
               raw
             }
             roleBindingTemplates {
@@ -73,24 +73,17 @@ describe('Policy Resolver', () => {
               lastTransition
               complianceType
               apiVersion
-              compliant
+              status
               raw
             }
             objectTemplates {
               name
+              kind
               lastTransition
               complianceType
               apiVersion
-              compliant
+              status
               raw
-            }
-            rules {
-              complianceType
-              templateType
-              ruleUID
-              apiGroups
-              verbs
-              resources
             }
             violations {
               name
@@ -99,6 +92,14 @@ describe('Policy Resolver', () => {
               message
               reason
               selector
+            }
+            rules {
+              complianceType
+              templateType
+              ruleUID
+              verbs
+              apiGroups
+              resources
             }
           }
         }

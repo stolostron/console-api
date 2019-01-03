@@ -16,6 +16,11 @@ Array [
         "name": "pods-1234",
       },
       "spec": Object {
+        "clusterSelector": Object {
+          "matchLabels": Object {
+            "name": "default",
+          },
+        },
         "scope": Object {
           "resource": "pods",
         },

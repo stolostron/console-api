@@ -24,6 +24,7 @@ type Policy implements K8sObject {
   violations: [Violations]
   raw: JSON
   message: String
+  cluster: String
 }
 
 type PolicyDetail {
@@ -35,6 +36,7 @@ type PolicyTemplates {
   apiVersion: String
   complianceType: String
   compliant: String
+  status: String
   lastTransition: String
   name: String
   kind: String
@@ -64,7 +66,7 @@ type Violations {
 export const resolver = {
   Query: {
     policies: (root, args, { complianceModel }) =>
-      complianceModel.getPolicies(args.name, args.namespace),
+      complianceModel.getPolicies(args.name, args.clusterName),
   },
   Policy: {
     detail: parent => ComplianceModel.resolvePolicyDetails(parent),

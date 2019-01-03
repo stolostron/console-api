@@ -339,24 +339,19 @@ export default class ComplianceModel {
     return placementPolicies;
   }
 
-  async getPolicies(name, namespace = 'default') {
+  async getPolicies(name, clusterName) {
     // if policy name specified
     if (name !== undefined) {
-      const response = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
-      if (response.code || response.message) {
-        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
-        return [];
+      const response = await this.kubeConnector.resourceViewQuery('policy', clusterName, name, false);
+      const results = _.get(response, 'status.results');
+      if (results) {
+        const item = _.get(results, `${clusterName}`, {});
+        if (item) {
+          return [{ ...item, cluster: clusterName, raw: item }];
+        }
       }
-      return [{ ...response, raw: response }];
     }
-
-    // for getting policy list
-    const response = await this.kubeConnector.get('/apis/policy.mcm.ibm.com/v1alpha1/policies');
-    if (response.code || response.message || (response && !response.items)) {
-      logger.error(`HCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    return response.items;
+    return [];
   }
 
 
@@ -453,6 +448,7 @@ export default class ComplianceModel {
             apiVersion: _.get(res, 'objectDefinition.apiVersion', ''),
             kind: _.get(res, 'objectDefinition.kind', ''),
             compliant: _.get(res, 'status.Compliant', ''),
+            status: _.get(res, 'status.Compliant', ''),
             validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
             raw: res,
           });
@@ -463,6 +459,7 @@ export default class ComplianceModel {
             complianceType: _.get(res, 'complianceType', ''),
             apiVersion: _.get(res, 'apiVersion', ''),
             compliant: _.get(res, 'status.Compliant', ''),
+            status: _.get(res, 'status.Compliant', ''),
             validity: _.get(res, 'status.Validity.valid') || _.get(res, 'status.Validity', ''),
             raw: res,
           });
