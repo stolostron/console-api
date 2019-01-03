@@ -24,7 +24,6 @@ describe('Compliance Resolver', () => {
               selfLink
               creationTimestamp
             }
-            clusterSelector
             policyCompliant
             clusterCompliant
           }
@@ -44,7 +43,6 @@ describe('Compliance Resolver', () => {
         query: `
         {
           compliances(name:"compliance-xz",namespace:"mcm") {
-            clusterSelector
             raw
             metadata {
               creationTimestamp
@@ -54,15 +52,70 @@ describe('Compliance Resolver', () => {
               selfLink
               uid
             }
+            placementPolicies {
+              metadata {
+                annotations
+                name
+                namespace
+                creationTimestamp
+                selfLink
+              }
+              clusterLabels
+              clusterReplicas
+              resourceSelector
+              status
+              raw
+            }
             complianceStatus {
               clusterNamespace
               localCompliantStatus
               localValidStatus
             }
+            compliancePolicy {
+              name
+              status
+              complianceName
+              complianceNamespace
+              complianceSelfLink
+              roleTemplates {
+                apiVersion
+                complianceType
+                compliant
+                lastTransition
+                name
+                kind
+                validity
+                raw
+              }
+              roleBindingTemplates {
+                apiVersion
+                complianceType
+                compliant
+                lastTransition
+                name
+                kind
+                validity
+                raw
+              }
+              objectTemplates {
+                apiVersion
+                complianceType
+                compliant
+                lastTransition
+                name
+                kind
+                validity
+                raw
+              }
+              detail
+              raw
+            }
             compliancePolicies {
               name
               clusterCompliant
               clusterNotCompliant
+              complianceName
+              complianceNamespace
               policies {
                 name
                 cluster
@@ -151,11 +204,6 @@ describe('Compliance Resolver', () => {
               description: "Instance descriptor for compliance resource",
             },
             spec: {
-              clusterSelector: {
-                matchNames: [
-                  "mycluster",
-                ],
-              },
               runtimeRules: [
                 {
                   apiVersion: "policy.mcm.ibm.com/v1alpha1",

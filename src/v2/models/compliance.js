@@ -122,13 +122,12 @@ export default class ComplianceModel {
       raw: compliance,
       selfLink: _.get(compliance, 'metadata.selfLink', ''),
       apiVersion: _.get(compliance, 'apiVersion', ''),
-      clusterSelector: _.get(compliance, 'spec.clusterSelector', {}),
     }));
   }
 
 
   static resolveCompliancePolicies(parent) {
-    const aggregatedStatus = _.get(parent, 'status');
+    const aggregatedStatus = _.get(parent, 'status.status');
     // compliance that has aggregatedStatus
     if (aggregatedStatus) return this.resolvePolicyFromStatus(aggregatedStatus, parent);
     // in this case, a compliance doesn't connect with a
@@ -137,7 +136,7 @@ export default class ComplianceModel {
   }
 
   static resolveCompliancePolicy(parent) {
-    const aggregatedStatus = _.get(parent, 'status');
+    const aggregatedStatus = _.get(parent, 'status.status');
     return this.resolveCompliancePoliciesFromSpec(parent, aggregatedStatus);
   }
 
@@ -268,7 +267,7 @@ export default class ComplianceModel {
 
   static resolveComplianceStatus(parent) {
     const complianceStatus = [];
-    Object.entries(_.get(parent, 'status', {})).forEach(([clusterName, perClusterStatus]) => {
+    Object.entries(_.get(parent, 'status.status', {})).forEach(([clusterName, perClusterStatus]) => {
       const aggregatedStatus = _.get(perClusterStatus, 'aggregatePoliciesStatus', {});
 
       // get compliant status per cluster
@@ -297,7 +296,7 @@ export default class ComplianceModel {
     let totalPolicies = 0;
     let compliantPolicies = 0;
 
-    Object.values(status || []).forEach((cluster) => {
+    Object.values(status.status || []).forEach((cluster) => {
       Object.values(cluster.aggregatePoliciesStatus || {}).forEach((policyValue) => {
         totalPolicies += 1;
         if (this.resolveStatus(policyValue).toLowerCase() === 'compliant') compliantPolicies += 1;
@@ -309,12 +308,36 @@ export default class ComplianceModel {
 
 
   static resolveClusterCompliant({ status = {} }) {
-    const totalClusters = Object.keys(status).length;
-    const compliantClusters = Object.values(status).filter(cluster => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
+    const totalClusters = Object.keys(status.status).length;
+    const compliantClusters = Object.values(status.status || []).filter(cluster => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
 
     return `${compliantClusters.length}/${totalClusters}`;
   }
 
+  async getPlacementPolicies(parent = {}) {
+    const policies = _.get(parent, 'status.placementPolicies', []);
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
+      { kind: 'PlacementPolicy' },
+    );
+    const map = new Map();
+    if (response) {
+      response.forEach(item => map.set(item.metadata.name, item));
+    }
+    const placementPolicies = [];
+    policies.forEach((policy) => {
+      const pp = map.get(policy);
+      placementPolicies.push({
+        clusterLabels: pp.spec.clusterLabels,
+        metadata: pp.metadata,
+        raw: pp,
+        clusterReplicas: pp.spec.clusterReplicas,
+        resourceSelector: pp.spec.resourceSelector,
+        status: pp.status,
+      });
+    });
+    return placementPolicies;
+  }
 
   async getPolicies(name, namespace = 'default') {
     // if policy name specified

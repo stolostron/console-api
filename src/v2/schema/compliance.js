@@ -12,7 +12,6 @@ import ComplianceModel from '../models/compliance';
 export const typeDef = `
 type Compliance implements K8sObject {
   clusterCompliant: String
-  clusterSelector: JSON
   compliancePolicies: [CompliancePolicies]
   compliancePolicy: [CompliancePolicyDetail]
   complianceStatus: [CompliantStatus]
@@ -20,6 +19,7 @@ type Compliance implements K8sObject {
   policyCompliant: String
   raw: JSON
   apiVersion: String
+  placementPolicies: [PlacementPolicy]
 }
 
 type CompliantStatus {
@@ -89,6 +89,8 @@ export const resolver = {
     complianceStatus: parent => ComplianceModel.resolveComplianceStatus(parent),
     policyCompliant: parent => ComplianceModel.resolvePolicyCompliant(parent),
     clusterCompliant: parent => ComplianceModel.resolveClusterCompliant(parent),
+    placementPolicies: (parent, args, { complianceModel }) =>
+      complianceModel.getPlacementPolicies(parent),
   },
   Mutation: {
     createCompliance: (root, args, { complianceModel }) =>
