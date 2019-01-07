@@ -20,6 +20,7 @@ type Compliance implements K8sObject {
   raw: JSON
   apiVersion: String
   placementPolicies: [PlacementPolicy]
+  placementBindings: [PlacementBinding]
 }
 
 type CompliantStatus {
@@ -91,6 +92,8 @@ export const resolver = {
     clusterCompliant: parent => ComplianceModel.resolveClusterCompliant(parent),
     placementPolicies: (parent, args, { complianceModel }) =>
       complianceModel.getPlacementPolicies(parent),
+    placementBindings: (parent, args, { complianceModel }) =>
+      complianceModel.getPlacementBindings(parent),
   },
   Mutation: {
     createCompliance: (root, args, { complianceModel }) =>

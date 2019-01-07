@@ -87,6 +87,8 @@ export default function createMockHttp() {
         return state.apps.gbappPB;
       case params.url.endsWith('/placementbindings/gbapp-gbapp-redismaster'):
         return state.apps.gbappRedisMasterPB;
+      case params.url.includes('default/placementbindings'):
+        return state.policies.mockPlacementBindingResponse;
       case params.url.includes('/placementbindings'):
         return state.apps.mockAppPlacementBindings;
       case params.url.includes('/applicationrelationships'):
@@ -134,7 +136,7 @@ export default function createMockHttp() {
       case params.url.includes('default/policies/test-policy'):
         return state.policies.mockDeleteResponse;
       case params.url.includes('kube-system/placementpolicies'):
-        return { body: { items: [] } };
+        return state.policies.mockPlacementPolicyResponse;
       case params.url.includes('placementpolicies'):
         return state.apps.mockPlacementPoliciesResponse;
       case params.url.includes('policies/policy-xz-1'):

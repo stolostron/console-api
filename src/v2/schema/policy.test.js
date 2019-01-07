@@ -44,6 +44,7 @@ describe('Policy Resolver', () => {
         {
           policies(name:"policy-all", clusterName:"cluster1") {
             cluster
+            message
             metadata {
               name
               namespace
@@ -61,28 +62,36 @@ describe('Policy Resolver', () => {
             }
             raw
             roleTemplates {
-              name
-              lastTransition
-              complianceType
               apiVersion
+              complianceType
+              compliant
               status
+              lastTransition
+              name
+              kind
+              validity
               raw
             }
             roleBindingTemplates {
-              name
-              lastTransition
-              complianceType
               apiVersion
+              complianceType
+              compliant
               status
+              lastTransition
+              name
+              kind
+              validity
               raw
             }
             objectTemplates {
+              apiVersion
+              complianceType
+              compliant
+              status
+              lastTransition
               name
               kind
-              lastTransition
-              complianceType
-              apiVersion
-              status
+              validity
               raw
             }
             violations {

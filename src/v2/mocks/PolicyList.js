@@ -532,6 +532,96 @@ export const mockCreatePolicy = {
   },
 };
 
+
+export const mockPlacementPolicyResponse = {
+  body: {
+    kind: 'PlacementPolicyList',
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    metadata: {
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementpolicies',
+      resourceVersion: '51490',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'placement-xz',
+          namespace: 'mcm',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementpolicies/placement-xz',
+          uid: '3df1e8f5-1053-11e9-a535-e2d4c161f9ad',
+          resourceVersion: '51486',
+          creationTimestamp: '2019-01-04T19:02:11Z',
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+        },
+        spec: {
+          clusterLabels: {
+            matchLabels: {
+              cloud: 'IBM',
+            },
+          },
+          resourceHint: {
+
+          },
+        },
+        status: {
+          decisions: [
+            {
+              clusterName: 'cluster3',
+              clusterNamespace: 'cluster3',
+            },
+            {
+              clusterName: 'cluster1',
+              clusterNamespace: 'cluster1',
+            },
+          ],
+        },
+      },
+    ],
+  },
+};
+
+export const mockPlacementBindingResponse = {
+  body: {
+    kind: 'PlacementBindingList',
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    metadata: {
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementbindings',
+      resourceVersion: '48564',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'binding-xz',
+          namespace: 'mcm',
+          selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementbindings/binding-xz',
+          uid: '7fc24685-0ec6-11e9-a535-e2d4c161f9ad',
+          resourceVersion: '249',
+          creationTimestamp: '2019-01-02T19:42:12Z',
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+            'seed-generation': '1',
+          },
+          finalizers: [
+            'finalizer.mcm.ibm.com',
+          ],
+        },
+        subjects: [
+          {
+            kind: 'Compliance',
+            name: 'compliance-all',
+          },
+        ],
+        placementRef: {
+          name: 'placement-xz',
+        },
+      },
+    ],
+  },
+};
+
 export const mockDeleteResponse = {
   body: {
     apiVersion: 'policy.mcm.ibm.com/v1alpha1',

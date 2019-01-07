@@ -5,14 +5,319 @@ Object {
   "data": Object {
     "compliances": Array [
       Object {
+        "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
         "clusterCompliant": "3/3",
         "metadata": Object {
-          "creationTimestamp": "2019-01-02T19:42:12Z",
           "name": "compliance-xz",
           "namespace": "mcm",
           "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-xz",
         },
+        "placementBindings": Array [
+          Object {
+            "metadata": Object {
+              "name": "binding-xz",
+              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementbindings/binding-xz",
+            },
+          },
+        ],
+        "placementPolicies": Array [
+          Object {
+            "metadata": Object {
+              "name": "placement-xz",
+              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementpolicies/placement-xz",
+            },
+          },
+        ],
         "policyCompliant": "3/3",
+        "raw": Object {
+          "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
+          "kind": "Compliance",
+          "metadata": Object {
+            "annotations": Object {
+              "seed-generation": "1",
+            },
+            "creationTimestamp": "2019-01-02T19:42:12Z",
+            "finalizers": Array [
+              "finalizer.mcm.ibm.com",
+            ],
+            "generation": 1,
+            "name": "compliance-xz",
+            "namespace": "mcm",
+            "resourceVersion": "5533372",
+            "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-xz",
+            "uid": "7fc1f4a2-0ec6-11e9-8fd0-0ebe277f4f9c",
+          },
+          "spec": Object {
+            "runtime-rules": Array [
+              Object {
+                "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+                "kind": "Policy",
+                "metadata": Object {
+                  "creationTimestamp": null,
+                  "labels": Object {
+                    "hipaa": "true",
+                  },
+                  "name": "policy-all",
+                },
+                "spec": Object {
+                  "complianceType": "musthave",
+                  "namespaces": Object {
+                    "exclude": Array [
+                      "kube*",
+                    ],
+                    "include": Array [
+                      "default",
+                    ],
+                  },
+                  "object-templates": Array [
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "Pod",
+                        "metadata": Object {
+                          "name": "nginx",
+                        },
+                        "spec": Object {
+                          "containers": Array [
+                            Object {
+                              "image": "nginx:1.7.9",
+                              "name": "nginx",
+                              "ports": Array [
+                                Object {
+                                  "containerPort": 80,
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "Namespace",
+                        "metadata": Object {
+                          "labels": Object {
+                            "name": "production",
+                          },
+                          "name": "production",
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "rbac.authorization.k8s.io/v1",
+                        "kind": "RoleBinding",
+                        "metadata": Object {
+                          "name": "operate-pods-rolebinding",
+                          "namespace": "default",
+                        },
+                        "roleRef": Object {
+                          "apiGroup": "rbac.authorization.k8s.io",
+                          "kind": "Role",
+                          "name": "operator",
+                        },
+                        "subjects": Array [
+                          Object {
+                            "apiGroup": "rbac.authorization.k8s.io",
+                            "kind": "User",
+                            "name": "jane",
+                          },
+                        ],
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "policy/v1beta1",
+                        "kind": "PodSecurityPolicy",
+                        "metadata": Object {
+                          "annotations": Object {
+                            "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*",
+                          },
+                          "name": "privileged-mcm",
+                        },
+                        "spec": Object {
+                          "allowPrivilegeEscalation": true,
+                          "allowedCapabilities": Array [
+                            "*",
+                          ],
+                          "fsGroup": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "hostIPC": true,
+                          "hostNetwork": true,
+                          "hostPID": true,
+                          "hostPorts": Array [
+                            Object {
+                              "max": 65535,
+                              "min": 0,
+                            },
+                          ],
+                          "privileged": true,
+                          "runAsUser": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "seLinux": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "supplementalGroups": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "volumes": Array [
+                            "*",
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "networking.k8s.io/v1",
+                        "kind": "NetworkPolicy",
+                        "metadata": Object {
+                          "name": "allow-all-mcm",
+                        },
+                        "spec": Object {
+                          "ingress": Array [
+                            Object {},
+                          ],
+                          "podSelector": Object {},
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "LimitRange",
+                        "metadata": Object {
+                          "name": "mem-limit-range",
+                        },
+                        "spec": Object {
+                          "limits": Array [
+                            Object {
+                              "default": Object {
+                                "memory": "512Mi",
+                              },
+                              "defaultRequest": Object {
+                                "memory": "256Mi",
+                              },
+                              "type": "Container",
+                            },
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                  ],
+                  "remediationAction": "enforce",
+                  "role-templates": Array [
+                    Object {
+                      "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                      "complianceType": "musthave",
+                      "metadata": Object {
+                        "creationTimestamp": null,
+                        "name": "operator-role",
+                      },
+                      "rules": Array [
+                        Object {
+                          "complianceType": "musthave",
+                          "policyRule": Object {
+                            "apiGroups": Array [
+                              "extensions",
+                              "apps",
+                            ],
+                            "resources": Array [
+                              "deployments",
+                            ],
+                            "verbs": Array [
+                              "get",
+                              "list",
+                              "watch",
+                              "create",
+                              "delete",
+                              "patch",
+                            ],
+                          },
+                        },
+                      ],
+                      "selector": Object {
+                        "matchLabels": Object {
+                          "hipaa": "true",
+                        },
+                      },
+                      "status": Object {
+                        "Validity": Object {},
+                      },
+                    },
+                  ],
+                },
+                "status": Object {},
+              },
+            ],
+          },
+          "status": Object {
+            "placementBindings": Array [
+              "binding-xz",
+            ],
+            "placementPolicies": Array [
+              "placement-xz",
+            ],
+            "status": Object {
+              "cluster1": Object {
+                "aggregatePoliciesStatus": Object {
+                  "policy-all": Object {
+                    "compliant": "Compliant",
+                    "valid": true,
+                  },
+                },
+                "clustername": "cluster1",
+                "compliant": "Compliant",
+              },
+              "cluster2": Object {
+                "aggregatePoliciesStatus": Object {
+                  "policy-all": Object {
+                    "compliant": "Compliant",
+                    "valid": true,
+                  },
+                },
+                "clustername": "cluster2",
+                "compliant": "Compliant",
+              },
+              "cluster3": Object {
+                "aggregatePoliciesStatus": Object {
+                  "policy-all": Object {
+                    "compliant": "Compliant",
+                    "valid": true,
+                  },
+                },
+                "clustername": "cluster3",
+                "compliant": "Compliant",
+              },
+            },
+          },
+        },
       },
     ],
   },
@@ -2559,7 +2864,95 @@ Object {
           "selfLink": "/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/mcm/compliances/compliance-all",
           "uid": "7fc1f4a2-0ec6-11e9-8fd0-0ebe277f4f9c",
         },
-        "placementPolicies": null,
+        "placementBindings": Array [
+          Object {
+            "metadata": Object {
+              "creationTimestamp": "2019-01-02T19:42:12Z",
+              "name": "binding-xz",
+              "namespace": "mcm",
+              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementbindings/binding-xz",
+            },
+            "placementRef": Object {
+              "kind": null,
+              "name": "placement-xz",
+            },
+            "subjects": Array [
+              Object {
+                "kind": "Compliance",
+                "name": "compliance-all",
+              },
+            ],
+          },
+        ],
+        "placementPolicies": Array [
+          Object {
+            "clusterLabels": Object {
+              "matchLabels": Object {
+                "cloud": "IBM",
+              },
+            },
+            "clusterReplicas": null,
+            "metadata": Object {
+              "annotations": Object {
+                "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+                "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+              },
+              "creationTimestamp": "2019-01-04T19:02:11Z",
+              "name": "placement-xz",
+              "namespace": "mcm",
+              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementpolicies/placement-xz",
+            },
+            "raw": Object {
+              "apiVersion": "mcm.ibm.com/v1alpha1",
+              "kind": "PlacementPolicy",
+              "metadata": Object {
+                "annotations": Object {
+                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+                },
+                "creationTimestamp": "2019-01-04T19:02:11Z",
+                "name": "placement-xz",
+                "namespace": "mcm",
+                "resourceVersion": "51486",
+                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/mcm/placementpolicies/placement-xz",
+                "uid": "3df1e8f5-1053-11e9-a535-e2d4c161f9ad",
+              },
+              "spec": Object {
+                "clusterLabels": Object {
+                  "matchLabels": Object {
+                    "cloud": "IBM",
+                  },
+                },
+                "resourceHint": Object {},
+              },
+              "status": Object {
+                "decisions": Array [
+                  Object {
+                    "clusterName": "cluster3",
+                    "clusterNamespace": "cluster3",
+                  },
+                  Object {
+                    "clusterName": "cluster1",
+                    "clusterNamespace": "cluster1",
+                  },
+                ],
+              },
+            },
+            "resourceSelector": null,
+            "status": Object {
+              "decisions": Array [
+                Object {
+                  "clusterName": "cluster3",
+                  "clusterNamespace": "cluster3",
+                },
+                Object {
+                  "clusterName": "cluster1",
+                  "clusterNamespace": "cluster1",
+                },
+              ],
+            },
+          },
+        ],
         "policyCompliant": "3/3",
         "raw": Object {
           "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
@@ -2853,21 +3246,5 @@ Object {
       },
     ],
   },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 13,
-          "line": 13,
-        },
-      ],
-      "message": "Cannot read property 'spec' of undefined",
-      "path": Array [
-        "compliances",
-        0,
-        "placementPolicies",
-      ],
-    },
-  ],
 }
 `;

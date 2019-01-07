@@ -13,7 +13,7 @@ import config from '../../../config';
 
 const POLICY_FAILURE_STATUS = 'Failure';
 
-function getTemplates(policy) {
+function getTemplates(policy = {}) {
   const templates = [];
   Object.entries(policy.spec || []).forEach(([key, value]) => {
     if (key.endsWith('-templates')) {
@@ -92,9 +92,35 @@ export default class ComplianceModel {
     if (response.code || response.message) {
       throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
     }
+    const errors = await this.deleteComplianceResource(input.resources);
+    if (errors && errors.length > 0) {
+      throw new Error(`MCM ERROR: Unable to delete application resource(s) - ${JSON.stringify(errors)}`);
+    }
     return response.metadata.name;
   }
 
+  async deleteComplianceResource(resources = []) {
+    if (resources.length < 1) {
+      logger.info('No Compliance resources selected for deletion');
+      return [];
+    }
+
+    const result = await Promise.all(resources.map(resource =>
+      this.kubeConnector.delete(resource.selfLink)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }))));
+
+    const errors = [];
+    result.forEach((item) => {
+      if (item.code >= 400 || item.status === 'Failure') {
+        errors.push({ message: item.message });
+      }
+    });
+
+    return errors;
+  }
 
   async getCompliances(name, namespace) {
     let compliances = [];
@@ -308,10 +334,12 @@ export default class ComplianceModel {
 
 
   static resolveClusterCompliant({ status = {} }) {
-    const totalClusters = Object.keys(status.status).length;
-    const compliantClusters = Object.values(status.status || []).filter(cluster => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
-
-    return `${compliantClusters.length}/${totalClusters}`;
+    if (status && status.status) {
+      const totalClusters = Object.keys(status.status).length;
+      const compliantClusters = Object.values(status.status || []).filter(cluster => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
+      return `${compliantClusters.length}/${totalClusters}`;
+    }
+    return '0/0';
   }
 
   async getPlacementPolicies(parent = {}) {
@@ -327,16 +355,45 @@ export default class ComplianceModel {
     const placementPolicies = [];
     policies.forEach((policy) => {
       const pp = map.get(policy);
-      placementPolicies.push({
-        clusterLabels: pp.spec.clusterLabels,
-        metadata: pp.metadata,
-        raw: pp,
-        clusterReplicas: pp.spec.clusterReplicas,
-        resourceSelector: pp.spec.resourceSelector,
-        status: pp.status,
-      });
+      const spec = pp.spec || {};
+      if (pp) {
+        placementPolicies.push({
+          clusterLabels: spec.clusterLabels,
+          metadata: pp.metadata,
+          raw: pp,
+          clusterReplicas: spec.clusterReplicas,
+          resourceSelector: spec.resourceSelector,
+          status: pp.status,
+        });
+      }
     });
     return placementPolicies;
+  }
+
+  async getPlacementBindings(parent = {}) {
+    const bindings = _.get(parent, 'status.placementBindings', []);
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
+      { kind: 'PlacementBinding' },
+    );
+    const map = new Map();
+    if (response) {
+      response.forEach(item => map.set(item.metadata.name, item));
+    }
+    const placementBindings = [];
+
+    bindings.forEach((binding) => {
+      const pb = map.get(binding);
+      if (pb) {
+        placementBindings.push({
+          metadata: pb.metadata,
+          raw: pb,
+          placementRef: pb.placementRef,
+          subjects: pb.subjects,
+        });
+      }
+    });
+    return placementBindings;
   }
 
   async getPolicies(name, clusterName) {

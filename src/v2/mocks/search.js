@@ -7,35 +7,33 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import casual from 'casual';
-
 const resourceTemplate = {
   cluster: id => ({
     kind: 'cluster',
     name: `mock-cluster${id > 0 ? `-${id}` : ''}`,
     namespace: 'mock-mcm-cluster',
-    status: casual.random_element(['ok']),
+    status: 'ok',
     endpoint: '',
-    nodes: casual.integer(1, 32),
-    cpu: `${casual.integer(0, 100)}%`,
-    memory: `${casual.integer(0, 100)}%`,
-    storage: `${casual.integer(0, 100)}%`,
+    nodes: 10,
+    cpu: '30%',
+    memory: '20%',
+    storage: '10%',
   }),
   node: (id = 0) => ({
     kind: 'node',
     name: `mock-1.1.1.${id}`,
-    cpus: casual.integer(1, 32),
-    role: casual.random_element(['master', 'worker', 'management', 'proxy, management, master']),
+    cpus: 10,
+    role: 'master',
   }),
   pod: id => ({
     kind: 'pod',
     name: `mock-cluster${id > 0 ? `-${id}` : ''}`,
     namespace: 'kube-system',
-    restarts: casual.integer(0, 100),
+    restarts: 20,
     creationTimestamp: '2018-09-27 16:52:20 -0400 EDT',
-    status: casual.random_element(['Failed', 'Pending', 'Running', 'Succeeded']),
-    hostIP: casual.ip,
-    podIP: casual.ip,
+    status: 'Running',
+    hostIP: '179.160.35.59',
+    podIP: '179.160.35.59',
   }),
 };
 
@@ -75,19 +73,19 @@ export const mockSearchResult = {
       relatedResources: [
         {
           kind: 'application',
-          count: casual.integer(1, 5),
+          count: 2,
         },
         {
           kind: 'cluster',
-          count: casual.integer(1, 5),
+          count: 3,
         },
         {
           kind: 'deployment',
-          count: casual.integer(1, 20),
+          count: 10,
         },
         {
           kind: 'pod',
-          count: casual.integer(1, 1500),
+          count: 200,
         },
       ],
     };
@@ -103,7 +101,7 @@ export default class MockSearchConnector {
   }
 
   async runSearchQueryCountOnly() {
-    return casual.integer(0, 1500);
+    return 100;
   }
 
   async getAllProperties() {

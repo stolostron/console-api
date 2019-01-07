@@ -49,6 +49,16 @@ type Deployable implements K8sObject {
   raw: JSON
 }
 
+type PlacementPolicy implements K8sObject {
+  clusterLabels: JSON
+  metadata: Metadata
+  # The object's yaml definition in JSON format.
+  raw: JSON
+  clusterReplicas: Int
+  resourceSelector: JSON
+  status: JSON
+}
+
 type PlacementBinding implements K8sObject {
   metadata: Metadata
   # The object's yaml definition in JSON format.
@@ -61,16 +71,6 @@ type Subject {
   apiGroup: String
   kind: String
   name: String
-}
-
-type PlacementPolicy implements K8sObject {
-  clusterLabels: JSON
-  metadata: Metadata
-  # The object's yaml definition in JSON format.
-  raw: JSON
-  clusterReplicas: Int
-  resourceSelector: JSON
-  status: JSON
 }
 
 type DeployableDependency {

@@ -22,10 +22,23 @@ describe('Compliance Resolver', () => {
               name
               namespace
               selfLink
-              creationTimestamp
             }
+            raw
+            apiVersion
             policyCompliant
             clusterCompliant
+            placementPolicies {
+              metadata {
+                name
+                selfLink
+              }
+            }
+            placementBindings {
+              metadata {
+                name
+                selfLink
+              }
+            }
           }
         }
       `,
@@ -51,6 +64,22 @@ describe('Compliance Resolver', () => {
               resourceVersion
               selfLink
               uid
+            }
+            placementBindings {
+              metadata {
+                name
+                namespace
+                creationTimestamp
+                selfLink
+              }
+              placementRef {
+                name
+                kind
+              }
+              subjects {
+                name
+                kind
+              }
             }
             placementPolicies {
               metadata {
@@ -370,7 +399,7 @@ describe('Compliance Resolver', () => {
       .send({
         query: `
         mutation {
-          deleteCompliance(name:"compliance-xz",namespace:"mcm")
+          deleteCompliance(name:"compliance-xz",namespace:"mcm", resources:[])
         }
       `,
       })
