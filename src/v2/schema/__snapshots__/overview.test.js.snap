@@ -13,8 +13,12 @@ Object {
           "raw": Object {
             "metadata": Object {
               "annotations": Object {
+                "applicationRelationship": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
+                "dashboard": "https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
+                "deployable": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
                 "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
                 "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+                "placementBinding": "gbapp-gbapp,gbapp-gbapp-redismaster",
               },
               "creationTimestamp": "2018-11-12T18:48:14Z",
               "labels": Object {
@@ -53,33 +57,7 @@ Object {
                 ],
               },
             },
-            "status": Object {
-              "ApplicationRelationships": Array [
-                Object {
-                  "name": "gbapp-gbapp-master",
-                },
-                Object {
-                  "name": "gbapp-gbapp-slave",
-                },
-              ],
-              "Dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-              "Deployables": Array [
-                Object {
-                  "name": "gbapp-gbapp",
-                },
-                Object {
-                  "name": "gbapp-gbapp-redismaster",
-                },
-                Object {
-                  "name": "gbapp-gbapp-redisslave",
-                },
-              ],
-              "PlacementPolicies": Array [
-                Object {
-                  "name": "gbapp-gbapp",
-                },
-              ],
-            },
+            "status": Object {},
           },
           "selector": Object {
             "matchExpressions": Array [

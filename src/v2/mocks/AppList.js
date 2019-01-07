@@ -34,6 +34,10 @@ export const mockAppsResponse = {
           annotations: {
             'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
             'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+            applicationRelationship: 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+            dashboard: 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+            deployable: 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+            placementBinding: 'gbapp-gbapp,gbapp-gbapp-redismaster',
           },
         },
         spec: {
@@ -60,31 +64,6 @@ export const mockAppsResponse = {
           },
         },
         status: {
-          Dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-          Deployables: [
-            {
-              name: 'gbapp-gbapp',
-            },
-            {
-              name: 'gbapp-gbapp-redismaster',
-            },
-            {
-              name: 'gbapp-gbapp-redisslave',
-            },
-          ],
-          PlacementPolicies: [
-            {
-              name: 'gbapp-gbapp',
-            },
-          ],
-          ApplicationRelationships: [
-            {
-              name: 'gbapp-gbapp-master',
-            },
-            {
-              name: 'gbapp-gbapp-slave',
-            },
-          ],
         },
       },
     ],
@@ -112,6 +91,10 @@ export const mockSingleAppResponse = {
       annotations: {
         'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
         'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+        applicationRelationship: 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+        dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+        deployable: 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+        placementBinding: 'gbapp-gbapp,gbapp-gbapp-redismaster',
       },
     },
     spec: {
@@ -138,32 +121,85 @@ export const mockSingleAppResponse = {
       },
     },
     status: {
-      Dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-      Deployables: [
-        {
-          name: 'gbapp-gbapp',
-        },
-        {
-          name: 'gbapp-gbapp-redismaster',
-        },
-        {
-          name: 'gbapp-gbapp-redisslave',
-        },
-      ],
-      PlacementPolicies: [
-        {
-          name: 'gbapp-gbapp',
-        },
-      ],
-      ApplicationRelationships: [
-        {
-          name: 'gbapp-gbapp-master',
-        },
-        {
-          name: 'gbapp-gbapp-slave',
-        },
-      ],
     },
+  },
+};
+
+export const gbappPB = {
+  body: {
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    kind: 'PlacementBinding',
+    metadata: {
+      annotations: {
+        'mcm.ibm.com/user-group': 'c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+        'mcm.ibm.com/user-identity': 'YWRtaW4=',
+      },
+      creationTimestamp: '2019-01-04T15:42:07Z',
+      labels: {
+        app: 'gbapp',
+        chart: 'gbapp-0.1.0',
+        heritage: 'Tiller',
+        name: 'gbapp-gbapp',
+        release: 'gbapp',
+        servicekind: 'CacheService',
+      },
+      name: 'gbapp-gbapp',
+      namespace: 'kube-system',
+      resourceVersion: '169',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/kube-system/placementbindings/gbapp-gbapp',
+      uid: '4adbeea1-1037-11e9-9498-02257a13dd26',
+    },
+    placementRef: {
+      apiGroup: 'mcm.ibm.com',
+      kind: 'PlacementPolicy',
+      name: 'gbapp-gbapp',
+    },
+    subjects: [
+      {
+        apiGroup: 'mcm.ibm.com',
+        kind: 'Deployable',
+        name: 'gbapp-gbapp',
+      },
+    ],
+  },
+};
+
+export const gbappRedisMasterPB = {
+  body: {
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    kind: 'PlacementBinding',
+    metadata: {
+      annotations: {
+        'mcm.ibm.com/user-group': 'c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=',
+        'mcm.ibm.com/user-identity': 'YWRtaW4=',
+      },
+      creationTimestamp: '2019-01-04T15:42:07Z',
+      labels: {
+        app: 'gbapp',
+        chart: 'gbapp-0.1.0',
+        heritage: 'Tiller',
+        name: 'gbapp-gbapp',
+        release: 'gbapp',
+        servicekind: 'CacheService',
+      },
+      name: 'gbapp-gbapp-redismaster',
+      namespace: 'kube-system',
+      resourceVersion: '169',
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/kube-system/placementbindings/gbapp-gbapp-redismaster',
+      uid: '4adbeea1-1037-11e9-9498-02257a13dd26',
+    },
+    placementRef: {
+      apiGroup: 'mcm.ibm.com',
+      kind: 'PlacementPolicy',
+      name: 'gbapp-gbapp-redismaster',
+    },
+    subjects: [
+      {
+        apiGroup: 'mcm.ibm.com',
+        kind: 'Deployable',
+        name: 'gbapp-gbapp-redismaster',
+      },
+    ],
   },
 };
 
@@ -362,7 +398,22 @@ export const mockAppRelationships = {
   },
 };
 
-export const mockAppDeployables = {
+export const mockAppPlacementBindings = {
+  body: {
+    kind: 'PlacementBindingList',
+    apiVersion: 'mcm.ibm.com/v1alpha1',
+    metadata: {
+      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementbindings',
+      resourceVersion: '130498',
+    },
+    items: [
+      gbappRedisMasterPB.body,
+      gbappPB.body,
+    ],
+  },
+};
+
+export const mockApplicationWorks = {
   body: {
     kind: 'WorkList',
     apiVersion: 'mcm.ibm.com/v1alpha1',

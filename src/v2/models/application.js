@@ -12,7 +12,7 @@ import KubeModel from './kube';
 import logger from '../lib/logger';
 
 const filterByName = (names, items) =>
-  items.filter(item => names.find(name => name.name === item.metadata.name));
+  items.filter(item => names.find(name => name === item.metadata.name));
 
 export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
@@ -102,24 +102,31 @@ export default class ApplicationModel extends KubeModel {
     let apps;
     if (name) {
       apps = await this.kubeConnector.getResources(
-        ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applications/${name}`,
+        ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      apps = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applications`);
+      apps = await this.kubeConnector.getResources(ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
     }
-
     return apps
-      .map(app => ({
-        applicationRelationshipNames: app.status.ApplicationRelationships || [],
-        applicationWorkNames: app.metadata.name || '',
-        dashboard: app.status.Dashboard || {},
-        deployableNames: app.status.Deployables || [],
-        placementPolicyNames: app.status.PlacementPolicies || [],
-        metadata: app.metadata,
-        raw: app,
-        selector: app.spec.selector,
-      }));
+      .map(async (app) => {
+        const deployableNames = _.get(app, 'metadata.annotations.deployable') ? _.get(app, 'metadata.annotations.deployable').split(',') : [];
+        const placementBindingNames = _.get(app, 'metadata.annotations.placementBinding') ? _.get(app, 'metadata.annotations.placementBinding').split(',') : [];
+        const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+        const placementPolicyNames =
+          placementPolicyItems.map(pp => pp.placementRef && pp.placementRef.name);
+        return {
+          applicationRelationshipNames: _.get(app, 'metadata.annotations.applicationRelationship') ? _.get(app, 'metadata.annotations.applicationRelationship').split(',') : [],
+          applicationWorkNames: app.metadata.name || '',
+          dashboard: _.get(app, 'metadata.annotations.dashboard') || {},
+          deployableNames,
+          placementBindingNames,
+          placementPolicyNames: placementPolicyNames || [],
+          metadata: app.metadata,
+          raw: app,
+          selector: app.spec.selector,
+        };
+      });
   }
 
   async getApplicationRelationships(selector = {}) {
@@ -160,6 +167,23 @@ export default class ApplicationModel extends KubeModel {
     }));
   }
 
+  async getPlacementBindings(selector = {}) {
+    const { matchNames } = selector;
+
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
+      { kind: 'PlacementBinding' },
+    );
+    const placementBindings = matchNames ? filterByName(matchNames, response) : response;
+
+    return placementBindings.map(pb => ({
+      metadata: pb.metadata,
+      raw: pb,
+      placementRef: pb.placementRef,
+      subjects: pb.subjects,
+    }));
+  }
+
   async getPlacementPolicies(selector = {}) {
     const { matchNames } = selector;
 
@@ -180,9 +204,9 @@ export default class ApplicationModel extends KubeModel {
   }
 
   async getApplicationWorks(selector = {}) {
-    const { appName } = selector;
+    const { deployableNames, placementBindingNames } = selector;
 
-    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable=${appName},placementBinding=${appName}`);
+    const response = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable+in+%28${deployableNames.join(',')}%29%2CplacementBinding+in+%28${placementBindingNames.join(',')}%29`);
     return response.map(work => ({
       metadata: work.metadata,
       release: _.get(work, 'status.result.metadata.name', '-'),

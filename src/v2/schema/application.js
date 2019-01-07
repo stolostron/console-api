@@ -16,6 +16,7 @@ type Application implements K8sObject {
   dashboard: String
   deployables: [Deployable]
   metadata: Metadata
+  placementBindings: [PlacementBinding]
   placementPolicies: [PlacementPolicy]
   # The object's yaml definition in JSON format.
   raw: JSON
@@ -46,6 +47,20 @@ type Deployable implements K8sObject {
   metadata: Metadata
   # The object's yaml definition in JSON format.
   raw: JSON
+}
+
+type PlacementBinding implements K8sObject {
+  metadata: Metadata
+  # The object's yaml definition in JSON format.
+  raw: JSON
+  placementRef: Subject
+  subjects: [Subject]
+}
+
+type Subject {
+  apiGroup: String
+  kind: String
+  name: String
 }
 
 type PlacementPolicy implements K8sObject {
@@ -89,16 +104,18 @@ type HelmDeployer {
 export const resolver = {
   Query: {
     applications: (root, args, { applicationModel }) => applicationModel.getApplications(args.name, args.namespace),
-    deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(args.selector),
-    placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
+    // deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(args.selector),
+    // placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
   },
   Application: {
     applicationRelationships: (parent, args, { applicationModel }) =>
       applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
     applicationWorks: (parent, args, { applicationModel }) =>
-      applicationModel.getApplicationWorks({ appName: parent.applicationWorkNames }),
+      applicationModel.getApplicationWorks({ deployableNames: parent.deployableNames, placementBindingNames: parent.placementBindingNames }),
     deployables: (parent, args, { applicationModel }) =>
       applicationModel.getDeployables({ matchNames: parent.deployableNames }),
+    placementBindings: (parent, args, { applicationModel }) =>
+      applicationModel.getPlacementBindings({ matchNames: parent.placementBindingNames }),
     placementPolicies: (parent, args, { applicationModel }) =>
       applicationModel.getPlacementPolicies({ matchNames: parent.placementPolicyNames }),
   },

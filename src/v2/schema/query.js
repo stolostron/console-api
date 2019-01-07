@@ -14,7 +14,6 @@ type Query {
   charts: [HelmChart]
   clusters: [Cluster]
   overview: Overview
-  deployables (selector: JSON): [Deployable]
   namespaces: [Namespace]
   nodes: [Node]
   pods: [Pod]

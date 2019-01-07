@@ -83,12 +83,18 @@ export default function createMockHttp() {
         return state.apps.mockAppsResponse;
       case params.url.includes('kube-system/application'):
         return { body: { items: [] } };
+      case params.url.endsWith('/placementbindings/gbapp-gbapp'):
+        return state.apps.gbappPB;
+      case params.url.endsWith('/placementbindings/gbapp-gbapp-redismaster'):
+        return state.apps.gbappRedisMasterPB;
+      case params.url.includes('/placementbindings'):
+        return state.apps.mockAppPlacementBindings;
       case params.url.includes('/applicationrelationships'):
         return state.apps.mockAppRelationships;
-      case params.url.includes('kube-system/works?labelSelector=deployable=gbapp-gbapp,placementBinding=gbapp-gbapp'):
+      case params.url.includes('kube-system/works?labelSelector=deployable+in+%28'):
         return { body: { items: [] } };
-      case params.url.includes('works?labelSelector=deployable=gbapp-gbapp,placementBinding=gbapp-gbapp'):
-        return state.apps.mockAppDeployables;
+      case params.url.includes('works?labelSelector=deployable+in+%28'):
+        return state.apps.mockApplicationWorks;
       case params.url.endsWith('default/clusters/cluster1'):
         return state.logs.mockClusterResponse;
       case params.url.endsWith('kube-system/clusters/cluster1'):

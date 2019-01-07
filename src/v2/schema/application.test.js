@@ -161,78 +161,78 @@ describe('Application Resolver', () => {
   });
 
 
-  test('Correctly Resolves Deployables Query - MatchNames', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        {
-          deployables(selector:{
-            matchNames:[
-              {name: "gbapp-gbapp"},
-              {name: "gbapp-gbapp-redismaster"},
-              {name: "gbapp-gbapp-redisslave"}
-            ]
-          }) {
-            dependencies {
-              kind
-              name
-            }
-            deployer {
-              chartName
-              namespace
-              repository
-              version
-              chartURL
-            }
-            metadata {
-              name
-              namespace
-              creationTimestamp
-            }
-            raw
-          }
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Correctly Resolves Deployables Query - MatchNames', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //       {
+  //         deployables(selector:{
+  //           matchNames:[
+  //             {name: "gbapp-gbapp"},
+  //             {name: "gbapp-gbapp-redismaster"},
+  //             {name: "gbapp-gbapp-redisslave"}
+  //           ]
+  //         }) {
+  //           dependencies {
+  //             kind
+  //             name
+  //           }
+  //           deployer {
+  //             chartName
+  //             namespace
+  //             repository
+  //             version
+  //             chartURL
+  //           }
+  //           metadata {
+  //             name
+  //             namespace
+  //             creationTimestamp
+  //           }
+  //           raw
+  //         }
+  //       }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('Correctly Resolves Placement Policies Query', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        {
-          placementPolicies(selector:{
-             matchNames:[{
-              name:"gbapp-gbapp"
-            }]
-          }) {
-            metadata {
-              annotations
-              name
-              namespace
-              creationTimestamp
-              selfLink
-            }
-            clusterLabels
-            clusterReplicas
-            resourceSelector
-            status
-            raw
-          }
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Correctly Resolves Placement Policies Query', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //       {
+  //         placementPolicies(selector:{
+  //            matchNames:[{
+  //             name:"gbapp-gbapp"
+  //           }]
+  //         }) {
+  //           metadata {
+  //             annotations
+  //             name
+  //             namespace
+  //             creationTimestamp
+  //             selfLink
+  //           }
+  //           clusterLabels
+  //           clusterReplicas
+  //           resourceSelector
+  //           status
+  //           raw
+  //         }
+  //       }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
   test('Correctly Resolves Create Application Mutation', (done) => {
     supertest(server)
