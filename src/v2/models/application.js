@@ -18,17 +18,13 @@ export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
     const appKinds = {
       Application: 'applications',
+      ApplicationRelationship: 'applicationrelationships',
       ConfigMap: 'configmaps',
       DeployableOverride: 'deployableoverrides',
       Deployable: 'deployables',
+      PlacementBinding: 'placementbindings',
       PlacementPolicy: 'placementpolicies',
     };
-
-    if (!resources.find(resource => resource.kind === 'Application')) {
-      return {
-        errors: [{ message: 'Must contain a resource with kind "Application".' }],
-      };
-    }
 
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', 'default');
@@ -38,6 +34,14 @@ export default class ApplicationModel extends KubeModel {
           message: `Invalid Kind: ${resource.kind}`,
         });
       }
+      if (appKinds[resource.kind] === 'applications') {
+        return this.kubeConnector.post(`/apis/app.k8s.io/v1beta1/namespaces/${namespace}/applications`, resource)
+          .catch(err => ({
+            status: 'Failure',
+            message: err.message,
+          }));
+      }
+
       return this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${appKinds[resource.kind]}`, resource)
         .catch(err => ({
           status: 'Failure',
@@ -118,7 +122,7 @@ export default class ApplicationModel extends KubeModel {
         return {
           applicationRelationshipNames: _.get(app, 'metadata.annotations.applicationRelationship') ? _.get(app, 'metadata.annotations.applicationRelationship').split(',') : [],
           applicationWorkNames: app.metadata.name || '',
-          dashboard: _.get(app, 'metadata.annotations.dashboard') || {},
+          dashboard: _.get(app, 'metadata.annotations.dashboard') || '',
           deployableNames,
           placementBindingNames,
           placementPolicyNames: placementPolicyNames || [],
