@@ -34,10 +34,10 @@ export const mockAppsResponse = {
           annotations: {
             'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
             'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
-            applicationRelationship: 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
-            dashboard: 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-            deployable: 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
-            placementBinding: 'gbapp-gbapp,gbapp-gbapp-redismaster',
+            'apps.ibm.com/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+            'apps.ibm.com/dashboard': 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+            'apps.ibm.com/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+            'apps.ibm.com/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
           },
         },
         spec: {
@@ -91,10 +91,10 @@ export const mockSingleAppResponse = {
       annotations: {
         'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
         'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
-        applicationRelationship: 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
-        dashboard: 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-        deployable: 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
-        placementBinding: 'gbapp-gbapp,gbapp-gbapp-redismaster',
+        'apps.ibm.com/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+        'apps.ibm.com/dashboard': 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+        'apps.ibm.com/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+        'apps.ibm.com/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
       },
     },
     spec: {

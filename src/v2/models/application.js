@@ -114,15 +114,15 @@ export default class ApplicationModel extends KubeModel {
     }
     return apps
       .map(async (app) => {
-        const deployableNames = _.get(app, 'metadata.annotations.deployable') ? _.get(app, 'metadata.annotations.deployable').split(',') : [];
-        const placementBindingNames = _.get(app, 'metadata.annotations.placementBinding') ? _.get(app, 'metadata.annotations.placementBinding').split(',') : [];
+        const deployableNames = _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]').split(',') : [];
+        const placementBindingNames = _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]').split(',') : [];
         const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
         const placementPolicyNames =
           placementPolicyItems.map(pp => pp.placementRef && pp.placementRef.name);
         return {
-          applicationRelationshipNames: _.get(app, 'metadata.annotations.applicationRelationship') ? _.get(app, 'metadata.annotations.applicationRelationship').split(',') : [],
+          applicationRelationshipNames: _.get(app, 'metadata.annotations["apps.ibm.com/applicationrelationships"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/applicationrelationships"]').split(',') : [],
           applicationWorkNames: app.metadata.name || '',
-          dashboard: _.get(app, 'metadata.annotations.dashboard') || '',
+          dashboard: _.get(app, 'metadata.annotations["apps.ibm.com/dashboard"]') || '',
           deployableNames,
           placementBindingNames,
           placementPolicyNames: placementPolicyNames || [],
