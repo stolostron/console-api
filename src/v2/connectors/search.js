@@ -42,21 +42,15 @@ export default class SearchConnector {
     this.remoteConnection = new gremlin.driver.DriverRemoteConnection(this.gremlinEndpoint);
     this.graph = new gremlin.structure.Graph();
     this.g = this.graph.traversal().withRemote(this.remoteConnection);
+
+    this.gremlinClient = new gremlin.driver.Client(gremlinEndpoint, {});
+    this.gremlinClient.open();
+    this.gremlinClient.submit('graph = TinkerGraph.open()');
   }
 
-
-  // async checkConnection() {
-  //   if (this.remoteConnection === undefined || !this.remoteConnection.isOpen) {
-  //     logger.error(`Error connecting to gremlin-server at ${this.gremlinEndpoint}`);
-  //     throw Error('Error connecting to gremlin-server.');
-
-  //     // TODO: Add gremlin connection retry logic.
-  //   }
-  // }
-
   async runSearchQuery(searchProperties) {
-    // await this.checkConnection();
-    // logger.info('Running search', searchProperties);
+    logger.debug('Running search', searchProperties);
+    await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
 
     const v = this.g.V();
     searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
@@ -64,8 +58,7 @@ export default class SearchConnector {
   }
 
   async runSearchQueryCountOnly(searchProperties) {
-    // await this.checkConnection();
-    // logger.info('Running search (count only)', searchProperties);
+    logger.debug('Running search (count only)', searchProperties);
 
     const v = this.g.V();
     searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
@@ -73,22 +66,18 @@ export default class SearchConnector {
   }
 
   async getAllProperties() {
-    // await this.checkConnection();
-    // logger.info('Getting all properties.');
-
-    // TODO: Need to use a more efficient query.
+    // TODO: Maybe there's a more efficient query.
     const properties = await this.g.V().properties().dedup().toList();
     const values = new Set();
     properties.forEach((prop) => {
       values.add(prop.label);
     });
 
-    return [...values];
+    return [...values].filter(item => item.charAt(0) !== '_');
   }
 
   async getAllValues(property) {
-    // await this.checkConnection();
-    // logger.info('Getting all values for property:', property);
+    logger.debug('Getting all values for property:', property);
 
     // TODO: Need to use a more efficient query.
     const resultValues = [];

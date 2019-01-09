@@ -38,7 +38,7 @@ export const typeDef = `
 
 export const resolver = {
   Query: {
-    search: (parent, args, { searchModel }) => searchModel.multiSearch(args),
+    search: (parent, { input }) => input,
     searchComplete: (parent, { property }, { searchModel }) =>
       searchModel.resolveSearchComplete({ property }),
     searchSchema: (parent, args, { searchModel }) => searchModel.searchSchema(),
@@ -46,6 +46,6 @@ export const resolver = {
   SearchResult: {
     count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(parent),
     items: (parent, args, { searchModel }) => searchModel.resolveSearch(parent),
-    related: (parent, args, { searchModel }) => searchModel.resolveRelated(parent),
+    related: (parent, args, { searchModel }) => searchModel.resolveRelatedResources(parent),
   },
 };

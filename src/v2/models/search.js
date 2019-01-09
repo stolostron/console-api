@@ -10,19 +10,11 @@
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
 
-/* eslint-disable class-methods-use-this */
 export default class SearchModel {
   constructor({ searchConnector = isRequired('searchConnector') }) {
     this.searchConnector = searchConnector;
   }
 
-  async multiSearch({ input }) {
-    return input.map((i) => {
-      logger.info('Running search with input:\n\t', i);
-
-      return i;
-    });
-  }
 
   async resolveSearch(parent) {
     return this.searchConnector.runSearchQuery(parent.filters);
@@ -36,25 +28,25 @@ export default class SearchModel {
     return this.searchConnector.getAllValues(property);
   }
 
-  async resolveRelated() {
-    logger.warn('TODO: Resolving search related resources query. RETURNING MOCK RESULTS.');
-    return [
-      {
-        kind: 'cluster',
-        count: 5,
-      },
-      {
-        kind: 'application',
-        count: 3,
-      },
-    ];
+  /* eslint-disable class-methods-use-this */
+  async resolveRelatedResources() {
+    logger.warn('Ignoring related resources query. This feature is not implemented yet.');
+    return [];
+  //   return [
+  //     {
+  //       kind: 'cluster',
+  //       count: 5,
+  //     },
+  //     {
+  //       kind: 'application',
+  //       count: 3,
+  //     },
+  //   ];
   }
-
 
   async searchSchema() {
     return {
       allProperties: await this.searchConnector.getAllProperties(),
-      allFields: await this.searchConnector.getAllProperties(), // TODO: Deprecated, remove
     };
   }
 }

@@ -119,16 +119,7 @@ Object {
             },
           ],
         },
-        "related": Array [
-          Object {
-            "count": 5,
-            "kind": "cluster",
-          },
-          Object {
-            "count": 3,
-            "kind": "application",
-          },
-        ],
+        "related": Array [],
       },
     ],
   },
