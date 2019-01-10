@@ -1177,11 +1177,11 @@ export const mockResponse = {
                       },
                       {
                         name: 'PLATFORM_IDENTITY_PROVIDER_URL',
-                        value: 'http://platform-identity-provider:4300',
+                        value: 'https://platform-identity-provider:4300',
                       },
                       {
                         name: 'PLATFORM_IDENTITY_MGMT_URL',
-                        value: 'http://platform-identity-management:4500',
+                        value: 'https://platform-identity-management:4500',
                       },
                       {
                         name: 'PLATFORM_IDENTITY_PROVIDER_CLIENTID',
@@ -2128,7 +2128,7 @@ export const mockResponse = {
                       },
                       {
                         name: 'IDPROVIDER_KUBEDNS_NAME',
-                        value: 'http://127.0.0.1',
+                        value: 'https://127.0.0.1',
                       },
                       {
                         name: 'KUBE_APISERVER_HOST',
@@ -2603,7 +2603,7 @@ export const mockResponse = {
                       },
                       {
                         name: 'PDP_URL',
-                        value: 'http://iam-pdp:7998',
+                        value: 'https://iam-pdp:7998',
                       },
                       {
                         name: 'PLATFORM',
@@ -2629,11 +2629,11 @@ export const mockResponse = {
                       },
                       {
                         name: 'IDENTITY_PROVIDER_URL',
-                        value: 'http://platform-identity-provider:4300',
+                        value: 'https://platform-identity-provider:4300',
                       },
                       {
                         name: 'IDENTITY_MGMT_URL',
-                        value: 'http://platform-identity-management:4500',
+                        value: 'https://platform-identity-management:4500',
                       },
                     ],
                     image: 'www.ibm.com/ibmcom-amd64/iam-policy-administration:3.1.0',
@@ -3003,7 +3003,7 @@ export const mockResponse = {
                       },
                       {
                         name: 'CAMS_PDP_URL',
-                        value: 'http://iam-pdp:7998',
+                        value: 'https://iam-pdp:7998',
                       },
                       {
                         name: 'IAM_TOKEN_SERVICE_URL',
@@ -3011,11 +3011,11 @@ export const mockResponse = {
                       },
                       {
                         name: 'IDENTITY_PROVIDER_URL',
-                        value: 'http://platform-identity-provider:4300',
+                        value: 'https://platform-identity-provider:4300',
                       },
                       {
                         name: 'IAM_PAP_URL',
-                        value: 'http://iam-pap:39001',
+                        value: 'https://iam-pap:39001',
                       },
                     ],
                     image: 'www.ibm.com/ibmcom-amd64/iam-policy-decision:3.1.0',
@@ -3092,7 +3092,7 @@ export const mockResponse = {
                     command: [
                       'sh',
                       '-c',
-                      'until curl -k -i -fsS http://platform-identity-provider:4300 | grep "200 OK"; do sleep 3; done;',
+                      'until curl -k -i -fsS https://platform-identity-provider:4300 | grep "200 OK"; do sleep 3; done;',
                     ],
                     image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
@@ -3112,7 +3112,7 @@ export const mockResponse = {
                     command: [
                       'sh',
                       '-c',
-                      'until curl -k -i -fsS http://platform-identity-management:4500 | grep "200 OK"; do sleep 3; done;',
+                      'until curl -k -i -fsS https://platform-identity-management:4500 | grep "200 OK"; do sleep 3; done;',
                     ],
                     image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
@@ -3152,7 +3152,7 @@ export const mockResponse = {
                     command: [
                       'sh',
                       '-c',
-                      'until curl -k -i -fsS http://iam-pap:39001/v1/health | grep "200 OK"; do sleep 3; done;',
+                      'until curl -k -i -fsS https://iam-pap:39001/v1/health | grep "200 OK"; do sleep 3; done;',
                     ],
                     image: 'www.ibm.com/ibmcom-amd64/icp-platform-auth:3.1.0',
                     imagePullPolicy: 'IfNotPresent',
@@ -5047,11 +5047,11 @@ export const mockResponse = {
                       },
                       {
                         name: 'PLATFORM_IDENTITY_PROVIDER_URL',
-                        value: 'http://platform-identity-provider:4300',
+                        value: 'https://platform-identity-provider:4300',
                       },
                       {
                         name: 'WLP_REDIRECT_URL',
-                        value: 'http://localhost:3000/auth/liberty/callback',
+                        value: 'https://localhost:3000/auth/liberty/callback',
                       },
                     ],
                     image: 'www.ibm.com/ibmcom/icp-catalog-ui-amd64:3.1.0-mcm',
