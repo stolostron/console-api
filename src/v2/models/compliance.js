@@ -355,8 +355,8 @@ export default class ComplianceModel {
     const placementPolicies = [];
     policies.forEach((policy) => {
       const pp = map.get(policy);
-      const spec = pp.spec || {};
       if (pp) {
+        const spec = pp.spec || {};
         placementPolicies.push({
           clusterLabels: spec.clusterLabels,
           metadata: pp.metadata,
