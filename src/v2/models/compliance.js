@@ -132,7 +132,7 @@ export default class ComplianceModel {
         logger.error(`HCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
-      compliances = response.items;
+      compliances = response.items || [];
     } else {
       // get single compliance from a specific namespace
       const response = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/compliances/${name}`);
