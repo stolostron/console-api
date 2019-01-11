@@ -96,7 +96,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     httpLib: kubeHTTP,
     namespaces,
   });
-  const searchConnector = isTest ? new MockSearchConnector() : new SearchConnector();
+  const searchConnector = isTest ? new MockSearchConnector() :
+    new SearchConnector({ rbac: namespaces });
 
   const context = {
     req,

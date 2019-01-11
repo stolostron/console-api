@@ -10,6 +10,9 @@
 import gremlin from 'gremlin';
 import config from '../../../config';
 import logger from '../lib/logger';
+import { isRequired } from '../lib/utils';
+
+const { P } = gremlin.process;
 
 // TODO: Need a better solution to handle this connection error, using this ugly
 //      workaround for now because the gremlin client doesn't expose the websocket connection.
@@ -33,11 +36,14 @@ function formatResult(result) {
   });
   return resultObjects;
 }
+
 export default class SearchConnector {
   constructor({
     gremlinEndpoint = config.get('gremlinEndpoint'),
+    rbac = isRequired('rbac'),
   } = {}) {
     this.gremlinEndpoint = gremlinEndpoint;
+    this.rbac = rbac;
 
     this.remoteConnection = new gremlin.driver.DriverRemoteConnection(this.gremlinEndpoint);
     this.graph = new gremlin.structure.Graph();
@@ -52,7 +58,7 @@ export default class SearchConnector {
     logger.debug('Running search', searchProperties);
     await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
 
-    const v = this.g.V();
+    const v = this.g.V().has('_rbac', P.within(this.rbac));
     searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
     return v.valueMap().toList().then(result => formatResult(result));
   }
@@ -60,14 +66,15 @@ export default class SearchConnector {
   async runSearchQueryCountOnly(searchProperties) {
     logger.debug('Running search (count only)', searchProperties);
 
-    const v = this.g.V();
+    const v = this.g.V().has('_rbac', P.within(this.rbac));
     searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
     return v.count().next().then(result => result.value);
   }
 
   async getAllProperties() {
     // TODO: Maybe there's a more efficient query.
-    const properties = await this.g.V().properties().dedup().toList();
+    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    const properties = await v.properties().dedup().toList();
     const values = new Set();
     properties.forEach((prop) => {
       values.add(prop.label);
@@ -81,7 +88,8 @@ export default class SearchConnector {
 
     // TODO: Need to use a more efficient query.
     const resultValues = [];
-    await this.g.V().valueMap(property).dedup().toList()
+    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    await v.valueMap(property).dedup().toList()
       .then((result) => {
         result.forEach((valueMap) => {
           const values = valueMap.get(property) || [];
