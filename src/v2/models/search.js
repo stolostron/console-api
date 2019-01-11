@@ -15,6 +15,9 @@ export default class SearchModel {
     this.searchConnector = searchConnector;
   }
 
+  async getUpdatedTimestamp() {
+    return this.searchConnector.getLastUpdatedTimestamp();
+  }
 
   async resolveSearch(parent) {
     return this.searchConnector.runSearchQuery(parent.filters);

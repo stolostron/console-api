@@ -32,7 +32,10 @@ export const typeDef = `
   type SearchResult {
     count: Int
     items: JSON
+    # FUTURE: This isn't fully implemented yet.
     related: [SearchRelatedResult]
+    # Time when the backend data was last updated.
+    updatedTimestamp: Float
   }
 `;
 
@@ -46,6 +49,7 @@ export const resolver = {
   SearchResult: {
     count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(parent),
     items: (parent, args, { searchModel }) => searchModel.resolveSearch(parent),
+    updatedTimestamp: (parent, args, { searchModel }) => searchModel.getUpdatedTimestamp(),
     related: (parent, args, { searchModel }) => searchModel.resolveRelatedResources(parent),
   },
 };

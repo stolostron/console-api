@@ -54,6 +54,15 @@ export default class SearchConnector {
     this.gremlinClient.submit('graph = TinkerGraph.open()');
   }
 
+  async getLastUpdatedTimestamp() {
+    try {
+      const lastUpdated = await this.gremlinClient.submit("graph.variables().get('lastUpdatedTimestamp').get()");
+      return lastUpdated.traversers[0];
+    } catch (e) {
+      return 0;
+    }
+  }
+
   async runSearchQuery(searchProperties) {
     logger.debug('Running search', searchProperties);
     await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
