@@ -9,7 +9,7 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
-import { isRequired } from '../lib/utils';
+import { isRequired, getType } from '../lib/utils';
 
 const formatPod = (clusterName, pod) => ({
   cluster: { metadata: { name: clusterName } },
@@ -40,7 +40,7 @@ const formatPVs = (clusterName, pvs) => ({
   metadata: pvs.metadata,
   reclaimPolicy: _.get(pvs, 'spec.persistentVolumeReclaimPolicy', '-'),
   status: _.get(pvs, 'status.phase', '-'),
-  type: pvs.spec.local ? 'LocalVolume' : 'Hostpath',
+  type: getType(pvs),
 });
 
 const formatPVsClaims = (clusterName, claim) => ({
@@ -67,6 +67,7 @@ const formatNode = (clusterName, node) => ({
   startedAt: node.status.startTime,
   status: node.status.phase,
 });
+
 
 const formatNamespace = (clusterName, namespace) => ({
   cluster: clusterName,
