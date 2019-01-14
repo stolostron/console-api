@@ -7,6 +7,8 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import generateDemoData from './overviewDemo';
+
 export const typeDef = `
 type Overview {
   clusters: [ClusterOverview]
@@ -55,24 +57,31 @@ type PodOverview implements K8sObject {
 
 export const resolver = {
   Query: {
-    overview: async (root, args, {
+    overview: async (root, { demoMode }, {
       clusterModel, applicationModel, resourceViewModel,
     }) => {
-      const clusters = await clusterModel.getAllClusters();
+      if (!demoMode) {
+        const clusters = await clusterModel.getAllClusters();
 
-      // number and what clusters
-      const applications = await applicationModel.getApplications();
+        // number and what clusters
+        const applications = await applicationModel.getApplications();
 
-      // number, what cluster and status
-      const pods = await resourceViewModel.fetchResources({ type: 'pods' });
+        // number, what cluster and status
+        let pods = await resourceViewModel.fetchResources({ type: 'pods' });
+        pods = pods.map((pod) => {
+          const { metadata, cluster, status } = pod;
+          return { metadata, cluster, status };
+        });
 
-      // what time these values were fetched
-      // also forces apollo query to continially update the component even if nothing else changed
-      const timestamp = new Date().toString();
+        // what time these values were fetched
+        // also forces apollo query to continially update the component even if nothing else changed
+        const timestamp = new Date().toString();
 
-      return {
-        clusters, applications, pods, timestamp,
-      };
+        return {
+          clusters, applications, pods, timestamp,
+        };
+      }
+      return generateDemoData();
     },
   },
 };
