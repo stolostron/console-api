@@ -93,9 +93,36 @@ const generateDemoData = () => {
 
 
   const applications = Array.from({ length: 27 }, (v, k) => ({ metadata: { name: `app${k}` } }));
+
+  const statuses = {};
+  const compliances = [{
+    raw: {
+      status: {
+        status: statuses,
+      },
+    },
+  }];
+  [
+    {
+      c: 'cluster2', e: 'Compliant',
+    },
+    {
+      c: 'cluster5', e: 'Compliant',
+    },
+    {
+      c: 'cluster8', e: 'Non-Compliant',
+    },
+  ].forEach(({ c, e }) => {
+    statuses[c] = {
+      name: c,
+      compliant: e,
+    };
+  });
+
+
   const timestamp = new Date().toString();
   return {
-    clusters, applications, pods, timestamp,
+    clusters, applications, compliances, pods, timestamp,
   };
 };
 

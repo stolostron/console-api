@@ -47,6 +47,13 @@ describe('Overview Resolver', () => {
             raw
             selector
           }
+          compliances {
+            metadata {
+              name
+              namespace
+            }
+            raw
+          }
           pods {
             metadata {
               name

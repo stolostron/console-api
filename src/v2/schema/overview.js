@@ -14,6 +14,7 @@ type Overview {
   clusters: [ClusterOverview]
   applications: [ApplicationOverview]
   pods: [PodOverview]
+  compliances: [ComplianceOverview]
   timestamp: String
 }
 
@@ -44,6 +45,11 @@ type ApplicationOverview implements K8sObject {
   selector: JSON
 }
 
+type ComplianceOverview implements K8sObject {
+  metadata: Metadata
+  raw: JSON
+}
+
 type PodOverview implements K8sObject {
   metadata: Metadata
   cluster: Cluster
@@ -58,7 +64,7 @@ type PodOverview implements K8sObject {
 export const resolver = {
   Query: {
     overview: async (root, { demoMode }, {
-      clusterModel, applicationModel, resourceViewModel,
+      clusterModel, applicationModel, complianceModel, resourceViewModel,
     }) => {
       if (!demoMode) {
         const clusters = await clusterModel.getAllClusters();
@@ -73,12 +79,15 @@ export const resolver = {
           return { metadata, cluster, status };
         });
 
+        // policy compliances
+        const compliances = await complianceModel.getCompliances();
+
         // what time these values were fetched
         // also forces apollo query to continially update the component even if nothing else changed
         const timestamp = new Date().toString();
 
         return {
-          clusters, applications, pods, timestamp,
+          clusters, applications, compliances, pods, timestamp,
         };
       }
       return generateDemoData();
