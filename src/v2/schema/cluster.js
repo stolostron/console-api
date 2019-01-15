@@ -22,6 +22,8 @@ type Cluster implements K8sObject {
   totalStorage: String
   # Returns % of CPU used.
   totalCPU: String
+  klusterletVersion: String
+  k8sVersion: String
 }
 `;
 

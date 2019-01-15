@@ -42,6 +42,8 @@ export default class ClusterModel extends KubeModel {
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
         rawStatus: clusterstatus,
+        klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
+        k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
       };
 
       accum.push(result);
