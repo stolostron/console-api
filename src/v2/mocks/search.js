@@ -50,49 +50,20 @@ export const mockSearchResult = {
    *    { cluster: 2, pod:5 }
    */
   mock: (args) => {
-    const headers = new Set();
     const mockResult = [];
-    // Get headers
-    Object.keys(args).forEach((kind) => {
-      Object.keys(resourceTemplate[kind]).forEach(h => headers.add(h));
-    });
-    const baseResult = {};
-    headers.forEach((header) => { baseResult[header] = 'NULL'; });
 
     // Get items
     Object.keys(args).forEach((kind) => {
       for (let i = 0; i < args[kind]; i += 1) {
-        const mockItem = { ...baseResult, ...resourceTemplate[kind](i) };
+        const mockItem = { ...resourceTemplate[kind](i) };
         mockResult.push(mockItem);
       }
     });
 
-    return {
-      headers,
-      items: mockResult,
-      relatedResources: [
-        {
-          kind: 'application',
-          count: 2,
-        },
-        {
-          kind: 'cluster',
-          count: 3,
-        },
-        {
-          kind: 'deployment',
-          count: 10,
-        },
-        {
-          kind: 'pod',
-          count: 200,
-        },
-      ],
-    };
+    return mockResult;
   },
 };
 
-// export default mockSearchResult;
 
 /* eslint-disable class-methods-use-this */
 export default class MockSearchConnector {
