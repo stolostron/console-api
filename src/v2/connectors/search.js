@@ -68,7 +68,7 @@ export default class SearchConnector {
     await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
 
     const v = this.g.V().has('_rbac', P.within(this.rbac));
-    searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
+    searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
     return v.valueMap().toList().then(result => formatResult(result));
   }
 
@@ -76,7 +76,7 @@ export default class SearchConnector {
     logger.debug('Running search (count only)', searchProperties);
 
     const v = this.g.V().has('_rbac', P.within(this.rbac));
-    searchProperties.forEach(searchProp => v.has(searchProp.property, searchProp.values[0]));
+    searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
     return v.count().next().then(result => result.value);
   }
 
