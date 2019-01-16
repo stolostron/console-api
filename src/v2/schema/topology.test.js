@@ -61,7 +61,8 @@ afterAll(() => {
 });
 
 // Should skip the power build due to incompatible arch
-const testIf = process.arch === 'x64' ? describe : describe.skip;
+// const testIf = process.arch === 'x64' ? describe : describe.skip;
+const testIf = describe.skip;
 testIf('Topology Resolver', () => {
   test('Should Correctly Resolve Topology Labels Query', (done) => {
     supertest(server)
