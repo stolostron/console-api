@@ -45,8 +45,8 @@ export default class SearchModel {
     return this.searchConnector.runSearchQueryCountOnly(filters);
   }
 
-  async resolveSearchComplete({ property }) {
-    return this.searchConnector.getAllValues(property);
+  async resolveSearchComplete({ property, filters }) {
+    return this.searchConnector.getAllValues(property, filters);
   }
 
   /* eslint-disable class-methods-use-this */

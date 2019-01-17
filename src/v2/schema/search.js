@@ -42,8 +42,8 @@ export const typeDef = `
 export const resolver = {
   Query: {
     search: (parent, { input }) => input,
-    searchComplete: (parent, { property }, { searchModel }) =>
-      searchModel.resolveSearchComplete({ property }),
+    searchComplete: (parent, { property, query }, { searchModel }) =>
+      searchModel.resolveSearchComplete({ property, filters: query.filters }),
     searchSchema: (parent, args, { searchModel }) => searchModel.searchSchema(),
   },
   SearchResult: {

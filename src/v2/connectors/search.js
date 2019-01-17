@@ -92,12 +92,13 @@ export default class SearchConnector {
     return [...values].filter(item => item.charAt(0) !== '_');
   }
 
-  async getAllValues(property) {
+  async getAllValues(property, propFilters) {
     logger.debug('Getting all values for property:', property);
 
     // TODO: Need to use a more efficient query.
     const resultValues = [];
     const v = this.g.V().has('_rbac', P.within(this.rbac));
+    propFilters.forEach(propFilter => v.has(propFilter.property, P.within(propFilter.values)));
     await v.valueMap(property).dedup().toList()
       .then((result) => {
         result.forEach((valueMap) => {
