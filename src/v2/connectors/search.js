@@ -84,7 +84,7 @@ export default class SearchConnector {
     // TODO: Maybe there's a more efficient query.
     const v = this.g.V().has('_rbac', P.within(this.rbac));
     const properties = await v.properties().dedup().toList();
-    const values = new Set();
+    const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
     properties.forEach((prop) => {
       values.add(prop.label);
     });
@@ -92,7 +92,7 @@ export default class SearchConnector {
     return [...values].filter(item => item.charAt(0) !== '_');
   }
 
-  async getAllValues(property, propFilters) {
+  async getAllValues(property, propFilters = []) {
     logger.debug('Getting all values for property:', property);
 
     // TODO: Need to use a more efficient query.
