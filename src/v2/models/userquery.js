@@ -45,7 +45,10 @@ export default class QueryModel extends KubeModel {
     const queries = response.userQueries || [];
     const existingQuery = queries.findIndex(query => query.name === resource.name);
     if (existingQuery !== undefined && existingQuery !== -1) {
-      queries[existingQuery] = resource;
+      const target = queries[existingQuery];
+      target.name = resource.name;
+      target.description = resource.description;
+      if (resource.searchText !== '') target.searchText = resource.searchText;
       opts.json = {
         ...response, userQueries: queries,
       };
