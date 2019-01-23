@@ -11,37 +11,37 @@ const generateDemoData = () => {
   let pods = [];
   const clusters = [
     {
-      c: 'AWS', e: 'Dev', r: 'US', v: 'RHOL', s: 'ok', cu: '12', uu: '9299m', n: '2', cm: '24029Mi', um: '7029Mi', ct: '80Gi', ut: '60Gi', p: '89',
+      c: 'AWS', e: 'Dev', r: 'US', v: 'RHOL', s: 'ok', cu: '12', uu: '9299m', n: '6', cm: '24029Mi', um: '7029Mi', ct: '80Gi', ut: '60Gi', p: '89',
     },
     {
       c: 'AWS', e: 'Test', r: 'AP', v: 'IKE', s: 'ok', cu: '8', uu: '5299m', n: '2', cm: '24029Mi', um: '19029Mi', ct: '180Gi', ut: '100Gi', p: '189',
     },
     {
-      c: 'AWS', e: 'Prod', r: 'AP', v: 'ICP', s: 'ok', cu: '22', uu: '17299m', n: '2', cm: '24029Mi', um: '5029Mi', ct: '80Gi', ut: '80Gi', p: '59',
+      c: 'AWS', e: 'Prod', r: 'AP', v: 'ICP', s: 'ok', cu: '22', uu: '17299m', n: '4', cm: '24029Mi', um: '5029Mi', ct: '80Gi', ut: '80Gi', p: '59',
     },
     {
-      c: 'Azure', e: 'Dev', r: 'US', v: 'ICP', s: 'offline', cu: '8', uu: '7299m', n: '2', cm: '24029Mi', um: '17029Mi', ct: '60Gi', ut: '20Gi', p: '39',
+      c: 'Azure', e: 'Dev', r: 'US', v: 'AKS', s: 'offline', cu: '8', uu: '7299m', n: '9', cm: '24029Mi', um: '17029Mi', ct: '60Gi', ut: '20Gi', p: '39',
     },
     {
       c: 'Azure', e: 'Prod', r: 'AP', v: 'RKE', s: 'ok', cu: '32', uu: '27299m', n: '2', cm: '24029Mi', um: '12029Mi', ct: '80Gi', ut: '60Gi', p: '49',
     },
     {
-      c: 'Google', e: 'Dev', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '2', cm: '24029Mi', um: '9029Mi', ct: '100Gi', ut: '80Gi', p: '289',
+      c: 'Google', e: 'Dev', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '3', cm: '24029Mi', um: '9029Mi', ct: '100Gi', ut: '80Gi', p: '289',
     },
     {
       c: 'IBM', e: 'Dev', r: 'US', v: 'ICP', s: 'ok', cu: '8', uu: '3299m', n: '2', cm: '24029Mi', um: '6029Mi', ct: '80Gi', ut: '80Gi', p: '39',
     },
     {
-      c: 'IBM', e: 'Test', r: 'AP', v: 'ICP', s: 'ok', cu: '24', uu: '16299m', n: '2', cm: '24029Mi', um: '17029Mi', ct: '120Gi', ut: '100Gi', p: '79',
+      c: 'IBM', e: 'Test', r: 'AP', v: 'ICP', s: 'ok', cu: '24', uu: '16299m', n: '1', cm: '24029Mi', um: '17029Mi', ct: '120Gi', ut: '100Gi', p: '79',
     },
     {
-      c: 'IBM', e: 'Prod', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '2', cm: '24029Mi', um: '17029Mi', ct: '60Gi', ut: '40Gi', p: '99',
+      c: 'IBM', e: 'Prod', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '4', cm: '24029Mi', um: '17029Mi', ct: '60Gi', ut: '40Gi', p: '99',
     },
     {
       c: 'IBM', e: 'Dev', r: 'US', v: 'IKE', s: 'ok', cu: '8', uu: '2299m', n: '2', cm: '24029Mi', um: '17029Mi', ct: '20Gi', ut: '10Gi', p: '39',
     },
     {
-      c: 'huawei', e: 'Dev', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '2', cm: '24029Mi', um: '17029Mi', ct: '280Gi', ut: '10Gi', p: '189',
+      c: 'huawei', e: 'Dev', r: 'AP', v: 'ICP', s: 'ok', cu: '12', uu: '7299m', n: '8', cm: '24029Mi', um: '17029Mi', ct: '280Gi', ut: '10Gi', p: '189',
     },
   ].map(({
     c, e, r, v, s, cu, uu, n, cm, um, ct, ut, p,

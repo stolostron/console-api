@@ -67,20 +67,54 @@ export const resolver = {
       clusterModel, applicationModel, complianceModel, resourceViewModel,
     }) => {
       if (!demoMode) {
-        const clusters = await clusterModel.getAllClusters();
+        let clusters = await clusterModel.getAllClusters();
+        clusters = clusters.map(({
+          metadata, status, capacity, usage,
+        }) => {
+          const { name, namespace, labels } = metadata;
+          return {
+            metadata: {
+              name,
+              namespace,
+              labels,
+            },
+            status,
+            capacity,
+            usage,
+          };
+        });
 
         // number and what clusters
-        const applications = await applicationModel.getApplications();
+        let applications = await applicationModel.getApplicationOverview();
+        applications = applications.map(({ metadata: { name } }) => ({
+          metadata: {
+            name,
+          },
+        }));
 
         // number, what cluster and status
         let pods = await resourceViewModel.fetchResources({ type: 'pods' });
-        pods = pods.map((pod) => {
-          const { metadata, cluster, status } = pod;
-          return { metadata, cluster, status };
+        pods = pods.map(({ metadata, cluster, status }) => {
+          const { name, namespace } = metadata;
+          return {
+            metadata: {
+              name,
+              namespace,
+            },
+            status,
+            cluster,
+          };
         });
 
         // policy compliances
-        const compliances = await complianceModel.getCompliances();
+        let compliances = await complianceModel.getCompliances();
+        compliances = compliances.map(({ raw: { status: { status } } }) => ({
+          raw: {
+            status: {
+              status,
+            },
+          },
+        }));
 
         // what time these values were fetched
         // also forces apollo query to continially update the component even if nothing else changed

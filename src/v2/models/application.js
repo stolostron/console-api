@@ -102,6 +102,23 @@ export default class ApplicationModel extends KubeModel {
     return errors;
   }
 
+  async getApplicationOverview(name, namespace = 'default') {
+    let apps;
+    if (name) {
+      apps = await this.kubeConnector.getResources(
+        ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+        { namespaces: [namespace] },
+      );
+    } else {
+      apps = await this.kubeConnector.getResources(ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+    }
+    apps = await Promise.all(apps);
+    return apps
+      .map(app => ({
+        metadata: app.metadata,
+      }));
+  }
+
   async getApplications(name, namespace = 'default') {
     let apps;
     if (name) {
