@@ -7,9 +7,11 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import gremlin from 'gremlin';
 import config from '../../../config';
 import logger from '../lib/logger';
+import requestLib from '../lib/request';
 import { isRequired } from '../lib/utils';
 
 const { P } = gremlin.process;
@@ -36,6 +38,21 @@ function formatResult(result) {
     resultObjects.push(resourceObj);
   });
   return resultObjects;
+}
+
+function getForbiddenKindsForRole(role) {
+  switch (role.toLowerCase()) {
+    case 'viewer':
+    case 'editor':
+      return ['compliance', 'policy', 'node', 'placementpolicy', 'placementbinding', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
+    case 'operator':
+      return ['node', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
+    case 'administrator':
+    case 'clusteradministrator':
+      return [];
+    default:
+      return ['compliance', 'policy', 'node', 'placementpolicy', 'placementbinding', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
+  }
 }
 
 let gremlinConnection;
@@ -94,10 +111,29 @@ const getValidatedConnection = () => new Promise(async (resolve, reject) => {
 
 export default class SearchConnector {
   constructor({
+    httpLib = requestLib,
     rbac = isRequired('rbac'),
+    req = isRequired('req'),
   } = {}) {
     this.rbac = rbac;
+    this.http = httpLib;
+    this.req = req;
     this.initialize();
+    this.getUserRole(req);
+  }
+
+  async getUserRole(req) {
+    const iamToken = _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
+    const defaults = {
+      url: `${config.get('cfcRouterUrl')}/idmgmt/identity/api/v1/users/${req.user.name}/getHighestRole`,
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${iamToken}`,
+      },
+    };
+    return this.http(defaults).then((res) => {
+      this.role = res.body;
+    });
   }
 
   async initialize() {
@@ -124,27 +160,35 @@ export default class SearchConnector {
   async runSearchQuery(searchProperties) {
     logger.debug('Running search', searchProperties);
     await this.initialize();
+    await this.getUserRole(this.req);
     await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
 
-    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
+
     return v.valueMap().toList().then(result => formatResult(result));
   }
 
   async runSearchQueryCountOnly(searchProperties) {
     logger.debug('Running search (count only)', searchProperties);
     await this.initialize();
-    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    await this.getUserRole(this.req);
+
+    const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
+
     return v.count().next().then(result => result.value);
   }
 
   async getAllProperties() {
     // TODO: Maybe there's a more efficient query.
     await this.initialize();
-    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    await this.getUserRole(this.req);
+
+    const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     const properties = await v.properties().dedup().toList();
     const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
+
     properties.forEach((prop) => {
       values.add(prop.label);
     });
@@ -155,10 +199,12 @@ export default class SearchConnector {
   async getAllValues(property, propFilters = []) {
     logger.debug('Getting all values for property:', property);
     await this.initialize();
+    await this.getUserRole(this.req);
     // TODO: Need to use a more efficient query.
     const resultValues = [];
-    const v = this.g.V().has('_rbac', P.within(this.rbac));
+    const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     propFilters.forEach(propFilter => v.has(propFilter.property, P.within(propFilter.values)));
+
     await v.valueMap(property).dedup().toList()
       .then((result) => {
         result.forEach((valueMap) => {

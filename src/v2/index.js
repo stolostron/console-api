@@ -97,7 +97,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     namespaces,
   });
   const searchConnector = isTest ? new MockSearchConnector() :
-    new SearchConnector({ rbac: namespaces });
+    new SearchConnector({ rbac: namespaces, req });
 
   const context = {
     req,
