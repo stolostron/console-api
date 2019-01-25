@@ -12,6 +12,7 @@ YEAR=2018
 CHECK1=" Licensed Materials - Property of IBM"
 #LINE2="${COMMENT_PREFIX}(c) Copyright IBM Corporation ${YEAR}. All Rights Reserved."
 CHECK2=" Copyright IBM Corporation 2018. All Rights Reserved."
+CHECK2a=" Copyright IBM Corporation 2019. All Rights Reserved."
 #LINE3="${COMMENT_PREFIX}Note to U.S. Government Users Restricted Rights:"
 CHECK3=" Note to U.S. Government Users Restricted Rights:"
 #LINE4="${COMMENT_PREFIX}Use, duplication or disclosure restricted by GSA ADP Schedule"
@@ -54,7 +55,9 @@ for f in `find . -type f ! -path "./.eslintrc.js" ! -path "./build-harness/*" ! 
       printf "OK\n"
     else
       #Validate the copyright line being checked is present
-      if [[ "$HEADER" != *"${LIC_ARY[$i]}"* ]]; then
+     if [[ "$HEADER" != *"${LIC_ARY[$i]}"*
+       && "$HEADER" != *"${CHECK2}"*
+       && "$HEADER" != *"${CHECK2a}"* ]]; then
         printf "Missing copyright\n  >>Could not find [${LIC_ARY[$i]}] in the file $f\n"
         ERROR=1
         break

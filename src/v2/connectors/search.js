@@ -13,6 +13,7 @@ import config from '../../../config';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import { isRequired } from '../lib/utils';
+import getGremlinCredentials from './gremlinConnectionHelper';
 
 const { P } = gremlin.process;
 
@@ -57,14 +58,7 @@ function getForbiddenKindsForRole(role) {
 
 let gremlinConnection;
 const initializeGremlinConnection = () => new Promise(async (resolve, reject) => {
-  const securityEnabled = config.get('gremlinSecurityEnabled');
-  const gremlinEndpoint = securityEnabled ? config.get('gremlinEndpoint').replace('ws:', 'wss:') : config.get('gremlinEndpoint');
-  const gremlinUsername = config.get('gremlinUsername');
-  const gremlinPassword = config.get('gremlinPassword');
-
-  const authenticator = securityEnabled ?
-    new gremlin.driver.auth.PlainTextSaslAuthenticator(gremlinUsername, gremlinPassword) : {};
-  const connOpts = securityEnabled ? { authenticator, rejectUnauthorized: false } : {};
+  const { gremlinEndpoint, connOpts } = getGremlinCredentials();
 
   try {
     const gremlinClient = new gremlin.driver.Client(gremlinEndpoint, connOpts);
