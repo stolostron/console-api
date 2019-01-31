@@ -419,6 +419,8 @@ Object {
                 "deployer": Object {
                   "helm": Object {
                     "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbf-0.1.0.tgz",
+                    "kubeKind": "helm",
+                    "kubeName": "",
                     "namespace": "default",
                   },
                   "kind": "helm",
@@ -468,6 +470,8 @@ Object {
                 "deployer": Object {
                   "helm": Object {
                     "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrm-0.1.0.tgz",
+                    "kubeKind": "helm",
+                    "kubeName": "",
                     "namespace": "default",
                   },
                   "kind": "helm",
@@ -517,6 +521,8 @@ Object {
                 "deployer": Object {
                   "helm": Object {
                     "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrs-0.1.0.tgz",
+                    "kubeKind": "helm",
+                    "kubeName": "",
                     "namespace": "default",
                   },
                   "kind": "helm",

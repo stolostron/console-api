@@ -182,9 +182,17 @@ export default class ApplicationModel extends KubeModel {
         name: dep.destination.name,
         kind: dep.destination.kind,
       })),
-      deployer: deployable.spec.deployer && deployable.spec.deployer.helm,
       metadata: deployable.metadata,
       raw: deployable,
+      deployer: Object.assign(
+        // when chart was used
+        _.get(deployable, 'spec.deployer.helm', {}),
+
+        // when a k8 object was selected
+        { kubeKind: _.get(deployable, 'spec.deployer.kind', '') },
+        { kubeName: _.get(deployable, 'spec.deployer.kube.template.metadata.name', '') },
+      ),
+
     }));
   }
 
@@ -235,8 +243,15 @@ export default class ApplicationModel extends KubeModel {
       status: work.status.type,
       reason: work.status.reason || '-',
       result: Object.assign(
-        _.get(work, 'spec.helm', {}),
         _.get(work, 'status.result.spec', {}),
+
+        // when chart was used
+        _.get(work, 'spec.helm', {}),
+
+        // when a k8 object was selected
+        { kubeKind: _.get(work, 'spec.kube.template.kind', '') },
+        { kubeName: _.get(work, 'spec.kube.template.metadata.name', '') },
+        { kubeCluster: _.get(work, 'spec.cluster.name', '') },
       ),
     }));
   }

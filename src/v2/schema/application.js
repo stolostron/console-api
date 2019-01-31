@@ -43,7 +43,7 @@ type ApplicationRelationship implements K8sObject {
 
 type Deployable implements K8sObject {
   dependencies: [DeployableDependency]
-  deployer: HelmDeployer
+  deployer: Deployer
   metadata: Metadata
   # The object's yaml definition in JSON format.
   raw: JSON
@@ -79,10 +79,17 @@ type DeployableDependency {
 }
 
 type WorkResult {
+  # When a chart is used.
   chartURL: String
   namespace: String
   chartName: String
   chartVersion: String
+
+  # When k8 objects are selected.
+  kubeKind: String
+  kubeName: String
+  kubeCluster: String
+
   description: String
   firstDeployed: String
   lastDeployed: String
@@ -90,12 +97,18 @@ type WorkResult {
   version: String
 }
 
-type HelmDeployer {
+type Deployer {
+  # When a chart is used.
   chartName: String
   namespace: String
   repository: String
   version: String
   chartURL: String
+
+  # When k8 objects are selected.
+  kubeKind: String
+  kubeName: String
+
 }
 
 `;
