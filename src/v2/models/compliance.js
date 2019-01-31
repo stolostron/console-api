@@ -362,7 +362,7 @@ export default class ComplianceModel {
           metadata: pp.metadata,
           raw: pp,
           clusterReplicas: spec.clusterReplicas,
-          resourceSelector: spec.resourceSelector,
+          resourceSelector: spec.resourceHint,
           status: pp.status,
         });
       }

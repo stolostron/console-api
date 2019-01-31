@@ -603,9 +603,10 @@ Object {
                   },
                 },
                 "clusterReplicas": 2,
-                "resourceSelector": Object {
+                "resourceHint": Object {
                   "type": "cpu",
                 },
+                "resourceSelector": Object {},
               },
               "status": Object {
                 "decisions": Array [

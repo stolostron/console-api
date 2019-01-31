@@ -227,7 +227,7 @@ export default class ApplicationModel extends KubeModel {
       metadata: pp.metadata,
       raw: pp,
       clusterReplicas: pp.spec.clusterReplicas,
-      resourceSelector: pp.spec.resourceSelector,
+      resourceSelector: pp.spec.resourceHint,
       status: pp.status,
     }));
   }

@@ -886,6 +886,9 @@ export const mockPlacementPoliciesResponse = {
               name: 'cluster2',
             },
           },
+          resourceHint: {
+            type: 'cpu',
+          },
           resourceSelector: {},
         },
         status: {
@@ -920,6 +923,9 @@ export const mockPlacementPoliciesResponse = {
             matchLabels: {
               environment: 'Dev',
             },
+          },
+          resourceHint: {
+            type: 'cpu',
           },
           resourceSelector: {},
         },
@@ -960,9 +966,10 @@ export const mockPlacementPoliciesResponse = {
               environment: 'Dev',
             },
           },
-          resourceSelector: {
+          resourceHint: {
             type: 'cpu',
           },
+          resourceSelector: {},
         },
         status: {
           decisions: [

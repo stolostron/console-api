@@ -2938,7 +2938,7 @@ Object {
                 ],
               },
             },
-            "resourceSelector": null,
+            "resourceSelector": Object {},
             "status": Object {
               "decisions": Array [
                 Object {
