@@ -112,8 +112,6 @@ export default class SearchConnector {
     this.rbac = rbac;
     this.http = httpLib;
     this.req = req;
-    this.initialize();
-    this.getUserRole(req);
   }
 
   async getUserRole(req) {
@@ -131,13 +129,20 @@ export default class SearchConnector {
   }
 
   async initialize() {
-    if (gremlinConnection === undefined) {
-      gremlinConnection = initializeGremlinConnection();
+    if (!this.initializePromise) {
+      this.initializePromise = new Promise(async (resolve) => {
+        if (gremlinConnection === undefined) {
+          gremlinConnection = initializeGremlinConnection();
+        }
+        const [connection] = await Promise.all([
+          getValidatedConnection(), this.getUserRole(this.req)]);
+        this.gremlinClient = connection.gremlinClient;
+        this.remoteConnection = connection.remoteConnection;
+        this.g = connection.g;
+        resolve();
+      });
     }
-    const connection = await getValidatedConnection();
-    this.gremlinClient = connection.gremlinClient;
-    this.remoteConnection = connection.remoteConnection;
-    this.g = connection.g;
+    return this.initializePromise;
   }
 
 
@@ -154,8 +159,7 @@ export default class SearchConnector {
   async runSearchQuery(searchProperties) {
     logger.debug('Running search', searchProperties);
     await this.initialize();
-    await this.getUserRole(this.req);
-    await this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
+    this.gremlinClient.submit(`graph.variables().set('lastActivityTimestamp', ['${Date.now()}'])`);
 
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
@@ -166,7 +170,6 @@ export default class SearchConnector {
   async runSearchQueryCountOnly(searchProperties) {
     logger.debug('Running search (count only)', searchProperties);
     await this.initialize();
-    await this.getUserRole(this.req);
 
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     searchProperties.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
@@ -177,23 +180,23 @@ export default class SearchConnector {
   async getAllProperties() {
     // TODO: Maybe there's a more efficient query.
     await this.initialize();
-    await this.getUserRole(this.req);
 
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     const properties = await v.properties().dedup().toList();
-    const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
 
-    properties.forEach((prop) => {
-      values.add(prop.label);
+    const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
+    properties.forEach(({ label }) => {
+      if (label.charAt(0) !== '_') {
+        values.add(label);
+      }
     });
 
-    return [...values].filter(item => item.charAt(0) !== '_');
+    return [...values];
   }
 
   async getAllValues(property, propFilters = []) {
     logger.debug('Getting all values for property:', property);
     await this.initialize();
-    await this.getUserRole(this.req);
     // TODO: Need to use a more efficient query.
     const resultValues = [];
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
