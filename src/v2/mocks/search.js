@@ -82,4 +82,8 @@ export default class MockSearchConnector {
   async getAllValues(property) {
     return [`${property}-0`, `${property}-1`, `${property}-2`];
   }
+
+  async findRelationships() {
+    return [];
+  }
 }

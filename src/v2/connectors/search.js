@@ -212,4 +212,20 @@ export default class SearchConnector {
 
     return resultValues;
   }
+
+
+  async findRelationships({ countOnly, kind, filters }) {
+    await this.initialize();
+
+    const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
+    filters.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
+    v.out(kind).dedup();
+
+    if (countOnly) {
+      return v.count().next().then(result => result.value);
+    }
+
+    return v.valueMap().toList()
+      .then(result => formatResult(result));
+  }
 }

@@ -23,6 +23,7 @@ describe('Policy Resolver', () => {
               related {
                 kind
                 count
+                items
               }
               count
             }

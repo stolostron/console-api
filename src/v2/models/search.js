@@ -7,7 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
 
 // TODO: Keyword filtering currently requires that we transfer a large number of records from the
@@ -50,9 +49,14 @@ export default class SearchModel {
   }
 
   /* eslint-disable class-methods-use-this */
-  async resolveRelatedResources() {
-    logger.warn('Ignoring related resources query. This feature is not implemented yet.');
-    return [];
+  async resolveRelated(parent) {
+    // FIXME: This hardcoded list it temporary.
+    const supportedRelationships = ['cluster'];
+    return supportedRelationships.map(r => ({ kind: r, ...parent }));
+  }
+
+  async resolveRelatedItems(opts) {
+    return this.searchConnector.findRelationships(opts);
   }
 
   async searchSchema() {

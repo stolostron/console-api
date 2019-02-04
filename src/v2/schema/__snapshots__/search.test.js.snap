@@ -98,7 +98,13 @@ Object {
             "status": "Running",
           },
         ],
-        "related": Array [],
+        "related": Array [
+          Object {
+            "count": 0,
+            "items": Array [],
+            "kind": "cluster",
+          },
+        ],
       },
     ],
   },

@@ -13,20 +13,15 @@ export const typeDef = `
     values: [String]
   }
 
-  input SearchRelatedInput {
-    kind: String!
-    count: Int
-  }
-
   type SearchRelatedResult {
     kind: String!
     count: Int
+    items: JSON
   }
 
   input SearchInput {
     keywords: [String]
     filters: [SearchFilter]
-    relationship: [SearchRelatedInput]
   }
 
   type SearchResult {
@@ -50,6 +45,12 @@ export const resolver = {
     count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(parent),
     items: (parent, args, { searchModel }) => searchModel.resolveSearch(parent),
     updatedTimestamp: (parent, args, { searchModel }) => searchModel.getUpdatedTimestamp(),
-    related: (parent, args, { searchModel }) => searchModel.resolveRelatedResources(parent),
+    related: (parent, args, { searchModel }, context) =>
+      searchModel.resolveRelated(parent, context),
+  },
+  SearchRelatedResult: {
+    count: (parent, args, { searchModel }) =>
+      searchModel.resolveRelatedItems({ ...parent, countOnly: true }),
+    items: (parent, args, { searchModel }) => searchModel.resolveRelatedItems(parent),
   },
 };
