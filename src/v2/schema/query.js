@@ -20,6 +20,7 @@ type Query {
   pvs: [PVs]
   pvsClaims: [PVsClaims]
   releases: [HelmRel]
+  releasesFromSearch: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
 

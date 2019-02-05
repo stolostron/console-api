@@ -23,6 +23,7 @@ type HelmRel {
 export const resolver = {
   Query: {
     releases: (root, args, { helmModel, req }) => helmModel.getReleases({ user: req.user }),
+    releasesFromSearch: (root, args, { searchModel }) => searchModel.resolveSearch({ filters: [{ property: 'kind', values: ['releases'] }] }),
   },
   HelmRel: {
     cluster: (parent, args, { clusterModel, req }) =>
