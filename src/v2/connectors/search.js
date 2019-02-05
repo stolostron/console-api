@@ -214,18 +214,13 @@ export default class SearchConnector {
   }
 
 
-  async findRelationships({ countOnly, kind, filters }) {
+  async findRelationships({ filters = [] } = {}) {
     await this.initialize();
-
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     filters.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
-    v.out(kind).dedup();
+    v.out().dedup();
 
-    if (countOnly) {
-      return v.count().next().then(result => result.value);
-    }
-
-    return v.valueMap().toList()
-      .then(result => formatResult(result));
+    const result = await v.valueMap().toList();
+    return formatResult(result);
   }
 }

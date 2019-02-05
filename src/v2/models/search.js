@@ -48,15 +48,23 @@ export default class SearchModel {
     return this.searchConnector.getAllValues(property, filters);
   }
 
-  /* eslint-disable class-methods-use-this */
+  /** Resolve the related items for a given search query.
+   *
+   * @param {*} parent
+   * returns { kind: String, count: Int, items: [] }
+   */
   async resolveRelated(parent) {
-    // FIXME: This hardcoded list it temporary.
-    const supportedRelationships = ['cluster'];
-    return supportedRelationships.map(r => ({ kind: r, ...parent }));
-  }
+    const relationships = await this.searchConnector.findRelationships(parent);
 
-  async resolveRelatedItems(opts) {
-    return this.searchConnector.findRelationships(opts);
+    const result = {};
+    relationships.forEach((r) => {
+      if (!result[r.kind]) {
+        result[r.kind] = [];
+      }
+      result[r.kind].push(r);
+    });
+
+    return Object.keys(result).map(r => ({ kind: r, count: result[r].length, items: result[r] }));
   }
 
   async searchSchema() {

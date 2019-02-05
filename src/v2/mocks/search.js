@@ -84,6 +84,12 @@ export default class MockSearchConnector {
   }
 
   async findRelationships() {
-    return [];
+    return [{
+      kind: 'cluster',
+      count: 1,
+      items: [{
+        _uid: '123', kind: 'cluster', name: 'mockCluster', namespace: 'mockCluster-ns',
+      }],
+    }];
   }
 }

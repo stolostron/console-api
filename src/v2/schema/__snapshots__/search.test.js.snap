@@ -100,8 +100,21 @@ Object {
         ],
         "related": Array [
           Object {
-            "count": 0,
-            "items": Array [],
+            "count": 1,
+            "items": Array [
+              Object {
+                "count": 1,
+                "items": Array [
+                  Object {
+                    "_uid": "123",
+                    "kind": "cluster",
+                    "name": "mockCluster",
+                    "namespace": "mockCluster-ns",
+                  },
+                ],
+                "kind": "cluster",
+              },
+            ],
             "kind": "cluster",
           },
         ],
