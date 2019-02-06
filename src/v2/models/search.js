@@ -64,7 +64,14 @@ export default class SearchModel {
       result[r.kind].push(r);
     });
 
-    return Object.keys(result).map(r => ({ kind: r, count: result[r].length, items: result[r] }));
+    const resultKinds = Object.keys(result);
+
+    // TODO: UI can't display more than 5 tiles, so for now I'm truncating the resuls,
+    //       keeping the kinds listed below sorted at the top.
+    resultKinds.sort((a, b) => ['application', 'cluster', 'compliance', 'deployment', 'node', 'pod', 'release'].indexOf(b));
+    resultKinds.length = Math.min(resultKinds.length, 5);
+
+    return resultKinds.map(r => ({ kind: r, count: result[r].length, items: result[r] }));
   }
 
   async searchSchema() {

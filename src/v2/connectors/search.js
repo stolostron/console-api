@@ -30,14 +30,20 @@ process.on('uncaughtException', (e) => {
 });
 
 function formatResult(result) {
+  const startTime = Date.now();
   const resultObjects = [];
   result.forEach((resource) => {
     const resourceObj = {};
     resource.forEach((value, key) => {
-      resourceObj[key] = value.length === 1 ? value[0] : value;
+      if (['_rbac', '_resourceVersion'].indexOf(key) === -1) {
+        resourceObj[key] = value.length === 1 ? value[0] : value;
+      }
     });
     resultObjects.push(resourceObj);
   });
+  if (Date.now() - startTime > 100) {
+    logger.warn(`Search formatResult() took ${Date.now() - startTime > 100} ms. Result set size: ${result.length}`);
+  }
   return resultObjects;
 }
 
@@ -178,9 +184,7 @@ export default class SearchConnector {
   }
 
   async getAllProperties() {
-    // TODO: Maybe there's a more efficient query.
     await this.initialize();
-
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     const properties = await v.properties().dedup().toList();
 
@@ -197,20 +201,10 @@ export default class SearchConnector {
   async getAllValues(property, propFilters = []) {
     logger.debug('Getting all values for property:', property);
     await this.initialize();
-    // TODO: Need to use a more efficient query.
-    const resultValues = [];
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     propFilters.forEach(propFilter => v.has(propFilter.property, P.within(propFilter.values)));
 
-    await v.valueMap(property).dedup().toList()
-      .then((result) => {
-        result.forEach((valueMap) => {
-          const values = valueMap.get(property) || [];
-          values.forEach(value => resultValues.push(value));
-        });
-      });
-
-    return resultValues;
+    return v.values(property).dedup().toList();
   }
 
 
@@ -218,9 +212,8 @@ export default class SearchConnector {
     await this.initialize();
     const v = this.g.V().has('_rbac', P.within(this.rbac)).has('kind', P.without(getForbiddenKindsForRole(this.role)));
     filters.forEach(searchProp => v.has(searchProp.property, P.within(searchProp.values)));
-    v.out().dedup();
 
-    const result = await v.valueMap().toList();
+    const result = await v.both().dedup().valueMap().toList();
     return formatResult(result);
   }
 }
