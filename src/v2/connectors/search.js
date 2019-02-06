@@ -42,7 +42,7 @@ function formatResult(result) {
     resultObjects.push(resourceObj);
   });
   if (Date.now() - startTime > 100) {
-    logger.warn(`Search formatResult() took ${Date.now() - startTime > 100} ms. Result set size: ${result.length}`);
+    logger.warn(`Search formatResult() took ${Date.now() - startTime} ms. Result set size: ${result.length}`);
   }
   return resultObjects;
 }
