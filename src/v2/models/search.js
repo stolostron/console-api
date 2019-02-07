@@ -68,7 +68,18 @@ export default class SearchModel {
 
     // TODO: UI can't display more than 5 tiles, so for now I'm truncating the resuls,
     //       keeping the kinds listed below sorted at the top.
-    resultKinds.sort((a, b) => ['application', 'cluster', 'compliance', 'deployment', 'node', 'pod', 'release'].indexOf(b));
+    const prioritizedRelationships = [
+      'application',
+      'cluster',
+      'compliance',
+      'node',
+      'persistentvolume',
+      'persistentvolumeclaim',
+      'pod',
+      'release',
+      'secret',
+    ];
+    resultKinds.sort((a, b) => prioritizedRelationships.indexOf(b));
     resultKinds.length = Math.min(resultKinds.length, 5);
 
     return resultKinds.map(r => ({ kind: r, count: result[r].length, items: result[r] }));
