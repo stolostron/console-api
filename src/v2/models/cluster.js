@@ -24,20 +24,30 @@ function getStatus(cluster) {
   return status === '' ? 'offline' : status.toLowerCase();
 }
 
-export default class ClusterModel extends KubeModel {
-  async getClusters(args = {}) {
-    const [clusters, clusterstatuses] = await Promise.all([
-      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
-      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
-    ]);
-    const results = clusterstatuses.reduce((accum, clusterstatus, idx) => {
-      // namespace doesn't contain a cluster
-      if (!clusterstatus) {
-        return accum;
-      }
+function findClusterIntersection(clusters, clusterstatuses) {
+  const clusterSet = new Set(clusters.map(item =>
+    ((item && item.metadata) ? item.metadata.name : null)));
+  const clusterStatusSet = new Set(clusterstatuses.map(item =>
+    ((item && item.metadata) ? item.metadata.name : null)));
+  const intersect = new Set([...clusterSet].filter(name => clusterStatusSet.has(name)));
+  const resultMap = new Map();
+  clusters.forEach((cluster) => {
+    const clusterName = _.get(cluster, 'metadata.name');
+    if (intersect.has(clusterName)) {
+      resultMap.set(clusterName, { metadata: cluster.metadata, raw: cluster });
+    }
+  });
 
-      const result = {
-        metadata: clusters[idx].metadata,
+  return resultMap;
+}
+
+function findMatchedStatus(clusters, clusterstatuses) {
+  const resultMap = findClusterIntersection(clusters, clusterstatuses);
+  clusterstatuses.forEach((clusterstatus) => {
+    const clusterName = _.get(clusterstatus, 'metadata.name');
+    if (resultMap.has(clusterName)) {
+      const data = {
+        metadata: resultMap.get(clusterName).metadata,
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
@@ -45,12 +55,41 @@ export default class ClusterModel extends KubeModel {
         klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
         k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
       };
+      resultMap.set(clusterName, data);
+    }
+  });
+  return [...resultMap.values()];
+}
 
-      accum.push(result);
-      return accum;
-    }, []);
+function findMatchedStatusForOverview(clusters, clusterstatuses) {
+  const resultMap = findClusterIntersection(clusters, clusterstatuses);
+  clusterstatuses.forEach((clusterstatus) => {
+    const clusterName = _.get(clusterstatus, 'metadata.name');
+    if (resultMap.has(clusterName)) {
+      const cluster = resultMap.get(clusterName);
+      const data = {
+        metadata: cluster.metadata,
+        status: getStatus(cluster.raw),
+        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
+        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
+        capacity: _.get(clusterstatus, 'spec.capacity'),
+        usage: _.get(clusterstatus, 'spec.usage'),
+        rawCluster: cluster.raw,
+        rawStatus: clusterstatus,
+      };
+      resultMap.set(clusterName, data);
+    }
+  });
+  return [...resultMap.values()];
+}
 
-
+export default class ClusterModel extends KubeModel {
+  async getClusters(args = {}) {
+    const [clusters, clusterstatuses] = await Promise.all([
+      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
+      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
+    ]);
+    const results = findMatchedStatus(clusters, clusterstatuses);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
@@ -62,31 +101,7 @@ export default class ClusterModel extends KubeModel {
       this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
       this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
     ]);
-
-    const results = clusters.reduce((accum, cluster, idx) => {
-      // namespace doesn't contain a cluster
-      if (!cluster) {
-        return accum;
-      }
-
-      const clusterstatus = clusterstatuses[idx];
-
-      const result = {
-        metadata: cluster.metadata,
-        status: getStatus(cluster),
-        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
-        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
-        capacity: _.get(clusterstatus, 'spec.capacity'),
-        usage: _.get(clusterstatus, 'spec.usage'),
-        rawCluster: cluster,
-        rawStatus: clusterstatus,
-      };
-
-      accum.push(result);
-      return accum;
-    }, []);
-
-
+    const results = findMatchedStatusForOverview(clusters, clusterstatuses);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
