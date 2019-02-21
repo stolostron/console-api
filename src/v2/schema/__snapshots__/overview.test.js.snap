@@ -22,6 +22,7 @@ Object {
             "nodes": 2,
             "storage": "100Gi",
           },
+          "consoleURL": null,
           "metadata": Object {
             "labels": Object {
               "cloud": "IBM",
@@ -51,6 +52,7 @@ Object {
             "nodes": 3,
             "storage": "80Gi",
           },
+          "consoleURL": null,
           "metadata": Object {
             "labels": Object {
               "cloud": "IBM",

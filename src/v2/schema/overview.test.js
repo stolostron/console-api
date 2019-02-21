@@ -37,6 +37,7 @@ describe('Overview Resolver', () => {
               pods
               storage
             }
+            consoleURL
             status
           }
           applications {

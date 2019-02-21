@@ -22,6 +22,7 @@ type ClusterOverview implements K8sObject {
   metadata: Metadata
   capacity: ClusterCapacity
   usage: ClusterUsage
+  consoleURL: String
   status: String
 }
 
@@ -69,7 +70,7 @@ export const resolver = {
       if (!demoMode) {
         let clusters = await clusterModel.getAllClusters();
         clusters = clusters.map(({
-          metadata, status, capacity, usage,
+          metadata, status, capacity, usage, consoleURL,
         }) => {
           const { name, namespace, labels } = metadata;
           return {
@@ -78,6 +79,7 @@ export const resolver = {
               namespace,
               labels,
             },
+            consoleURL,
             status,
             capacity,
             usage,
