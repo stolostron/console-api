@@ -89,8 +89,33 @@ export default function createAuthMiddleWare({
     });
 
     req.kubeToken = `Bearer ${idToken}`;
-    const userName = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
+
     const iamToken = _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
+    let userName = _.get(jws.decode(idToken), 'payload.uniqueSecurityName');
+    if (process.env.NODE_ENV === 'test' || process.env.MOCK === 'true') {
+      userName = 'admin_test';
+    }
+    // special case for redhat openshift, can't get user from idtoken
+    if (!userName) {
+      const options = {
+        url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/userinfo`,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        json: true,
+        form: {
+          access_token: iamToken,
+        },
+      };
+
+      const response = await httpLib(options);
+      userName = _.get(response, 'body.name');
+      if (!userName) {
+        throw new Error(`Authentication error: ${response.body}`);
+      }
+    }
+
     req.user = {
       name: userName,
       namespaces: await getNamespaces({
