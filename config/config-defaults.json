@@ -1,14 +1,15 @@
 {
+  "complianceNamespace": "mcm",
   "contextPath": "/hcmuiapi",
-  "httpPort": 4000,
-  "hcmUrl": "",
   "gremlinEndpoint": "ws://localhost:8182/gremlin",
+  "gremlinPassword": "",
   "gremlinSecurityEnabled": false,
   "gremlinUsername": "",
-  "gremlinPassword": "",
-  "localKubeToken": "",
-  "mongodbUrl": "mongodb://localhost:27017/weave",
   "hcmPollInterval": 100,
   "hcmPollTimeout": 50000,
-  "complianceNamespace": "mcm"
+  "hcmUrl": "",
+  "httpPort": 4000,
+  "localKubeToken": "",
+  "mongodbUrl": "mongodb://localhost:27017/weave",
+  "useRedisBackend": false
 }

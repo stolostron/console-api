@@ -72,7 +72,7 @@ export default class MockSearchConnector {
   }
 
   async runSearchQueryCountOnly() {
-    return 100;
+    return 10;
   }
 
   async getAllProperties() {

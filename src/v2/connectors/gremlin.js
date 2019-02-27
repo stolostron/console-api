@@ -109,7 +109,7 @@ const getValidatedConnection = () => new Promise(async (resolve, reject) => {
   }
 });
 
-export default class SearchConnector {
+export default class GremlinConnector {
   constructor({
     httpLib = requestLib,
     rbac = isRequired('rbac'),

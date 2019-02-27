@@ -28,14 +28,16 @@ const jestConfig = {
   coverageThreshold: {
     global: {
       branches: 52,
-      functions: 68,
-      lines: 62,
-      statements: 62,
+      functions: 69,
+      lines: 65,
+      statements: 65,
     },
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
     '!src/**/mocks/*.js',
+    '!src/v2/connectors/gremlin.js', // Excluding from coverage report because gremlin will be deleted.
+    '!src/v2/connectors/gremlinConnectionHelper.js', // Excluding from coverage report because gremlin will be deleted.
   ],
   testEnvironment: 'node',
   setupTestFrameworkScriptFile: './jest.setup.js',

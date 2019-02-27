@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Policy Resolver Correctly Resolves Policy List Query 1`] = `
+exports[`Search Resolver Correctly Resolves Search Query 1`] = `
 Object {
   "data": Object {
     "searchResult": Array [

@@ -29,7 +29,7 @@ export default class SearchModel {
   }
 
   async resolveSearch({ keywords, filters }) {
-    if (keywords) {
+    if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords);
     }
@@ -37,7 +37,7 @@ export default class SearchModel {
   }
 
   async resolveSearchCount({ keywords, filters }) {
-    if (keywords) {
+    if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords).length;
     }

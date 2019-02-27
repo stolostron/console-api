@@ -10,8 +10,8 @@
 import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
-describe('Policy Resolver', () => {
-  test('Correctly Resolves Policy List Query', (done) => {
+describe('Search Resolver', () => {
+  test('Correctly Resolves Search Query', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({

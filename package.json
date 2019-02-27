@@ -66,6 +66,7 @@
     "mongoose": "^5.0.16",
     "morgan": "^1.9.0",
     "nconf": "^0.10.0",
+    "redisgraph.js": "^1.1.4",
     "requestretry": "^1.13.0"
   },
   "devDependencies": {

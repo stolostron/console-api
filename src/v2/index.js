@@ -20,7 +20,8 @@ import cookieParser from 'cookie-parser';
 import logger from './lib/logger';
 
 import KubeConnector from './connectors/kube';
-import SearchConnector from './connectors/search';
+import GremlinConnector from './connectors/gremlin';
+import RedisGraphConnector from './connectors/redisGraph';
 
 import ApplicationModel from './models/application';
 import ClusterModel from './models/cluster';
@@ -81,11 +82,19 @@ if (isProd) {
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
 }
 
+if (isTest) {
+  logger.info('Running in mock mode');
+  logger.info('Using Mocked search connector.');
+} else if (config.get('useRedisBackend') === true) {
+  logger.info('Using RedisGraph search connector.');
+} else {
+  logger.info('Using Gremlin search connector.');
+}
+
 graphQLServer.use(...auth);
 graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
   let kubeHTTP;
   if (isTest) {
-    logger.info('Running in mock mode');
     kubeHTTP = createMockKubeHTTP();
   }
 
@@ -96,8 +105,15 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     httpLib: kubeHTTP,
     namespaces,
   });
-  const searchConnector = isTest ? new MockSearchConnector() :
-    new SearchConnector({ rbac: namespaces, req });
+
+  let searchConnector;
+  if (isTest) {
+    searchConnector = new MockSearchConnector();
+  } else if (config.get('useRedisBackend') === true) {
+    searchConnector = new RedisGraphConnector({ rbac: namespaces, req });
+  } else {
+    searchConnector = new GremlinConnector({ rbac: namespaces, req });
+  }
 
   const context = {
     req,
