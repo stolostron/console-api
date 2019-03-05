@@ -9,6 +9,7 @@
 /* eslint-disable no-underscore-dangle */
 import _ from 'lodash';
 import { RedisGraph } from 'redisgraph.js';
+import moment from 'moment';
 import config from '../../../config';
 import logger from '../lib/logger';
 import requestLib from '../lib/request';
@@ -37,7 +38,7 @@ function formatResult(results) {
   return resultList;
 }
 
-function getForbiddenKindsForRole(role) {
+export function getForbiddenKindsForRole(role) {
   switch (role.toLowerCase()) {
     case 'viewer':
     case 'editor':
@@ -52,11 +53,68 @@ function getForbiddenKindsForRole(role) {
   }
 }
 
-function getFilterString(filters) {
+const isNumber = value => !Number.isNaN(value * 1);
+// TODO: Zack L - Need to come back to this once number values with units are normalized
+// const isNumWithChars = (value) => {
+//   if (!isNumber(value) && !Number.isNaN(parseInt(value, 10))) {
+// eslint-disable-next-line
+//     return ['Ei', 'Pi', 'Ti', 'Gi', 'Mi', 'Ki'].findIndex(unit => unit === value.substring(value.length - 2, value.length)) > -1;
+//   }
+//   return false;
+// };
+const isDate = value => !isNumber(value) && moment(value, 'YYYY-MM-DDTHH:mm:ssZ', true).isValid();
+const isDateFilter = value => ['hour', 'day', 'week', 'month', 'year'].indexOf(value) > -1;
+// const isVersion = property.toLowerCase().includes('version');
+
+export function getOperator(value) {
+  switch (true) {
+    case value.includes('<='):
+      return '<=';
+    case value.includes('>='):
+      return '>=';
+    case value.includes('!='):
+      return '!=';
+    case value.includes('<'):
+      return '<';
+    case value.includes('>'):
+      return '>';
+    default:
+      return '=';
+  }
+}
+
+function getDateFilter(value) {
+  const currentTime = Date.now();
+  switch (true) {
+    case value === 'hour':
+      return `> '${new Date(currentTime - 3600000).toISOString()}'`;
+    case value === 'day':
+      return `> '${new Date(currentTime - 86400000).toISOString()}'`;
+    case value === 'week':
+      return `> '${new Date(currentTime - 604800000).toISOString()}'`;
+    case value === 'month':
+      return `> '${new Date(currentTime - 2629743000).toISOString()}'`;
+    case value === 'year':
+      return `> '${new Date(currentTime - 31556926000).toISOString()}'`;
+    default:
+      // default to month
+      return `> '${new Date(currentTime - 2629743000).toISOString()}'`;
+  }
+}
+
+export function getFilterString(filters) {
   const filterStrings = [];
   filters.forEach((filter) => {
     // Use OR for filters with multiple values.
-    filterStrings.push(`(${filter.values.map(value => `n.${filter.property} = '${value}'`).join(' OR ')})`);
+    filterStrings.push(`(${filter.values.map((value) => {
+      const operatorRemoved = value.replace(/<=|>=|!=|<|>|=/, '');
+      if (isNumber(operatorRemoved)) { //  || isNumWithChars(operatorRemoved)
+        return `n.${filter.property} ${getOperator(value)} ${operatorRemoved}`;
+      } else if (isDateFilter(value)) {
+        return `n.${filter.property} ${getDateFilter(value)}`;
+      }
+      return `n.${filter.property} = '${value}'`;
+    }).join(' OR ')})`);
   });
   const resultString = filterStrings.join(' AND ');
   return resultString;
@@ -191,13 +249,24 @@ export default class RedisGraphConnector {
       :
       await this.g.query(`MATCH (n) WHERE ${await this.getRbacString()} RETURN DISTINCT n.${property}`);
 
-    const valuesList = [];
+    let valuesList = [];
     result._results.forEach((record) => {
-      if (record.values()[0] !== 'NULL') {
+      if (record.values()[0] !== 'NULL' && record.values()[0] !== null) {
         valuesList.push(record.values()[0]);
       }
     });
 
+    if (isDate(valuesList[0])) {
+      return ['isDate'];
+    } else if (isNumber(valuesList[0])) { //  || isNumWithChars(valuesList[0]))
+      valuesList = valuesList.filter(res => (isNumber(res) || (!isNumber(res))) && res !== ''); //  && isNumWithChars(res)
+      valuesList.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      if (valuesList.length > 1) {
+        return ['isNumber', valuesList[0], valuesList[valuesList.length - 1]];
+      } else if (valuesList.length === 1) {
+        return ['isNumber', valuesList[0]];
+      }
+    }
     return valuesList;
   }
 
