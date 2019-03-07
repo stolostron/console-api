@@ -67,23 +67,15 @@ const isDateFilter = value => ['hour', 'day', 'week', 'month', 'year'].indexOf(v
 // const isVersion = property.toLowerCase().includes('version');
 
 export function getOperator(value) {
-  switch (true) {
-    case value.includes('<='):
-      return '<=';
-    case value.includes('>='):
-      return '>=';
-    case value.includes('!='):
-      return '!=';
-    case value.includes('<'):
-      return '<';
-    case value.includes('>'):
-      return '>';
-    default:
-      return '=';
+  const match = value.match(/^<=|^>=|^!=|^!|^<|^>|^=]/);
+  let operator = (match && match[0]) || '=';
+  if (operator === '!') {
+    operator = '!=';
   }
+  return operator;
 }
 
-function getDateFilter(value) {
+export function getDateFilter(value) {
   const currentTime = Date.now();
   switch (true) {
     case value === 'hour':
@@ -107,19 +99,18 @@ export function getFilterString(filters) {
   filters.forEach((filter) => {
     // Use OR for filters with multiple values.
     filterStrings.push(`(${filter.values.map((value) => {
-      const operatorRemoved = value.replace(/<=|>=|!=|<|>|=/, '');
+      const operatorRemoved = value.replace(/^<=|^>=|^!=|^!|^<|^>|^=]/, '');
       if (isNumber(operatorRemoved)) { //  || isNumWithChars(operatorRemoved)
         return `n.${filter.property} ${getOperator(value)} ${operatorRemoved}`;
       } else if (isDateFilter(value)) {
         return `n.${filter.property} ${getDateFilter(value)}`;
       }
-      return `n.${filter.property} = '${value}'`;
+      return `n.${filter.property} ${getOperator(value)} '${operatorRemoved}'`;
     }).join(' OR ')})`);
   });
   const resultString = filterStrings.join(' AND ');
   return resultString;
 }
-
 
 export default class RedisGraphConnector {
   constructor({
