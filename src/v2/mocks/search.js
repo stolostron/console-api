@@ -76,11 +76,22 @@ export default class MockSearchConnector {
   }
 
   async getAllProperties() {
-    return ['name', 'namespace'];
+    return ['kind', 'name', 'namespace', 'cpu', 'created'];
   }
 
   async getAllValues(property) {
-    return [`${property}-0`, `${property}-1`, `${property}-2`];
+    switch (property) {
+      case 'kind':
+        return ['cluster', 'application', 'deployable', 'compiance'];
+      case 'namespace':
+        return ['default', 'kube-system'];
+      case 'cpu':
+        return ['<', '>', '!='];
+      case 'created':
+        return ['hour', 'day', 'week', 'month', 'year'];
+      default:
+        return ['kind', 'name', 'namespace', 'cpu', 'created'];
+    }
   }
 
   async findRelationships() {
