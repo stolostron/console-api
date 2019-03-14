@@ -75,7 +75,7 @@ ifeq ($(UNIT_TESTS), TRUE)
 		mkdir test-output; \
 	fi
 	npm test
-	@$(SELF) log:test LOG_TEST_OUTPUT_DIR=test-output
+	# @$(SELF) cicd-log-test LOG_TEST_OUTPUT_DIR=test-output
 endif
 
 include Makefile.docker

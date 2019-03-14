@@ -122,8 +122,8 @@ export default class RedisGraphConnector {
     this.http = httpLib;
     this.req = req;
 
-    this.status = new RedisGraph('status'); // Used to track lastUpdated and lastActivity. // TODO: use plain Redis
-    this.g = new RedisGraph('mcm-search');
+    this.status = new RedisGraph('status', config.get('redisEndpoint')); // Used to track lastUpdated and lastActivity. // TODO: use plain Redis
+    this.g = new RedisGraph('mcm-search', config.get('redisEndpoint'));
     this.initialize().then(() => logger.debug('Redisgraph initialization complete.'));
   }
 

@@ -24,7 +24,7 @@ before_install:
   # - "export DISPLAY=:99.0"
   # - "sh -e /etc/init.d/xvfb start"
   - make init
-  - make log:init
+  - make cicd-log-init
   - source travis-env.sh
   - make docker-login
   - chmod +x copyright-check.sh
@@ -57,10 +57,10 @@ after_success:
           fi
         fi
       fi
-  - make log:pass
+  - make cicd-log-success
 
 after_failure:
-  - make log:fail
+  - make cicd-log-fail
 
 notifications:
   slack:
