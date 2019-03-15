@@ -8,6 +8,7 @@
  ****************************************************************************** */
 /* eslint-disable no-underscore-dangle */
 import _ from 'lodash';
+import redis from 'redis';
 import { RedisGraph } from 'redisgraph.js';
 import moment from 'moment';
 import config from '../../../config';
@@ -122,22 +123,28 @@ export default class RedisGraphConnector {
     this.http = httpLib;
     this.req = req;
 
-    this.status = new RedisGraph('status', config.get('redisEndpoint')); // Used to track lastUpdated and lastActivity. // TODO: use plain Redis
-    this.g = new RedisGraph('mcm-search', config.get('redisEndpoint'));
+    if (config.get('redisPassword') === '') {
+      logger.warn('Starting redis client without authentication. redisPassword was not provided in config.');
+      this.redisClient = redis.createClient(config.get('redisEndpoint'));
+    } else {
+      this.redisClient = redis.createClient(config.get('redisEndpoint'), { password: config.get('redisPassword') });
+    }
+
+    this.g = new RedisGraph('icp-search', this.redisClient);
     this.initialize().then(() => logger.debug('Redisgraph initialization complete.'));
   }
 
   async initialize() {
-    try {
-      const status = await this.status.query('MATCH (status:status) RETURN status');
-      if (!status.hasNext()) {
-        logger.info('Status db existed but was empty. Adding status record.');
-        this.status.query(`CREATE (status:status {lastUpdatedTimestamp: 0, lastActivityTimestamp: ${Date.now()}})`);
-      }
-    } catch (e) {
-      logger.info('Status db did not exist. Initializing.');
-      await this.status.query(`CREATE (status:status {lastUpdatedTimestamp: 0, lastActivityTimestamp: ${Date.now()}})`);
-    }
+    return new Promise((resolve) => {
+      this.redisClient.get('lastUpdatedTimestamp', (err, reply) => {
+        if (reply == null) {
+          logger.info('Status db did not exist. Initializing.');
+          this.redisClient.set('lastUpdatedTimestamp', 0);
+          this.redisClient.set('lastActivityTimestamp', 0);
+        }
+        resolve();
+      });
+    });
   }
 
   async getUserRole(req) {
@@ -177,21 +184,22 @@ export default class RedisGraphConnector {
     // Skip is avtivity was reported within the last second.
     if (Date.now() > (lastActivityReported + 1000)) {
       lastActivityReported = Date.now();
-      this.status.query(`MATCH (s:status) SET s.lastActivityTimestamp = '${Date.now()}'`);
+      this.redisClient.set('lastActivityTimestamp', Date.now());
     }
   }
 
   async getLastUpdatedTimestamp() {
-    const res = await this.status.query('MATCH (s:status) RETURN s.lastUpdatedTimestamp');
-    const t = res.next();
-    if (t === undefined) {
-      await this.status.query(`MATCH (s:status) SET s.lastUpdatedTimestamp = '${Date.now()}'`);
-      return 0;
-    }
-
-    return t.getString('s.lastUpdatedTimestamp');
+    return new Promise((resolve) => {
+      this.redisClient.get('lastUpdatedTimestamp', (err, reply) => {
+        if (reply == null) {
+          this.redisClient.set('lastUpdatedTimestamp', 0);
+          resolve(0);
+        } else {
+          resolve(reply);
+        }
+      });
+    });
   }
-
 
   async runSearchQuery(filters) {
     // logger.info('runSearchQuery()', filters);

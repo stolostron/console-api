@@ -12,5 +12,6 @@
   "localKubeToken": "",
   "mongodbUrl": "mongodb://localhost:27017/weave",
   "redisEndpoint": "//localhost:6379",
+  "redisPassword": "",
   "useRedisBackend": false
 }

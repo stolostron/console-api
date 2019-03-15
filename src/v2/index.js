@@ -85,7 +85,7 @@ if (isProd) {
 if (isTest) {
   logger.info('Running in mock mode');
   logger.info('Using Mocked search connector.');
-} else if (config.get('useRedisBackend') === true) {
+} else if (config.get('useRedisBackend') === true || config.get('useRedisBackend') === 'true') {
   logger.info('Using RedisGraph search connector.');
 } else {
   logger.info('Using Gremlin search connector.');
@@ -109,7 +109,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   let searchConnector;
   if (isTest) {
     searchConnector = new MockSearchConnector();
-  } else if (config.get('useRedisBackend') === true) {
+  } else if (config.get('useRedisBackend') === true || config.get('useRedisBackend') === 'true') {
     searchConnector = new RedisGraphConnector({ rbac: namespaces, req });
   } else {
     searchConnector = new GremlinConnector({ rbac: namespaces, req });
