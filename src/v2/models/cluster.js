@@ -84,6 +84,16 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
 }
 
 export default class ClusterModel extends KubeModel {
+  async getSingleCluster(args = {}) {
+    const { name, namespace } = args;
+    const [clusters, clusterstatuses] = await Promise.all([
+      this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
+      this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
+    ]);
+    const results = findMatchedStatus([clusters], [clusterstatuses]);
+    return results;
+  }
+
   async getClusters(args = {}) {
     const [clusters, clusterstatuses] = await Promise.all([
       this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),

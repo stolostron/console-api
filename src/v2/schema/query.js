@@ -12,14 +12,17 @@ export const typeDef = `
 type Query {
   applications(name: String, namespace: String): [Application]
   charts: [HelmChart]
+  cluster(name: String, namespace: String): [Cluster]
   clusters: [Cluster]
   overview(demoMode: Boolean): Overview
   namespaces: [Namespace]
   nodes: [Node]
+  pod(name: String, namespace: String): [Pod]
   pods: [Pod]
   pvs: [PVs]
   pvsClaims: [PVsClaims]
   releases: [HelmRel]
+  release(name: String, namespace: String): [HelmRel]
   releasesFromSearch: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String

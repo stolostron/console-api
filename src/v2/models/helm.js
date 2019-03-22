@@ -14,6 +14,30 @@ import KubeModel from './kube';
 import logger from '../lib/logger';
 
 export default class HelmModel extends KubeModel {
+  async getRelease(name, namespace) {
+    const response = await this.kubeConnector.resourceViewQuery('releases');
+    const results = _.get(response, 'status.results', {});
+    if (name !== undefined) {
+      return Object.keys(results).reduce((accum, clusterName) => {
+        let rels = response.status.results[clusterName].items;
+        rels = rels.filter(rel => rel.metadata.name === name && rel.spec.namespace === namespace);
+        rels.map(rel => accum.push({
+          chartName: rel.spec.chartName,
+          chartVersion: rel.spec.chartVersion,
+          namespace: rel.spec.namespace,
+          status: rel.spec.status,
+          version: rel.spec.version,
+          name: rel.metadata.name,
+          cluster: clusterName,
+          lastDeployed: new Date(rel.spec.lastDeployed).getTime() / 1000,
+        }));
+
+        return accum;
+      }, []);
+    }
+    return [];
+  }
+
   async getReleases() {
     const response = await this.kubeConnector.resourceViewQuery('releases');
     const results = _.get(response, 'status.results', {});

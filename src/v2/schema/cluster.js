@@ -29,6 +29,8 @@ type Cluster implements K8sObject {
 
 export const resolver = {
   Query: {
+    cluster: (parent, args, { clusterModel, req }) =>
+      clusterModel.getSingleCluster({ ...args, user: req.user }),
     clusters: (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, user: req.user }),
   },
