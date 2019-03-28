@@ -101,24 +101,9 @@ export default class ResourceView extends KubeModel {
     }, []);
   }
 
-  async fetchResource(type, name, namespace) {
-    const response = await this.kubeConnector.resourceViewQuery(type);
-    const results = _.get(response, 'status.results', {});
-
+  async fetchResource(type, clusterName, name, namespace) {
+    const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace);
     const transform = this.transforms[type];
-    if (name !== undefined) {
-      return Object.keys(results).reduce((accum, clusterName) => {
-        const resourceList = response.status.results[clusterName].items;
-        resourceList.filter((resource) => {
-          if (resource.metadata.name === name && resource.metadata.namespace === namespace) {
-            return true;
-          }
-          return false;
-        }).map(resource => accum.push(transform(clusterName, resource)));
-
-        return accum;
-      }, []);
-    }
-    return [];
+    return [transform(clusterName, response.status.results[clusterName])];
   }
 }

@@ -66,7 +66,7 @@ type Violations {
 export const resolver = {
   Query: {
     policies: (root, args, { complianceModel }) =>
-      complianceModel.getPolicies(args.name, args.clusterName),
+      complianceModel.getPolicies(args.name, args.namespace, args.clusterName),
   },
   Policy: {
     detail: parent => ComplianceModel.resolvePolicyDetails(parent),

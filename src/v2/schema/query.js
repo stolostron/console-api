@@ -17,12 +17,12 @@ type Query {
   overview(demoMode: Boolean): Overview
   namespaces: [Namespace]
   nodes: [Node]
-  pod(name: String, namespace: String): [Pod]
+  pod(name: String, namespace: String, clusterName: String): [Pod]
   pods: [Pod]
   pvs: [PVs]
   pvsClaims: [PVsClaims]
   releases: [HelmRel]
-  release(name: String, namespace: String): [HelmRel]
+  release(name: String, namespace: String, clusterName: String): [HelmRel]
   releasesFromSearch: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
@@ -36,7 +36,7 @@ type Query {
 
 
   # Policies and Compliances
-  policies(name: String, clusterName: String): [Policy]
+  policies(name: String, namespace: String, clusterName: String): [Policy]
   compliances(name: String, namespace: String): [Compliance]
   placementPolicies (selector: JSON): [PlacementPolicy]
 

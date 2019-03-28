@@ -396,10 +396,10 @@ export default class ComplianceModel {
     return placementBindings;
   }
 
-  async getPolicies(name, clusterName) {
+  async getPolicies(name, namespace, clusterName) {
     // if policy name specified
     if (name !== undefined) {
-      const response = await this.kubeConnector.resourceViewQuery('policy', clusterName, name, false);
+      const response = await this.kubeConnector.resourceViewQuery('policy', clusterName, name, namespace, false);
       const results = _.get(response, 'status.results');
       if (results) {
         const item = _.get(results, `${clusterName}`, {});

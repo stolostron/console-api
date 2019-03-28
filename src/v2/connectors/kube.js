@@ -171,15 +171,8 @@ export default class KubeConnector {
     return newRequest;
   }
 
-  // TODO: Allow filtering - 07/25/18 10:48:31 sidney.wijngaarde1@ibm.com
-  async createResourceView(resourceType, clusterName, resourceName, summaryOnly) {
-    let clusterNamespace;
-    if (resourceName) {
-      const cluster = await this.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${clusterName}`);
-      if (cluster && cluster.length === 1) {
-        clusterNamespace = cluster[0].metadata.namespace;
-      }
-    }
+  /* eslint-disable max-len */
+  async createResourceView(resourceType, clusterName, resourceName, resourceNamespace, summaryOnly) {
     const name = `${resourceType}-${this.uid()}`;
     const body = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
@@ -205,11 +198,11 @@ export default class KubeConnector {
         },
       };
 
-      if (clusterNamespace) {
+      if (resourceNamespace) {
         body.spec.scope = {
           resource: resourceType,
           resourceName,
-          namespace: clusterNamespace,
+          namespace: resourceNamespace,
         };
       }
     }
@@ -272,8 +265,8 @@ export default class KubeConnector {
     return { cancel, promise };
   }
 
-  async resourceViewQuery(resourceType, clusterName, name, summaryOnly) {
-    const resource = await this.createResourceView(resourceType, clusterName, name, summaryOnly);
+  async resourceViewQuery(resourceType, clusterName, name, namespace, summaryOnly) {
+    const resource = await this.createResourceView(resourceType, clusterName, name, namespace, summaryOnly);
     if (resource.status === 'Failure' || resource.code >= 400) {
       throw new Error(`Create Resource View Failed [${resource.code}] - ${resource.message}`);
     }
