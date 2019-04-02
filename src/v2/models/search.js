@@ -8,6 +8,7 @@
  ****************************************************************************** */
 
 import { isRequired } from '../lib/utils';
+import logger from '../lib/logger';
 
 // TODO: Keyword filtering currently requires that we transfer a large number of records from the
 // gremlin-server to filter locally. We need to investigate alternatives to improve performance.
@@ -24,11 +25,20 @@ export default class SearchModel {
     this.searchConnector = searchConnector;
   }
 
+  checkSearchServiceAvailable() {
+    if (!this.searchConnector.isServiceAvailable()) {
+      logger.error('Unable to resolve search request because Redis is unavailable.');
+      throw Error('Search service is unavailable');
+    }
+  }
+
   async getUpdatedTimestamp() {
+    this.checkSearchServiceAvailable();
     return this.searchConnector.getLastUpdatedTimestamp();
   }
 
   async resolveSearch({ keywords, filters }) {
+    this.checkSearchServiceAvailable();
     if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords);
@@ -37,6 +47,7 @@ export default class SearchModel {
   }
 
   async resolveSearchCount({ keywords, filters }) {
+    this.checkSearchServiceAvailable();
     if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords).length;
@@ -45,6 +56,7 @@ export default class SearchModel {
   }
 
   async resolveSearchComplete({ property, filters }) {
+    this.checkSearchServiceAvailable();
     return this.searchConnector.getAllValues(property, filters);
   }
 
@@ -54,6 +66,7 @@ export default class SearchModel {
    * returns { kind: String, count: Int, items: [] }
    */
   async resolveRelated(parent) {
+    this.checkSearchServiceAvailable();
     const relationships = await this.searchConnector.findRelationships(parent);
 
     const result = {};
@@ -86,6 +99,7 @@ export default class SearchModel {
   }
 
   async searchSchema() {
+    this.checkSearchServiceAvailable();
     return {
       allProperties: await this.searchConnector.getAllProperties(),
     };

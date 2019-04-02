@@ -67,6 +67,10 @@ export const mockSearchResult = {
 
 /* eslint-disable class-methods-use-this */
 export default class MockSearchConnector {
+  async isServiceAvailable() {
+    return true;
+  }
+
   async runSearchQuery() {
     return mockSearchResult.mock({ cluster: 2, node: 3, pod: 5 });
   }

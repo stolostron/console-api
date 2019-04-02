@@ -113,6 +113,43 @@ export function getFilterString(filters) {
   return resultString;
 }
 
+let redisClient;
+let redisReady = false;
+function getRedisClient() {
+  if (redisClient) {
+    return redisClient;
+  }
+
+  if (config.get('redisPassword') === '') {
+    logger.warn('Starting redis client without authentication. redisPassword was not provided in config.');
+    redisClient = redis.createClient(config.get('redisEndpoint'));
+  } else {
+    redisClient = redis.createClient(config.get('redisEndpoint'), { password: config.get('redisPassword') });
+  }
+
+  // If we encounter an error we'll quit the client, the next request will attempt to reconnect.
+  redisClient.on('error', (error) => {
+    logger.info('Error with Redis connection: ', error);
+    redisReady = false;
+    redisClient = undefined;
+  });
+
+  // Initialization can happen asynchronously.
+  redisClient.get('lastUpdatedTimestamp', (err, reply) => {
+    if (err) {
+      logger.error('Error initializing Redis client.');
+      return;
+    }
+    if (reply == null) {
+      logger.info('Status db did not exist. Initializing it.');
+      redisClient.set('lastUpdatedTimestamp', 0);
+      redisClient.set('lastActivityTimestamp', 0);
+    }
+    redisReady = true;
+  });
+  return redisClient;
+}
+
 export default class RedisGraphConnector {
   constructor({
     httpLib = requestLib,
@@ -123,28 +160,13 @@ export default class RedisGraphConnector {
     this.http = httpLib;
     this.req = req;
 
-    if (config.get('redisPassword') === '') {
-      logger.warn('Starting redis client without authentication. redisPassword was not provided in config.');
-      this.redisClient = redis.createClient(config.get('redisEndpoint'));
-    } else {
-      this.redisClient = redis.createClient(config.get('redisEndpoint'), { password: config.get('redisPassword') });
-    }
-
+    this.redisClient = getRedisClient();
+    this.redisReady = redisReady;
     this.g = new RedisGraph('icp-search', this.redisClient);
-    this.initialize().then(() => logger.debug('Redisgraph initialization complete.'));
   }
 
-  async initialize() {
-    return new Promise((resolve) => {
-      this.redisClient.get('lastUpdatedTimestamp', (err, reply) => {
-        if (reply == null) {
-          logger.info('Status db did not exist. Initializing.');
-          this.redisClient.set('lastUpdatedTimestamp', 0);
-          this.redisClient.set('lastActivityTimestamp', 0);
-        }
-        resolve();
-      });
-    });
+  isServiceAvailable() {
+    return this.redisReady;
   }
 
   async getUserRole(req) {
