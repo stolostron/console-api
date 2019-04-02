@@ -26,7 +26,7 @@ function formatResult(results) {
     const resultItem = {};
     const record = results.next();
     record.keys().forEach((key) => {
-      if (record.get(key) !== 'NULL') {
+      if (record.get(key) !== null) {
         resultItem[key.substr(key.indexOf('.') + 1)] = record.get(key);
       }
     });
