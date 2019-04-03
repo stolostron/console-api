@@ -187,8 +187,7 @@ export default class RedisGraphConnector {
             // or resources w/o an apigroup use: "null_null_kind1"
             const resources = [];
             const ns = (namespace === '' || namespace === undefined) ? 'null_' : `${namespace}_`;
-            // TODO: when available get apiGroup
-            const apiGroup = 'null_';
+            const apiGroup = (item.apiGroups[0] === '' || item.apiGroups[0] === undefined) ? 'null_' : `${item.apiGroups[0]}_`;
             item.resources.forEach((resource) => {
               resources.push(`'${ns + apiGroup + resource}'`);
             });
