@@ -7,15 +7,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import { getForbiddenKindsForRole, getOperator, getDateFilter, getFilterString } from './redisGraph';
+import { getOperator, getDateFilter, getFilterString } from './redisGraph';
 
 describe('redisGraph', () => {
   describe('Class Functions', () => {
-    test('getForbiddenKindsForRole', async () => {
-      expect(getForbiddenKindsForRole('viewer')).toEqual(['compliance', 'policy', 'node', 'placementpolicy', 'placementbinding', 'persistentvolume', 'persistentvolumeclaim', 'secret']);
-      expect(getForbiddenKindsForRole('operator')).toEqual(['node', 'persistentvolume', 'persistentvolumeclaim', 'secret']);
-      expect(getForbiddenKindsForRole('clusteradministrator')).toEqual([]);
-    });
     test('getOperator', async () => {
       expect(getOperator('<=')).toEqual('<=');
       expect(getOperator('>=')).toEqual('>=');

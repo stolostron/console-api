@@ -9,6 +9,7 @@
 /* eslint-disable no-underscore-dangle */
 import _ from 'lodash';
 import redis from 'redis';
+import lru from 'lru-cache';
 import { RedisGraph } from 'redisgraph.js';
 import moment from 'moment';
 import config from '../../../config';
@@ -37,21 +38,6 @@ function formatResult(results) {
     logger.warn(`Search formatResult() took ${Date.now() - startTime} ms. Result set size: ${results.length}`);
   }
   return resultList;
-}
-
-export function getForbiddenKindsForRole(role) {
-  switch (role.toLowerCase()) {
-    case 'viewer':
-    case 'editor':
-      return ['compliance', 'policy', 'node', 'placementpolicy', 'placementbinding', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
-    case 'operator':
-      return ['node', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
-    case 'administrator':
-    case 'clusteradministrator':
-      return [];
-    default:
-      return ['compliance', 'policy', 'node', 'placementpolicy', 'placementbinding', 'persistentvolume', 'persistentvolumeclaim', 'secret'];
-  }
 }
 
 const isNumber = value => !Number.isNaN(value * 1);
@@ -155,10 +141,15 @@ export default class RedisGraphConnector {
     httpLib = requestLib,
     rbac = isRequired('rbac'),
     req = isRequired('req'),
+    cache = lru({
+      max: 1000,
+      maxAge: 1000 * 60, // 1min
+    }),
   } = {}) {
     this.rbac = rbac;
     this.http = httpLib;
     this.req = req;
+    this.cache = cache;
 
     this.redisClient = getRedisClient();
     this.redisReady = redisReady;
@@ -169,41 +160,86 @@ export default class RedisGraphConnector {
     return this.redisReady;
   }
 
-  async getUserRole(req) {
-    const iamToken = _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
+  async getUserAccess(req, namespace) {
     const defaults = {
-      url: `${config.get('cfcRouterUrl')}/idmgmt/identity/api/v1/users/${req.user.name}/getHighestRole`,
-      method: 'GET',
+      url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.k8s.io/v1/selfsubjectrulesreviews`,
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${iamToken}`,
+        Authorization: req.kubeToken,
+      },
+      json: {
+        apiVersion: 'authorization.k8s.io/v1',
+        kind: 'SelfSubjectRulesReview',
+        spec: {
+          namespace,
+        },
       },
     };
     return this.http(defaults).then((res) => {
-      this.role = res.body;
+      let userResources = [];
+      if (res.body && res.body.status) {
+        res.body.status.resourceRules.forEach((item) => {
+          if (item.verbs.includes('*') && item.resources.includes('*')) {
+            // if user has access to everything then add just an *
+            userResources = userResources.concat(['*']);
+          } else if (item.verbs.includes('get') && item.resources.length > 0) { // TODO need to include access for 'patch' and 'delete'
+            // RBAC string is defined as "namespace_apigroup_kind".  For non-namespaced resources
+            // or resources w/o an apigroup use: "null_null_kind1"
+            const resources = [];
+            const ns = (namespace === '' || namespace === undefined) ? 'null_' : `${namespace}_`;
+            // TODO: when available get apiGroup
+            const apiGroup = 'null_';
+            item.resources.forEach((resource) => {
+              resources.push(`'${ns + apiGroup + resource}'`);
+            });
+            userResources = userResources.concat(resources);
+          }
+          return null;
+        });
+      }
+      return userResources;
     });
   }
 
+  async getRbacString() {
+    const objAliases = ['n'];
+    const userAccessKey = this.req.user.name;
+    const userAccessCache = this.cache.get(userAccessKey);
+    let data = null;
+    if (userAccessCache !== undefined) {
+      data = userAccessCache;
+    } else if (this.rbac.length > 0) {
+      data = await Promise.all(this.rbac.map(namespace =>
+        this.getUserAccess(this.req, namespace)));
+      data = await _.flatten(data).map(item => `${objAliases[0]}._rbac = ${item}`);
+      this.cache.set(userAccessKey, data);
+    } else {
+      return '';
+    }
 
-  async getRbacString(objAliases = ['n']) {
-    await this.getUserRole(this.req); // TODO: should execute in initialize(); should cache result.
-
-    const namespaceStrings = [];
-    const roleStrings = [];
-
-    objAliases.forEach((alias) => {
-      this.rbac.forEach(namespace => namespaceStrings.push(`${alias}._rbac = '${namespace}'`));
-      getForbiddenKindsForRole(this.role).forEach(forbiddenKind => roleStrings.push(`${alias}.kind != '${forbiddenKind}'`));
-    });
-
-    const rbacFilter = (roleStrings.length > 0) ?
-      `((${namespaceStrings.join(' OR ')}) AND ${roleStrings.join(' OR ')})`
-      : `(${namespaceStrings.join(' OR ')})`;
-
+    if (data.includes(`${objAliases[0]}._rbac = *`)) {
+      return '';
+    }
+    const rbacFilter = `(${data.join(' OR ')})`;
     return rbacFilter;
   }
 
+  async createWhereClause(filters) {
+    const rbac = await this.getRbacString();
+    const filterString = getFilterString(filters);
+    if (rbac !== '') {
+      if (filterString !== '') {
+        return `WHERE ${rbac} AND ${filterString}`;
+      }
+      return `WHERE ${rbac}`;
+    } else if (filterString !== '') {
+      return `WHERE ${filterString}`;
+    }
+    return '';
+  }
+
   setLastActivityTimestamp() {
-    // Skip is avtivity was reported within the last second.
+    // Skip if avtivity was reported within the last second.
     if (Date.now() > (lastActivityReported + 1000)) {
       lastActivityReported = Date.now();
       this.redisClient.set('lastActivityTimestamp', Date.now());
@@ -226,7 +262,7 @@ export default class RedisGraphConnector {
   async runSearchQuery(filters) {
     // logger.info('runSearchQuery()', filters);
 
-    const result = await this.g.query(`MATCH (n) WHERE ${getFilterString(filters)} AND (${await this.getRbacString()}) RETURN n`);
+    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN n`);
     this.setLastActivityTimestamp();
     return formatResult(result);
   }
@@ -234,7 +270,7 @@ export default class RedisGraphConnector {
   async runSearchQueryCountOnly(filters) {
     // logger.info('runSearchQueryCountOnly()', filters);
 
-    const result = await this.g.query(`MATCH (n) WHERE ${getFilterString(filters)} AND (${await this.getRbacString()}) RETURN count(n)`);
+    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN count(n)`);
     this.setLastActivityTimestamp();
     if (result.hasNext() === true) {
       return result.next().get('count(n)');
@@ -244,7 +280,7 @@ export default class RedisGraphConnector {
 
   async getAllProperties() {
     // logger.info('Getting all properties');
-    const result = await this.g.query(`MATCH (n) WHERE ${await this.getRbacString()} RETURN n LIMIT 1`);
+    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN n LIMIT 1`);
     this.setLastActivityTimestamp();
 
     const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
@@ -265,10 +301,9 @@ export default class RedisGraphConnector {
       logger.warn('getAllValues() called with empty value. Most likely this was an unecessary API call.');
       return Promise.resolve([]);
     }
-    const result = filters.length > 0 ?
-      await this.g.query(`MATCH (n) WHERE ${getFilterString(filters)} AND (${await this.getRbacString()}) RETURN DISTINCT n.${property}`)
-      :
-      await this.g.query(`MATCH (n) WHERE ${await this.getRbacString()} RETURN DISTINCT n.${property}`);
+    const result = filters.length > 0
+      ? await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN DISTINCT n.${property}`)
+      : await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN DISTINCT n.${property}`);
 
     let valuesList = [];
     result._results.forEach((record) => {
@@ -295,7 +330,7 @@ export default class RedisGraphConnector {
   async findRelationships({ filters = [] } = {}) {
     // logger.info('findRelationships()', filters);
 
-    const result = await this.g.query(`MATCH (n)-[]->(r) WHERE ${getFilterString(filters)} AND (${await this.getRbacString()}) RETURN DISTINCT r`);
+    const result = await this.g.query(`MATCH (n)-[]->(r) ${await this.createWhereClause(filters)} RETURN DISTINCT r`);
     return formatResult(result);
   }
 }
