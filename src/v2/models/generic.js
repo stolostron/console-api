@@ -242,4 +242,63 @@ export default class GenericModel extends KubeModel {
     }
     throw new Error(`Enable to find the cluster called ${clusterName}`);
   }
+
+  // mocked for now - maybe use self link
+  // Generic query to get any resource's raw data
+  // ApiGroup wont be used for now
+  // eslint-disable-next-line
+  async getResource(kind, name, namespace, cluster, apiGroup) {
+    // const response = this.kubeConnector.get('');
+    return {
+      metadata: {
+        name: 'mockedApplication',
+        namespace: 'default',
+      },
+      kind,
+      cluster,
+      apiGroup,
+      raw: {
+        apiVersion: 'app.k8s.io/v1beta1',
+        kind: 'Application',
+        metadata: {
+          annotations: {
+            'apps.ibm.com/applicationrelationships': '',
+            'apps.ibm.com/dashboard': '',
+            'apps.ibm.com/deployables': '',
+            'apps.ibm.com/placementbindings': 'mockedApplication',
+          },
+          creationTimestamp: '2019-02-04T16:38:33Z',
+          generation: 1,
+          labels: {
+            app: 'mockedApplication',
+            hcmapp: 'mcmappdemo',
+          },
+          name: 'mockedApplication',
+          namespace: 'default',
+          resourceVersion: '7354831',
+          selfLink: '/apis/app.k8s.io/v1beta1/namespaces/default/applications/mockedApplication',
+          uid: '4fdb2bce-289b-11e9-9ab4-005056a0b88e',
+        },
+        spec: {
+          componentKinds: [
+            {
+              group: 'core',
+              kind: 'Service',
+            },
+            {
+              group: 'apps',
+              kind: 'Deployment',
+            },
+          ],
+          descriptor: {},
+          selector: {
+            matchLabels: {
+              hcmapp: 'mcmappdemo',
+            },
+          },
+        },
+        status: {},
+      },
+    };
+  }
 }

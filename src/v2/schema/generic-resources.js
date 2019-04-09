@@ -11,6 +11,10 @@ export const typeDef = `
 `;
 
 export const resolver = {
+  Query: {
+    getResource: (parent, args, { genericModel }) =>
+      genericModel.getResource(args.kind, args.name, args.namespace, args.cluster, args.apiGroup),
+  },
   Mutation: {
     // patch cluster labels
     updateResourceLabels: (parent, args, { genericModel }) =>
