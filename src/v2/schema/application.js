@@ -134,6 +134,5 @@ export const resolver = {
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args.resources),
-    deleteApplication: (root, args, { applicationModel }) => applicationModel.deleteApplication(args.path, args.resources),
   },
 };

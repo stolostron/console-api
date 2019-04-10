@@ -28,6 +28,7 @@ type Query {
   releasesFromSearch: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
+  userAccess(resource: String!, action: String!): JSON
 
   search(input: [SearchInput]): [SearchResult]
 
@@ -64,9 +65,6 @@ type Mutation {
   # Delete a user query
   deleteQuery(resource: JSON): JSON
 
-  # Delete Kubernetes Policy
-  deletePolicy(namespace: String, name: String!): String
-
   # Creates Kubernetes Compliance
   createCompliance(resources: [JSON]): JSON
 
@@ -79,22 +77,14 @@ type Mutation {
   # Update Kubernetes resources labels
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
-  # Delete Kubernetes Compliance
-  deleteCompliance(namespace: String, name: String!, resources: JSON): String
-
-  # NOTE: This deletes the top level Application object and any child resources the user has selected.
-  # Child resources include Deployables, PlacementPolicies, ConfigMaps, ApplicationRelationships and DeployableOverrides.
-  deleteApplication(path: String!, resources: JSON): String
-
   # Delete helm release on specific cluster
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
-  deleteHelmRepository(input: HelmRepoInput): HelmRepo
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
   setHelmRepo(input: HelmRepoInput): HelmRepo
 
-  # Delete Kubernetes pod on managed cluster
-  deletePod(name: String!, namespace: String!, cluster: String!): JSON
+  # Delete resource via selfLink
+  deleteResource(selfLink: String!, childResources: JSON): JSON
 }
 
 # Common fields for all Kubernetes objects

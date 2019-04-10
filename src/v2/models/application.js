@@ -9,7 +9,6 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
-import logger from '../lib/logger';
 
 const filterByName = (names, items) =>
   items.filter(item => names.find(name => name === item.metadata.name));
@@ -60,46 +59,6 @@ export default class ApplicationModel extends KubeModel {
       errors,
       result,
     };
-  }
-
-  /**
-   * NOTE: This deletes the top level Application and any child resources the user has selected.
-   * Child resources: Deployables, PlacementPolicies, AppRelationships and DeployableOverrides.
-   */
-  async deleteApplication(path, resources) {
-    const errors = await this.deleteAppResource(resources);
-    if (errors && errors.length > 0) {
-      throw new Error(`MCM ERROR: Unable to delete application resource(s) - ${JSON.stringify(errors)}`);
-    }
-
-    const response = await this.kubeConnector.delete(path);
-    if (response.code || response.message) {
-      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
-    }
-    return response.metadata.name;
-  }
-
-  async deleteAppResource(resources) {
-    if (resources.length < 1) {
-      logger.info('No Application resources selected for deletion');
-      return [];
-    }
-
-    const result = await Promise.all(resources.map(resource =>
-      this.kubeConnector.delete(resource.selfLink)
-        .catch(err => ({
-          status: 'Failure',
-          message: err.message,
-        }))));
-
-    const errors = [];
-    result.forEach((item) => {
-      if (item.code >= 400 || item.status === 'Failure') {
-        errors.push({ message: item.message });
-      }
-    });
-
-    return errors;
   }
 
   async getApplicationOverview(name, namespace = 'default') {

@@ -48,23 +48,4 @@ describe('Helm Repository Resolver', () => {
         done();
       });
   });
-
-  test('Correctly Resolves Delete Helm Repository Mutation', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-          deleteHelmRepository(input:{Name:"testRepo"}) {
-            Name
-            URL
-          }
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
 });

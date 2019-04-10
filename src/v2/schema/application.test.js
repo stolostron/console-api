@@ -276,21 +276,5 @@ describe('Application Resolver', () => {
         done();
       });
   });
-
-  test('Correctly Resolves Delete Application Mutation - with no child resources selected', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-          deleteApplication(path:"/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/testapp",resources:[{}])
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
 });
 

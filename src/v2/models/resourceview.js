@@ -104,6 +104,9 @@ export default class ResourceView extends KubeModel {
   async fetchResource(type, clusterName, name, namespace) {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace);
     const transform = this.transforms[type];
-    return [transform(clusterName, response.status.results[clusterName])];
+    if (response.status.results !== undefined) {
+      return [transform(clusterName, response.status.results[clusterName])];
+    }
+    return [];
   }
 }

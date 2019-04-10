@@ -392,20 +392,4 @@ describe('Compliance Resolver', () => {
         done();
       });
   });
-
-  test('Correctly Resolves Delete Compliance Mutation', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-          deleteCompliance(name:"compliance-xz",namespace:"mcm", resources:[])
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
 });

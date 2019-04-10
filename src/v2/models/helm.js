@@ -157,16 +157,4 @@ export default class HelmModel extends KubeModel {
       URL: response.spec.url,
     };
   }
-
-  async deleteRepo(input) {
-    const response = await this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos/${input.Name}`);
-    if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
-      return [];
-    }
-    return {
-      Name: response.metadata.name,
-      URL: response.spec.url,
-    };
-  }
 }

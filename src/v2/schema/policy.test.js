@@ -224,20 +224,4 @@ describe('Policy Resolver', () => {
         done();
       });
   });
-
-  test('Correctly Resolves Delete Policy Mutation', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-          deletePolicy(name:"test-policy",namespace:"default")
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
 });

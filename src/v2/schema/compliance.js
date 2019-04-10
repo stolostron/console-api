@@ -98,7 +98,5 @@ export const resolver = {
   Mutation: {
     createCompliance: (root, args, { complianceModel }) =>
       complianceModel.createCompliance(args.resources),
-    deleteCompliance: (root, args, { complianceModel }) =>
-      complianceModel.deleteCompliance(args),
   },
 };

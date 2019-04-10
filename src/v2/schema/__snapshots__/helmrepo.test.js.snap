@@ -1,16 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Helm Repository Resolver Correctly Resolves Delete Helm Repository Mutation 1`] = `
-Object {
-  "data": Object {
-    "deleteHelmRepository": Object {
-      "Name": "testRepo",
-      "URL": "https://testRepo.com",
-    },
-  },
-}
-`;
-
 exports[`Helm Repository Resolver Correctly Resolves Helm Repository Query 1`] = `
 Object {
   "data": Object {

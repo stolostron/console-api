@@ -301,4 +301,57 @@ export default class GenericModel extends KubeModel {
       },
     };
   }
+
+  async deleteResource(selfLink, childResources) {
+    const errors = this.deleteChildResource(childResources);
+    if (errors && errors.length > 0) {
+      throw new Error(`MCM ERROR: Unable to delete child resource(s) - ${JSON.stringify(errors)}`);
+    }
+
+    const response = await this.kubeConnector.delete(selfLink, {});
+    if (response.status === 'Failure' || response.code >= 400) {
+      throw new Error(`Failed to delete the requested resource [${response.code}] - ${response.message}`);
+    }
+    return response;
+  }
+
+  async deleteChildResource(resources) {
+    if (resources.length < 1) {
+      logger.info('No child resources selected for deletion');
+      return [];
+    }
+
+    const result = await Promise.all(resources.map(resource =>
+      this.kubeConnector.delete(resource.selfLink)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }))));
+
+    const errors = [];
+    result.forEach((item) => {
+      if (item.code >= 400 || item.status === 'Failure') {
+        errors.push({ message: item.message });
+      }
+    });
+    return errors;
+  }
+
+  async userAccess({ resource, action }) {
+    const body = {
+      apiVersion: 'authorization.k8s.io/v1',
+      kind: 'SelfSubjectAccessReview',
+      spec: {
+        resourceAttributes: {
+          verb: action,
+          resource,
+        },
+      },
+    };
+    const response = await this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', body);
+    if (response.status === 'Failure' || response.code >= 400) {
+      throw new Error(`Get User Access Failed [${response.code}] - ${response.message}`);
+    }
+    return response.status;
+  }
 }

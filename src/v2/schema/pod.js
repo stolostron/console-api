@@ -36,7 +36,10 @@ export const typeDef = `
 `;
 
 function resolveImages({ containers }) {
-  return Object.keys(containers).map(key => containers[key].image);
+  if (containers) {
+    return Object.keys(containers).map(key => containers[key].image);
+  }
+  return [];
 }
 
 export const resolver = {
@@ -49,8 +52,5 @@ export const resolver = {
   },
   Pod: {
     images: parent => resolveImages(parent),
-  },
-  Mutation: {
-    deletePod: (root, args, { genericModel }) => genericModel.resourceAction('pod', 'Delete', args.name, args.namespace, args.cluster),
   },
 };

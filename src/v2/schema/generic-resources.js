@@ -26,5 +26,7 @@ export const resolver = {
       return genericModel.putResource(args);
     },
     createResources: (parent, args, { genericModel }) => genericModel.createResources(args),
+    deleteResource: (root, args, { genericModel }) =>
+      genericModel.deleteResource(args.selfLink, args.childResources),
   },
 };

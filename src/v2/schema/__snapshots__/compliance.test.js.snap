@@ -497,14 +497,6 @@ Object {
 }
 `;
 
-exports[`Compliance Resolver Correctly Resolves Delete Compliance Mutation 1`] = `
-Object {
-  "data": Object {
-    "deleteCompliance": "compliance-all",
-  },
-}
-`;
-
 exports[`Compliance Resolver Correctly Resolves Single Compliance Query 1`] = `
 Object {
   "data": Object {

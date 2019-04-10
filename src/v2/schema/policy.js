@@ -81,6 +81,5 @@ export const resolver = {
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),
-    deletePolicy: (root, args, { complianceModel }) => complianceModel.deletePolicy(args),
   },
 };

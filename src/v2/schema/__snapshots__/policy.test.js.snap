@@ -364,14 +364,6 @@ Object {
 }
 `;
 
-exports[`Policy Resolver Correctly Resolves Delete Policy Mutation 1`] = `
-Object {
-  "data": Object {
-    "deletePolicy": "test-policy",
-  },
-}
-`;
-
 exports[`Policy Resolver Correctly Resolves Policy List Query 1`] = `
 Object {
   "data": Object {

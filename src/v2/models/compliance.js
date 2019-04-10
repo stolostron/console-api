@@ -77,51 +77,6 @@ export default class ComplianceModel {
     }
   }
 
-
-  async deletePolicy(input) {
-    const response = await this.kubeConnector.delete(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/policies/${input.name}`);
-    if (response.code || response.message) {
-      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
-    }
-    return response.metadata.name;
-  }
-
-
-  async deleteCompliance(input) {
-    const response = await this.kubeConnector.delete(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${input.namespace}/compliances/${input.name}`);
-    if (response.code || response.message) {
-      throw new Error(`MCM ERROR ${response.code} - ${response.message}`);
-    }
-    const errors = await this.deleteComplianceResource(input.resources);
-    if (errors && errors.length > 0) {
-      throw new Error(`MCM ERROR: Unable to delete application resource(s) - ${JSON.stringify(errors)}`);
-    }
-    return response.metadata.name;
-  }
-
-  async deleteComplianceResource(resources = []) {
-    if (resources.length < 1) {
-      logger.info('No Compliance resources selected for deletion');
-      return [];
-    }
-
-    const result = await Promise.all(resources.map(resource =>
-      this.kubeConnector.delete(resource.selfLink)
-        .catch(err => ({
-          status: 'Failure',
-          message: err.message,
-        }))));
-
-    const errors = [];
-    result.forEach((item) => {
-      if (item.code >= 400 || item.status === 'Failure') {
-        errors.push({ message: item.message });
-      }
-    });
-
-    return errors;
-  }
-
   async getCompliances(name, namespace) {
     let compliances = [];
 
