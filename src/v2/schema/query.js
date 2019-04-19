@@ -14,8 +14,7 @@ type Query {
   charts: [HelmChart]
   cluster(name: String, namespace: String): [Cluster]
   clusters: [Cluster]
-  # Mocked query for search resource data
-  getResource(kind: String, name: String, namespace: String, cluster: String, apiGroup: String): JSON
+  getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
   overview(demoMode: Boolean): Overview
   namespaces: [Namespace]
   nodes: [Node]
