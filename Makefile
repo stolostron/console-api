@@ -47,7 +47,9 @@ prune:
 my-version:
 	$(eval IMAGE_VERSION := $(shell git rev-parse --short HEAD))
 
-app-version: my-version
+#Removed so that IMAGE_VERSION from config file is added to the version label in the docker image
+#for redhat certification
+#app-version: my-version
 
 -include $(shell curl -so .build-harness -H "Authorization: token $(GITHUB_TOKEN)" -H "Accept: application/vnd.github.v3.raw" "https://raw.github.ibm.com/ICP-DevOps/build-harness/master/templates/Makefile.build-harness"; echo .build-harness)
 
