@@ -256,6 +256,77 @@ export default class GenericModel extends KubeModel {
     return [{ message: 'Unable to load resource data' }];
   }
 
+  async updateResource(args) {
+    const {
+      selfLink, namespace, kind, name, body, cluster,
+    } = args;
+    const requestBody = { body };
+    // If updating resource on local cluster use selfLink
+    if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
+      const response = await this.kubeConnector.put(selfLink, requestBody);
+      if (response.message) {
+        throw new Error(`${response.code} - ${response.message}`);
+      }
+      return response;
+    }
+    const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
+    const clusterNamespace = clusterResponse[0].metadata.namespace;
+    // Else If updating resource on remote cluster use an Action Type Work
+    const workName = `${name}-update-work-${this.kubeConnector.uid()}`;
+    const jsonBody = {
+      apiVersion: 'mcm.ibm.com/v1alpha1',
+      kind: 'Work',
+      metadata: {
+        name: workName,
+        namespace: clusterNamespace,
+      },
+      spec: {
+        cluster: {
+          name: cluster,
+        },
+        type: 'Action',
+        scope: {
+          resourceType: kind,
+          namespace,
+        },
+        actionType: 'Update',
+        kube: {
+          resource: kind,
+          name,
+          namespace,
+          template: body,
+        },
+      },
+    };
+    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
+    if (response.code || response.message) {
+      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      return [{
+        code: response.code,
+        message: response.message,
+      }];
+    }
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
+
+    try {
+      const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
+      if (result) {
+        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
+          .catch(e => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
+      }
+      const reason = _.get(result, 'status.reason');
+      if (reason) {
+        throw new Error(`Failed to Update ${name}: ${reason}`);
+      } else {
+        return _.get(result, 'metadata.name');
+      }
+    } catch (e) {
+      logger.error('Resource Action Error:', e.message);
+      cancel();
+      throw e;
+    }
+  }
+
   async deleteResource(selfLink, childResources) {
     const errors = this.deleteChildResource(childResources);
     if (errors && errors.length > 0) {

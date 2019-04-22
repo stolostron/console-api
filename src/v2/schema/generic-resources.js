@@ -14,6 +14,7 @@ export const resolver = {
   Query: {
     getResource: (parent, args, { genericModel }) =>
       genericModel.getResource(args.selfLink, args.namespace, args.kind, args.name, args.cluster),
+    updateResource: (parent, args, { genericModel }) => genericModel.updateResource(args),
   },
   Mutation: {
     // patch cluster labels

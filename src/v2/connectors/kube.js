@@ -237,7 +237,7 @@ export default class KubeConnector {
               clearInterval(intervalID);
               return reject(response);
             }
-            const isComplete = _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
+            const isComplete = _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
 
             if (isComplete === 'Completed') {
               clearInterval(intervalID);
