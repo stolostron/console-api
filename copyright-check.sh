@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Licensed Materials - Property of IBM
-# (c) Copyright IBM Corporation 2018. All Rights Reserved.
+# (c) Copyright IBM Corporation 2018, 2019. All Rights Reserved.
 # Note to U.S. Government Users Restricted Rights:
 # Use, duplication or disclosure restricted by GSA ADP Schedule
 # Contract with IBM Corp.
@@ -12,7 +12,8 @@ YEAR=2018
 CHECK1=" Licensed Materials - Property of IBM"
 #LINE2="${COMMENT_PREFIX}(c) Copyright IBM Corporation ${YEAR}. All Rights Reserved."
 CHECK2=" Copyright IBM Corporation 2018. All Rights Reserved."
-CHECK2a=" Copyright IBM Corporation 2019. All Rights Reserved."
+CHECK2a=" Copyright IBM Corporation 2018, 2019. All Rights Reserved."
+CHECK2b=" Copyright IBM Corporation 2019. All Rights Reserved."
 #LINE3="${COMMENT_PREFIX}Note to U.S. Government Users Restricted Rights:"
 CHECK3=" Note to U.S. Government Users Restricted Rights:"
 #LINE4="${COMMENT_PREFIX}Use, duplication or disclosure restricted by GSA ADP Schedule"
@@ -53,11 +54,13 @@ for f in `find . -type f ! -path "./.eslintrc.js" ! -path "./build-harness/*" ! 
     #Add a status message of OK, if all copyright lines are found
     if [ $i -eq ${LIC_ARY_SIZE} ]; then
       printf "OK\n"
+      ERROR=0
     else
       #Validate the copyright line being checked is present
      if [[ "$HEADER" != *"${LIC_ARY[$i]}"*
        && "$HEADER" != *"${CHECK2}"*
-       && "$HEADER" != *"${CHECK2a}"* ]]; then
+       && "$HEADER" != *"${CHECK2a}"*
+       && "$HEADER" != *"${CHECK2b}"* ]]; then
         printf "Missing copyright\n  >>Could not find [${LIC_ARY[$i]}] in the file $f\n"
         ERROR=1
         break
