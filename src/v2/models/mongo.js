@@ -8,6 +8,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import fs from 'fs';
 import mongooseLib, { Schema } from 'mongoose';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
@@ -56,11 +57,20 @@ export default class MongoModel {
       return this.mongoose.connection;
     }
 
+    const ca = [fs.readFileSync('/certs/mongodb-ca/tls.crt')];
+    const cert = fs.readFileSync('/certs/mongodb-client/tls.crt');
+    const key = fs.readFileSync('/certs/mongodb-client/tls.key');
+
     let retries = numRetries;
     while (retries) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await this.mongoose.connect(this.mongoURI);
+        await this.mongoose.connect(this.mongoURI, {
+          sslValidate: true,
+          sslCA: ca,
+          sslKey: key,
+          sslCert: cert,
+        });
         logger.info('Mongo Connection Succesful');
         break;
       } catch (e) {
