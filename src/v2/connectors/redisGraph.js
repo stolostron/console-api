@@ -19,6 +19,11 @@ import requestLib from '../lib/request';
 import { isRequired } from '../lib/utils';
 
 let lastActivityReported = 0;
+let isOpenshift = null;
+const cache = lru({
+  max: 1000,
+  maxAge: 1000 * 60, // 1 min
+});
 
 // FIXME: Is there a more efficient way?
 function formatResult(results) {
@@ -158,15 +163,10 @@ export default class RedisGraphConnector {
     httpLib = requestLib,
     rbac = isRequired('rbac'),
     req = isRequired('req'),
-    cache = lru({
-      max: 1000,
-      maxAge: 1000 * 60, // 1min
-    }),
   } = {}) {
     this.rbac = rbac;
     this.http = httpLib;
     this.req = req;
-    this.cache = cache;
 
     this.redisClient = getRedisClient();
     this.redisReady = redisReady;
@@ -177,15 +177,37 @@ export default class RedisGraphConnector {
     return this.redisReady;
   }
 
+  async checkIfOpenShiftPlatform(req) {
+    const defaults = {
+      url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.openshift.io/v1`,
+      method: 'GET',
+      headers: {
+        Authorization: req.kubeToken,
+      },
+    };
+
+    const res = await this.http(defaults);
+    if (res.statusCode === 200) {
+      const selfReview = res.body.resources.filter(r => r.kind === 'SelfSubjectRulesReview');
+      logger.info('SelfSubjectRulesReview:', selfReview);
+      if (selfReview.length > 0) {
+        logger.info('Found API "authorization.openshift.io/v1" so assuming that we are running in OpenShift');
+        isOpenshift = true;
+        return;
+      }
+    }
+    isOpenshift = false;
+  }
+
   async getUserAccess(req, namespace) {
     const defaults = {
-      url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.k8s.io/v1/selfsubjectrulesreviews`,
+      url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.${!isOpenshift ? 'k8s' : 'openshift'}.io/v1/${!isOpenshift ? '' : `namespaces/${namespace}/`}selfsubjectrulesreviews`,
       method: 'POST',
       headers: {
         Authorization: req.kubeToken,
       },
       json: {
-        apiVersion: 'authorization.k8s.io/v1',
+        apiVersion: `authorization.${!isOpenshift ? 'k8s' : 'openshift'}.io/v1`,
         kind: 'SelfSubjectRulesReview',
         spec: {
           namespace,
@@ -195,13 +217,13 @@ export default class RedisGraphConnector {
     return this.http(defaults).then((res) => {
       let userResources = [];
       if (res.body && res.body.status) {
-        res.body.status.resourceRules.forEach((item) => {
+        const results = isOpenshift ? res.body.status.rules : res.body.status.resourceRules;
+        results.forEach((item) => {
           if (item.verbs.includes('*') && item.resources.includes('*')) {
             // if user has access to everything then add just an *
             userResources = userResources.concat(['*']);
           } else if (item.verbs.includes('get') && item.resources.length > 0) { // TODO need to include access for 'patch' and 'delete'
-            // RBAC string is defined as "namespace_apigroup_kind".  For non-namespaced resources
-            // or resources w/o an apigroup use: "null_null_kind1"
+            // RBAC string is defined as "namespace_apigroup_kind"
             const resources = [];
             const ns = (namespace === '' || namespace === undefined) ? 'null_' : `${namespace}_`;
             const apiGroup = (item.apiGroups[0] === '' || item.apiGroups[0] === undefined) ? 'null_' : `${item.apiGroups[0]}_`;
@@ -220,15 +242,18 @@ export default class RedisGraphConnector {
   async getRbacString() {
     const objAliases = ['n'];
     const userAccessKey = this.req.user.name;
-    const userAccessCache = this.cache.get(userAccessKey);
+    const userAccessCache = cache.get(userAccessKey);
     let data = null;
     if (userAccessCache !== undefined) {
       data = userAccessCache;
     } else if (this.rbac.length > 0) {
+      if (isOpenshift === null) {
+        await this.checkIfOpenShiftPlatform(this.req);
+      }
       data = await Promise.all(this.rbac.map(namespace =>
         this.getUserAccess(this.req, namespace)));
       data = await _.flatten(data).map(item => `${objAliases[0]}._rbac = ${item}`);
-      this.cache.set(userAccessKey, data);
+      cache.set(userAccessKey, data);
     } else {
       return '';
     }
@@ -318,8 +343,8 @@ export default class RedisGraphConnector {
       return Promise.resolve([]);
     }
     const result = filters.length > 0
-      ? await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN DISTINCT n.${property}`)
-      : await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN DISTINCT n.${property}`);
+      ? await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`)
+      : await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`);
 
     let valuesList = [];
     result._results.forEach((record) => {

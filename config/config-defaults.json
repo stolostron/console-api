@@ -14,5 +14,5 @@
   "redisEndpoint": "//localhost:6379",
   "redisSSLEndpoint": "",
   "redisPassword": "",
-  "useRedisBackend": false
+  "useRedisBackend": true
 }

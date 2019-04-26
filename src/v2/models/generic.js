@@ -253,7 +253,7 @@ export default class GenericModel extends KubeModel {
     if (response.status.results) {
       return response.status.results[cluster];
     }
-    return [{ message: 'Unable to load resource data' }];
+    return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
   }
 
   async updateResource(args) {
