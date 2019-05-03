@@ -33,12 +33,12 @@ export default class SearchModel {
   }
 
   async getUpdatedTimestamp() {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     return this.searchConnector.getLastUpdatedTimestamp();
   }
 
   async resolveSearch({ keywords, filters }) {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords);
@@ -47,7 +47,7 @@ export default class SearchModel {
   }
 
   async resolveSearchCount({ keywords, filters }) {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     if (keywords && keywords.length > 0) {
       const results = await this.searchConnector.runSearchQuery(filters);
       return filterByKeywords(results, keywords).length;
@@ -56,7 +56,7 @@ export default class SearchModel {
   }
 
   async resolveSearchComplete({ property, filters }) {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     return this.searchConnector.getAllValues(property, filters);
   }
 
@@ -66,7 +66,7 @@ export default class SearchModel {
    * returns { kind: String, count: Int, items: [] }
    */
   async resolveRelated(parent) {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     const relationships = await this.searchConnector.findRelationships(parent);
 
     const result = {};
@@ -99,7 +99,7 @@ export default class SearchModel {
   }
 
   async searchSchema() {
-    this.checkSearchServiceAvailable();
+    await this.checkSearchServiceAvailable();
     return {
       allProperties: await this.searchConnector.getAllProperties(),
     };

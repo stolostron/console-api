@@ -18,7 +18,6 @@ import logger from '../lib/logger';
 import requestLib from '../lib/request';
 import { isRequired } from '../lib/utils';
 
-let lastActivityReported = 0;
 let isOpenshift = null;
 const cache = lru({
   max: 1000,
@@ -106,57 +105,65 @@ export function getFilterString(filters) {
 }
 
 let redisClient;
-let redisReady = false;
 function getRedisClient() {
-  if (redisClient) {
-    return redisClient;
-  }
-
-  if (config.get('redisPassword') === '') {
-    logger.warn('Starting redis client without authentication. redisPassword was not provided in config.');
-    redisClient = redis.createClient(config.get('redisEndpoint'));
-  } else if (config.get('redisSSLEndpoint') === '') {
-    logger.info('Starting Redis client using endpoint: ', config.get('redisEndpoint'));
-    redisClient = redis.createClient(config.get('redisEndpoint'), { password: config.get('redisPassword') });
-  } else {
-    logger.info('Starting Redis client using SSL endpoint: ', config.get('redisSSLEndpoint'));
-    const redisUrl = config.get('redisSSLEndpoint');
-    const redisInfo = redisUrl.split(':');
-    const redisHost = redisInfo[0];
-    const redisPort = redisInfo[1];
-    const redisCert = fs.readFileSync(process.env.redisCert || './rediscert/redis.crt', 'utf8');
-    redisClient = redis.createClient(redisPort, redisHost, { auth_pass: config.get('redisPassword'), tls: { servername: redisHost, ca: [redisCert] } });
-    redisClient.ping((error, result) => {
-      if (error) logger.error('Error with Redis SSL connection: ', error);
-      else {
-        logger.info('Redis SSL connection respone : ', result);
-        if (result === 'PONG') redisReady = true;
-      }
-    });
-  }
-
-  // If we encounter an error we'll quit the client, the next request will attempt to reconnect.
-  redisClient.on('error', (error) => {
-    logger.info('Error with Redis connection: ', error);
-    redisReady = false;
-    redisClient = undefined;
-  });
-
-  // Initialization can happen asynchronously.
-  redisClient.get('lastUpdatedTimestamp', (err, reply) => {
-    if (err) {
-      logger.error('Error initializing Redis client.');
+  return new Promise((resolve) => {
+    if (redisClient) {
+      resolve(redisClient);
       return;
     }
-    if (reply == null) {
-      logger.info('Status db did not exist. Initializing it.');
-      redisClient.set('lastUpdatedTimestamp', 0);
-      redisClient.set('lastActivityTimestamp', 0);
+
+    logger.info('Initializing new Redis client.');
+
+    if (config.get('redisPassword') === '') {
+      logger.warn('Starting redis client without authentication. redisPassword was not provided in config.');
+      redisClient = redis.createClient(config.get('redisEndpoint'));
+    } else if (config.get('redisSSLEndpoint') === '') {
+      logger.info('Starting Redis client using endpoint: ', config.get('redisEndpoint'));
+      redisClient = redis.createClient(config.get('redisEndpoint'), { password: config.get('redisPassword') });
+    } else {
+      logger.info('Starting Redis client using SSL endpoint: ', config.get('redisSSLEndpoint'));
+      const redisUrl = config.get('redisSSLEndpoint');
+      const redisInfo = redisUrl.split(':');
+      const redisHost = redisInfo[0];
+      const redisPort = redisInfo[1];
+      const redisCert = fs.readFileSync(process.env.redisCert || './rediscert/redis.crt', 'utf8');
+      redisClient = redis.createClient(redisPort, redisHost, { auth_pass: config.get('redisPassword'), tls: { servername: redisHost, ca: [redisCert] } });
+      redisClient.ping((error, result) => {
+        if (error) logger.error('Error with Redis SSL connection: ', error);
+        else {
+          logger.info('Redis SSL connection respone : ', result);
+          if (result === 'PONG') {
+            resolve(redisClient);
+          }
+        }
+      });
     }
-    redisReady = true;
+
+
+    // Wait until the client connects and is ready to resolve with the connecction.
+    redisClient.on('connect', () => {
+      logger.info('Redis Client connected.');
+    });
+    redisClient.on('ready', () => {
+      logger.info('Redis Client redy.');
+      resolve(redisClient);
+    });
+
+    // Log redis connection events.
+    redisClient.on('error', (error) => {
+      logger.info('Error with Redis connection: ', error);
+    });
+    redisClient.on('end', (msg) => {
+      logger.info('The Redis connection has ended.', msg);
+    });
   });
-  return redisClient;
 }
+
+// Initializes the Redis client on startup.
+if (process.env.NODE_ENV !== 'test') { // Skip while running tests until we can mock Redis.
+  getRedisClient();
+}
+
 
 export default class RedisGraphConnector {
   constructor({
@@ -167,14 +174,14 @@ export default class RedisGraphConnector {
     this.rbac = rbac;
     this.http = httpLib;
     this.req = req;
-
-    this.redisClient = getRedisClient();
-    this.redisReady = redisReady;
-    this.g = new RedisGraph('icp-search', this.redisClient);
   }
 
-  isServiceAvailable() {
-    return this.redisReady;
+  async isServiceAvailable() {
+    await getRedisClient();
+    if (this.g === undefined && redisClient) {
+      this.g = new RedisGraph('icp-search', redisClient);
+    }
+    return redisClient.connected && redisClient.ready;
   }
 
   async checkIfOpenShiftPlatform(req) {
@@ -277,13 +284,6 @@ export default class RedisGraphConnector {
     return '';
   }
 
-  setLastActivityTimestamp() {
-    // Skip if avtivity was reported within the last second.
-    if (Date.now() > (lastActivityReported + 1000)) {
-      lastActivityReported = Date.now();
-      this.redisClient.set('lastActivityTimestamp', Date.now());
-    }
-  }
 
   async getLastUpdatedTimestamp() {
     return new Promise((resolve) => {
@@ -308,7 +308,6 @@ export default class RedisGraphConnector {
     // logger.info('runSearchQuery()', filters);
     if (this.rbac.length > 0) {
       const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN n`);
-      this.setLastActivityTimestamp();
       return formatResult(result);
     }
     return [];
@@ -319,7 +318,6 @@ export default class RedisGraphConnector {
 
     if (this.rbac.length > 0) {
       const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN count(n)`);
-      this.setLastActivityTimestamp();
       if (result.hasNext() === true) {
         return result.next().get('count(n)');
       }
@@ -332,7 +330,6 @@ export default class RedisGraphConnector {
     const values = new Set();
     if (this.rbac.length > 0) {
       const result = await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN n LIMIT 1`);
-      this.setLastActivityTimestamp();
 
       values.add('kind', 'name', 'namespace', 'status'); // Add these first so they show at the top.
       result._header.forEach((property) => {
