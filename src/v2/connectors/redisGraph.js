@@ -246,7 +246,7 @@ export default class RedisGraphConnector {
     let data = null;
     if (userAccessCache !== undefined) {
       data = userAccessCache;
-    } else if (this.rbac.length > 0) {
+    } else {
       if (isOpenshift === null) {
         await this.checkIfOpenShiftPlatform(this.req);
       }
@@ -254,8 +254,6 @@ export default class RedisGraphConnector {
         this.getUserAccess(this.req, namespace)));
       data = await _.flatten(data).map(item => `${objAliases[0]}._rbac = ${item}`);
       cache.set(userAccessKey, data);
-    } else {
-      return '';
     }
 
     if (data.includes(`${objAliases[0]}._rbac = *`)) {
@@ -300,38 +298,50 @@ export default class RedisGraphConnector {
     });
   }
 
+  /**
+   * TODO: For users less than clusterAdmin we we do not currently handle non-namespaced resources
+   * For users with access to >0 namespaces we create an RBAC string for resources user has access
+   * For users with access to 0 namespaces we return an empty object
+   */
+
   async runSearchQuery(filters) {
     // logger.info('runSearchQuery()', filters);
-
-    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN n`);
-    this.setLastActivityTimestamp();
-    return formatResult(result);
+    if (this.rbac.length > 0) {
+      const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN n`);
+      this.setLastActivityTimestamp();
+      return formatResult(result);
+    }
+    return [];
   }
 
   async runSearchQueryCountOnly(filters) {
     // logger.info('runSearchQueryCountOnly()', filters);
 
-    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN count(n)`);
-    this.setLastActivityTimestamp();
-    if (result.hasNext() === true) {
-      return result.next().get('count(n)');
+    if (this.rbac.length > 0) {
+      const result = await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN count(n)`);
+      this.setLastActivityTimestamp();
+      if (result.hasNext() === true) {
+        return result.next().get('count(n)');
+      }
     }
     return 0;
   }
 
   async getAllProperties() {
     // logger.info('Getting all properties');
-    const result = await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN n LIMIT 1`);
-    this.setLastActivityTimestamp();
+    const values = new Set();
+    if (this.rbac.length > 0) {
+      const result = await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN n LIMIT 1`);
+      this.setLastActivityTimestamp();
 
-    const values = new Set(['kind', 'name', 'namespace', 'status']); // Add these first so they show at the top.
-    result._header.forEach((property) => {
-      const label = property.substr(property.indexOf('.') + 1);
-      if (label.charAt(0) !== '_' && label.indexOf('label__') === -1) {
-        values.add(label);
-      }
-    });
-
+      values.add('kind', 'name', 'namespace', 'status'); // Add these first so they show at the top.
+      result._header.forEach((property) => {
+        const label = property.substr(property.indexOf('.') + 1);
+        if (label.charAt(0) !== '_' && label.indexOf('label__') === -1) {
+          values.add(label);
+        }
+      });
+    }
     return [...values];
   }
 
@@ -342,26 +352,29 @@ export default class RedisGraphConnector {
       logger.warn('getAllValues() called with empty value. Most likely this was an unecessary API call.');
       return Promise.resolve([]);
     }
-    const result = filters.length > 0
-      ? await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`)
-      : await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`);
 
     let valuesList = [];
-    result._results.forEach((record) => {
-      if (record.values()[0] !== 'NULL' && record.values()[0] !== null) {
-        valuesList.push(record.values()[0]);
-      }
-    });
+    if (this.rbac.length > 0) {
+      const result = filters.length > 0
+        ? await this.g.query(`MATCH (n) ${await this.createWhereClause(filters)} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`)
+        : await this.g.query(`MATCH (n) ${await this.createWhereClause([])} RETURN DISTINCT n.${property} ORDER BY n.${property} ASC`);
 
-    if (isDate(valuesList[0])) {
-      return ['isDate'];
-    } else if (isNumber(valuesList[0])) { //  || isNumWithChars(valuesList[0]))
-      valuesList = valuesList.filter(res => (isNumber(res) || (!isNumber(res))) && res !== ''); //  && isNumWithChars(res)
-      valuesList.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-      if (valuesList.length > 1) {
-        return ['isNumber', valuesList[0], valuesList[valuesList.length - 1]];
-      } else if (valuesList.length === 1) {
-        return ['isNumber', valuesList[0]];
+      result._results.forEach((record) => {
+        if (record.values()[0] !== 'NULL' && record.values()[0] !== null) {
+          valuesList.push(record.values()[0]);
+        }
+      });
+
+      if (isDate(valuesList[0])) {
+        return ['isDate'];
+      } else if (isNumber(valuesList[0])) { //  || isNumWithChars(valuesList[0]))
+        valuesList = valuesList.filter(res => (isNumber(res) || (!isNumber(res))) && res !== ''); //  && isNumWithChars(res)
+        valuesList.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+        if (valuesList.length > 1) {
+          return ['isNumber', valuesList[0], valuesList[valuesList.length - 1]];
+        } else if (valuesList.length === 1) {
+          return ['isNumber', valuesList[0]];
+        }
       }
     }
     return valuesList;
@@ -370,8 +383,10 @@ export default class RedisGraphConnector {
 
   async findRelationships({ filters = [] } = {}) {
     // logger.info('findRelationships()', filters);
-
-    const result = await this.g.query(`MATCH (n)-[]->(r) ${await this.createWhereClause(filters)} RETURN DISTINCT r`);
-    return formatResult(result);
+    if (this.rbac.length > 0) {
+      const result = await this.g.query(`MATCH (n)-[]->(r) ${await this.createWhereClause(filters)} RETURN DISTINCT r`);
+      return formatResult(result);
+    }
+    return [];
   }
 }
