@@ -206,6 +206,94 @@ export default class RedisGraphConnector {
     isOpenshift = false;
   }
 
+  async getNonNamespacedResources(req) {
+    const resources = [];
+
+    // Get non-namespaced resources WITH an api group
+    const apiGroupDefaults = {
+      url: `${config.get('cfcRouterUrl')}/kubernetes/apis/`,
+      method: 'POST',
+      headers: {
+        Authorization: req.kubeToken,
+      },
+      json: {},
+    };
+    resources.push(await this.http(apiGroupDefaults).then(async (res) => {
+      if (res.body) {
+        const apiGroups = res.body.groups.map(group => group.preferredVersion.groupVersion);
+        const results = await Promise.all(apiGroups.map((group) => {
+          const resourceDefaults = {
+            url: `${config.get('cfcRouterUrl')}/kubernetes/apis/${group}`,
+            method: 'GET',
+            headers: {
+              Authorization: req.kubeToken,
+            },
+            json: {},
+          };
+          return this.http(resourceDefaults).then((result) => {
+            const nonNamespaced = result.body.resources
+              .filter(resource => resource.namespaced === false)
+              .map(resource => resource.name);
+            return nonNamespaced.filter(item => item.length > 0)
+              .map(item => ({ name: item, apiGroup: group }));
+          });
+        }));
+        return _.flatten(results.filter(item => item.length > 0));
+      }
+      return 'Error getting available apis.';
+    }));
+
+    // Get non-namespaced resources WITHOUT an api group
+    const defaults = {
+      url: `${config.get('cfcRouterUrl')}/kubernetes/api/v1`,
+      method: 'GET',
+      headers: {
+        Authorization: req.kubeToken,
+      },
+      json: {},
+    };
+    resources.push(await this.http(defaults).then((res) => {
+      if (res.body) {
+        return res.body.resources.filter(resource => resource.namespaced === false)
+          .map(item => ({ name: item.name, apiGroup: 'null' }));
+      }
+      return 'Error getting available apis.';
+    }));
+    return _.flatten(resources);
+  }
+
+  async getNonNamespacedAccess(req) {
+    const nonNamespacedResources = await this.getNonNamespacedResources(req);
+    const results = await Promise.all(nonNamespacedResources.map((resource) => {
+      const defaults = {
+        url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.k8s.io/v1/selfsubjectaccessreviews`,
+        method: 'POST',
+        headers: {
+          Authorization: req.kubeToken,
+        },
+        json: {
+          apiVersion: 'authorization.k8s.io/v1',
+          kind: 'SelfSubjectAccessReview',
+          spec: {
+            resourceAttributes: {
+              verb: 'get',
+              resource: resource.name,
+            },
+          },
+        },
+      };
+      return this.http(defaults).then((res) => {
+        if (res.body && res.body.status) {
+          if (res.body.status.allowed) {
+            return `'null_${resource.apiGroup}_${resource.name}'`;
+          }
+        }
+        return null;
+      });
+    }));
+    return results;
+  }
+
   async getUserAccess(req, namespace) {
     const defaults = {
       url: `${config.get('cfcRouterUrl')}/kubernetes/apis/authorization.${!isOpenshift ? 'k8s' : 'openshift'}.io/v1/${!isOpenshift ? '' : `namespaces/${namespace}/`}selfsubjectrulesreviews`,
@@ -259,6 +347,7 @@ export default class RedisGraphConnector {
       }
       data = await Promise.all(this.rbac.map(namespace =>
         this.getUserAccess(this.req, namespace)));
+      data.push(await this.getNonNamespacedAccess(this.req));
       data = await _.flatten(data).map(item => `${objAliases[0]}._rbac = ${item}`);
       cache.set(userAccessKey, data);
     }
