@@ -27,7 +27,7 @@ type Query {
   releasesFromSearch: [HelmRel]
   repos: [HelmRepo]
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
-  userAccess(resource: String!, action: String!): JSON
+  userAccess(resource: String!, action: String!, namespace: String): JSON
   # Generic call to update resources on both local and remote clusters
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
 

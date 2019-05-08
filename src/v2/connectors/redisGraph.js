@@ -231,8 +231,8 @@ export default class RedisGraphConnector {
             json: {},
           };
           return this.http(resourceDefaults).then((result) => {
-            const nonNamespaced = result.body.resources
-              .filter(resource => resource.namespaced === false)
+            const groupResources = _.get(result, 'body.resources', []);
+            const nonNamespaced = groupResources.filter(resource => resource.namespaced === false)
               .map(resource => resource.name);
             return nonNamespaced.filter(item => item.length > 0)
               .map(item => ({ name: item, apiGroup: group }));

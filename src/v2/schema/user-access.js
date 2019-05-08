@@ -17,6 +17,6 @@ type userAccess {
 export const resolver = {
   Query: {
     userAccess: (parent, args, { genericModel }) =>
-      genericModel.userAccess({ resource: args.resource, action: args.action }),
+      genericModel.userAccess(args),
   },
 };
