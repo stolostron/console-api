@@ -1,3 +1,4 @@
+**
 !/jest.config.js
 !/LICENSE 
 !/.babelrc
@@ -6,3 +7,4 @@
 !/jest.setup.js
 !/node_modules
 !/sslcert
+!license.txt
