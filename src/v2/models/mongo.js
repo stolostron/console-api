@@ -65,7 +65,7 @@ export default class MongoModel {
     while (retries) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await this.mongoose.connect(`${this.mongoURI}?authSource=admin`, {
+        await this.mongoose.connect(`${this.mongoURI}?replicaSet=rs0&authSource=admin`, {
           ssl: true,
           sslCA: ca,
           sslKey: key,
