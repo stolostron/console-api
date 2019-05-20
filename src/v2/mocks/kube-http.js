@@ -8,6 +8,13 @@
  ****************************************************************************** */
 /* eslint-disable global-require */
 
+import lru from 'lru-cache';
+
+const cache = lru({
+  max: 1000,
+  maxAge: 1000 * 60, // 1 min
+});
+
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
@@ -20,7 +27,7 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
-    userQuery: require('./UserQuery').default,
+    userQuery: require('./UserQuery'),
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
@@ -43,7 +50,8 @@ export default function createMockHttp() {
   return async function MockLib(params) {
     if (params.json) {
       if (params.json.userQueries) {
-        return state.userQuery;
+        cache.set('savedUserQuery', true);
+        return state.userQuery.seleniumResponse;
       }
       switch (true) {
         case params.json.metadata.name.includes('pods'):
@@ -152,7 +160,9 @@ export default function createMockHttp() {
       case params.url.includes('clusters'):
         return state.clusters;
       case params.url.includes('api/v1/userpreferences'):
-        return state.userQuery;
+        return cache.get('savedUserQuery')
+          ? state.userQuery.seleniumResponse
+          : state.userQuery.unitResponse;
       case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
         return state.apiList.apiPath;
       default:

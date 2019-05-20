@@ -7,10 +7,19 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-const mockResponse = {
+const unitResponse = {
   body: {
     userQueries: [{ name: 'test', description: 'test', searchText: 'test' }],
   },
 };
 
-export default mockResponse;
+const seleniumResponse = {
+  body: {
+    userQueries: [
+      { name: 'test', description: 'test', searchText: 'test' },
+      { name: 'SeleniumTesting', description: 'Testing the search UI using selenium/nightwatch', searchText: 'kind:pod' },
+    ],
+  },
+};
+
+export { unitResponse, seleniumResponse };
