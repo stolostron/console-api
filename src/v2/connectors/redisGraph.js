@@ -330,6 +330,7 @@ export default class RedisGraphConnector {
           return null;
         });
       }
+      userResources.push(`'${namespace}_null_releases'`);
       return userResources;
     });
   }
