@@ -50,6 +50,10 @@ export default function createMockHttp() {
   return async function MockLib(params) {
     if (params.json) {
       if (params.json.userQueries) {
+        if (cache.get('savedUserQuery')) {
+          cache.set('savedUserQuery', false);
+          return state.userQuery.unitResponse;
+        }
         cache.set('savedUserQuery', true);
         return state.userQuery.seleniumResponse;
       }

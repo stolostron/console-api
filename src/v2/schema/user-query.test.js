@@ -27,22 +27,6 @@ describe('User Query Resolver', () => {
       });
   });
 
-  test('Correctly Resolves Remove User Query', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-          mutation {
-            deleteQuery(resource: {name: "test", description: "test", searchText: "test"})
-          }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-
   test('Correctly Resolves Get User Query', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
@@ -54,6 +38,22 @@ describe('User Query Resolver', () => {
               description
               searchText
             }
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Remove User Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+          mutation {
+            deleteQuery(resource: {name: "test", description: "test", searchText: "test"})
           }
       `,
       })

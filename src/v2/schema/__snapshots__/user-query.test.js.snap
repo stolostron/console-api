@@ -50,11 +50,6 @@ Object {
           "name": "test",
           "searchText": "test",
         },
-        Object {
-          "description": "Testing the search UI using selenium/nightwatch",
-          "name": "SeleniumTesting",
-          "searchText": "kind:pod",
-        },
       ],
     },
   },
