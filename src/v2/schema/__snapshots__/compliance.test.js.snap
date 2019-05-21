@@ -3236,6 +3236,378 @@ Object {
           },
         },
       },
+      Object {
+        "clusterCompliant": "0/0",
+        "compliancePolicies": Array [],
+        "compliancePolicy": Array [],
+        "complianceStatus": Array [],
+        "metadata": Object {
+          "creationTimestamp": "2019-01-03T21:32:55Z",
+          "name": "policy-1546551175122",
+          "namespace": "default",
+          "resourceVersion": "30574",
+          "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/policy-1546551175122",
+          "uid": "21c50bb6-0f9f-11e9-a535-e2d4c161f9ad",
+        },
+        "placementBindings": Array [],
+        "placementPolicies": Array [],
+        "policyCompliant": "0/0",
+        "raw": Object {
+          "apiVersion": "mcm.ibm.com/v1alpha1",
+          "kind": "ResourceView",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2019-01-03T21:32:55Z",
+            "labels": Object {
+              "name": "policy-1546551175122",
+            },
+            "name": "policy-1546551175122",
+            "namespace": "default",
+            "resourceVersion": "30574",
+            "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/policy-1546551175122",
+            "uid": "21c50bb6-0f9f-11e9-a535-e2d4c161f9ad",
+          },
+          "spec": Object {
+            "clusterSelector": Object {
+              "matchLabels": Object {
+                "name": "cluster2",
+              },
+            },
+            "scope": Object {
+              "namespace": "mcm-cluster2",
+              "resource": "policy",
+              "resourceName": "policy-all",
+            },
+          },
+          "status": Object {
+            "conditions": Array [
+              Object {
+                "lastUpdateTime": "2019-01-03T21:32:55Z",
+                "type": "Completed",
+              },
+            ],
+            "results": Object {
+              "cluster2": Object {
+                "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+                "kind": "Policy",
+                "metadata": Object {
+                  "annotations": Object {
+                    "seed-generation": "7",
+                  },
+                  "creationTimestamp": "2019-01-03T16:29:46Z",
+                  "finalizers": Array [
+                    "finalizer.mcm.ibm.com",
+                  ],
+                  "generation": 1,
+                  "labels": Object {
+                    "compliance": "compliance-all",
+                    "ignore": "false",
+                  },
+                  "name": "policy-all",
+                  "namespace": "mcm-cluster2",
+                  "ownerReferences": Array [
+                    Object {
+                      "apiVersion": "compliance.mcm.ibm.com/v1alpha1",
+                      "blockOwnerDeletion": true,
+                      "controller": true,
+                      "kind": "Compliance",
+                      "name": "compliance-all",
+                      "uid": "c8ad7adb-0f74-11e9-9723-0e8b333ab57e",
+                    },
+                  ],
+                  "resourceVersion": "5543743",
+                  "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mcm-cluster2/policies/policy-all",
+                  "uid": "c8af7ef9-0f74-11e9-9723-0e8b333ab57e",
+                },
+                "spec": Object {
+                  "complianceType": "musthave",
+                  "namespaces": Object {
+                    "exclude": Array [
+                      "kube*",
+                    ],
+                    "include": Array [
+                      "default",
+                    ],
+                  },
+                  "object-templates": Array [
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "Pod",
+                        "metadata": Object {
+                          "name": "nginx",
+                        },
+                        "spec": Object {
+                          "containers": Array [
+                            Object {
+                              "image": "nginx:1.7.9",
+                              "name": "nginx",
+                              "ports": Array [
+                                Object {
+                                  "containerPort": 80,
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:49Z",
+                            "message": "pods \`nginx\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "Namespace",
+                        "metadata": Object {
+                          "labels": Object {
+                            "name": "production",
+                          },
+                          "name": "production",
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:49Z",
+                            "message": "namespaces \`production\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "rbac.authorization.k8s.io/v1",
+                        "kind": "RoleBinding",
+                        "metadata": Object {
+                          "name": "operate-pods-rolebinding",
+                          "namespace": "default",
+                        },
+                        "roleRef": Object {
+                          "apiGroup": "rbac.authorization.k8s.io",
+                          "kind": "Role",
+                          "name": "operator",
+                        },
+                        "subjects": Array [
+                          Object {
+                            "apiGroup": "rbac.authorization.k8s.io",
+                            "kind": "User",
+                            "name": "jane",
+                          },
+                        ],
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:49Z",
+                            "message": "rolebindings \`operate-pods-rolebinding\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "policy/v1beta1",
+                        "kind": "PodSecurityPolicy",
+                        "metadata": Object {
+                          "annotations": Object {
+                            "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*",
+                          },
+                          "name": "privileged-mcm",
+                        },
+                        "spec": Object {
+                          "allowPrivilegeEscalation": true,
+                          "allowedCapabilities": Array [
+                            "*",
+                          ],
+                          "fsGroup": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "hostIPC": true,
+                          "hostNetwork": true,
+                          "hostPID": true,
+                          "hostPorts": Array [
+                            Object {
+                              "max": 65535,
+                              "min": 0,
+                            },
+                          ],
+                          "privileged": true,
+                          "runAsUser": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "seLinux": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "supplementalGroups": Object {
+                            "rule": "RunAsAny",
+                          },
+                          "volumes": Array [
+                            "*",
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:49Z",
+                            "message": "podsecuritypolicies \`privileged-mcm\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "networking.k8s.io/v1",
+                        "kind": "NetworkPolicy",
+                        "metadata": Object {
+                          "name": "allow-all-mcm",
+                        },
+                        "spec": Object {
+                          "ingress": Array [
+                            Object {},
+                          ],
+                          "podSelector": Object {},
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:49Z",
+                            "message": "networkpolicies \`allow-all-mcm\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                    Object {
+                      "complianceType": "musthave",
+                      "objectDefinition": Object {
+                        "apiVersion": "v1",
+                        "kind": "LimitRange",
+                        "metadata": Object {
+                          "name": "mem-limit-range",
+                        },
+                        "spec": Object {
+                          "limits": Array [
+                            Object {
+                              "default": Object {
+                                "memory": "512Mi",
+                              },
+                              "defaultRequest": Object {
+                                "memory": "256Mi",
+                              },
+                              "type": "Container",
+                            },
+                          ],
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {},
+                        "conditions": Array [
+                          Object {
+                            "lastTransitionTime": "2019-01-03T21:32:53Z",
+                            "message": "limitranges \`mem-limit-range\` exists as it should be, therefore the this Object template is compliant",
+                            "reason": "K8s \`must have\` object already exists",
+                            "status": "True",
+                            "type": "notification",
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  "remediationAction": "enforce",
+                  "role-templates": Array [
+                    Object {
+                      "apiVersion": "roletemplate.mcm.ibm.com/v1alpha1",
+                      "complianceType": "musthave",
+                      "metadata": Object {
+                        "creationTimestamp": null,
+                        "name": "operator-role",
+                      },
+                      "rules": Array [
+                        Object {
+                          "complianceType": "musthave",
+                          "policyRule": Object {
+                            "apiGroups": Array [
+                              "extensions",
+                              "apps",
+                            ],
+                            "resources": Array [
+                              "deployments",
+                            ],
+                            "verbs": Array [
+                              "get",
+                              "list",
+                              "watch",
+                              "create",
+                              "delete",
+                              "patch",
+                            ],
+                          },
+                        },
+                      ],
+                      "selector": Object {
+                        "matchLabels": Object {
+                          "hipaa": "true",
+                        },
+                      },
+                      "status": Object {
+                        "Compliant": "Compliant",
+                        "Validity": Object {
+                          "valid": true,
+                        },
+                      },
+                    },
+                  ],
+                },
+                "status": Object {
+                  "compliant": "Compliant",
+                  "valid": true,
+                },
+              },
+            },
+          },
+        },
+      },
     ],
   },
 }

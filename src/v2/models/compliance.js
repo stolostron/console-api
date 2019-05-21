@@ -78,31 +78,48 @@ export default class ComplianceModel {
   }
 
   async getCompliances(name, namespace) {
+    let compliancesAndPolicies = [];
     let compliances = [];
+    let policies = [];
 
     if (!name) {
       // for getting compliance list
-      const response = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/compliances`);
-      if (response.code || response.message) {
-        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
-        return [];
+      const complianceResponse = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/compliances`);
+      if (complianceResponse.code || complianceResponse.message) {
+        logger.error(`HCM ERROR ${complianceResponse.code} - ${complianceResponse.message}`);
       }
-      compliances = response.items || [];
+      compliances = complianceResponse.items || [];
+      // for getting policy list
+      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/policies`);
+      if (policyResponse.code || policyResponse.message) {
+        logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
+      }
+      policies = policyResponse.items || [];
     } else {
-      // get single compliance from a specific namespace
-      const response = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/compliances/${name}`);
-      if (response.code || response.message) {
-        logger.error(`HCM ERROR ${response.code} - ${response.message}`);
-        return [];
+      // get single compliance with a specific name - walkaround of no type field
+      const complianceResponse = await this.kubeConnector.get(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/compliances/${name}`);
+      if (complianceResponse.code || complianceResponse.message) {
+        logger.error(`HCM ERROR ${complianceResponse.code} - ${complianceResponse.message}`);
+      } else {
+        compliances.push(complianceResponse);
       }
-      compliances.push(response);
+      // get single policy with a specific name - walkaround of no type field
+      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('policyNamespace') || 'mcm'}/policies/${name}`);
+      if (policyResponse.code || policyResponse.message) {
+        logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
+      } else {
+        policies.push(policyResponse);
+      }
     }
-
-    return compliances.map(compliance => ({
-      ...compliance,
-      raw: compliance,
-      selfLink: _.get(compliance, 'metadata.selfLink', ''),
-      apiVersion: _.get(compliance, 'apiVersion', ''),
+    compliancesAndPolicies = compliances.concat(policies);
+    return compliancesAndPolicies.map(entry => ({
+      ...entry,
+      raw: entry,
+      name: _.get(entry, 'metadata.name', ''),
+      namespace: _.get(entry, 'metadata.namespace', ''),
+      remediation: _.get(entry, 'spec.remediationAction', ''),
+      selfLink: _.get(entry, 'metadata.selfLink', ''),
+      apiVersion: _.get(entry, 'apiVersion', ''),
     }));
   }
 
