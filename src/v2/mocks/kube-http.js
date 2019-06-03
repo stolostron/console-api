@@ -28,6 +28,7 @@ export default function createMockHttp() {
     },
     clusters: require('./ClusterList').default,
     userQuery: require('./UserQuery'),
+    userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
@@ -45,6 +46,7 @@ export default function createMockHttp() {
     compliances: require('./ComplianceList'),
     resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
+    genericResourceList: require('./GenericResourceList'),
   };
 
   return async function MockLib(params) {
@@ -58,6 +60,8 @@ export default function createMockHttp() {
         return state.userQuery.seleniumResponse;
       }
       switch (true) {
+        case params.json.kind.includes('SelfSubjectAccessReview'):
+          return state.userAccess;
         case params.json.metadata.name.includes('pods'):
           return state.pods.mockResourceView;
         case params.json.metadata.name.includes('nodes'):
@@ -169,6 +173,10 @@ export default function createMockHttp() {
           : state.userQuery.unitResponse;
       case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
         return state.apiList.apiPath;
+      case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):
+        return state.genericResourceList.getResourceMock;
+      case params.url.includes('/api/v1/namespaces/multicluster-endpoint'):
+        return state.genericResourceList.updateResourceMock;
       default:
         return state.apiList.mockResponse;
     }

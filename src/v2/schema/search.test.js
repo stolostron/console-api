@@ -35,4 +35,49 @@ describe('Search Resolver', () => {
         done();
       });
   });
+  test('Correctly Resolves SearchSchema Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+          {
+            searchSchema
+          }
+        `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+  test('Correctly Resolves SearchComplete Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+          {
+            searchComplete(property:"kind", query: {keywords:[], filters:[]})
+          }
+        `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+  test('Correctly Resolves SearchComplete Query With Filters', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+          {
+            searchComplete(property:"storage", query: {keywords:[], filters:[{property:"kind", values:"cluster"}]})
+          }
+        `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });

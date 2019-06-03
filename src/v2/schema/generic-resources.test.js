@@ -11,6 +11,37 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Generic Resources', () => {
+  test('Correctly Resolves Get Resource Locally', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          getResource(selfLink:"/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b", namespace:null, kind:null, name:null, cluster:"local-cluster")
+        }`,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Update Resource', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          updateResource(selfLink: "/api/v1/namespaces/multicluster-endpoint", namespace: "", kind: "namespace", name: "multicluster-endpoint", cluster: "local-cluster", body: {kind: "Namespace", apiVersion: "v1", metadata: {name: "multicluster-endpoint", selfLink: "/api/v1/namespaces/multicluster-endpoint", uid: "34ddc94d-70dc-11e9-865a-00000a15079c", resourceVersion: "2120711", creationTimestamp: "2019-05-07T15:24:29Z", labels: {icp: "system", test: "test"}}, spec: {finalizers: ["kubernetes"]}, status: {phase: "Active"}})
+        }
+        `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
   test('Should Report Error While Create Resources Mutation', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)

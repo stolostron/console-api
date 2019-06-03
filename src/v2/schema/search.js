@@ -44,7 +44,7 @@ export const resolver = {
   SearchResult: {
     count: (parent, args, { searchModel }) => searchModel.resolveSearchCount(parent),
     items: (parent, args, { searchModel }) => searchModel.resolveSearch(parent),
-    updatedTimestamp: (parent, args, { searchModel }) => searchModel.getUpdatedTimestamp(),
+    // updatedTimestamp: (parent, args, { searchModel }) => searchModel.getUpdatedTimestamp(),
     related: (parent, args, { searchModel }) => searchModel.resolveRelated(parent),
   },
 };

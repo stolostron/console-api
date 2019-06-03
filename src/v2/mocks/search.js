@@ -86,7 +86,7 @@ export default class MockSearchConnector {
   async getAllValues(property) {
     switch (property) {
       case 'kind':
-        return ['cluster', 'application', 'deployable', 'compiance'];
+        return ['cluster', 'application', 'deployable', 'compliance'];
       case 'namespace':
         return ['default', 'kube-system'];
       case 'cpu':

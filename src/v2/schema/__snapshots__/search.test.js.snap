@@ -123,3 +123,46 @@ Object {
   },
 }
 `;
+
+exports[`Search Resolver Correctly Resolves SearchComplete Query 1`] = `
+Object {
+  "data": Object {
+    "searchComplete": Array [
+      "cluster",
+      "application",
+      "deployable",
+      "compliance",
+    ],
+  },
+}
+`;
+
+exports[`Search Resolver Correctly Resolves SearchComplete Query With Filters 1`] = `
+Object {
+  "data": Object {
+    "searchComplete": Array [
+      "kind",
+      "name",
+      "namespace",
+      "cpu",
+      "created",
+    ],
+  },
+}
+`;
+
+exports[`Search Resolver Correctly Resolves SearchSchema Query 1`] = `
+Object {
+  "data": Object {
+    "searchSchema": Object {
+      "allProperties": Array [
+        "kind",
+        "name",
+        "namespace",
+        "cpu",
+        "created",
+      ],
+    },
+  },
+}
+`;
