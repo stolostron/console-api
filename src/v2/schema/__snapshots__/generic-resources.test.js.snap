@@ -723,7 +723,7 @@ Object {
 }
 `;
 
-exports[`Generic Resources Correctly Resolves Update Resource 1`] = `
+exports[`Generic Resources Correctly Resolves Update Local Resource 1`] = `
 Object {
   "data": Object {
     "updateResource": Object {
@@ -753,6 +753,14 @@ Object {
         },
       },
     },
+  },
+}
+`;
+
+exports[`Generic Resources Correctly Resolves Update Remote Resource 1`] = `
+Object {
+  "data": Object {
+    "updateResource": "platform-auto-service-update-work-1234",
   },
 }
 `;

@@ -368,7 +368,7 @@ export const getResourceMock = {
   },
 };
 
-export const updateResourceMock = {
+export const updateResourceLocalMock = {
   body: {
     data: {
       updateResource: {
@@ -395,5 +395,26 @@ export const updateResourceMock = {
         },
       },
     },
+  },
+};
+
+export const mockedUpdateWorkResponse = {
+  body: {
+    metadata: {
+      selfLink: 'test-path-to-update-work',
+    },
+  },
+};
+
+export const mockedUpdatePollResponse = {
+  body: {
+    metadata: {
+      name: 'platform-auto-service-update-work-1234',
+    },
+    items: [{
+      status: {
+        status: 'Completed',
+      },
+    }],
   },
 };

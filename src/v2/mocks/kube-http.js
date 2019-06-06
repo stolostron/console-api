@@ -86,6 +86,8 @@ export default function createMockHttp() {
           return state.compliances.mockCreateCompliance;
         case params.url.includes('applications'):
           return state.apps.mockCreateAppResponse;
+        case params.url.includes('default/work'):
+          return state.genericResourceList.mockedUpdateWorkResponse;
         default:
           return state.pods;
       }
@@ -176,7 +178,9 @@ export default function createMockHttp() {
       case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):
         return state.genericResourceList.getResourceMock;
       case params.url.includes('/api/v1/namespaces/multicluster-endpoint'):
-        return state.genericResourceList.updateResourceMock;
+        return state.genericResourceList.updateResourceLocalMock;
+      case params.url.includes('test-path-to-update-work'):
+        return state.genericResourceList.mockedUpdatePollResponse;
       default:
         return state.apiList.mockResponse;
     }

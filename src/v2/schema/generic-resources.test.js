@@ -26,13 +26,30 @@ describe('Generic Resources', () => {
       });
   });
 
-  test('Correctly Resolves Update Resource', (done) => {
+  test('Correctly Resolves Update Local Resource', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         {
           updateResource(selfLink: "/api/v1/namespaces/multicluster-endpoint", namespace: "", kind: "namespace", name: "multicluster-endpoint", cluster: "local-cluster", body: {kind: "Namespace", apiVersion: "v1", metadata: {name: "multicluster-endpoint", selfLink: "/api/v1/namespaces/multicluster-endpoint", uid: "34ddc94d-70dc-11e9-865a-00000a15079c", resourceVersion: "2120711", creationTimestamp: "2019-05-07T15:24:29Z", labels: {icp: "system", test: "test"}}, spec: {finalizers: ["kubernetes"]}, status: {phase: "Active"}})
+        }
+        `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Update Remote Resource', (done) => {
+    Date.now = jest.fn(() => 1234);
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          updateResource(selfLink: "/api/v1/namespaces/kube-system/endpoints/platform-auth-service", namespace: "kube-system", kind: "endpoints", name: "platform-auto-service", cluster: "layne-remote", body: {apiVersion: "v1", kind: "Endpoints", metadata: {creationTimestamp: "2019-04-16T01:40:57Z", labels: {app: "platform-auth-service", chart: "auth-idp-99.99.99", heritage: "Tiller", release: "auth-idp"}, name: "platform-auth-service", namespace: "kube-system", resourceVersion: "6278503", selfLink: "/api/v1/namespaces/kube-system/endpoints/platform-auth-service", uid: "ae97cf94-5fe8-11e9-bfe4-00000a150993"}, subsets: [{addresses: [{ip: "10.1.137.67", nodeName: "10.21.9.147", targetRef: {kind: "Pod", name: "auth-idp-4hj22", namespace: "kube-system", resourceVersion: "6278502", uid: "ae9d0d17-5fe8-11e9-bfe4-00000a150993"}}], ports: [{name: "p3100", port: 3100, protocol: "TCP"}, {name: "p9443", port: 9443, protocol: "TCP"}]}]})
         }
         `,
       })
