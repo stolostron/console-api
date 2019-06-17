@@ -2,8 +2,9 @@ sudo: required
 language: node_js
 
 os:
-  - linux-ppc64le
   - linux
+  - linux-ppc64le
+
 
 cache:
   apt: true
@@ -27,7 +28,7 @@ before_install:
   - make init
   - make cicd-log-init
   - source travis-env.sh
-  - make docker-login
+  - make docker-logins
   - chmod +x copyright-check.sh
 
 install:
@@ -38,10 +39,10 @@ before_script:
 
 script:
   - make copyright-check
-  - make image
+  - make docker:build
 
 after_success:
-  - make push
+  - test "$TRAVIS_EVENT_TYPE" = "pull_request" && make push
   - test "$TRAVIS_EVENT_TYPE" != "pull_request" && make release || echo "success"
   - |
       if [[ "$TRAVIS_EVENT_TYPE" != "pull_request" && "$TRAVIS_BRANCH" != "development"]]; then
@@ -51,8 +52,8 @@ after_success:
         if [[ "$BUILD_LEADER" == "YES" ]]; then
           if [[ "$BUILD_AGGREGATE_STATUS" == "others_succeeded" ]]; then
             echo "All jobs succeeded! Creating multi arch image..."
-            make manifest-tool
-            make multi-arch
+            make docker:manifest-tool
+            make docker:multi-arch
           else
             echo "Some jobs failed" && exit 1
           fi
