@@ -275,7 +275,9 @@ export default class GenericModel extends KubeModel {
     const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
     const clusterNamespace = clusterResponse[0].metadata.namespace;
     // Else If updating resource on remote cluster use an Action Type Work
-    const workName = `${name}-update-work-${this.kubeConnector.uid()}`;
+    // Limit workName to 63 characters
+    const modName = (name.length >= 36) ? name.slice(0, 36) : name;
+    const workName = `${modName}-update-work-${this.kubeConnector.uid()}`;
     const jsonBody = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'Work',
