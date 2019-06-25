@@ -124,6 +124,11 @@ release:
 	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY)
 	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY)
 
+.PHONY: image
+image: build lint prune
+	make docker:info
+	make docker:build
+
 .PHONY: app-version
 app-version:
 	$(eval WORKING_CHANGES := $(shell git status --porcelain))
@@ -160,5 +165,4 @@ test-image-size:: check-env app-version
 show-labels: app-version
 	@docker inspect $(IMAGE_REPO)/$(IMAGE_NAME_ARCH):$(IMAGE_VERSION) --format='{{json .Config.Labels}}' | tr , '\n' | tr -d '{' | tr -d '}'
 
-#include Makefile.docker
 include Makefile.cicd
