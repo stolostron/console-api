@@ -31,6 +31,8 @@ DOCKER_BUILD_OPTS = --build-arg "VCS_REF=$(VCS_REF)" \
 										--build-arg "IMAGE_SUMMARY=$(IMAGE_SUMMARY)" \
 										--build-arg "IMAGE_OPENSHIFT_TAGS=$(IMAGE_OPENSHIFT_TAGS)"
 
+SHORT_COMMIT_NAME := $(shell git rev-parse --short HEAD)
+
 ifneq ($(ARCH), x86_64)
 DOCKER_FILE = Dockerfile.$(ARCH)
 else
@@ -113,8 +115,9 @@ endif
 .PHONY: push
 push: check-env app-version
 	#docker push $(IMAGE_REPO)/$(IMAGE_NAME_ARCH):$(IMAGE_VERSION)
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY)
+	$(eval DOCKER_TAG := "$(DOCKER_TAG)-$(SHORT_COMMIT_NAME)")
+	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(DOCKER_TAG)
+	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(DOCKER_TAG)
 
 .PHONY: release
 release:
