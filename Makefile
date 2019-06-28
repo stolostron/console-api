@@ -101,7 +101,6 @@ ifeq ($(UNIT_TESTS), TRUE)
 	# @$(SELF) cicd-log-test LOG_TEST_OUTPUT_DIR=test-output
 endif
 
-################################################### moved from Makefile.docker
 .PHONY: docker-logins
 docker-logins:
 ifndef $(and DOCKER_USERNAME, DOCKER_PASSWORD)
@@ -164,5 +163,9 @@ test-image-size:: check-env app-version
 .PHONY: show-labels
 show-labels: app-version
 	@docker inspect $(IMAGE_REPO)/$(IMAGE_NAME_ARCH):$(IMAGE_VERSION) --format='{{json .Config.Labels}}' | tr , '\n' | tr -d '{' | tr -d '}'
+
+.PHONY:
+image-dev: build
+	docker build -t $(IMAGE_NAME_ARCH):latest .
 
 include Makefile.cicd

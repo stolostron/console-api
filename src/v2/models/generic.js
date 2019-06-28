@@ -36,7 +36,36 @@ export default class GenericModel extends KubeModel {
   }
 
   async createResources(args) {
-    const { resources } = args;
+    const { resources, clusterInfo } = args;
+    if (clusterInfo) {
+      const responseArr = await Promise.all(resources.map(async (resource) => {
+        const now = new Date();
+        const jsonBody = {
+          apiVersion: 'mcm.ibm.com/v1alpha1',
+          kind: 'Work',
+          metadata: {
+            name: `${resource.metadata.name}-${now.valueOf()}`,
+            namespace: clusterInfo.clusterNameSpace,
+          },
+          spec: {
+            cluster: {
+              name: clusterInfo.clusterName,
+            },
+            type: 'Action',
+            actionType: 'Create',
+            kube: {
+              resource: resource.kind.toLowerCase(),
+              namespace: resource.metadata.namespace,
+              template: resource,
+            },
+          },
+        };
+        const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterInfo.clusterNameSpace}/works`, jsonBody);
+        return response;
+      }));
+      return responseArr;
+    }
+
     const k8sPaths = await this.kubeConnector.get('/');
     // get resource end point for each resource
     const requestPaths = await Promise.all(resources.map(async resource =>
@@ -56,6 +85,7 @@ export default class GenericModel extends KubeModel {
         errors: [{ message: 'Namespace not found in the template' }],
       };
     }
+
     const result = await Promise.all(resources.map((resource, index) =>
       this.kubeConnector.post(requestPaths[index], resource)
         .catch(err => ({

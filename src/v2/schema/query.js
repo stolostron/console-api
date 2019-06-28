@@ -70,7 +70,7 @@ type Mutation {
   createCompliance(resources: [JSON]): JSON
 
   # Creates Kubernetes Resources
-  createResources(resources: [JSON]): JSON
+  createResources(resources: [JSON], clusterInfo: JSON): JSON
 
   # Update Kubernetes resources
   updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
