@@ -28,6 +28,6 @@ export const resolver = {
     },
     createResources: (parent, args, { genericModel }) => genericModel.createResources(args),
     deleteResource: (root, args, { genericModel }) =>
-      genericModel.deleteResource(args.selfLink, args.childResources),
+      genericModel.deleteResource(args),
   },
 };

@@ -85,7 +85,7 @@ type Mutation {
   setHelmRepo(input: HelmRepoInput): HelmRepo
 
   # Delete resource via selfLink
-  deleteResource(selfLink: String!, childResources: JSON): JSON
+  deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
 }
 
 # Common fields for all Kubernetes objects
