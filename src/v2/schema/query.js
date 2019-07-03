@@ -11,31 +11,31 @@
 export const typeDef = `
 type Query {
   applications(name: String, namespace: String): [Application]
-  charts: [HelmChart]
+  charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
   cluster(name: String, namespace: String): [Cluster]
   clusters: [Cluster]
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
   overview(demoMode: Boolean): Overview
-  namespaces: [Namespace]
-  nodes: [Node]
+  namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
+  nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pod(name: String, namespace: String, clusterName: String): [Pod]
-  pods: [Pod]
-  pvs: [PVs]
-  pvsClaims: [PVsClaims]
-  releases: [HelmRel]
+  pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
+  pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
+  pvsClaims: [PVsClaims] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
+  releases: [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   release(name: String, namespace: String, clusterName: String): [HelmRel]
-  releasesFromSearch: [HelmRel]
-  repos: [HelmRepo]
+  releasesFromSearch: [HelmRel] @deprecated(reason: "Moved to search-api service in 4.1")
+  repos: [HelmRepo] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
   # Generic call to update resources on both local and remote clusters
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
 
-  search(input: [SearchInput]): [SearchResult]
+  search(input: [SearchInput]): [SearchResult] @deprecated(reason: "Moved to search-api service in 4.1")
 
   # Get all values for the given property. If a query is passed, then results will be filtered to only those matching the query.
-  searchComplete(property: String!, query: SearchInput): [String]
-  searchSchema: JSON
+  searchComplete(property: String!, query: SearchInput): [String] @deprecated(reason: "Moved to search-api service in 4.1")
+  searchSchema: JSON @deprecated(reason: "Moved to search-api service in 4.1")
   userQueries: [userQuery]
 
 
@@ -82,7 +82,7 @@ type Mutation {
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
-  setHelmRepo(input: HelmRepoInput): HelmRepo
+  setHelmRepo(input: HelmRepoInput): HelmRepo @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
 
   # Delete resource via selfLink
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON

@@ -53,7 +53,7 @@ async function getKubeToken({
       if (idToken) {
         cache.set(accessToken, idToken);
       } else {
-        throw new Error(`Authentication error: ${response.body}`);
+        throw new Error(`Authentication error: ${JSON.stringify(response.body)}`);
       }
     }
   }
