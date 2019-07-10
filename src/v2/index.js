@@ -24,6 +24,7 @@ import GremlinConnector from './connectors/gremlin';
 import RedisGraphConnector from './connectors/redisGraph';
 
 import ApplicationModel from './models/application';
+import ChannelModel from './models/channel';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import QueryModel from './models/userquery';
@@ -118,6 +119,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   const context = {
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
+    channelModel: new ChannelModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
     queryModel: new QueryModel({ kubeConnector, req }),

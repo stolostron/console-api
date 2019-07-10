@@ -11,6 +11,7 @@ import _ from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 
 import * as applications from './application';
+import * as channels from './channel';
 import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as compliance from './compliance';
@@ -33,6 +34,7 @@ import * as userQuery from './user-query';
 
 const modules = [
   applications,
+  channels,
   charts,
   cluster,
   compliance,

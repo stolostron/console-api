@@ -161,6 +161,22 @@ export const apiPath = {
         ],
       },
       {
+        name: 'channels',
+        singularName: '',
+        namespaced: true,
+        kind: 'Channel',
+        verbs: [
+          'create',
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'update',
+          'watch',
+        ],
+      },
+      {
         name: 'applications/status',
         singularName: '',
         namespaced: true,

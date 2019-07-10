@@ -6,3 +6,5 @@ config/config-development.json
 coverage
 build-harness
 .build-harness
+.history
+.project
