@@ -11,7 +11,8 @@
 export const typeDef = `
 type Query {
   applications(name: String, namespace: String): [Application]
-  channels(name: String, namespace: String): [Channel]  
+  channels(name: String, namespace: String): [Channel]
+  subscriptions(name: String!, namespace: String!): [Subscription]
   charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
   cluster(name: String, namespace: String): [Cluster]
   clusters: [Cluster]
@@ -59,6 +60,8 @@ type Mutation {
   createApplication(resources: [JSON]): JSON
 
   createChannel(resources: [JSON]): JSON
+
+  createSubscription(resources: [JSON]): JSON
 
   # Creates a Kubernetes Policy
   createPolicy(resources: [JSON]): JSON

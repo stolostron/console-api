@@ -84,6 +84,7 @@ export default class SearchModel {
     const prioritizedRelationships = [
       'application',
       'channel',
+      'subscription',
       'cluster',
       'compliance',
       'node',

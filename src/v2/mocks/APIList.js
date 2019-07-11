@@ -177,6 +177,22 @@ export const apiPath = {
         ],
       },
       {
+        name: 'subscriptions',
+        singularName: '',
+        namespaced: true,
+        kind: 'Subscription',
+        verbs: [
+          'create',
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'update',
+          'watch',
+        ],
+      },
+      {
         name: 'applications/status',
         singularName: '',
         namespaced: true,

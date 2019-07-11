@@ -25,6 +25,7 @@ import RedisGraphConnector from './connectors/redisGraph';
 
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
+import SubscriptionModel from './models/subscription';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import QueryModel from './models/userquery';
@@ -120,6 +121,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
     channelModel: new ChannelModel({ kubeConnector }),
+    subscriptionModel: new SubscriptionModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
     queryModel: new QueryModel({ kubeConnector, req }),
