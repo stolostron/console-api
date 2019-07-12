@@ -9,89 +9,122 @@
 
 // eslint-disable-next-line
 export const typeDef = `
+# Multicloud Manager Queries
 type Query {
+  # Get application resources.
   applications(name: String, namespace: String): [Application]
-  channels(name: String, namespace: String): [Channel]
-  subscriptions(name: String!, namespace: String!): [Subscription]
-  charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
+
+  # Get channel resources.
+  channels(name: String!, namespace: String!): [Channel]
+
+  # Get a cluster resource.
   cluster(name: String, namespace: String): [Cluster]
+
+  # List all managed clusters.
   clusters: [Cluster]
+
+  # Get any kubernetes resource from any managed cluster.
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
+
+  # Retrieves logs for the given container.
+  logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
+
+  # Resolves the data needed to render the overview page.
   overview(demoMode: Boolean): Overview
+
+  # Get placement policies.
+  placementPolicies (selector: JSON): [PlacementPolicy]
+
+  # Get policies.
+  policies(name: String, namespace: String, clusterName: String): [Policy]
+
+  # Get subscription resources.
+  subscriptions(name: String!, namespace: String!): [Subscription]
+
+  # Update any Kubernetes resources on both local and managed clusters.
+  # FIXME: This must be moved to mutations, query operations should not change any data.
+  updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
+
+  # Resolves if the current user is authorized to access a given resource.
+  userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
+
+  # Get saved search queries for the current user.
+  userQueries: [userQuery]
+
+  # Used for Topology.
+  filters: Filters
+
+  # Used for Topology.
+  labels: [Label]
+
+  # Used for Topology.
+  resourceTypes: [String]
+
+  # Gets data for the topology diagram.
+  topology(filter: Filter): Topology
+
+
+  # DEPRECATED QUERIES
+  charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
+  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
   namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pod(name: String, namespace: String, clusterName: String): [Pod]
+  pod(name: String, namespace: String, clusterName: String): [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pvsClaims: [PVsClaims] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   releases: [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  release(name: String, namespace: String, clusterName: String): [HelmRel]
+  release(name: String, namespace: String, clusterName: String): [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   releasesFromSearch: [HelmRel] @deprecated(reason: "Moved to search-api service in 4.1")
   repos: [HelmRepo] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
-  logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
-  userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
-  # Generic call to update resources on both local and remote clusters
-  updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
-
   search(input: [SearchInput]): [SearchResult] @deprecated(reason: "Moved to search-api service in 4.1")
-
   # Get all values for the given property. If a query is passed, then results will be filtered to only those matching the query.
   searchComplete(property: String!, query: SearchInput): [String] @deprecated(reason: "Moved to search-api service in 4.1")
   searchSchema: JSON @deprecated(reason: "Moved to search-api service in 4.1")
-  userQueries: [userQuery]
-
-
-  # Policies and Compliances
-  policies(name: String, namespace: String, clusterName: String): [Policy]
-  compliances(name: String, namespace: String): [Compliance]
-  placementPolicies (selector: JSON): [PlacementPolicy]
-
-  # Topology
-  filters: Filters
-  labels: [Label]
-  resourceTypes: [String]
-  topology(filter: Filter): Topology
 }
 
+# Multicloud Manager Mutations
 type Mutation {
   # Creates an Application.
   # Requires a resource of kind "Application".
   # Other supported kinds are: ConfigMap, Deployable, DeployableOverride, and PlacementPolicy
   createApplication(resources: [JSON]): JSON
 
+  # Creates a channel resource.
   createChannel(resources: [JSON]): JSON
 
-  createSubscription(resources: [JSON]): JSON
-
-  # Creates a Kubernetes Policy
+  # Creates a Kubernetes Policy.
   createPolicy(resources: [JSON]): JSON
 
-  # Save a user query
-  saveQuery(resource: JSON): JSON
+  # Creates a subscription resource.
+  createSubscription(resources: [JSON]): JSON
 
-  # Delete a user query
-  deleteQuery(resource: JSON): JSON
-
-  # Creates Kubernetes Compliance
-  createCompliance(resources: [JSON]): JSON
-
-  # Creates Kubernetes Resources
+  # Creates Kubernetes resources in any cluster.
   createResources(resources: [JSON], clusterInfo: JSON): JSON
 
-  # Update Kubernetes resources
+  # Updates Kubernetes resources in any managed cluster.
   updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
-  # Update Kubernetes resources labels
+  # Updates the labels of a Kubernetes resource.
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
-  # Delete helm release on specific cluster
+  # Delete helm release on specific cluster. Used by catalog.
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
-  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse]
-  setHelmRepo(input: HelmRepoInput): HelmRepo @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
+  # Delete search query for the current user.
+  deleteQuery(resource: JSON): JSON
 
-  # Delete resource via selfLink
+  # Delete any Kubernetes resource via selfLink
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
+
+  # Save a search query for the current user.
+  saveQuery(resource: JSON): JSON
+
+
+  # DEPRECATED MUTATIONS
+  createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
+  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse] @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
+  setHelmRepo(input: HelmRepoInput): HelmRepo @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
 }
 
 # Common fields for all Kubernetes objects
