@@ -6,7 +6,6 @@
 ```
 cfcRouterUrl
 mongodbUrl
-useRedisBackend - default false - switch search feature to use redisGraph instead of gremlin.
 redisEndpoint - Endpoint of RedisGraph server ie. "//redis-host:6379"
 redisPassword - Password to authenticate with the RedisGraph server.
 PLATFORM_IDENTITY_PROVIDER_URL

@@ -1,10 +1,6 @@
 {
   "complianceNamespace": "mcm",
   "contextPath": "/hcmuiapi",
-  "gremlinEndpoint": "ws://localhost:8182/gremlin",
-  "gremlinPassword": "",
-  "gremlinSecurityEnabled": false,
-  "gremlinUsername": "",
   "hcmPollInterval": 100,
   "hcmPollTimeout": 50000,
   "hcmUrl": "",
@@ -13,6 +9,5 @@
   "mongodbUrl": "mongodb://localhost:27017/weave",
   "redisEndpoint": "//localhost:6379",
   "redisSSLEndpoint": "",
-  "redisPassword": "",
-  "useRedisBackend": true
+  "redisPassword": ""
 }

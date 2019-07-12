@@ -11,7 +11,7 @@ import { isRequired } from '../lib/utils';
 import logger from '../lib/logger';
 
 // TODO: Keyword filtering currently requires that we transfer a large number of records from the
-// gremlin-server to filter locally. We need to investigate alternatives to improve performance.
+// redis-server to filter locally. We need to investigate alternatives to improve performance.
 function filterByKeywords(resultSet, keywords) {
   /* Regular expression resolves to a string like:
    *     /(?=.*keyword1)(?=.*keyword2)(?=.*keyword3)/gi

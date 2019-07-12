@@ -36,8 +36,6 @@ const jestConfig = {
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
     '!src/**/mocks/*.js',
-    '!src/v2/connectors/gremlin.js', // Excluding from coverage report because gremlin will be deleted.
-    '!src/v2/connectors/gremlinConnectionHelper.js', // Excluding from coverage report because gremlin will be deleted.
   ],
   testEnvironment: 'node',
   setupTestFrameworkScriptFile: './jest.setup.js',

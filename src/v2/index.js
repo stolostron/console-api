@@ -20,7 +20,6 @@ import cookieParser from 'cookie-parser';
 import logger from './lib/logger';
 
 import KubeConnector from './connectors/kube';
-import GremlinConnector from './connectors/gremlin';
 import RedisGraphConnector from './connectors/redisGraph';
 
 import ApplicationModel from './models/application';
@@ -87,10 +86,8 @@ if (isProd) {
 if (isTest) {
   logger.info('Running in mock mode');
   logger.info('Using Mocked search connector.');
-} else if (config.get('useRedisBackend') === true || config.get('useRedisBackend') === 'true') {
-  logger.info('Using RedisGraph search connector.');
 } else {
-  logger.info('Using Gremlin search connector.');
+  logger.info('Using RedisGraph search connector.');
 }
 
 graphQLServer.use(...auth);
@@ -111,10 +108,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   let searchConnector;
   if (isTest) {
     searchConnector = new MockSearchConnector();
-  } else if (config.get('useRedisBackend') === true || config.get('useRedisBackend') === 'true') {
-    searchConnector = new RedisGraphConnector({ rbac: namespaces, req });
   } else {
-    searchConnector = new GremlinConnector({ rbac: namespaces, req });
+    searchConnector = new RedisGraphConnector({ rbac: namespaces, req });
   }
 
   const context = {
