@@ -14,8 +14,8 @@ type Query {
   # Get application resources.
   applications(name: String, namespace: String): [Application]
 
-  # Get channel resources.
-  channels(name: String!, namespace: String!): [Channel]
+  # Get all channel resources. Optionally, specify name and namespace to filter results.
+  channels(name: String, namespace: String): [Channel]
 
   # Get a cluster resource.
   cluster(name: String, namespace: String): [Cluster]
@@ -38,8 +38,8 @@ type Query {
   # Get policies.
   policies(name: String, namespace: String, clusterName: String): [Policy]
 
-  # Get subscription resources.
-  subscriptions(name: String!, namespace: String!): [Subscription]
+  # Get all subscription resources. Optionally, specify name and namespace to filter results.
+  subscriptions(name: String, namespace: String): [Subscription]
 
   # Update any Kubernetes resources on both local and managed clusters.
   # FIXME: This must be moved to mutations, query operations should not change any data.
