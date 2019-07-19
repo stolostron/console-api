@@ -32,6 +32,7 @@ import * as search from './search';
 import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as userQuery from './user-query';
+import * as cemIncident from './cem-incident';
 
 const modules = [
   applications,
@@ -56,6 +57,7 @@ const modules = [
   topology,
   userAccess,
   userQuery,
+  cemIncident,
 ];
 
 const mainDefs = [`

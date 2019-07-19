@@ -51,6 +51,9 @@ type Query {
   # Get saved search queries for the current user.
   userQueries: [userQuery]
 
+  # Get cloud event manager queries .
+  cemIncidents: [cemIncident]
+
   # Used for Topology.
   filters: Filters
 

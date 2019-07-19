@@ -28,6 +28,7 @@ import SubscriptionModel from './models/subscription';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import QueryModel from './models/userquery';
+import CemModel from './models/cemincident';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import MongoModel from './models/mongo';
@@ -120,6 +121,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
     queryModel: new QueryModel({ kubeConnector, req }),
+    cemModel: new CemModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
