@@ -31,6 +31,7 @@ IMAGE_SUMMARY=$(IMAGE_DESCRIPTION)
 IMAGE_OPENSHIFT_TAGS=mcm ui api
 
 
-DOCKER_SCRATCH_REGISTRY ?= hyc-cloud-private-scratch-docker-local.artifactory.swg-devops.com
-DOCKER_EDGE_REGISTRY ?= hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com
+DOCKER_SCRATCH_REGISTRY			?= hyc-cloud-private-scratch-docker-local.artifactory.swg-devops.com
+DOCKER_EDGE_REGISTRY 				?= hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com
 DOCKER_INTEGRATION_REGISTRY ?= hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com
+DOCKER_REGISTRY             ?=$(DOCKER_INTEGRATION_REGISTRY)
