@@ -18,9 +18,12 @@ type Channel implements K8sObject {
   objectPath: String 
   #Defines the required credentials to access channel. The secret should sit inside the channel namespace.
   secretRef: String
+  configRef: String
   metadata: Metadata
   raw: JSON
-  selector: JSON  
+  selector: JSON
+  gates: JSON
+  sourceNamespaces: JSON
 }
 
 `;

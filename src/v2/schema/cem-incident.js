@@ -19,6 +19,7 @@ type cemIncident {
   incidentURL: String
   eventsURL: String
   timelineURL: String
+  eventSummary: JSON
 }
 `;
 

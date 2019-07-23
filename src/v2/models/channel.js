@@ -93,6 +93,8 @@ export default class ChannelModel extends KubeModel {
       objectPath: channel.spec.pathname,
       secret: channel.spec.secretRef ? channel.spec.secretRef.name : '',
       raw: channel,
+      gates: channel.spec.gates || {},
+      sourceNamespaces: channel.spec.sourceNamespaces || {},
     }));
   }
 }
