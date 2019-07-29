@@ -20,7 +20,6 @@ import cookieParser from 'cookie-parser';
 import logger from './lib/logger';
 
 import KubeConnector from './connectors/kube';
-import RedisGraphConnector from './connectors/redisGraph';
 
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
@@ -33,10 +32,8 @@ import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
-import SearchModel from './models/search';
 
 import createMockKubeHTTP from './mocks/kube-http';
-import MockSearchConnector from './mocks/search';
 import schema from './schema/';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
@@ -86,9 +83,6 @@ if (isProd) {
 
 if (isTest) {
   logger.info('Running in mock mode');
-  logger.info('Using Mocked search connector.');
-} else {
-  logger.info('Using RedisGraph search connector.');
 }
 
 graphQLServer.use(...auth);
@@ -106,13 +100,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     namespaces,
   });
 
-  let searchConnector;
-  if (isTest) {
-    searchConnector = new MockSearchConnector();
-  } else {
-    searchConnector = new RedisGraphConnector({ rbac: namespaces, req });
-  }
-
   const context = {
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
@@ -126,7 +113,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     helmModel: new HelmModel({ kubeConnector }),
     mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
-    searchModel: new SearchModel({ searchConnector }),
   };
 
   return { formatError, schema, context };

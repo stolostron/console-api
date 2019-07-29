@@ -25,7 +25,6 @@ export const resolver = {
     release: (root, args, { helmModel }) =>
       helmModel.getRelease(args.name, args.namespace, args.clusterName),
     releases: (root, args, { helmModel, req }) => helmModel.getReleases({ user: req.user }),
-    releasesFromSearch: (root, args, { searchModel }) => searchModel.resolveSearch({ filters: [{ property: 'kind', values: ['releases'] }] }),
   },
   HelmRel: {
     cluster: (parent, args, { clusterModel, req }) =>

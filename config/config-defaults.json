@@ -6,8 +6,5 @@
   "hcmUrl": "",
   "httpPort": 4000,
   "localKubeToken": "",
-  "mongodbUrl": "mongodb://localhost:27017/weave",
-  "redisEndpoint": "//localhost:6379",
-  "redisSSLEndpoint": "",
-  "redisPassword": ""
+  "mongodbUrl": "mongodb://localhost:27017/weave"
 }

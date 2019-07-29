@@ -6,8 +6,6 @@
 ```
 cfcRouterUrl
 mongodbUrl
-redisEndpoint - Endpoint of RedisGraph server ie. "//redis-host:6379"
-redisPassword - Password to authenticate with the RedisGraph server.
 PLATFORM_IDENTITY_PROVIDER_URL
 ARTIFACTORY_USER - mcmdev@us.ibm.com
 ARTIFACTORY_PWD - Artifactory API KEY, base64 encoded. You can get this value for functional id mcmdev@us.ibm.com from: https://ibm.ent.box.com/notes/287638278960

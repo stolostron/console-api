@@ -28,7 +28,6 @@ import * as genericResources from './generic-resources';
 import * as query from './query';
 import * as releases from './helmrels';
 import * as repo from './helmrepo';
-import * as search from './search';
 import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as userQuery from './user-query';
@@ -53,7 +52,6 @@ const modules = [
   genericResources,
   releases,
   repo,
-  search,
   topology,
   userAccess,
   userQuery,

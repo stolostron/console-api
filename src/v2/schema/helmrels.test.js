@@ -41,35 +41,3 @@ describe('Helm Release Resolver', () => {
       });
   });
 });
-
-
-describe('Helm Release Resolver from Search', () => {
-  test('Correctly Resolves Helm Release Query', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        {
-          releasesFromSearch {
-            chartName
-            chartVersion
-            namespace
-            status
-            version
-            name
-            cluster {
-              metadata {
-                name
-              }
-            }
-            lastDeployed
-          }
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-});
