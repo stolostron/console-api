@@ -80,10 +80,6 @@ type Query {
   release(name: String, namespace: String, clusterName: String): [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   releasesFromSearch: [HelmRel] @deprecated(reason: "Moved to search-api service in 4.1")
   repos: [HelmRepo] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
-  # search(input: [SearchInput]): [SearchResult] @deprecated(reason: "Moved to search-api service in 4.1")
-  # Get all values for the given property. If a query is passed, then results will be filtered to only those matching the query.
-  # searchComplete(property: String!, query: SearchInput): [String] @deprecated(reason: "Moved to search-api service in 4.1")
-  # searchSchema: JSON @deprecated(reason: "Moved to search-api service in 4.1")
 }
 
 # Multicloud Manager Mutations
