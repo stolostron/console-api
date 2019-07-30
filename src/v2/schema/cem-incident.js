@@ -27,5 +27,7 @@ export const resolver = {
   Query: {
     cemIncidents: (parent, args, { cemModel, req }) =>
       cemModel.getIncidents({ ...args, req }),
+    cemIncidentsForApplication: (parent, args, { cemModel, req }) =>
+      cemModel.getIncidentsForApplication({ ...args, req }),
   },
 };

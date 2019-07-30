@@ -54,6 +54,9 @@ type Query {
   # Get cloud event manager queries .
   cemIncidents: [cemIncident]
 
+  # Get cloud event manager queries .
+  cemIncidentsForApplication(name: String!, namespace: String): [cemIncident]
+
   # Used for Topology.
   filters: Filters
 
