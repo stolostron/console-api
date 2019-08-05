@@ -18,7 +18,7 @@ export default class CemModel extends KubeModel {
     const cemsid = _.get(args.req, "cookies['cem.sid']");
     const cemxsrfToken = _.get(args.req, "cookies['cem.xsrf']");
     const userAgent = 'test'; // TODO put actual value
-    const startTime = moment().subtract(1, 'months').format('YYYY-MM-DDTHH:mm:ssZ');
+    const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
     // for getting cem incidents list
     const opts = {
       url: `${config.get('cfcRouterUrl')}/cemui/api/resources/v1/incidentQueries?start_time=${startTime}`,
@@ -57,7 +57,7 @@ export default class CemModel extends KubeModel {
     const cemxsrfToken = _.get(args.req, "cookies['cem.xsrf']");
     const userAgent = 'test'; // TODO put actual value
     const { name } = args;
-    const startTime = moment().subtract(1, 'months').format('YYYY-MM-DDTHH:mm:ssZ');
+    const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
     // for getting cem incidents list
     const opts = {
       url: `${config.get('cfcRouterUrl')}/cemui/api/resources/v1/incidentQueries?start_time=${startTime}`,
