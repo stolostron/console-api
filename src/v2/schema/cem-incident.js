@@ -14,12 +14,15 @@ type cemIncident {
   lastChanged: String
   priority: String
   escalated: String
-  searchText: String
   correlationDetails: JSON
   incidentURL: String
   eventsURL: String
   timelineURL: String
-  eventSummary: JSON
+  owner: String
+  team: String
+  state: String
+  summary: String
+  description: String
 }
 `;
 

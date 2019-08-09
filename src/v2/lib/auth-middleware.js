@@ -72,6 +72,17 @@ async function getNamespaces({ iamToken, user }) {
   return idConnector.get(`/identity/api/v1/users/${user}/getTeamResources?resourceType=namespace`);
 }
 
+async function getAccountData({ iamToken, user }) {
+  const options = { iamToken };
+  if (process.env.NODE_ENV === 'test') {
+    options.httpLib = createMockIAMHTTP();
+  }
+
+  const idConnector = new IDConnector(options);
+
+  return idConnector.get(`/identity/api/v1/users/${user}`);
+}
+
 export default function createAuthMiddleWare({
   cache = lru({
     max: 1000,
@@ -124,6 +135,12 @@ export default function createAuthMiddleWare({
         iamToken,
         user: userName,
       }),
+      userAccount: await getAccountData({
+        // cookies field doesn't exist on test case requests
+        iamToken,
+        user: userName,
+      }),
+
     };
 
     next();

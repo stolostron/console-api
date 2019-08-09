@@ -28,6 +28,7 @@ export default class CemModel extends KubeModel {
         'User-Agent': `${userAgent}`,
       },
     };
+
     const postBody = {
       incident: {
         operator: 'and',
@@ -52,39 +53,21 @@ export default class CemModel extends KubeModel {
     return response || [];
   }
 
-  async getIncidentsForApplication(args = {}) {
-    const cemsid = _.get(args.req, "cookies['cem.sid']");
-    const cemxsrfToken = _.get(args.req, "cookies['cem.xsrf']");
-    const userAgent = 'test'; // TODO put actual value
-    const { name } = args;
-    const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
-    // for getting cem incidents list
+  async getIncidentsForApplication(args) {
+    const icpToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
+    const subscriptionId = args.req.user.userAccount && args.req.user.userAccount.activeAccountId;
+    // const { name } = args;
+    // const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
+    // const incidentFilter = `state == 'unassigned'`;
+    // const eventFilter = `resource.application contains ${name}`;
     const opts = {
-      url: `${config.get('cfcRouterUrl')}/cemui/api/resources/v1/incidentQueries?start_time=${startTime}`,
+      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1`,
       headers: {
-        'X-CEM-XSRF': `${cemxsrfToken}`,
-        Cookie: `cem.sid=${cemsid}`,
-        'User-Agent': `${userAgent}`,
+        Authorization: `bearer origin:icp:${icpToken}`,
+        'X-Subscription-ID': `${subscriptionId}`,
       },
     };
-    const postBody = {
-      incident: {
-        operator: 'and',
-        value: [
-          {
-            attribute: 'state',
-            operator: 'contains',
-            value: ['unassigned', 'inprogress'],
-          },
-          {
-            attribute: 'correlationDetails.application',
-            operator: 'contains',
-            value: `${name}`,
-          },
-        ],
-      },
-    };
-    const response = await this.kubeConnector.post('', postBody, opts, true);
+    const response = await this.kubeConnector.get('', opts, true);
 
     if (response.code || response.message) {
       // don't throw error, send empty response
