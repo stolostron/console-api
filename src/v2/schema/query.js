@@ -51,6 +51,9 @@ type Query {
   # Get saved search queries for the current user.
   userQueries: [userQuery]
 
+  # Get logged in user information
+  userInfo: userInfo
+
   # Get cloud event manager queries .
   cemIncidents: [cemIncident]
 

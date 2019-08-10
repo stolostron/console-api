@@ -31,6 +31,7 @@ import * as repo from './helmrepo';
 import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as userQuery from './user-query';
+import * as userInfo from './user-info';
 import * as cemIncident from './cem-incident';
 
 const modules = [
@@ -55,6 +56,7 @@ const modules = [
   topology,
   userAccess,
   userQuery,
+  userInfo,
   cemIncident,
 ];
 

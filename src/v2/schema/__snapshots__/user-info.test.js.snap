@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Info Resolver Correctly Resolves User Info Query 1`] = `
+Object {
+  "data": Object {
+    "items": Object {
+      "activeAccountId": null,
+      "activeAccountName": null,
+      "userId": null,
+    },
+  },
+}
+`;

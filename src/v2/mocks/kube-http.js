@@ -47,6 +47,7 @@ export default function createMockHttp() {
     resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
+    userInfo: require('./UserInfo'),
   };
 
   return async function MockLib(params) {
@@ -58,6 +59,9 @@ export default function createMockHttp() {
         }
         cache.set('savedUserQuery', true);
         return state.userQuery.seleniumResponse;
+      }
+      if (params.json.userinfo) {
+        return state.userInfo;
       }
       switch (true) {
         case params.json.kind.includes('SelfSubjectAccessReview'):
