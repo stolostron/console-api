@@ -9,6 +9,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import queryString from 'querystring';
 import KubeModel from './kube';
 import config from '../../../config';
 import logger from '../lib/logger';
@@ -56,12 +57,15 @@ export default class CemModel extends KubeModel {
   async getIncidentsForApplication(args) {
     const icpToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
     const subscriptionId = args.req.user.userAccount && args.req.user.userAccount.activeAccountId;
-    // const { name } = args;
-    // const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
-    // const incidentFilter = `state == 'unassigned'`;
-    // const eventFilter = `resource.application contains ${name}`;
+    const { name } = args;
+    const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
+    const params = {
+      starttime: `${startTime}`,
+      event_filter_1: `resource.application == '${name}'`,
+    };
+    const qString = queryString.stringify(params);
     const opts = {
-      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1`,
+      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1?${qString}`,
       headers: {
         Authorization: `bearer origin:icp:${icpToken}`,
         'X-Subscription-ID': `${subscriptionId}`,
