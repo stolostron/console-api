@@ -23,6 +23,10 @@ type Query {
   # List all managed clusters.
   clusters: [Cluster]
 
+  # List all cloud connections and providers
+  connections: [Connection]
+  providers: [Provider]
+
   # Get any kubernetes resource from any managed cluster.
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
 
@@ -107,6 +111,15 @@ type Mutation {
   # Creates Kubernetes resources in any cluster.
   createResources(resources: [JSON], clusterInfo: JSON): JSON
 
+  # Creates a cloud connection
+  createCloudConnection(body: JSON) : JSON
+
+  # Delete a cloud connection
+  deleteCloudConnection(namespace: String!, name: String!) : JSON
+
+  # Edit a cloud connection
+  editCloudConnection(body: JSON, namespace: String!, name: String!) : JSON
+
   # Updates Kubernetes resources in any managed cluster.
   updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
@@ -149,10 +162,29 @@ type Metadata {
   status: String
   uid: String
 }
+
+# fields for all API objects
+interface ConnectionObject {
+  metadata: ConnectionMetadata
+}
+
+#Common fields for all API objects
+type ConnectionMetadata {
+  name: String
+  namespace: String
+  provider: String
+  name_namespace: String
+}
+
 `;
 
 export const resolver = {
   K8sObject: {
+    __resolveType() {
+      return null;
+    },
+  },
+  ConnectionObject: {
     __resolveType() {
       return null;
     },

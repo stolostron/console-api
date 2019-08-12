@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cloud Connections Correctly Resolves Create Cloud Connection 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 121,
+          "line": 3,
+        },
+      ],
+      "message": "Syntax Error: Unterminated string.",
+    },
+  ],
+}
+`;
+
+exports[`Cloud Connections Correctly Resolves Delete Cloud Connection 1`] = `
+Object {
+  "data": Object {
+    "deleteCloudConnection": null,
+  },
+}
+`;
+
+exports[`Cloud Connections Correctly Resolves Edit Cloud Connection 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 119,
+          "line": 3,
+        },
+      ],
+      "message": "Syntax Error: Unterminated string.",
+    },
+  ],
+}
+`;
+
+exports[`Cloud Connections Correctly Resolves Get Cloud Connections 1`] = `
+Object {
+  "data": Object {
+    "connections": Array [
+      Object {
+        "metadata": Object {
+          "name": null,
+          "name_namespace": null,
+          "namespace": null,
+          "provider": null,
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`Cloud Connections Correctly Resolves Get Cloud Providers 1`] = `
+Object {
+  "data": Object {
+    "providers": Array [
+      Object {
+        "clusterMetadata": "",
+        "clusterValues": "",
+        "configMetadata": "",
+        "configValues": "",
+        "longname": "iks-test",
+        "name": "iks-test",
+        "statusCode": 200,
+      },
+    ],
+  },
+}
+`;

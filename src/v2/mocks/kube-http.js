@@ -47,6 +47,7 @@ export default function createMockHttp() {
     resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
+    connectionsList: require('./ConnectionsList'),
     userInfo: require('./UserInfo'),
   };
 
@@ -92,6 +93,8 @@ export default function createMockHttp() {
           return state.apps.mockCreateAppResponse;
         case params.url.includes('default/work'):
           return state.genericResourceList.mockedUpdateWorkResponse;
+        case params.url.includes('api/v1/cloudconnections'):
+          return state.connectionsList.getCloudConnectionsResponse;
         default:
           return state.pods;
       }
@@ -185,6 +188,8 @@ export default function createMockHttp() {
         return state.genericResourceList.updateResourceLocalMock;
       case params.url.includes('test-path-to-update-work'):
         return state.genericResourceList.mockedUpdatePollResponse;
+      case params.url.includes('api/v1/cloudproviders'):
+        return state.connectionsList.getCloudProvidersResponse;
       default:
         return state.apiList.mockResponse;
     }
