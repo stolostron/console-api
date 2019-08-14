@@ -76,6 +76,7 @@ type Query {
   # Gets data for the topology diagram.
   topology(filter: Filter): Topology
 
+  getAutomatedImportStatus(namespace: String, name: String): JSON
 
   # DEPRECATED QUERIES
   charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
@@ -138,6 +139,9 @@ type Mutation {
   # Save a search query for the current user.
   saveQuery(resource: JSON): JSON
 
+  createClusterResource(body: String): JSON
+
+  automatedImport(namespace: String, name: String, body: JSON): JSON
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")

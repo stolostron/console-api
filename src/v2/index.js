@@ -16,11 +16,13 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import _ from 'lodash';
 
 import logger from './lib/logger';
 
 import ApiConnector from './connectors/api';
 import KubeConnector from './connectors/kube';
+import PlatformApiConnector from './connectors/platformApi';
 
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
@@ -35,6 +37,7 @@ import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
+import PlatformApiModel from './models/platformApi';
 
 import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
@@ -103,6 +106,11 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     namespaces,
   });
 
+  const platformApiConnector = new PlatformApiConnector({
+    token: _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie'),
+    httpLib: kubeHTTP,
+  });
+
   const apiConnector = new ApiConnector({
     token: req.cookies['cfc-access-token-cookie'],
     httpLib: kubeHTTP,
@@ -123,6 +131,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     helmModel: new HelmModel({ kubeConnector }),
     mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
+    platformApiModel: new PlatformApiModel({ platformApiConnector }),
   };
 
   return { formatError, schema, context };

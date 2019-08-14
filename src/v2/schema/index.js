@@ -34,6 +34,7 @@ import * as userAccess from './user-access';
 import * as userQuery from './user-query';
 import * as userInfo from './user-info';
 import * as cemIncident from './cem-incident';
+import * as platformApi from './platformApi';
 
 const modules = [
   applications,
@@ -60,6 +61,7 @@ const modules = [
   userQuery,
   userInfo,
   cemIncident,
+  platformApi,
 ];
 
 const mainDefs = [`
