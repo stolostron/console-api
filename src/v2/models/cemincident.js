@@ -51,7 +51,7 @@ export default class CemModel extends KubeModel {
       logger.error(`CEM ERROR ${response.code} - ${response.message}`);
       return [];
     }
-    return response || [];
+    return response instanceof Array ? response : [];
   }
 
   async getIncidentsForApplication(args) {
@@ -78,6 +78,6 @@ export default class CemModel extends KubeModel {
       logger.error(`CEM ERROR ${response.code} - ${response.message}`);
       return [];
     }
-    return response || [];
+    return response instanceof Array ? response : [];
   }
 }
