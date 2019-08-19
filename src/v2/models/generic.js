@@ -374,7 +374,7 @@ export default class GenericModel extends KubeModel {
     }
 
     // If deleting resource on local cluster use selfLink
-    if ((cluster === '' || cluster === 'local-cluster') && selfLink && selfLink !== '') {
+    if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined) && selfLink && selfLink !== '') {
       const response = await this.kubeConnector.delete(selfLink, {});
       if (response.status === 'Failure' || response.code >= 400) {
         throw new Error(`Failed to delete the requested resource [${response.code}] - ${response.message}`);
