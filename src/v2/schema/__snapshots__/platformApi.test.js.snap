@@ -4,64 +4,69 @@ exports[`Platform Api Resolver Create Kubernetes Cluster Resource for Import 1`]
 Object {
   "data": Object {
     "createClusterResource": Object {
-      "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-      "items": Array [
-        Object {
+      "error": Object {
+        "rawResponse": Object {
           "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "kind": "Cluster",
-          "metadata": Object {
-            "annotations": Object {
-              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-            },
-            "creationTimestamp": "2018-08-13T16:56:41Z",
-            "finalizers": Array [
-              "finalizer.hcm.ibm.com",
-            ],
-            "labels": Object {
-              "cloud": "IBM",
-              "datacenter": "toronto",
-              "environment": "Dev",
-              "name": "mycluster.icp",
-              "owner": "marketing",
-              "region": "US",
-              "vendor": "ICP",
-            },
-            "name": "mycluster.icp",
-            "namespace": "default",
-            "resourceVersion": "136558",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-          },
-          "spec": Object {
-            "authInfo": Object {},
-            "kubernetesApiEndpoints": Object {
-              "serverEndpoints": Array [
-                Object {
-                  "serverAddress": "9.42.80.212:8001",
+          "items": Array [
+            Object {
+              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+              "kind": "Cluster",
+              "metadata": Object {
+                "annotations": Object {
+                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
                 },
-              ],
-            },
-          },
-          "status": Object {
-            "conditions": Array [
-              Object {
-                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                "lastTransitionTime": null,
-                "status": "",
-                "type": "OK",
+                "creationTimestamp": "2018-08-13T16:56:41Z",
+                "finalizers": Array [
+                  "finalizer.hcm.ibm.com",
+                ],
+                "labels": Object {
+                  "cloud": "IBM",
+                  "datacenter": "toronto",
+                  "environment": "Dev",
+                  "name": "mycluster.icp",
+                  "owner": "marketing",
+                  "region": "US",
+                  "vendor": "ICP",
+                },
+                "name": "mycluster.icp",
+                "namespace": "default",
+                "resourceVersion": "136558",
+                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
+                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
               },
-            ],
+              "spec": Object {
+                "authInfo": Object {},
+                "kubernetesApiEndpoints": Object {
+                  "serverEndpoints": Array [
+                    Object {
+                      "serverAddress": "9.42.80.212:8001",
+                    },
+                  ],
+                },
+              },
+              "status": Object {
+                "conditions": Array [
+                  Object {
+                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                    "lastTransitionTime": null,
+                    "status": "",
+                    "type": "OK",
+                  },
+                ],
+              },
+            },
+          ],
+          "kind": "ClusterList",
+          "metadata": Object {
+            "resourceVersion": "136667",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
           },
+          "statusCode": "",
+          "statusMessage": "",
         },
-      ],
-      "kind": "ClusterList",
-      "metadata": Object {
-        "resourceVersion": "136667",
-        "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
+        "statusCode": "",
       },
-      "statusCode": "",
-      "statusMessage": "",
     },
   },
 }
@@ -93,64 +98,69 @@ exports[`Platform Api Resolver Get Automated Import Status 1`] = `
 Object {
   "data": Object {
     "getAutomatedImportStatus": Object {
-      "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-      "items": Array [
-        Object {
+      "error": Object {
+        "rawResponse": Object {
           "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "kind": "Cluster",
-          "metadata": Object {
-            "annotations": Object {
-              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-            },
-            "creationTimestamp": "2018-08-13T16:56:41Z",
-            "finalizers": Array [
-              "finalizer.hcm.ibm.com",
-            ],
-            "labels": Object {
-              "cloud": "IBM",
-              "datacenter": "toronto",
-              "environment": "Dev",
-              "name": "mycluster.icp",
-              "owner": "marketing",
-              "region": "US",
-              "vendor": "ICP",
-            },
-            "name": "mycluster.icp",
-            "namespace": "default",
-            "resourceVersion": "136558",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-          },
-          "spec": Object {
-            "authInfo": Object {},
-            "kubernetesApiEndpoints": Object {
-              "serverEndpoints": Array [
-                Object {
-                  "serverAddress": "9.42.80.212:8001",
+          "items": Array [
+            Object {
+              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+              "kind": "Cluster",
+              "metadata": Object {
+                "annotations": Object {
+                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
                 },
-              ],
-            },
-          },
-          "status": Object {
-            "conditions": Array [
-              Object {
-                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                "lastTransitionTime": null,
-                "status": "",
-                "type": "OK",
+                "creationTimestamp": "2018-08-13T16:56:41Z",
+                "finalizers": Array [
+                  "finalizer.hcm.ibm.com",
+                ],
+                "labels": Object {
+                  "cloud": "IBM",
+                  "datacenter": "toronto",
+                  "environment": "Dev",
+                  "name": "mycluster.icp",
+                  "owner": "marketing",
+                  "region": "US",
+                  "vendor": "ICP",
+                },
+                "name": "mycluster.icp",
+                "namespace": "default",
+                "resourceVersion": "136558",
+                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
+                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
               },
-            ],
+              "spec": Object {
+                "authInfo": Object {},
+                "kubernetesApiEndpoints": Object {
+                  "serverEndpoints": Array [
+                    Object {
+                      "serverAddress": "9.42.80.212:8001",
+                    },
+                  ],
+                },
+              },
+              "status": Object {
+                "conditions": Array [
+                  Object {
+                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                    "lastTransitionTime": null,
+                    "status": "",
+                    "type": "OK",
+                  },
+                ],
+              },
+            },
+          ],
+          "kind": "ClusterList",
+          "metadata": Object {
+            "resourceVersion": "136667",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
           },
+          "statusCode": "",
+          "statusMessage": "",
         },
-      ],
-      "kind": "ClusterList",
-      "metadata": Object {
-        "resourceVersion": "136667",
-        "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
+        "statusCode": "",
       },
-      "statusCode": "",
-      "statusMessage": "",
     },
   },
 }

@@ -12,17 +12,31 @@ import config from '../../../config';
 import requestLib from '../lib/request';
 
 const successCb = (res) => {
-  const tmpRes = (typeof res === 'object') ? res : JSON.parse(res);
-  tmpRes.body = (typeof tmpRes.body === 'object') ? tmpRes.body : JSON.parse(tmpRes.body);
-  tmpRes.body.statusCode = tmpRes.statusCode || '';
-  tmpRes.body.statusMessage = tmpRes.statusMessage || '';
-  return tmpRes.body;
+  try {
+    const tmpRes = (typeof res === 'object') ? res : JSON.parse(res);
+    tmpRes.body = tmpRes.body || {};
+    tmpRes.body = (typeof tmpRes.body === 'object') ? tmpRes.body : JSON.parse(tmpRes.body);
+    tmpRes.body.statusCode = tmpRes.statusCode || '';
+    tmpRes.body.statusMessage = tmpRes.statusMessage || '';
+    return tmpRes.body;
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      return {
+        statusCode: 500,
+        statusMessage: 'Platform Api Connector Json Parse Error',
+      };
+    }
+  }
+  return {
+    statusCode: 500,
+    statusMessage: 'Error Occured on Platform Api Connector',
+  };
 };
 
 export default class PlatformApiConnector {
   constructor({
     httpLib = requestLib,
-    token = 'Bearer localdev',
+    token = 'localdev',
     platformApiEndpoint = `${config.get('cfcRouterUrl')}/api/v1`,
   } = {}) {
     this.http = httpLib;

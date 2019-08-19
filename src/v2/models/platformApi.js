@@ -21,12 +21,25 @@ export default class PlatformApiModel {
 
   getErrorMsg(response) {
     let errorMsg = '';
-    response.code && (errorMsg += `${response.code} - `);
-    response.message && (errorMsg += `${response.message} - `);
-    response.statusCode && (errorMsg += `${response.statusCode} - `);
-    response.statusMessage && (errorMsg += `${response.statusMessage} - `);
-    response.description && (errorMsg += `${response.description}`);
+    const errorMsgKeys = ['code', 'message', 'statusCode', 'statusMessage'];
+    errorMsgKeys.forEach((key, i) => {
+      response[key] && (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
+    });
     return errorMsg;
+  }
+
+  responseHasError(response) {
+    return (response.statusCode < 200 || response.statusCode >= 300);
+  }
+
+  responseForError(errorTitle, response) {
+    logger.error(`PLATFORM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+    return {
+      error: {
+        rawResponse: response,
+        statusCode: response.statusCode,
+      },
+    };
   }
 
   async createClusterResource(args) {
@@ -38,14 +51,8 @@ export default class PlatformApiModel {
     } else {
       response = await this.platformApiConnector.postWithString('/clusters', body);
     }
-    if (response && (response.code || response.message)) {
-      logger.error(`PLATFORM API ERROR: POST ${this.platformApiConnector.platformApiEndpoint}/clusters - ${this.getErrorMsg(response)}`);
-      return {
-        error: {
-          rawResponse: response,
-          statusCode: response.statusCode,
-        },
-      };
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`POST ${this.platformApiConnector.platformApiEndpoint}/clusters`, response);
     }
     return response;
   }
@@ -59,14 +66,8 @@ export default class PlatformApiModel {
     } else {
       response = await this.platformApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
     }
-    if (response && (response.code || response.message)) {
-      logger.error(`PLATFORM API ERROR: POST ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports - ${this.getErrorMsg(response)}`);
-      return {
-        error: {
-          rawResponse: response,
-          statusCode: response.statusCode,
-        },
-      };
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`POST ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
     }
     return response;
   }
@@ -80,14 +81,8 @@ export default class PlatformApiModel {
     } else {
       response = await this.platformApiConnector.get(`/clusters/${namespace}/${name}/imports`);
     }
-    if (response && (response.code || response.message)) {
-      logger.error(`PLATFORM API ERROR: GET ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports - ${this.getErrorMsg(response)}`);
-      return {
-        error: {
-          rawResponse: response,
-          statusCode: response.statusCode,
-        },
-      };
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`GET ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
     }
     return response;
   }
