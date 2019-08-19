@@ -1,5 +1,5 @@
 # Licensed Materials - Property of IBM 
-# Copyright IBM Corporation 2018. All Rights Reserved. 
+# Copyright IBM Corporation 2018, 2019. All Rights Reserved. 
 # Note to U.S. Government Users Restricted Rights: 
 # Use, duplication or disclosure restricted by GSA ADP Schedule 
 # Contract with IBM Corp. 
@@ -12,6 +12,10 @@ else
 fi
 if [ "$TRAVIS_TAG" != "" ]; then
     RELEASE_TAG="${TRAVIS_TAG#v}"
+fi
+
+if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ]; then
+    RELEASE_TAG="$RELEASE_TAG-$COMMIT"
 fi
 export RELEASE_TAG="$RELEASE_TAG"
 
