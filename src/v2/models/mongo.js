@@ -7,7 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import _ from 'lodash';
 import fs from 'fs';
 import mongooseLib, { Schema } from 'mongoose';
 import logger from '../lib/logger';
@@ -57,15 +56,17 @@ export default class MongoModel {
       return this.mongoose.connection;
     }
 
-    const ca = [fs.readFileSync('/certs/mongodb-ca/tls.crt')];
-    const cert = fs.readFileSync('/certs/mongodb-client/tls.crt');
-    const key = fs.readFileSync('/certs/mongodb-client/tls.key');
+    const certs = process.env.NODE_ENV === 'development' ? './certs' : '/certs';
+    const ca = [fs.readFileSync(`${certs}/mongodb-ca/tls.crt`)];
+    const cert = fs.readFileSync(`${certs}/mongodb-client/tls.crt`);
+    const key = fs.readFileSync(`${certs}/mongodb-client/tls.key`);
 
     let retries = numRetries;
     while (retries) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await this.mongoose.connect(`${this.mongoURI}?replicaSet=rs0&authSource=admin`, {
+        await this.mongoose.connect(`${this.mongoURI}?${process.env.NODE_ENV === 'production' ? `replicaSet=${process.env.MONGO_REPLICASET}&` : ''}authSource=admin`, {
+          useNewUrlParser: true,
           ssl: true,
           sslCA: ca,
           sslKey: key,
@@ -94,52 +95,38 @@ export default class MongoModel {
 
     const filters = [];
 
-    const clusterNames = _.get(filter, 'cluster[0]')
-      ? filter.cluster.filter(clus => clusters.includes(clus))
-      : clusters;
-
+    // filter by cluster
+    let clusterNames = [];
+    if (filter.cluster) {
+      clusterNames = filter.cluster.filter(clus => clusters.includes(clus));
+    }
     const clusterDocs = await this.Resource.find({ type: 'cluster', name: { $in: clusterNames } });
-
     filters.push({ cluster: { $in: clusterDocs.map(doc => doc.id) } });
-    if (filter) {
-      Object.keys(filter).forEach((filterType) => {
-        if (filter[filterType] && filter[filterType][0]) {
-          if (filterType === 'label') {
-            filters.push({
-              $or: filter[filterType].map(label => (
-                { 'labels.name': label.name, 'labels.value': label.value }
-              )),
-            });
-          } else if (filterType !== 'cluster') { // Cluster is a special type, handled above.
-            filters.push({ [filterType]: { $in: filter[filterType] } });
-          }
-        }
-      });
 
-      if (filters.length > 0) {
-        // Always include the nodes of type 'cluster' in the result.
-        return { $or: [{ $and: filters }, { type: 'cluster' }] };
-      }
+    // filter by label
+    if (filter.label && filter.label.length > 0) {
+      filters.push({
+        $or: filter.label.map(label => (
+          { 'labels.name': label.name, 'labels.value': label.value }
+        )),
+      });
     }
 
-    return {};
-  }
+    // filter by type
+    if (filter.type) {
+      filters.push({ type: { $in: filter.type } });
+    } else {
+      // else include all types except 'unmanaged' and 'container'
+      filters.push({ type: { $nin: ['unmanaged', 'container'] } });
+    }
 
-  async label() {
-    await this.connect();
-    return this.Resource.distinct('labels');
+    // Always include the nodes of type 'cluster' in the result.
+    return { $or: [{ $and: filters }, { type: 'cluster' }] };
   }
 
   async resource(args, options) {
     await this.connect();
     const query = await this.getResourceQuery(args);
     return this.Resource.find(query, null, options);
-  }
-
-  async type() {
-    await this.connect();
-    const types = await this.Resource.distinct('type');
-    // Exclude cluster, internet, and unmanaged types because these aren't valid filterable types.
-    return types.filter(t => t !== 'cluster' && t !== 'internet' && t !== 'unmanaged');
   }
 }

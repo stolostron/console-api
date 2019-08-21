@@ -13,6 +13,12 @@ import KubeModel from './kube';
 const filterByName = (names, items) =>
   items.filter(item => names.find(name => name === item.metadata.name));
 
+const filterByNameNamespace = (names, items) =>
+  items.filter(({ metadata }) => names.find((name) => {
+    const path = name.split('/');
+    return path[1] === metadata.name && path[0] === metadata.namespace;
+  }));
+
 export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
     const appKinds = {
@@ -61,6 +67,11 @@ export default class ApplicationModel extends KubeModel {
     };
   }
 
+  // //////////////// USED IN OVERVIEW PAGE /////////
+  // //////////////// USED IN OVERVIEW PAGE /////////
+  // //////////////// USED IN OVERVIEW PAGE /////////
+  // //////////////// USED IN OVERVIEW PAGE /////////
+
   async getApplicationOverview(name, namespace = 'default') {
     let apps;
     if (name) {
@@ -77,6 +88,102 @@ export default class ApplicationModel extends KubeModel {
         metadata: app.metadata,
       }));
   }
+
+  // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
+  // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
+  // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
+  // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
+
+  async getApplication(name, namespace, channel) {
+    // get application
+    let model = null;
+    const apps = await this.kubeConnector.getResources(
+      ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+      { namespaces: [namespace] },
+    );
+    if (apps.length > 0) {
+      const app = apps[0];
+
+      // get its associated resources
+      model = { name, namespace, app };
+
+      // get subscriptions to channels (pipelines)
+      let subscriptionNames = _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]') ||
+        _.get(app, 'metadata.annotations["apps.ibm.com/subscriptions"]');
+      let deployableNames = _.get(app, 'metadata.annotations["app.ibm.com/deployables"]') ||
+        _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]');
+      if (subscriptionNames && subscriptionNames.length > 0) {
+        subscriptionNames = subscriptionNames.split(',');
+        const subscriptions =
+          await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
+
+        // pick subscription based on channel requested by ui
+        let [subscription] = subscriptions;
+        model.activeChannel = _.get(subscription, 'spec.channel');
+        model.channels = [];
+        subscriptions.forEach((sub) => {
+          const chn = _.get(sub, 'spec.channel');
+          if (chn) {
+            model.channels.push(chn);
+            if (chn === channel) {
+              subscription = sub;
+              model.activeChannel = channel;
+            }
+          }
+        });
+
+        deployableNames = _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]');
+        if (deployableNames && deployableNames.length > 0) {
+          deployableNames = deployableNames.split(',');
+          model.deployables =
+            await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
+        }
+        ([subscription] = await this.getPlacementRules([subscription]));
+        model.subscription = subscription;
+      } else if (deployableNames && deployableNames.length > 0) {
+        deployableNames = deployableNames.split(',');
+        model.deployables =
+          await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
+        await this.getPlacementRules(model.deployables);
+      }
+    }
+    return model;
+  }
+
+  async getApplicationResources(names, type, kind) {
+    const namespaces = new Set(names.map(name => name.split('/')[0]));
+    const response = await this.kubeConnector.getResources(
+      ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/${type}`,
+      { kind, namespaces: Array.from(namespaces) },
+    );
+    return filterByNameNamespace(names, response);
+  }
+
+  async getPlacementRules(resources) {
+    const requests = resources.map(async (resource) => {
+      // if this one has a placement rule reference get that
+      const placementRule = _.get(resource, 'spec.placement.placementRef.name');
+      if (placementRule) {
+        const namespace = _.get(resource, 'metadata.namespace');
+        const response = await this.kubeConnector.getResources(
+          ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
+          { kind: 'PlacementRule', namespaces: [namespace] },
+        );
+        if (Array.isArray(response)) {
+          const [rules] = response;
+          return _.merge(resource, { rules });
+        }
+      }
+      return resource;
+    });
+    return Promise.all(requests);
+  }
+
+  // ///////////////  deprecated /////////////////////////
+  // ///////////////  deprecated /////////////////////////
+  // ///////////////  deprecated /////////////////////////
+  // ///////////////  deprecated /////////////////////////
+
 
   async getApplications(name, namespace = 'default') {
     let apps;

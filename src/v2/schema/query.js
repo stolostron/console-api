@@ -74,7 +74,7 @@ type Query {
   resourceTypes: [String]
 
   # Gets data for the topology diagram.
-  topology(filter: Filter): Topology
+  topology(filter: TopologyFilter): Topology
 
   getAutomatedImportStatus(namespace: String, name: String): JSON
 

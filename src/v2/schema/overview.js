@@ -7,8 +7,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import generateDemoData from './overviewDemo';
-
 export const typeDef = `
 type Overview {
   clusters: [ClusterOverview]
@@ -64,69 +62,66 @@ type PodOverview implements K8sObject {
 
 export const resolver = {
   Query: {
-    overview: async (root, { demoMode }, {
+    overview: async (root, args, {
       clusterModel, applicationModel, complianceModel, resourceViewModel,
     }) => {
-      if (!demoMode) {
-        let clusters = await clusterModel.getAllClusters();
-        clusters = clusters.map(({
-          metadata, status, capacity, usage, consoleURL,
-        }) => {
-          const { name, namespace, labels } = metadata;
-          return {
-            metadata: {
-              name,
-              namespace,
-              labels,
-            },
-            consoleURL,
-            status,
-            capacity,
-            usage,
-          };
-        });
-
-        // number and what clusters
-        let applications = await applicationModel.getApplicationOverview();
-        applications = applications.map(({ metadata: { name } }) => ({
+      let clusters = await clusterModel.getAllClusters();
+      clusters = clusters.map(({
+        metadata, status, capacity, usage, consoleURL,
+      }) => {
+        const { name, namespace, labels } = metadata;
+        return {
           metadata: {
             name,
+            namespace,
+            labels,
           },
-        }));
-
-        // number, what cluster and status
-        let pods = await resourceViewModel.fetchResources({ type: 'pods' });
-        pods = pods.map(({ metadata, cluster, status }) => {
-          const { name, namespace } = metadata;
-          return {
-            metadata: {
-              name,
-              namespace,
-            },
-            status,
-            cluster,
-          };
-        });
-
-        // policy compliances
-        let compliances = await complianceModel.getCompliances();
-        compliances = compliances.map(({ raw: { status: { status } } }) => ({
-          raw: {
-            status: {
-              status,
-            },
-          },
-        }));
-
-        // what time these values were fetched
-        // also forces apollo query to continially update the component even if nothing else changed
-        const timestamp = new Date().toString();
-
-        return {
-          clusters, applications, compliances, pods, timestamp,
+          consoleURL,
+          status,
+          capacity,
+          usage,
         };
-      }
-      return generateDemoData();
+      });
+
+      // number and what clusters
+      let applications = await applicationModel.getApplicationOverview();
+      applications = applications.map(({ metadata: { name } }) => ({
+        metadata: {
+          name,
+        },
+      }));
+
+      // number, what cluster and status
+      let pods = await resourceViewModel.fetchResources({ type: 'pods' });
+      pods = pods.map(({ metadata, cluster, status }) => {
+        const { name, namespace } = metadata;
+        return {
+          metadata: {
+            name,
+            namespace,
+          },
+          status,
+          cluster,
+        };
+      });
+
+      // policy compliances
+      let compliances = await complianceModel.getCompliances();
+      compliances = compliances.map(({ raw: { status: { status } } }) => ({
+        raw: {
+          status: {
+            status,
+          },
+        },
+      }));
+
+      // what time these values were fetched
+      // also forces apollo query to continially update the component even if nothing else changed
+      const timestamp = new Date().toString();
+
+      return {
+        clusters, applications, compliances, pods, timestamp,
+      };
     },
   },
 };

@@ -1,29 +1,34 @@
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
- * (c) Copyright IBM Corporation 2018. All Rights Reserved.
+ * (c) Copyright IBM Corporation 2019. All Rights Reserved.
  *
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import getApplicationElements from './applicationHelper';
+
 export const typeDef = `
 type Resource {
-    cluster: String
-    labels: [Label]
-    name: String
-    namespace: String
-    relationships: [Relationship]
-    topology: String
-    type: String
-    uid: String
-    id: String
+  cluster: String
+  clusterName: String
+  labels: [Label]
+  name: String
+  namespace: String
+  relationships: [Relationship]
+  topology: String
+  type: String
+  specs: JSON
+  uid: String
+  id: String
 }
 
 type Relationship {
   type: String
   to: Resource
   from: Resource
+  specs: JSON
 }
 
 type Topology {
@@ -40,35 +45,30 @@ input LabelInput {
   name: String
   value: String
 }
+
+input TopologyFilter {
+  application: [JSON]
+  cluster: [JSON]
+  policy: [JSON]
+  namespace: [String]
+  type: [String]
+}
 `;
 
 export const resolver = {
   Query: {
-    // labels filter in topology view
-    labels: async (root, args, { mongoModel }) => mongoModel.label(),
-
-    // types filter in topology view
-    resourceTypes: async (root, args, { mongoModel }) => mongoModel.type(),
-
-    // objects in topology view
-    topology: async (root, args, { mongoModel, clusterModel }) => {
-      const clusters = await clusterModel.getClusters();
-      const resources = await mongoModel.resource({
-        ...args,
-        clusters: clusters.filter(c => !!c.metadata).map(c => c.metadata.name),
-      });
-      const resourceUids = new Set(resources.map(res => res.uid));
-      const relationships = resources.reduce((accum, res) => {
-        if (res.relationships && res.relationships.length) {
-          res.relationships.forEach((outgoing) => {
-            if (resourceUids.has(outgoing.uid)) {
-              accum.push({ type: 'calls', from: res, to: outgoing });
-            }
-          });
-        }
-
-        return accum;
-      }, []);
+    topology: async (root, { filter },
+      {
+        clusterModel, applicationModel,
+      }) => {
+      let resources = [];
+      let relationships = [];
+      const { name, namespace, channel } = filter.application[0];
+      const application = await applicationModel.getApplication(name, namespace, channel);
+      if (application) {
+        ({ resources, relationships } =
+          await getApplicationElements(application, clusterModel));
+      }
       return { resources, relationships };
     },
   },

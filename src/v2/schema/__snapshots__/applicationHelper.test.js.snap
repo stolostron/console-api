@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`applicationHelper should match snapshot with subscription 1`] = `Promise {}`;
+
+exports[`applicationHelper should match snapshot without subscription 1`] = `Promise {}`;
