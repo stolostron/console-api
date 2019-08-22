@@ -16,7 +16,6 @@ import * as subscriptions from './subscription';
 import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as compliance from './compliance';
-import * as connections from './connections';
 import * as filter from './filter';
 import * as overview from './overview';
 import * as json from './json';
@@ -43,7 +42,6 @@ const modules = [
   charts,
   cluster,
   compliance,
-  connections,
   filter,
   overview,
   json,

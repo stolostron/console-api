@@ -81,4 +81,34 @@ export default class PlatformApiConnector {
     };
     return this.http(_.merge(defaults, opts)).then(this.successCb);
   }
+
+  delete(path) {
+    const defaults = {
+      url: `${this.platformApiEndpoint}${path}`,
+      method: 'DELETE',
+      headers: {
+        Authorization: `${this.token}`,
+      },
+    };
+    return this.http(defaults).then(res => res.statusCode);
+  }
+
+  put(path, jsonBody) {
+    const defaults = {
+      url: `${this.platformApiEndpoint}${path}`,
+      method: 'PUT',
+      headers: {
+        Authorization: `${this.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: jsonBody,
+    };
+    // eslint-disable-next-line arrow-body-style
+    return this.http(defaults).then((res) => {
+      return ({
+        connection: res.body,
+        statusCode: res.statusCode,
+      });
+    });
+  }
 }

@@ -40,4 +40,7 @@ export const resolver = {
     totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
     totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
+  Mutation: {
+    createCluster: (parent, args, { clusterModel }) => clusterModel.createCluster(args),
+  },
 };

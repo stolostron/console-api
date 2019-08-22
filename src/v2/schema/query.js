@@ -139,6 +139,8 @@ type Mutation {
   # Save a search query for the current user.
   saveQuery(resource: JSON): JSON
 
+  # Create remote cluster
+  createCluster(namespace: String!, cluster: JSON!) : JSON
   createClusterResource(body: String): JSON
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
@@ -167,19 +169,18 @@ type Metadata {
   uid: String
 }
 
-# fields for all API objects
+#fields for all API objects
 interface ConnectionObject {
   metadata: ConnectionMetadata
 }
 
-#Common fields for all API objects
+ #Common fields for all API objects
 type ConnectionMetadata {
   name: String
   namespace: String
   provider: String
   name_namespace: String
 }
-
 `;
 
 export const resolver = {

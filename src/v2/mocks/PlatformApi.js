@@ -1,3 +1,6 @@
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable key-spacing */
+/* eslint-disable quote-props */
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
  * (c) Copyright IBM Corporation 2019. All Rights Reserved.
@@ -53,5 +56,142 @@ const createClusterResourceResponse = {
   },
   statusCode: 200,
 };
+const getCloudConnectionsResponse = {
+  body: {
+    Items: [
+      {
+        name: 'iks-test',
+        namespace: 'default',
+        provider: 'iks',
+        metadata: 'secret:\n  apiKey: iks-test\n',
+      },
+    ],
+  },
+  statusCode: 200,
+};
 
-export { createClusterResourceResponse, automatedImportResponse, getAutomatedImportStatusResponse };
+const getCloudProvidersResponse = {
+  body: {
+    Items: [
+      {
+        name: 'iks-test',
+        longname: 'iks-test',
+        configMetadata: '',
+        configValues: '',
+        clusterMetadata: '',
+        clusterValues: '',
+      },
+    ],
+  },
+  statusCode: 200,
+};
+
+const getClusterCreationResponse = {
+  metadata: {
+    name: 'ericabrtest4',
+    namespace: 'iks',
+    selfLink: '/apis/cluster.k8s.io/v1alpha1/namespaces/iks/clusters/ericabrtest4',
+    uid: '3b0c9b68-c3c7-11e9-b18a-00163e01f736',
+    resourceVersion: '4330986',
+    generation: 1,
+    creationTimestamp: '2019-08-21T03:53:26Z',
+    labels: {
+      'cluster-provider': 'iks',
+      'ibm.com/cloud-connection': 'iks-account-privatecloud-2',
+      'ibm.com/cloud-connection-ns': 'iks',
+    },
+  },
+  'spec':{  
+    'clusterNetwork' :{
+      'services':{  
+        'cidrBlocks':[  
+          '172.32.0.0/16',
+        ],
+      },
+      'pods':{  
+        'cidrBlocks':[  
+          '192.168.0.0/16',
+        ],
+      },
+      'serviceDomain':'cluster.local',
+    },
+    'providerSpec':{  
+      'value':{  
+        'apiVersion':'iks/v1alpha1',
+        'kind':'IKSClusterProviderSpec',
+        'spec':{  
+          'machineType':'u3c.2x4',
+          'privateVlan':2646659,
+          'publicVlan':2646657,
+          'region':null,
+          'secretName':'iks-account-privatecloud-2-apikey',
+          'workers':1,
+          'zone':'dal10',
+        },
+      },
+    },
+  },
+  'status':{  
+
+  },
+  'statusCode':201,
+  'statusMessage':'Created',
+};
+
+const getClusterCreationResponseWithError = {
+  metadata: {
+    name: 'ericabrtest5',
+    namespace: 'iks',
+    selfLink: '/apis/cluster.k8s.io/v1alpha1/namespaces/iks/clusters/ericabrtest5',
+    uid: '3b0c9b68-c3c7-11e9-b18a-00163e01f736',
+    resourceVersion: '4330986',
+    generation: 1,
+    creationTimestamp: '2019-08-21T03:53:26Z',
+    labels: {
+      'cluster-provider': 'iks',
+      'ibm.com/cloud-connection': 'iks-account-privatecloud-2',
+      'ibm.com/cloud-connection-ns': 'iks',
+    },
+  },
+  'spec':{  
+    'clusterNetwork' :{
+      'services':{  
+        'cidrBlocks':[  
+          '172.32.0.0/16',
+        ],
+      },
+      'pods':{  
+        'cidrBlocks':[  
+          '192.168.0.0/16',
+        ],
+      },
+      'serviceDomain':'cluster.local',
+    },
+    'providerSpec':{  
+      'value':{  
+        'apiVersion':'iks/v1alpha1',
+        'kind':'IKSClusterProviderSpec',
+        'spec':{  
+          'machineType':'u3c.2x4',
+          'privateVlan':2646659,
+          'publicVlan':2646657,
+          'region':null,
+          'secretName':'iks-account-privatecloud-2-apikey',
+          'workers':1,
+          'zone':'dal10',
+        },
+      },
+    },
+  },
+  'status':{  
+
+  },
+  'statusCode':400,
+  'statusMessage':'Invalid body',
+};
+
+export {
+  createClusterResourceResponse, automatedImportResponse, getAutomatedImportStatusResponse,
+  getCloudConnectionsResponse, getCloudProvidersResponse, getClusterCreationResponse,
+  getClusterCreationResponseWithError,
+};

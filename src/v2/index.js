@@ -20,7 +20,6 @@ import _ from 'lodash';
 
 import logger from './lib/logger';
 
-import ApiConnector from './connectors/api';
 import KubeConnector from './connectors/kube';
 import PlatformApiConnector from './connectors/platformApi';
 
@@ -28,7 +27,6 @@ import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
 import SubscriptionModel from './models/subscription';
 import ClusterModel from './models/cluster';
-import ConnectionsModel from './models/connections';
 import GenericModel from './models/generic';
 import QueryModel from './models/userquery';
 import UserInfoModel from './models/userinfo';
@@ -111,18 +109,12 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     httpLib: kubeHTTP,
   });
 
-  const apiConnector = new ApiConnector({
-    token: req.cookies['cfc-access-token-cookie'],
-    httpLib: kubeHTTP,
-  });
-
   const context = {
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
     channelModel: new ChannelModel({ kubeConnector }),
     subscriptionModel: new SubscriptionModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
-    connectionsModel: new ConnectionsModel({ apiConnector, req }),
     genericModel: new GenericModel({ kubeConnector }),
     queryModel: new QueryModel({ kubeConnector, req }),
     userInfoModel: new UserInfoModel({ kubeConnector, req }),
