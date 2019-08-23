@@ -23,6 +23,21 @@ type Query {
   # List all managed clusters.
   clusters: [Cluster]
 
+  # Get Nodes and node info
+  nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
+
+  # Account id for user.
+  accountId: AccountId
+
+  # Get Compliance/Policy info
+  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
+
+  # Security findings
+  occurrences: [Occurrence]
+
+  # Get Cluster incidents.
+  incidents(accountId: String, cluster: String): [cemIncident]
+  
   # List all cloud connections and providers
   connections: [Connection]
   providers: [Provider]
@@ -80,9 +95,7 @@ type Query {
 
   # DEPRECATED QUERIES
   charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
-  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
   namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pod(name: String, namespace: String, clusterName: String): [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
@@ -145,6 +158,7 @@ type Mutation {
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
 
+  deleteCluster(namespace: String, cluster: String): JSON
   updateClusterResource(namespace: String, name: String, body: String): JSON
 
   # DEPRECATED MUTATIONS

@@ -28,6 +28,7 @@ Object {
         "roles": Array [
           "worker",
         ],
+        "status": "True",
       },
       Object {
         "architecture": "amd64",
@@ -53,6 +54,7 @@ Object {
         "roles": Array [
           "worker",
         ],
+        "status": "True",
       },
       Object {
         "architecture": "amd64",
@@ -89,6 +91,7 @@ Object {
           "master",
           "etcd",
         ],
+        "status": "True",
       },
     ],
   },

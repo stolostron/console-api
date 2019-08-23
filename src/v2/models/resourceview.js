@@ -65,7 +65,7 @@ const formatNode = (clusterName, node) => ({
   operatingSystem: node.status.nodeInfo.operatingSystem,
   osImage: node.status.nodeInfo.osImage,
   startedAt: node.status.startTime,
-  status: node.status.phase,
+  status: node.status,
 });
 
 

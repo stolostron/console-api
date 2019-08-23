@@ -18,11 +18,14 @@ type cemIncident {
   incidentURL: String
   eventsURL: String
   timelineURL: String
+  eventSummary: JSON
+  description: String
   owner: String
   team: String
+  displayId: String
+  resolutionCode: String
   state: String
   summary: String
-  description: String
 }
 `;
 
@@ -32,5 +35,7 @@ export const resolver = {
       cemModel.getIncidents({ ...args, req }),
     cemIncidentsForApplication: (parent, args, { cemModel, req }) =>
       cemModel.getIncidentsForApplication({ ...args, req }),
+    incidents: (parent, args, { cemModel, req }) =>
+      cemModel.getClusterIncidents({ ...args, req }),
   },
 };

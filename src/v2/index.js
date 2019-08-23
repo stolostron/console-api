@@ -35,6 +35,8 @@ import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
+import AccountIdModel from './models/user-accountid';
+import SFModel from './models/findings';
 import PlatformApiModel from './models/platformApi';
 
 import createMockKubeHTTP from './mocks/kube-http';
@@ -123,6 +125,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     helmModel: new HelmModel({ kubeConnector }),
     mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
+    accountModel: new AccountIdModel({ kubeConnector, req }),
+    sfModel: new SFModel({ kubeConnector, req }),
     platformApiModel: new PlatformApiModel({ platformApiConnector }),
   };
 

@@ -37,6 +37,7 @@ export const resolver = {
     createClusterResource: (parent, args, { platformApiModel }) => platformApiModel.createClusterResource(args),
     createCluster: (parent, args, { platformApiModel }) => platformApiModel.createCluster(args),
     automatedImport: (parent, args, { platformApiModel }) => platformApiModel.automatedImport(args),
+    deleteCluster: (parent, args, { platformApiModel }) => platformApiModel.deleteCluster(args),
     updateClusterResource: (parent, args, { platformApiModel }) => platformApiModel.updateClusterResource(args),
     createCloudConnection: (parent, args, { platformApiModel }) =>
       platformApiModel.createConnection(args),

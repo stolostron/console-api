@@ -201,4 +201,19 @@ export default class PlatformApiModel {
     }
     return response;
   }
+
+  async deleteCluster(args) {
+    let response;
+    const { namespace, cluster } = args;
+
+    if (!cluster) {
+      throw new Error('cluster name is required for deleteCluster');
+    } else {
+      response = await this.platformApiConnector.delete(`/clusters/${namespace}/${cluster}`);
+    }
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`DELETE ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${cluster}`, response);
+    }
+    return response;
+  }
 }

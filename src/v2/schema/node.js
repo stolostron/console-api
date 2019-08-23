@@ -25,9 +25,15 @@ type Node implements K8sObject {
   osImage: String
   # Values: proxy, management, masater, va, etcd
   roles: [String]
+  status: String
 }
 `;
 
+async function resolveStatus(parent) {
+  const { status: { conditions } } = parent;
+  const nodeStatus = conditions.find(cond => (cond.type === 'Ready'));
+  return nodeStatus.status;
+}
 
 async function resolveRoles(parent) {
   const { metadata: { labels } } = parent;
@@ -62,5 +68,6 @@ export const resolver = {
     cluster: async (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
     roles: parent => resolveRoles(parent),
+    status: parent => resolveStatus(parent),
   },
 };

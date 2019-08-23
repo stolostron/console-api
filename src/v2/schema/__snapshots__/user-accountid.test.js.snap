@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountId Resolver Correctly Resolves AccountId Query 1`] = `
+Object {
+  "data": Object {
+    "accountId": Object {
+      "activeAccountId": null,
+      "activeAccountName": null,
+      "lastLogin": null,
+      "userId": null,
+    },
+  },
+}
+`;

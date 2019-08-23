@@ -10,31 +10,18 @@
 import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
-describe('Nodes Resolver', () => {
-  test('Correctly Resolves Nodes Query', (done) => {
+describe('AccountId Resolver', () => {
+  test('Correctly Resolves AccountId Query', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         {
-          nodes {
-            architecture
-            cluster {
-              clusterip
-              metadata {
-                name
-              }
-            }
-            metadata {
-              creationTimestamp
-              labels
-              name
-              uid
-            }
-            operatingSystem
-            osImage
-            roles
-            status
+          accountId {
+            userId
+            lastLogin
+            activeAccountId
+            activeAccountName
           }
         }
       `,

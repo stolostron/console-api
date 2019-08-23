@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Occurrences Resolver Correctly Resolves Occurrences Query 1`] = `
+Object {
+  "data": Object {
+    "occurrences": null,
+  },
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 11,
+          "line": 3,
+        },
+      ],
+      "message": "Cannot read property 'includes' of undefined",
+      "path": Array [
+        "occurrences",
+      ],
+    },
+  ],
+}
+`;

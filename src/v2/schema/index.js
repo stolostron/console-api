@@ -18,6 +18,8 @@ import * as cluster from './cluster';
 import * as compliance from './compliance';
 import * as filter from './filter';
 import * as overview from './overview';
+import * as accountId from './user-accountid';
+import * as occurrence from './occurrence';
 import * as json from './json';
 import * as namespace from './namespace';
 import * as node from './node';
@@ -44,6 +46,8 @@ const modules = [
   compliance,
   filter,
   overview,
+  accountId,
+  occurrence,
   json,
   namespace,
   node,

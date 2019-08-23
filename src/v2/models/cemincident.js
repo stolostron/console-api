@@ -80,4 +80,22 @@ export default class CemModel extends KubeModel {
     }
     return response instanceof Array ? response : [];
   }
+
+  async getClusterIncidents(args) {
+    const { accountId, cluster } = args;
+    const accessToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
+    const opts = {
+      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1?event_filter_1=resource.cluster == '${cluster}'`,
+      headers: {
+        Authorization: `bearer origin:icp:${accessToken}`,
+        'X-Subscription-ID': `${accountId}`,
+      },
+    };
+
+    const response = await this.kubeConnector.get('', opts, true);
+    if (response.code || response.message) {
+      throw new Error(`ERROR ${response.code} - ${response.message}`);
+    }
+    return response || [];
+  }
 }
