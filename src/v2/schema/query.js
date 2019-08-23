@@ -145,6 +145,8 @@ type Mutation {
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
 
+  updateClusterResource(namespace: String, name: String, body: String): JSON
+
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
   installHelmChart(input: InstallHelmChartInput): [HelmChartResponse] @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")

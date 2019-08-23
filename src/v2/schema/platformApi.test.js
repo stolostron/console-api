@@ -265,4 +265,36 @@ describe('Platform Api Resolver', () => {
         done();
       });
   });
+
+  test('Update Kubernetes Cluster Resource for Import', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          updateClusterResource(namespace:"test", name:"test", body: "test")
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Update Kubernetes Cluster Resource for Import should return error msg', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          updateClusterResource(namespace:"", name:"test", body: "test")
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });

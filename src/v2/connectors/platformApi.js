@@ -58,6 +58,19 @@ export default class PlatformApiConnector {
     return this.http(_.merge(defaults, opts)).then(this.successCb);
   }
 
+  putWithString(path, body, opts = {}) {
+    const defaults = {
+      url: `${this.platformApiEndpoint}${path}`,
+      method: 'PUT',
+      headers: {
+        Authorization: this.token,
+      },
+      body,
+      json: false,
+    };
+    return this.http(_.merge(defaults, opts)).then(this.successCb);
+  }
+
   post(path, body, opts = {}) {
     const defaults = {
       url: `${this.platformApiEndpoint}${path}`,

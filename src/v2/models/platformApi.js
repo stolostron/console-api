@@ -143,6 +143,21 @@ export default class PlatformApiModel {
     return response;
   }
 
+  async updateClusterResource(args) {
+    let response;
+    const { namespace, name, body } = args;
+
+    if (!body || !namespace || !name) {
+      throw new Error('Body, namespace, and name are required for updateClusterResource');
+    } else {
+      response = await this.platformApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
+    }
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`PUT ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}`, response);
+    }
+    return response;
+  }
+
   async automatedImport(args) {
     let response;
     const { namespace, name, body } = args;
