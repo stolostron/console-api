@@ -9,6 +9,7 @@
 
 export const typeDef = `
 type userQuery {
+  id: String
   name: String
   description: String
   searchText: String

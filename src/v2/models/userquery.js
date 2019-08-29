@@ -43,11 +43,13 @@ export default class QueryModel extends KubeModel {
       throw new Error(`HCM ERROR ${response.code} - ${response.message}`);
     }
     const queries = response.userQueries || [];
-    const existingQuery = queries.findIndex(query => query.name === resource.name);
-    if (existingQuery !== undefined && existingQuery !== -1) {
-      const target = queries[existingQuery];
+    // check Id and Name for backwards compatibility
+    const target = queries.find(query => query.id === resource.id) ||
+     queries.find(query => query.name === resource.name);
+    if (target) { // this is an edit
       target.name = resource.name;
       target.description = resource.description;
+      target.id = resource.id || Date.now().toString(); // Queries before 3.2.1, didn't have IDs.
       if (resource.searchText !== '') target.searchText = resource.searchText;
       opts.json = {
         ...response, userQueries: queries,

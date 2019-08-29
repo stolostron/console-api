@@ -7,11 +7,13 @@ Object {
       "userQueries": Array [
         Object {
           "description": "test",
+          "id": "id_02",
           "name": "test",
           "searchText": "test",
         },
         Object {
           "description": "Testing the search UI using selenium/nightwatch",
+          "id": "id_03",
           "name": "SeleniumTesting",
           "searchText": "kind:pod",
         },
@@ -27,11 +29,13 @@ Object {
     "items": Array [
       Object {
         "description": "test",
+        "id": "id_02",
         "name": "test",
         "searchText": "test",
       },
       Object {
         "description": "Testing the search UI using selenium/nightwatch",
+        "id": "id_03",
         "name": "SeleniumTesting",
         "searchText": "kind:pod",
       },
@@ -47,6 +51,7 @@ Object {
       "userQueries": Array [
         Object {
           "description": "test",
+          "id": "id_10",
           "name": "test",
           "searchText": "test",
         },

@@ -17,7 +17,7 @@ describe('User Query Resolver', () => {
       .send({
         query: `
           mutation {
-            saveQuery(resource: {name: "test", description: "test", searchText: "test"})
+            saveQuery(resource: {id:"id_10", name: "test", description: "test", searchText: "test"})
           }
       `,
       })
@@ -34,6 +34,7 @@ describe('User Query Resolver', () => {
         query: `
           query userQueries {
             items: userQueries {
+              id
               name
               description
               searchText
@@ -53,7 +54,7 @@ describe('User Query Resolver', () => {
       .send({
         query: `
           mutation {
-            deleteQuery(resource: {name: "test", description: "test", searchText: "test"})
+            deleteQuery(resource: {id: "id_10", name: "test", description: "test", searchText: "test"})
           }
       `,
       })

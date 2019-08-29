@@ -9,15 +9,21 @@
 
 const unitResponse = {
   body: {
-    userQueries: [{ name: 'test', description: 'test', searchText: 'test' }],
+    userQueries: [{
+      id: 'id_01', name: 'test', description: 'test', searchText: 'test',
+    }],
   },
 };
 
 const seleniumResponse = {
   body: {
     userQueries: [
-      { name: 'test', description: 'test', searchText: 'test' },
-      { name: 'SeleniumTesting', description: 'Testing the search UI using selenium/nightwatch', searchText: 'kind:pod' },
+      {
+        id: 'id_02', name: 'test', description: 'test', searchText: 'test',
+      },
+      {
+        id: 'id_03', name: 'SeleniumTesting', description: 'Testing the search UI using selenium/nightwatch', searchText: 'kind:pod',
+      },
     ],
   },
 };
