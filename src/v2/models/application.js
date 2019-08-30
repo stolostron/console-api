@@ -118,12 +118,18 @@ export default class ApplicationModel extends KubeModel {
           await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
 
         // pick subscription based on channel requested by ui
+        const getChannelName = (subscription) => {
+          const { metadata: { name: nm, namespace: ns } } = subscription;
+          const chn = _.get(subscription, 'spec.channel');
+          return `${ns}/${nm}//${chn}`;
+        };
         let [subscription] = subscriptions;
-        model.activeChannel = _.get(subscription, 'spec.channel');
+        model.activeChannel = getChannelName(subscription);
         model.channels = [];
         subscriptions.forEach((sub) => {
-          const chn = _.get(sub, 'spec.channel');
+          let chn = _.get(sub, 'spec.channel');
           if (chn) {
+            chn = getChannelName(sub);
             model.channels.push(chn);
             if (chn === channel) {
               subscription = sub;

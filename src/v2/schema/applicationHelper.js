@@ -97,22 +97,25 @@ async function getApplicationElements(application) {
 
     // add cluster(s)
     const clusterNames = Array.from(clusterSet);
-    memberId = 'member--clusters';
-    nodes.push({
-      name: clusterNames.join(', '),
-      namespace: '',
-      type: 'clusters',
-      id: memberId,
-      uid: memberId,
-      specs: { clusterNames, isDivider: true },
-    });
-    links.push({
-      from: { uid: parentId },
-      to: { uid: memberId },
-      type: '',
-      specs: { isDesign: true },
-    });
-    parentId = memberId;
+    const isPlaced = clusterNames.length > 0;
+    if (isPlaced) {
+      memberId = 'member--clusters';
+      nodes.push({
+        name: clusterNames.join(', '),
+        namespace: '',
+        type: 'clusters',
+        id: memberId,
+        uid: memberId,
+        specs: { clusterNames, isDivider: true },
+      });
+      links.push({
+        from: { uid: parentId },
+        to: { uid: memberId },
+        type: '',
+        specs: { isDesign: true },
+      });
+      parentId = memberId;
+    }
 
     // if subscription has deployables
     if (application.deployables) {
@@ -136,41 +139,43 @@ async function getApplicationElements(application) {
         });
 
         // installs these K8 objects
-        const template = _.get(deployable, 'spec.template', { metadata: {} });
-        let { kind = 'container' } = template;
-        const { metadata: { name: k8Name } } = template;
-        kind = kind.toLowerCase();
-        memberId = `member--${kind}--${k8Name}`;
-        nodes.push({
-          name: k8Name,
-          namespace: '',
-          type: kind,
-          id: memberId,
-          uid: memberId,
-          specs: { raw: template, isDesign: kind === 'deployable' || kind === 'subscription' },
-        });
-        links.push({
-          from: { uid: deployableId },
-          to: { uid: memberId },
-          type: '',
-        });
-
-        // if deployment, show pod
-        if (kind === 'deployment') {
-          const podId = `member--pod--${k8Name}`;
+        if (isPlaced) {
+          const template = _.get(deployable, 'spec.template', { metadata: {} });
+          let { kind = 'container' } = template;
+          const { metadata: { name: k8Name } } = template;
+          kind = kind.toLowerCase();
+          memberId = `member--${kind}--${k8Name}`;
           nodes.push({
             name: k8Name,
             namespace: '',
-            type: 'pod',
-            id: podId,
-            uid: podId,
-            specs: { raw: template },
+            type: kind,
+            id: memberId,
+            uid: memberId,
+            specs: { raw: template, isDesign: kind === 'deployable' || kind === 'subscription' },
           });
           links.push({
-            from: { uid: memberId },
-            to: { uid: podId },
+            from: { uid: deployableId },
+            to: { uid: memberId },
             type: '',
           });
+
+          // if deployment, show pod
+          if (kind === 'deployment') {
+            const podId = `member--pod--${k8Name}`;
+            nodes.push({
+              name: k8Name,
+              namespace: '',
+              type: 'pod',
+              id: podId,
+              uid: podId,
+              specs: { raw: template },
+            });
+            links.push({
+              from: { uid: memberId },
+              to: { uid: podId },
+              type: '',
+            });
+          }
         }
       });
     }
