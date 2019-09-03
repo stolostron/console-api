@@ -168,15 +168,15 @@ export default class ApplicationModel extends KubeModel {
   async getPlacementRules(resources) {
     const requests = resources.map(async (resource) => {
       // if this one has a placement rule reference get that
-      const placementRule = _.get(resource, 'spec.placement.placementRef.name');
-      if (placementRule) {
+      const name = _.get(resource, 'spec.placement.placementRef.name');
+      if (name) {
         const namespace = _.get(resource, 'metadata.namespace');
         const response = await this.kubeConnector.getResources(
           ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
           { kind: 'PlacementRule', namespaces: [namespace] },
         );
         if (Array.isArray(response)) {
-          const [rules] = response;
+          const [rules] = filterByName([name], response);
           return _.merge(resource, { rules });
         }
       }
