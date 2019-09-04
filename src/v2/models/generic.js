@@ -282,7 +282,9 @@ export default class GenericModel extends KubeModel {
       return this.kubeConnector.get(selfLink);
     }
     // if not local cluster -> need to create a resource query to get remote resource
-    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace);
+    const apiGroup = selfLink.split('/')[2]; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
+    // eslint-disable-next-line
+    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup);
     if (response.status.results) {
       return response.status.results[cluster];
     }
