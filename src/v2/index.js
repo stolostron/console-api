@@ -98,7 +98,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     kubeHTTP = createMockKubeHTTP();
   }
 
-  const namespaces = req.user.namespaces.map(ns => ns.namespaceId);
+  let namespaces = _.get(req, 'user.namespaces', []);
+  namespaces = Array.isArray(namespaces) ? namespaces.map(ns => ns.namespaceId) : [];
 
   const kubeConnector = new KubeConnector({
     token: req.kubeToken,
