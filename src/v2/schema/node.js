@@ -10,7 +10,6 @@
 export const typeDef = `
 type NodeResources {
   cpu: Int
-  ephemeralStorage: String
   memory: String
 }
 

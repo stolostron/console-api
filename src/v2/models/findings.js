@@ -82,8 +82,8 @@ export default class SFModel extends KubeModel {
       }`,
     };
     const response = await this.kubeConnector.post('', body, opts);
-    if (response.code || response.message) {
-      throw new Error(`HCM ERROR ${response.code} - ${response.message}`);
+    if (response.errors) {
+      throw new Error(`HCM ERROR ${JSON.stringify(response.errors)}`);
     }
     return response.data.occurrences || [];
   }
