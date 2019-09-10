@@ -28,6 +28,7 @@ type Provider {
 export const resolver = {
   Query: {
     getAutomatedImportStatus: (parent, args, { platformApiModel }) => platformApiModel.getAutomatedImportStatus(args),
+    getImportYamlTemplate: (parent, args, { platformApiModel }) => platformApiModel.getImportYamlTemplate(),
     connections: (parent, args, { platformApiModel, req }) =>
       platformApiModel.getConnections({ user: req.user }),
     providers: (parent, args, { platformApiModel }) =>

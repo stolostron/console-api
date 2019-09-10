@@ -22,8 +22,9 @@ const successCb = (res) => {
   } catch (e) {
     if (e instanceof SyntaxError) {
       return {
-        statusCode: 500,
-        statusMessage: 'Platform Api Connector Json Parse Error',
+        body: res.body,
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage,
       };
     }
   }

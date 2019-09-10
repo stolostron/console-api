@@ -21,7 +21,7 @@ export default class PlatformApiModel {
 
   getErrorMsg(response) {
     let errorMsg = '';
-    const errorMsgKeys = ['code', 'message', 'statusCode', 'statusMessage'];
+    const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
     errorMsgKeys.forEach((key, i) => {
       response[key] && (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
     });
@@ -39,6 +39,7 @@ export default class PlatformApiModel {
       error: {
         rawResponse: response,
         statusCode: response.statusCode,
+        statusMsg: response.message || response.description || response.statusMessage,
       },
     };
   }
@@ -213,6 +214,14 @@ export default class PlatformApiModel {
     }
     if (response && this.responseHasError(response)) {
       return this.responseForError(`DELETE ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${cluster}`, response);
+    }
+    return response;
+  }
+
+  async getImportYamlTemplate() {
+    const response = await this.platformApiConnector.get('/import.yaml');
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`GET ${this.platformApiConnector.platformApiEndpoint}/import.yaml`, response);
     }
     return response;
   }
