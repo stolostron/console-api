@@ -70,6 +70,11 @@ export const resolver = {
         metadata, status, capacity, usage, consoleURL,
       }) => {
         const { name, namespace, labels } = metadata;
+        ['vendor', 'cloud', 'region', 'environment'].forEach((key) => {
+          if (labels[key] === undefined) {
+            labels[key] = 'Other';
+          }
+        });
         return {
           metadata: {
             name,
