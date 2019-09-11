@@ -76,47 +76,7 @@ Object {
           },
         },
       ],
-      "compliances": Array [
-        Object {
-          "metadata": null,
-          "raw": Object {
-            "status": Object {
-              "status": Object {
-                "cluster1": Object {
-                  "aggregatePoliciesStatus": Object {
-                    "policy-all": Object {
-                      "compliant": "Compliant",
-                      "valid": true,
-                    },
-                  },
-                  "clustername": "cluster1",
-                  "compliant": "Compliant",
-                },
-                "cluster2": Object {
-                  "aggregatePoliciesStatus": Object {
-                    "policy-all": Object {
-                      "compliant": "Compliant",
-                      "valid": true,
-                    },
-                  },
-                  "clustername": "cluster2",
-                  "compliant": "Compliant",
-                },
-                "cluster3": Object {
-                  "aggregatePoliciesStatus": Object {
-                    "policy-all": Object {
-                      "compliant": "Compliant",
-                      "valid": true,
-                    },
-                  },
-                  "clustername": "cluster3",
-                  "compliant": "Compliant",
-                },
-              },
-            },
-          },
-        },
-      ],
+      "compliances": Array [],
       "pods": Array [
         Object {
           "cluster": Object {
