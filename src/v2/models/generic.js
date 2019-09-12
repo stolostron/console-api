@@ -282,7 +282,16 @@ export default class GenericModel extends KubeModel {
       return this.kubeConnector.get(selfLink);
     }
     // if not local cluster -> need to create a resource query to get remote resource
-    const apiGroup = selfLink.split('/')[2]; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
+    // TODO - need to pass apigroup from backend to this function so we dont need this hack
+    let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
+    const selfLinkData = selfLink.split('/');
+    // eslint-disable-next-line
+    // When splitting the selfLink, the item at selfLinkData[3] is either the api version (if the resource has an apiGroup namespaced or not), resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
+    // knowing this we grab the apiGroup if selfLinkData[3] is not the kind or 'namespaces'
+    if (selfLinkData[3] !== kind && selfLinkData[3] !== 'namespaces') {
+      // eslint-disable-next-line prefer-destructuring
+      apiGroup = selfLinkData[2];
+    }
     // eslint-disable-next-line
     const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup);
     if (response.status.results) {
