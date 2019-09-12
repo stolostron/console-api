@@ -317,7 +317,7 @@ export default class GenericModel extends KubeModel {
     const clusterNamespace = clusterResponse[0].metadata.namespace;
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
-    const modName = (name.length >= 36) ? name.slice(0, 36) : name;
+    const modName = (name.length >= 30) ? name.substring(name.length - 30) : name;
     const workName = `${modName}-update-work-${this.kubeConnector.uid()}`;
     const jsonBody = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
@@ -397,7 +397,9 @@ export default class GenericModel extends KubeModel {
     const clusterNamespace = clusterResponse[0].metadata.namespace;
 
     // Else if deleting resource on remote cluster use Action Type Work
-    const workName = `${name}-delete-work-${this.kubeConnector.uid()}`;
+    // Limit workName to 63 characters
+    const modName = (name.length >= 30) ? name.substring(name.length - 30) : name;
+    const workName = `${modName}-delete-work-${this.kubeConnector.uid()}`;
     const jsonBody = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'Work',
