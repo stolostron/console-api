@@ -100,21 +100,23 @@ async function getApplicationElements(application) {
     const isPlaced = clusterNames.length > 0;
     if (isPlaced) {
       memberId = 'member--clusters';
+      const cns = clusterNames.join(', ');
+      const uid = `${memberId}--${cns}`;
       nodes.push({
-        name: clusterNames.join(', '),
+        name: cns,
         namespace: '',
         type: 'clusters',
         id: memberId,
-        uid: memberId,
+        uid,
         specs: { clusterNames, isDivider: true },
       });
       links.push({
         from: { uid: parentId },
-        to: { uid: memberId },
+        to: { uid },
         type: '',
         specs: { isDesign: true },
       });
-      parentId = memberId;
+      parentId = uid;
     }
 
     // if subscription has deployables
