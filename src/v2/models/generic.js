@@ -11,6 +11,20 @@ import _ from 'lodash';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
+function getApiGroupFromSelfLink(selfLink, kind) {
+  // TODO - need to pass apigroup from backend to this function so we dont need this hack
+  let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
+  const selfLinkData = selfLink.split('/');
+  // eslint-disable-next-line
+  // When splitting the selfLink, the item at selfLinkData[3] is either the api version (if the resource has an apiGroup namespaced or not), resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
+  // knowing this we grab the apiGroup if selfLinkData[3] is not the kind or 'namespaces'
+  if (selfLinkData[3] !== kind && selfLinkData[3] !== 'namespaces') {
+    // eslint-disable-next-line prefer-destructuring
+    apiGroup = selfLinkData[2];
+  }
+  return apiGroup;
+}
+
 export default class GenericModel extends KubeModel {
   async getResourceEndPoint(resource, k8sPaths) {
     // dynamically get resource endpoint from kebernetes API
@@ -282,16 +296,8 @@ export default class GenericModel extends KubeModel {
       return this.kubeConnector.get(selfLink);
     }
     // if not local cluster -> need to create a resource query to get remote resource
-    // TODO - need to pass apigroup from backend to this function so we dont need this hack
-    let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
-    const selfLinkData = selfLink.split('/');
-    // eslint-disable-next-line
-    // When splitting the selfLink, the item at selfLinkData[3] is either the api version (if the resource has an apiGroup namespaced or not), resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
-    // knowing this we grab the apiGroup if selfLinkData[3] is not the kind or 'namespaces'
-    if (selfLinkData[3] !== kind && selfLinkData[3] !== 'namespaces') {
-      // eslint-disable-next-line prefer-destructuring
-      apiGroup = selfLinkData[2];
-    }
+    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
+
     // eslint-disable-next-line
     const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup);
     if (response.status.results) {
@@ -315,6 +321,7 @@ export default class GenericModel extends KubeModel {
     }
     const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
     const clusterNamespace = clusterResponse[0].metadata.namespace;
+    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
     const modName = (name.length >= 30) ? name.substring(name.length - 30) : name;
@@ -332,12 +339,12 @@ export default class GenericModel extends KubeModel {
         },
         type: 'Action',
         scope: {
-          resourceType: kind,
+          resourceType: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
           namespace,
         },
         actionType: 'Update',
         kube: {
-          resource: kind,
+          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
           name,
           namespace,
           template: body,
@@ -395,6 +402,7 @@ export default class GenericModel extends KubeModel {
 
     const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
     const clusterNamespace = clusterResponse[0].metadata.namespace;
+    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
@@ -413,12 +421,12 @@ export default class GenericModel extends KubeModel {
         },
         type: 'Action',
         scope: {
-          resourceType: kind,
+          resourceType: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
           namespace,
         },
         actionType: 'Delete',
         kube: {
-          resource: kind,
+          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
           name,
           namespace,
         },
