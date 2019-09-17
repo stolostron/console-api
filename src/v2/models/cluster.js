@@ -25,19 +25,24 @@ function getStatus(cluster) {
 }
 
 function findClusterIntersection(clusters, clusterstatuses) {
+  const uniqueNameForCluster = (name, namespace) => `${name}_${namespace}`;
   const clusterSet = new Set(clusters.map(item =>
-    ((item && item.metadata) ? item.metadata.name : null)));
+    ((item && item.metadata)
+      ? uniqueNameForCluster(item.metadata.name, item.metadata.namespace)
+      : null)));
   const clusterStatusSet = new Set(clusterstatuses.map(item =>
-    ((item && item.metadata) ? item.metadata.name : null)));
+    ((item && item.metadata)
+      ? uniqueNameForCluster(item.metadata.name, item.metadata.namespace)
+      : null)));
   const intersect = new Set([...clusterSet].filter(name => clusterStatusSet.has(name)));
   const resultMap = new Map();
   clusters.forEach((cluster) => {
-    const clusterName = _.get(cluster, 'metadata.name');
-    if (intersect.has(clusterName)) {
+    const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
+    const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
+    if (intersect.has(uniqueNameForCluster(clusterName, clusterNamespace))) {
       resultMap.set(clusterName, { metadata: cluster.metadata, raw: cluster });
     }
   });
-
   return resultMap;
 }
 

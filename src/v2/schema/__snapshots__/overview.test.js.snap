@@ -14,68 +14,7 @@ Object {
           "selector": null,
         },
       ],
-      "clusters": Array [
-        Object {
-          "capacity": Object {
-            "cpu": "18",
-            "memory": "32013Mi",
-            "nodes": 2,
-            "storage": "100Gi",
-          },
-          "consoleURL": null,
-          "metadata": Object {
-            "labels": Object {
-              "cloud": "IBM",
-              "datacenter": "toronto",
-              "environment": "Dev",
-              "name": "managed-cluster",
-              "owner": "marketing",
-              "region": "US",
-              "vendor": "ICP",
-            },
-            "name": "managed-cluster",
-            "namespace": "default",
-            "uid": null,
-          },
-          "status": "ok",
-          "usage": Object {
-            "cpu": "6598m",
-            "memory": "6728Mi",
-            "pods": 5071,
-            "storage": "60Gi",
-          },
-        },
-        Object {
-          "capacity": Object {
-            "cpu": "16",
-            "memory": "32013Mi",
-            "nodes": 3,
-            "storage": "80Gi",
-          },
-          "consoleURL": null,
-          "metadata": Object {
-            "labels": Object {
-              "cloud": "IBM",
-              "datacenter": "raleigh",
-              "environment": "Dev",
-              "name": "hub-cluster",
-              "owner": "development",
-              "region": "US",
-              "vendor": "ICP",
-            },
-            "name": "hub-cluster",
-            "namespace": "kube-system",
-            "uid": null,
-          },
-          "status": "ok",
-          "usage": Object {
-            "cpu": "6598m",
-            "memory": "6728Mi",
-            "pods": 5071,
-            "storage": "60Gi",
-          },
-        },
-      ],
+      "clusters": Array [],
       "compliances": Array [],
       "pods": Array [
         Object {

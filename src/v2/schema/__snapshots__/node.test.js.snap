@@ -6,12 +6,7 @@ Object {
     "nodes": Array [
       Object {
         "architecture": "amd64",
-        "cluster": Object {
-          "clusterip": "9.42.23.230",
-          "metadata": Object {
-            "name": "hub-cluster",
-          },
-        },
+        "cluster": null,
         "metadata": Object {
           "creationTimestamp": "2018-08-18T15:52:43Z",
           "labels": Object {
@@ -32,12 +27,7 @@ Object {
       },
       Object {
         "architecture": "amd64",
-        "cluster": Object {
-          "clusterip": "9.42.23.230",
-          "metadata": Object {
-            "name": "hub-cluster",
-          },
-        },
+        "cluster": null,
         "metadata": Object {
           "creationTimestamp": "2018-08-18T15:52:44Z",
           "labels": Object {
@@ -58,12 +48,7 @@ Object {
       },
       Object {
         "architecture": "amd64",
-        "cluster": Object {
-          "clusterip": "9.42.23.230",
-          "metadata": Object {
-            "name": "hub-cluster",
-          },
-        },
+        "cluster": null,
         "metadata": Object {
           "creationTimestamp": "2018-08-18T15:50:24Z",
           "labels": Object {
