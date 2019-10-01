@@ -6,7 +6,7 @@
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
  ****************************************************************************** */
-
+/* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 import KubeModel from './kube';
 
@@ -18,6 +18,14 @@ const filterByNameNamespace = (names, items) =>
     const path = name.split('/');
     return path[1] === metadata.name && path[0] === metadata.namespace;
   }));
+
+const getChannelName = (subscription) => {
+  const { metadata: { name: nm, namespace: ns } } = subscription;
+  const chn = _.get(subscription, 'spec.channel');
+  return `${ns}/${nm}//${chn}`;
+};
+
+const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 
 export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
@@ -94,7 +102,7 @@ export default class ApplicationModel extends KubeModel {
   // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
   // ///////////// USED FOR APPLICATION TOPOLOGY ////////////////
 
-  async getApplication(name, namespace, channel) {
+  async getApplication(name, namespace, selectedChannel) {
     // get application
     let model = null;
     const apps = await this.kubeConnector.getResources(
@@ -108,6 +116,7 @@ export default class ApplicationModel extends KubeModel {
       model = { name, namespace, app };
 
       // get subscriptions to channels (pipelines)
+      let arr = null;
       let subscriptionNames = _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]') ||
         _.get(app, 'metadata.annotations["apps.ibm.com/subscriptions"]');
       let deployableNames = _.get(app, 'metadata.annotations["app.ibm.com/deployables"]') ||
@@ -118,34 +127,66 @@ export default class ApplicationModel extends KubeModel {
           await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
 
         // pick subscription based on channel requested by ui
-        const getChannelName = (subscription) => {
-          const { metadata: { name: nm, namespace: ns } } = subscription;
-          const chn = _.get(subscription, 'spec.channel');
-          return `${ns}/${nm}//${chn}`;
-        };
-        let [subscription] = subscriptions;
-        model.activeChannel = getChannelName(subscription);
-        model.channels = [];
-        subscriptions.forEach((sub) => {
-          let chn = _.get(sub, 'spec.channel');
-          if (chn) {
-            chn = getChannelName(sub);
-            model.channels.push(chn);
-            if (chn === channel) {
-              subscription = sub;
-              model.activeChannel = channel;
+        model.activeChannel = selectedChannel;
+
+        // the everything channel (all subscriptions/all channels)
+        model.channels = [EVERYTHING_CHANNEL];
+
+        // what subscriptions does user want to see
+        model.subscriptions = [];
+        const rulesMap = {};
+        const deployableMap = {};
+
+        // get all the channels
+        let selectedSubscription;
+        subscriptions.forEach((subscription) => {
+          if (_.get(subscription, 'spec.channel')) {
+            const subscriptionChannel = getChannelName(subscription);
+            model.channels.push(subscriptionChannel);
+            if (selectedChannel === subscriptionChannel) {
+              selectedSubscription = [subscription];
             }
           }
         });
 
-        deployableNames = _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]');
-        if (deployableNames && deployableNames.length > 0) {
-          deployableNames = deployableNames.split(',');
-          model.deployables =
-            await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
-        }
-        ([subscription] = await this.getPlacementRules([subscription]));
-        model.subscription = subscription;
+        // get all subscriptions
+        (selectedSubscription || subscriptions).forEach((subscription) => {
+          model.subscriptions.push(subscription);
+
+          // build up map of what deployables to get for a bulk fetch
+          _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]', '')
+            .split(',').forEach((deployablePath) => {
+              if (deployablePath && deployablePath.split('/').length > 0) {
+                const [deployableNamespace, deployableName] = deployablePath.split('/');
+                arr = deployableMap[deployableNamespace];
+                if (!arr) {
+                  deployableMap[deployableNamespace] = [];
+                  arr = deployableMap[deployableNamespace];
+                }
+                arr.push({ deployableName, subscription });
+                subscription.deployables = [];
+              }
+            });
+
+          // ditto for rules
+          const ruleNamespace = _.get(subscription, 'metadata.namespace');
+          _.get(subscription, 'spec.placement.placementRef.name', '')
+            .split(',').forEach((ruleName) => {
+              if (ruleName) {
+                arr = rulesMap[ruleNamespace];
+                if (!arr) {
+                  rulesMap[ruleNamespace] = [];
+                  arr = rulesMap[ruleNamespace];
+                }
+                arr.push({ ruleName, subscription });
+                subscription.rules = [];
+              }
+            });
+        });
+
+        // now fetch them
+        await this.getAppDeployables(deployableMap);
+        await this.getAppRules(rulesMap);
       } else if (deployableNames && deployableNames.length > 0) {
         deployableNames = deployableNames.split(',');
         model.deployables =
@@ -154,6 +195,48 @@ export default class ApplicationModel extends KubeModel {
       }
     }
     return model;
+  }
+
+  async getAppDeployables(deployableMap) {
+    const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
+      // get all deployables in this namespace
+      const response = await this.kubeConnector.getResources(
+        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/deployables`,
+        { kind: 'Deployable', namespaces: [namespace] },
+      ) || [];
+
+      // stuff responses into subscriptions that requested them
+      response.forEach((deployable) => {
+        const name = _.get(deployable, 'metadata.name');
+        values.forEach(({ deployableName, subscription }) => {
+          if (name === deployableName) {
+            subscription.deployables.push(deployable);
+          }
+        });
+      });
+    });
+    return Promise.all(requests);
+  }
+
+  async getAppRules(rulesMap) {
+    const requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
+    // get all rules in this namespace
+      const response = await this.kubeConnector.getResources(
+        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
+        { kind: 'PlacementRule', namespaces: [namespace] },
+      ) || [];
+
+      // stuff responses into subscriptions that requested them
+      response.forEach((rule) => {
+        const name = _.get(rule, 'metadata.name');
+        values.forEach(({ ruleName, subscription }) => {
+          if (name === ruleName) {
+            subscription.rules.push(rule);
+          }
+        });
+      });
+    });
+    return Promise.all(requests);
   }
 
   async getApplicationResources(names, type, kind) {
