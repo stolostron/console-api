@@ -62,6 +62,8 @@ export const resolver = {
   Query: {
     nodes: (root, args, { resourceViewModel }) =>
       resourceViewModel.fetchResources({ type: 'nodes' }),
+    node: (root, args, { resourceViewModel }) =>
+      resourceViewModel.fetchNodeResource('nodes', args.name, args.namespace),
   },
   Node: {
     cluster: async (parent, args, { clusterModel, req }) =>
