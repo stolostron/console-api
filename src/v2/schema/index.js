@@ -32,7 +32,6 @@ import * as releases from './helmrels';
 import * as repo from './helmrepo';
 import * as topology from './topology';
 import * as userAccess from './user-access';
-import * as userQuery from './user-query';
 import * as userInfo from './user-info';
 import * as cemIncident from './cem-incident';
 import * as platformApi from './platformApi';
@@ -60,7 +59,6 @@ const modules = [
   repo,
   topology,
   userAccess,
-  userQuery,
   userInfo,
   cemIncident,
   platformApi,

@@ -8,13 +8,6 @@
  ****************************************************************************** */
 /* eslint-disable global-require */
 
-import lru from 'lru-cache';
-
-const cache = lru({
-  max: 1000,
-  maxAge: 1000 * 60, // 1 min
-});
-
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
@@ -27,7 +20,6 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
-    userQuery: require('./UserQuery'),
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
@@ -53,14 +45,6 @@ export default function createMockHttp() {
 
   return async function MockLib(params) {
     if (params.json) {
-      if (params.json.userQueries) {
-        if (cache.get('savedUserQuery')) {
-          cache.set('savedUserQuery', false);
-          return state.userQuery.unitResponse;
-        }
-        cache.set('savedUserQuery', true);
-        return state.userQuery.seleniumResponse;
-      }
       if (params.json.userinfo) {
         return state.userInfo;
       }
@@ -176,10 +160,6 @@ export default function createMockHttp() {
         return state.resourceViews.mockWorksetPollComplete;
       case params.url.includes('clusters'):
         return state.clusters;
-      case params.url.includes('api/v1/userpreferences'):
-        return cache.get('savedUserQuery')
-          ? state.userQuery.seleniumResponse
-          : state.userQuery.unitResponse;
       case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
         return state.apiList.apiPath;
       case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):

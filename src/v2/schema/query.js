@@ -68,9 +68,6 @@ type Query {
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
 
-  # Get saved search queries for the current user.
-  userQueries: [userQuery]
-
   # Get logged in user information
   userInfo: userInfo
 
@@ -146,14 +143,8 @@ type Mutation {
   # Delete helm release on specific cluster. Used by catalog.
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
-  # Delete search query for the current user.
-  deleteQuery(resource: JSON): JSON
-
   # Delete any Kubernetes resource via selfLink
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
-
-  # Save a search query for the current user.
-  saveQuery(resource: JSON): JSON
 
   # Create remote cluster
   createCluster(namespace: String!, cluster: JSON!) : JSON

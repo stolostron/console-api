@@ -28,7 +28,6 @@ import ChannelModel from './models/channel';
 import SubscriptionModel from './models/subscription';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
-import QueryModel from './models/userquery';
 import UserInfoModel from './models/userinfo';
 import CemModel from './models/cemincident';
 import ComplianceModel from './models/compliance';
@@ -119,7 +118,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     subscriptionModel: new SubscriptionModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
-    queryModel: new QueryModel({ kubeConnector, req }),
     userInfoModel: new UserInfoModel({ kubeConnector, req }),
     cemModel: new CemModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
