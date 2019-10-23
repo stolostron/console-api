@@ -193,6 +193,22 @@ export const apiPath = {
         ],
       },
       {
+        name: 'placementrules',
+        singularName: '',
+        namespaced: true,
+        kind: 'PlacementRule',
+        verbs: [
+          'create',
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'update',
+          'watch',
+        ],
+      },
+      {
         name: 'applications/status',
         singularName: '',
         namespaced: true,
@@ -375,6 +391,25 @@ export const apiPath = {
         ],
         shortNames: [
           'pp',
+        ],
+      },
+      {
+        name: 'placementrules',
+        singularName: '',
+        namespaced: true,
+        kind: 'placementrule',
+        verbs: [
+          'create',
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'update',
+          'watch',
+        ],
+        shortNames: [
+          'pr',
         ],
       },
       {

@@ -26,6 +26,7 @@ import PlatformApiConnector from './connectors/platformApi';
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
 import SubscriptionModel from './models/subscription';
+import PlacementRuleModel from './models/placementrule';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import UserInfoModel from './models/userinfo';
@@ -116,6 +117,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     applicationModel: new ApplicationModel({ kubeConnector }),
     channelModel: new ChannelModel({ kubeConnector }),
     subscriptionModel: new SubscriptionModel({ kubeConnector }),
+    placementRuleModel: new PlacementRuleModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
     userInfoModel: new UserInfoModel({ kubeConnector, req }),

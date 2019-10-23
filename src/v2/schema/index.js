@@ -16,6 +16,7 @@ import * as subscriptions from './subscription';
 import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as compliance from './compliance';
+import * as placementrules from './placementrule';
 import * as filter from './filter';
 import * as overview from './overview';
 import * as accountId from './user-accountid';
@@ -40,6 +41,7 @@ const modules = [
   applications,
   channels,
   subscriptions,
+  placementrules,
   charts,
   cluster,
   compliance,

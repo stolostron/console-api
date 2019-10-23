@@ -55,6 +55,9 @@ type Query {
   # Get placement policies.
   placementPolicies (selector: JSON): [PlacementPolicy]
 
+  # Get placement rules.
+  placementrules (name: String, namespace: String): [PlacementRule]
+
   # Get policies.
   policies(name: String, namespace: String, clusterName: String): [Policy]
 
@@ -121,6 +124,9 @@ type Mutation {
 
   # Creates a subscription resource.
   createSubscription(resources: [JSON]): JSON
+
+  # Creates a placement rule resource.
+  createPlacementRule(resources: [JSON]): JSON
 
   # Creates Kubernetes resources in any cluster.
   createResources(resources: [JSON], clusterInfo: JSON): JSON
