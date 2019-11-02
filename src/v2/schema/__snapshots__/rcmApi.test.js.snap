@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Platform Api Resolver Correctly Resolves Create Cloud Connection 1`] = `
+exports[`RCM Api Resolver Correctly Resolves Create Cloud Connection 1`] = `
 Object {
   "errors": Array [
     Object {
@@ -16,7 +16,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Correctly Resolves Delete Cloud Connection 1`] = `
+exports[`RCM Api Resolver Correctly Resolves Delete Cloud Connection 1`] = `
 Object {
   "data": Object {
     "deleteCloudConnection": null,
@@ -24,7 +24,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Correctly Resolves Edit Cloud Connection 1`] = `
+exports[`RCM Api Resolver Correctly Resolves Edit Cloud Connection 1`] = `
 Object {
   "errors": Array [
     Object {
@@ -40,7 +40,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Correctly Resolves Get Cloud Connections 1`] = `
+exports[`RCM Api Resolver Correctly Resolves Get Cloud Connections 1`] = `
 Object {
   "data": Object {
     "connections": Array [
@@ -57,25 +57,41 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Correctly Resolves Get Cloud Providers 1`] = `
+exports[`RCM Api Resolver Correctly Resolves Get Cloud Providers 1`] = `
 Object {
   "data": Object {
     "providers": Array [
       Object {
-        "clusterMetadata": "",
-        "clusterValues": "",
-        "configMetadata": "",
-        "configValues": "",
-        "longname": "iks-test",
-        "name": "iks-test",
-        "statusCode": 200,
+        "clusterMetadata": null,
+        "clusterValues": null,
+        "configMetadata": null,
+        "configValues": null,
+        "longname": null,
+        "name": null,
+        "statusCode": null,
       },
     ],
   },
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 17,
+          "line": 10,
+        },
+      ],
+      "message": "Int cannot represent non 32-bit signed integer value: (empty string)",
+      "path": Array [
+        "providers",
+        0,
+        "statusCode",
+      ],
+    },
+  ],
 }
 `;
 
-exports[`Platform Api Resolver Create Kubernetes Cluster Resource for Import 1`] = `
+exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import 1`] = `
 Object {
   "data": Object {
     "createClusterResource": Object {
@@ -148,7 +164,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
+exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
 Object {
   "data": Object {
     "createClusterResource": null,
@@ -170,7 +186,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Get Automated Import Status 1`] = `
+exports[`RCM Api Resolver Get Automated Import Status 1`] = `
 Object {
   "data": Object {
     "getAutomatedImportStatus": Object {
@@ -243,7 +259,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Get Automated Import Status should return error msg 1`] = `
+exports[`RCM Api Resolver Get Automated Import Status should return error msg 1`] = `
 Object {
   "data": Object {
     "getAutomatedImportStatus": null,
@@ -265,7 +281,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Start Automated Import Process 1`] = `
+exports[`RCM Api Resolver Start Automated Import Process 1`] = `
 Object {
   "data": Object {
     "automatedImport": null,
@@ -287,7 +303,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Start Automated Import Process should return error msg 1`] = `
+exports[`RCM Api Resolver Start Automated Import Process should return error msg 1`] = `
 Object {
   "data": Object {
     "automatedImport": null,
@@ -309,7 +325,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Update Kubernetes Cluster Resource for Import 1`] = `
+exports[`RCM Api Resolver Update Kubernetes Cluster Resource for Import 1`] = `
 Object {
   "data": Object {
     "updateClusterResource": Object {
@@ -382,7 +398,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver Update Kubernetes Cluster Resource for Import should return error msg 1`] = `
+exports[`RCM Api Resolver Update Kubernetes Cluster Resource for Import should return error msg 1`] = `
 Object {
   "data": Object {
     "updateClusterResource": null,
@@ -404,7 +420,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver createCluster test that we can create cluster correctly 1`] = `
+exports[`RCM Api Resolver createCluster test that we can create cluster correctly 1`] = `
 Object {
   "data": Object {
     "createCluster": null,
@@ -426,7 +442,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver createCluster test that we get an error when cluster not provided 1`] = `
+exports[`RCM Api Resolver createCluster test that we get an error when cluster not provided 1`] = `
 Object {
   "errors": Array [
     Object {
@@ -442,7 +458,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver createCluster test that we get an error when namespace not provided 1`] = `
+exports[`RCM Api Resolver createCluster test that we get an error when namespace not provided 1`] = `
 Object {
   "errors": Array [
     Object {
@@ -458,7 +474,7 @@ Object {
 }
 `;
 
-exports[`Platform Api Resolver createCluster test with all required fields but returns with error 1`] = `
+exports[`RCM Api Resolver createCluster test with all required fields but returns with error 1`] = `
 Object {
   "data": Object {
     "createCluster": null,

@@ -7,8 +7,8 @@ matrix:
       env: OSARCH=linux-ppc64le
     - os: linux
       env: OSARCH=linux-amd64
-    - os: linux-s390
-      env: OSARCH=linux
+    # - os: linux-s390
+    #  env: OSARCH=linux
 
 cache:
   apt: true

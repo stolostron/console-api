@@ -39,7 +39,7 @@ export default function createMockHttp() {
     resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
-    platformApi: require('./PlatformApi'),
+    rcmApi: require('./RcmApi'),
     userInfo: require('./UserInfo'),
   };
 
@@ -78,7 +78,7 @@ export default function createMockHttp() {
         case params.url.includes('default/work'):
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/clusters') && params.url.includes('/imports'):
-          return state.platformApi.getAutomatedImportStatusResponse;
+          return state.rcmApi.getAutomatedImportStatusResponse;
         default:
           return state.pods;
       }
@@ -169,11 +169,11 @@ export default function createMockHttp() {
       case params.url.includes('test-path-to-update-work'):
         return state.genericResourceList.mockedUpdatePollResponse;
       case params.url.includes('/api/v1/clusters'):
-        return state.platformApi.createClusterResourceResponse;
+        return state.rcmApi.createClusterResourceResponse;
       case params.url.includes('api/v1/cloudproviders'):
-        return state.platformApi.getCloudProvidersResponse;
+        return state.rcmApi.getCloudProvidersResponse;
       case params.url.includes('api/v1/cloudconnections/iks/ericabrtest4/clusters'):
-        return state.platformApi.getClusterCreationResponse;
+        return state.rcmApi.getClusterCreationResponse;
       default:
         return state.apiList.mockResponse;
     }

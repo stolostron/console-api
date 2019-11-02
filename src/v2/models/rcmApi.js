@@ -11,12 +11,12 @@
 
 import logger from '../lib/logger';
 
-export default class PlatformApiModel {
-  constructor({ platformApiConnector }) {
-    if (!platformApiConnector) {
-      throw new Error('platformApiConnector is a required parameter');
+export default class RcmApiModel {
+  constructor({ rcmApiConnector }) {
+    if (!rcmApiConnector) {
+      throw new Error('rcmApiConnector is a required parameter');
     }
-    this.platformApiConnector = platformApiConnector;
+    this.rcmApiConnector = rcmApiConnector;
   }
 
   getErrorMsg(response) {
@@ -34,7 +34,7 @@ export default class PlatformApiModel {
 
 
   responseForError(errorTitle, response) {
-    logger.error(`PLATFORM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+    logger.error(`RCM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
     return {
       error: {
         rawResponse: response,
@@ -45,9 +45,9 @@ export default class PlatformApiModel {
   }
   async getProviders() {
     // eslint-disable-next-line arrow-body-style
-    const response = await this.platformApiConnector.get('/cloudproviders');
+    const response = await this.rcmApiConnector.get('/cloudproviders');
     if (response && (response.code || response.message)) {
-      logger.error(`PLATFORM API ERROR: POST ${this.platformApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
+      logger.error(`RCM API ERROR: POST ${this.rcmApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
       return {
         error: {
           rawResponse: response,
@@ -79,13 +79,13 @@ export default class PlatformApiModel {
 
   async createConnection(args) {
     const { body } = args;
-    const response = await this.platformApiConnector.post('/cloudconnections', body);
+    const response = await this.rcmApiConnector.post('/cloudconnections', body);
     return response;
   }
 
   async getConnections(args = {}) {
     const userNamespaces = args.user.namespaces && args.user.namespaces.map(ns => ns.namespaceId);
-    const connections = await this.platformApiConnector.get('/cloudconnections');
+    const connections = await this.rcmApiConnector.get('/cloudconnections');
     // eslint-disable-next-line arrow-body-style
     if (connections.statusCode !== 200) {
       const errors = [];
@@ -119,13 +119,13 @@ export default class PlatformApiModel {
 
   async deleteConnection(args) {
     const { namespace, name } = args;
-    const response = await this.platformApiConnector.delete(`/cloudconnections/${namespace}/${name}`);
+    const response = await this.rcmApiConnector.delete(`/cloudconnections/${namespace}/${name}`);
     return response;
   }
 
   async editConnection(args) {
     const { body, namespace, name } = args;
-    const response = await this.platformApiConnector.put(`/cloudconnections/${namespace}/${name}`, body);
+    const response = await this.rcmApiConnector.put(`/cloudconnections/${namespace}/${name}`, body);
     return response;
   }
 
@@ -136,10 +136,10 @@ export default class PlatformApiModel {
     if (!body) {
       throw new Error('Body is required for createClusterResource');
     } else {
-      response = await this.platformApiConnector.postWithString('/clusters', body);
+      response = await this.rcmApiConnector.postWithString('/clusters', body);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.platformApiConnector.platformApiEndpoint}/clusters`, response);
+      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters`, response);
     }
     return response;
   }
@@ -151,10 +151,10 @@ export default class PlatformApiModel {
     if (!body || !namespace || !name) {
       throw new Error('Body, namespace, and name are required for updateClusterResource');
     } else {
-      response = await this.platformApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
+      response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`PUT ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}`, response);
+      return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
     }
     return response;
   }
@@ -166,10 +166,10 @@ export default class PlatformApiModel {
     if (!body || !namespace || !name) {
       throw new Error('Body, namespace, and name are required for automatedImport');
     } else {
-      response = await this.platformApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
+      response = await this.rcmApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
+      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
     }
     return response;
   }
@@ -180,10 +180,10 @@ export default class PlatformApiModel {
     if (!namespace || !cluster) {
       throw new Error('Namespace and cluster are required for createCluster');
     } else {
-      response = await this.platformApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters`, cluster);
+      response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters`, cluster);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.platformApiConnector.platformApiEndpoint}/cloudconnections/${namespace}/${cluster.name}/clusters`, response);
+      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/${namespace}/${cluster.name}/clusters`, response);
     }
     return response;
   }
@@ -195,10 +195,10 @@ export default class PlatformApiModel {
     if (!namespace || !name) {
       throw new Error('namespace and name are required for getAutomatedImportStatus');
     } else {
-      response = await this.platformApiConnector.get(`/clusters/${namespace}/${name}/imports`);
+      response = await this.rcmApiConnector.get(`/clusters/${namespace}/${name}/imports`);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
+      return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
     }
     return response;
   }
@@ -210,18 +210,18 @@ export default class PlatformApiModel {
     if (!cluster) {
       throw new Error('cluster name is required for deleteCluster');
     } else {
-      response = await this.platformApiConnector.delete(`/clusters/${namespace}/${cluster}`);
+      response = await this.rcmApiConnector.delete(`/clusters/${namespace}/${cluster}`);
     }
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`DELETE ${this.platformApiConnector.platformApiEndpoint}/clusters/${namespace}/${cluster}`, response);
+      return this.responseForError(`DELETE ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${cluster}`, response);
     }
     return response;
   }
 
   async getImportYamlTemplate() {
-    const response = await this.platformApiConnector.get('/import.yaml');
+    const response = await this.rcmApiConnector.get('/import.yaml');
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET ${this.platformApiConnector.platformApiEndpoint}/import.yaml`, response);
+      return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/import.yaml`, response);
     }
     return response;
   }

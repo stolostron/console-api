@@ -21,7 +21,7 @@ import _ from 'lodash';
 import logger from './lib/logger';
 
 import KubeConnector from './connectors/kube';
-import PlatformApiConnector from './connectors/platformApi';
+import RcmApiConnector from './connectors/rcmApi';
 
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
@@ -37,7 +37,7 @@ import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
 import AccountIdModel from './models/user-accountid';
 import SFModel from './models/findings';
-import PlatformApiModel from './models/platformApi';
+import RcmApiModel from './models/rcmApi';
 
 import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
@@ -107,7 +107,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     namespaces,
   });
 
-  const platformApiConnector = new PlatformApiConnector({
+  const rcmApiConnector = new RcmApiConnector({
     token: _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie'),
     httpLib: kubeHTTP,
   });
@@ -128,7 +128,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     accountModel: new AccountIdModel({ kubeConnector, req }),
     sfModel: new SFModel({ kubeConnector, req }),
-    platformApiModel: new PlatformApiModel({ platformApiConnector }),
+    rcmApiModel: new RcmApiModel({ rcmApiConnector }),
   };
 
   return { formatError, schema, context };

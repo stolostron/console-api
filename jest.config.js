@@ -27,7 +27,7 @@ const jestConfig = {
   ],
   coverageThreshold: {
     global: {
-      branches: 39,
+      branches: 38,
       functions: 40,
       lines: 48,
       statements: 48,

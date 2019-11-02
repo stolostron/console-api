@@ -10,7 +10,7 @@
 import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
-describe('Platform Api Resolver', () => {
+describe('RCM Api Resolver', () => {
   test('Get Automated Import Status', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)

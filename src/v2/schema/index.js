@@ -35,7 +35,7 @@ import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as userInfo from './user-info';
 import * as cemIncident from './cem-incident';
-import * as platformApi from './platformApi';
+import * as rcmApi from './rcmApi';
 
 const modules = [
   applications,
@@ -63,7 +63,7 @@ const modules = [
   userAccess,
   userInfo,
   cemIncident,
-  platformApi,
+  rcmApi,
 ];
 
 const mainDefs = [`

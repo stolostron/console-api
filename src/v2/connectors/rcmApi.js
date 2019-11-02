@@ -30,25 +30,25 @@ const successCb = (res) => {
   }
   return {
     statusCode: 500,
-    statusMessage: 'Error Occured on Platform Api Connector',
+    statusMessage: 'Error Occured on RCM Api Connector',
   };
 };
 
-export default class PlatformApiConnector {
+export default class RcmApiConnector {
   constructor({
     httpLib = requestLib,
     token = 'localdev',
-    platformApiEndpoint = `${config.get('cfcRouterUrl')}/api/v1`,
+    rcmApiEndpoint = `${config.get('cfcRouterUrl')}/rcm/v1`,
   } = {}) {
     this.http = httpLib;
     this.token = `Bearer ${token}`;
-    this.platformApiEndpoint = platformApiEndpoint;
+    this.rcmApiEndpoint = rcmApiEndpoint;
     this.successCb = successCb;
   }
 
   postWithString(path, body, opts = {}) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'POST',
       headers: {
         Authorization: this.token,
@@ -61,7 +61,7 @@ export default class PlatformApiConnector {
 
   putWithString(path, body, opts = {}) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'PUT',
       headers: {
         Authorization: this.token,
@@ -74,7 +74,7 @@ export default class PlatformApiConnector {
 
   post(path, body, opts = {}) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'POST',
       headers: {
         Authorization: this.token,
@@ -87,7 +87,7 @@ export default class PlatformApiConnector {
 
   get(path, opts = {}) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'GET',
       headers: {
         Authorization: this.token,
@@ -98,7 +98,7 @@ export default class PlatformApiConnector {
 
   delete(path) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'DELETE',
       headers: {
         Authorization: `${this.token}`,
@@ -109,7 +109,7 @@ export default class PlatformApiConnector {
 
   put(path, jsonBody) {
     const defaults = {
-      url: `${this.platformApiEndpoint}${path}`,
+      url: `${this.rcmApiEndpoint}${path}`,
       method: 'PUT',
       headers: {
         Authorization: `${this.token}`,
