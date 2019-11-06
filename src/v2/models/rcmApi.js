@@ -71,6 +71,7 @@ export default class RcmApiModel {
         providers: item.providers.map(provider => ({
           name: provider.name,
           longname: provider.longname,
+          type: provider.type,
           configMetadata: provider.configMetadata,
           configValues: provider.configValues,
           clusterMetadata: provider.clusterMetadata,
@@ -106,6 +107,7 @@ export default class RcmApiModel {
     const formattedItems = allProviders.map(provider => ({
       name: provider.name,
       longname: provider.longname,
+      type: provider.type,
       configMetadata: provider.configMetadata,
       configValues: provider.configValues,
       clusterMetadata: provider.clusterMetadata,

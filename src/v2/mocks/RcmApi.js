@@ -76,6 +76,7 @@ const getCloudProvidersResponse = {
       {
         name: 'iks-test',
         longname: 'iks-test',
+        type: '',
         configMetadata: '',
         configValues: '',
         clusterMetadata: '',

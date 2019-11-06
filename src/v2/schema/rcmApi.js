@@ -17,6 +17,7 @@ type Connection implements ConnectionObject {
 type Provider {
   name: String
   longname: String
+  type: String
   configMetadata: String
   configValues: String
   clusterMetadata: String

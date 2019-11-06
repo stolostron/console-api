@@ -69,6 +69,7 @@ Object {
         "longname": null,
         "name": null,
         "statusCode": null,
+        "type": null,
       },
     ],
   },
@@ -77,7 +78,7 @@ Object {
       "locations": Array [
         Object {
           "column": 17,
-          "line": 10,
+          "line": 11,
         },
       ],
       "message": "Int cannot represent non 32-bit signed integer value: (empty string)",

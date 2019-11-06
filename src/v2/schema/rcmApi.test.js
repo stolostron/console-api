@@ -141,6 +141,7 @@ describe('RCM Api Resolver', () => {
               providers {
                 name
                 longname
+                type
                 configMetadata
                 configValues
                 clusterMetadata
