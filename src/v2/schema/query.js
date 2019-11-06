@@ -39,9 +39,10 @@ type Query {
   # Get Cluster incidents.
   incidents(accountId: String, cluster: String): [cemIncident]
   
-  # List all cloud connections and providers
+  # List all cloud connections and orchestrations
   connections: [Connection]
   providers: [Provider]
+  orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
@@ -211,3 +212,4 @@ export const resolver = {
     },
   },
 };
+

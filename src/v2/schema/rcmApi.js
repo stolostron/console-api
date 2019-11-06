@@ -23,6 +23,12 @@ type Provider {
   clusterValues: String
   statusCode: Int
 }
+type Orchestration {
+  name: String
+  longname: String
+  providers: [Provider]
+  statusCode: Int
+}
 `;
 
 export const resolver = {
@@ -31,6 +37,8 @@ export const resolver = {
     getImportYamlTemplate: (parent, args, { rcmApiModel }) => rcmApiModel.getImportYamlTemplate(),
     connections: (parent, args, { rcmApiModel, req }) =>
       rcmApiModel.getConnections({ user: req.user }),
+    orchestrations: (parent, args, { rcmApiModel }) =>
+      rcmApiModel.getOrchestrations(),
     providers: (parent, args, { rcmApiModel }) =>
       rcmApiModel.getProviders(),
   },
@@ -48,3 +56,4 @@ export const resolver = {
       rcmApiModel.editConnection(args),
   },
 };
+

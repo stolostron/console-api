@@ -43,7 +43,7 @@ export default class RcmApiModel {
       },
     };
   }
-  async getProviders() {
+  async getOrchestrations() {
     // eslint-disable-next-line arrow-body-style
     const response = await this.rcmApiConnector.get('/cloudproviders');
     if (response && (response.code || response.message)) {
@@ -67,13 +67,51 @@ export default class RcmApiModel {
       return ({
         name: item.name,
         longname: item.longname,
-        configMetadata: item.configMetadata,
-        configValues: item.configValues,
-        clusterMetadata: item.clusterMetadata,
-        clusterValues: item.clusterValues,
         statusCode: response.statusCode,
+        providers: item.providers.map(provider => ({
+          name: provider.name,
+          longname: provider.longname,
+          configMetadata: provider.configMetadata,
+          configValues: provider.configValues,
+          clusterMetadata: provider.clusterMetadata,
+          clusterValues: provider.clusterValues,
+          statusCode: response.statusCode,
+        })),
       });
     });
+    return (formattedItems);
+  }
+
+  async getProviders() {
+    // eslint-disable-next-line arrow-body-style
+    const response = await this.rcmApiConnector.get('/cloudproviders');
+    if (response && (response.code || response.message)) {
+      logger.error(`RCM API ERROR: POST ${this.rcmApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
+      return {
+        error: {
+          rawResponse: response,
+          statusCode: response.statusCode,
+        },
+      };
+    }
+    if (response.statusCode !== 200) {
+      const Items = [];
+      const item = { statusCode: response.statusCode };
+      Items.push(item);
+      return Items;
+    }
+    const Items = response && response.Items;
+    const providerReducer = (acc, orchestration) => [...acc.providers, ...orchestration.providers];
+    const allProviders = Items.reduce(providerReducer);
+    const formattedItems = allProviders.map(provider => ({
+      name: provider.name,
+      longname: provider.longname,
+      configMetadata: provider.configMetadata,
+      configValues: provider.configValues,
+      clusterMetadata: provider.clusterMetadata,
+      clusterValues: provider.clusterValues,
+      statusCode: response.statusCode,
+    }));
     return (formattedItems);
   }
 
@@ -226,3 +264,4 @@ export default class RcmApiModel {
     return response;
   }
 }
+
