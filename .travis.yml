@@ -7,8 +7,8 @@ matrix:
       env: OSARCH=linux-ppc64le
     - os: linux
       env: OSARCH=linux-amd64
-    # - os: linux-s390
-    #  env: OSARCH=linux
+    - os: linux-s390
+      env: OSARCH=linux-s390
 
 cache:
   apt: true
@@ -30,8 +30,6 @@ before_install:
   # - "export DISPLAY=:99.0"
   # - "sh -e /etc/init.d/xvfb start"
   - make init
-  - make cicd-log-init
-  - source travis-env.sh
   - make docker-logins
   - chmod +x copyright-check.sh
 
@@ -47,7 +45,7 @@ script:
 
 after_success:
   - test "$TRAVIS_EVENT_TYPE" = "pull_request" && make push
-  - test "$TRAVIS_EVENT_TYPE" != "pull_request" && make release || echo "not pushing to integration"
+  - test "$TRAVIS_EVENT_TYPE" = !"pull_request" && make release || echo "not pushing to integration"
   - |
       if [[ "$TRAVIS_EVENT_TYPE" != "pull_request" && "$TRAVIS_BRANCH" != "development" ]]; then
         curl -Lo travis_after_all.py https://raw.github.com/dmakhno/travis_after_all/master/travis_after_all.py
@@ -56,17 +54,12 @@ after_success:
         if [[ "$BUILD_LEADER" == "YES" ]]; then
           if [[ "$BUILD_AGGREGATE_STATUS" == "others_succeeded" ]]; then
             echo "All jobs succeeded! Creating multi arch image..."
-            make docker:manifest-tool
-            make docker:multi-arch
+            make multi-arch
           else
             echo "Some jobs failed" && exit 1
           fi
         fi
       fi
-  - make cicd-log-success
-
-after_failure:
-  - make cicd-log-fail
 
 notifications:
   slack:

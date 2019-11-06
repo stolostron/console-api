@@ -14,7 +14,6 @@ import config from '../../../config';
 export default class UserInfoModel extends KubeModel {
   async getUserInfo(args) {
     const { req: { user } } = args;
-    console.log(`user id${user.name}`);
     const iamToken = _.get(args.req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
     // for getting queries list
     const opts = {
