@@ -22,7 +22,7 @@ export const kubeSystem = {
         metadata: {
           name: 'hub-cluster',
           namespace: 'kube-system',
-          selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp',
+          selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster',
           uid: 'd9f3a5aa-9f19-11e8-855e-f2b998610544',
           resourceVersion: '136558',
           creationTimestamp: '2018-08-13T16:56:41Z',
@@ -57,6 +57,54 @@ export const kubeSystem = {
           conditions: [
             {
               type: 'OK',
+              status: '',
+              lastHeartbeatTime: '2018-08-15T19:41:20Z',
+              lastTransitionTime: null,
+            },
+          ],
+        },
+      },
+      {
+        kind: 'Cluster',
+        apiVersion: 'clusterregistry.k8s.io/v1alpha1',
+        metadata: {
+          name: 'new-cluster',
+          namespace: 'kube-system',
+          selfLink: '/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster',
+          uid: 'd9f3a6aa-9f19-11f8-855e-f2b908610543',
+          resourceVersion: '137558',
+          creationTimestamp: '2018-08-13T16:56:41Z',
+          labels: {
+            cloud: 'IBM',
+            datacenter: 'raleigh',
+            environment: 'Dev',
+            name: 'new-cluster',
+            owner: 'development',
+            region: 'US',
+            vendor: 'ICP',
+          },
+          annotations: {
+            'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
+            'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
+          },
+          finalizers: [
+            'finalizer.hcm.ibm.com',
+          ],
+        },
+        spec: {
+          kubernetesApiEndpoints: {
+            serverEndpoints: [
+              {
+                serverAddress: '9.42.80.212:8001',
+              },
+            ],
+          },
+          authInfo: {},
+        },
+        status: {
+          conditions: [
+            {
+              type: '',
               status: '',
               lastHeartbeatTime: '2018-08-15T19:41:20Z',
               lastTransitionTime: null,
@@ -114,16 +162,7 @@ export default {
           },
           authInfo: {},
         },
-        status: {
-          conditions: [
-            {
-              type: 'OK',
-              status: '',
-              lastHeartbeatTime: '2018-08-15T19:41:20Z',
-              lastTransitionTime: null,
-            },
-          ],
-        },
+        status: {},
       },
     ],
   },

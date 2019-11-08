@@ -7,7 +7,12 @@ Object {
       Object {
         "chartName": "audit-logging",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085446",
         "name": "audit-logging",
         "namespace": "kube-system",
@@ -17,7 +22,12 @@ Object {
       Object {
         "chartName": "auth-apikeys",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084433",
         "name": "auth-apikeys",
         "namespace": "kube-system",
@@ -27,7 +37,12 @@ Object {
       Object {
         "chartName": "auth-idp",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084428",
         "name": "auth-idp",
         "namespace": "kube-system",
@@ -37,7 +52,12 @@ Object {
       Object {
         "chartName": "auth-pap",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084436",
         "name": "auth-pap",
         "namespace": "kube-system",
@@ -47,7 +67,12 @@ Object {
       Object {
         "chartName": "auth-pdp",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084440",
         "name": "auth-pdp",
         "namespace": "kube-system",
@@ -57,7 +82,12 @@ Object {
       Object {
         "chartName": "calico",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084159",
         "name": "calico",
         "namespace": "kube-system",
@@ -67,7 +97,12 @@ Object {
       Object {
         "chartName": "icp-catalog-chart",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085380",
         "name": "catalog-ui",
         "namespace": "kube-system",
@@ -77,7 +112,12 @@ Object {
       Object {
         "chartName": "ibm-cert-manager",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084229",
         "name": "cert-manager",
         "namespace": "cert-manager",
@@ -87,7 +127,12 @@ Object {
       Object {
         "chartName": "ibm-custom-metrics-adapter",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085148",
         "name": "custom-metrics-adapter",
         "namespace": "kube-system",
@@ -97,7 +142,12 @@ Object {
       Object {
         "chartName": "gbapp",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536162383",
         "name": "gbapp",
         "namespace": "kube-system",
@@ -107,7 +157,12 @@ Object {
       Object {
         "chartName": "heapster",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085131",
         "name": "heapster",
         "namespace": "kube-system",
@@ -117,7 +172,12 @@ Object {
       Object {
         "chartName": "helm-api",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085385",
         "name": "helm-api",
         "namespace": "kube-system",
@@ -127,7 +187,12 @@ Object {
       Object {
         "chartName": "helm-repo",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085135",
         "name": "helm-repo",
         "namespace": "kube-system",
@@ -137,7 +202,12 @@ Object {
       Object {
         "chartName": "icp-management-ingress",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084444",
         "name": "icp-management-ingress",
         "namespace": "kube-system",
@@ -147,7 +217,12 @@ Object {
       Object {
         "chartName": "ibmcloud-image-enforcement",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085139",
         "name": "image-security-enforcement",
         "namespace": "kube-system",
@@ -157,7 +232,12 @@ Object {
       Object {
         "chartName": "kube-dns",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084163",
         "name": "kube-dns",
         "namespace": "kube-system",
@@ -167,7 +247,12 @@ Object {
       Object {
         "chartName": "gbapp",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536163032",
         "name": "kube-system",
         "namespace": "kube-system",
@@ -177,7 +262,12 @@ Object {
       Object {
         "chartName": "ibm-icplogging",
         "chartVersion": "2.0.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085156",
         "name": "logging",
         "namespace": "kube-system",
@@ -187,7 +277,12 @@ Object {
       Object {
         "chartName": "mariadb",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084289",
         "name": "mariadb",
         "namespace": "kube-system",
@@ -197,7 +292,12 @@ Object {
       Object {
         "chartName": "ibm-mcm-controller",
         "chartVersion": "3.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536161718",
         "name": "mcm",
         "namespace": "kube-system",
@@ -207,7 +307,12 @@ Object {
       Object {
         "chartName": "gbf",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536165889",
         "name": "md-gbapp-gbapp-mycluster-icp",
         "namespace": "default",
@@ -217,7 +322,12 @@ Object {
       Object {
         "chartName": "gbrm",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536165885",
         "name": "md-gbapp-gbapp-redismaster-mycluster-icp",
         "namespace": "default",
@@ -227,7 +337,12 @@ Object {
       Object {
         "chartName": "gbrs",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536165886",
         "name": "md-gbapp-gbapp-redisslave-mycluster-icp",
         "namespace": "default",
@@ -237,7 +352,12 @@ Object {
       Object {
         "chartName": "gbf",
         "chartVersion": "0.1.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536163045",
         "name": "md-kube-system-gbapp-mycluster-icp",
         "namespace": "default",
@@ -247,7 +367,12 @@ Object {
       Object {
         "chartName": "metering",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085143",
         "name": "metering",
         "namespace": "kube-system",
@@ -257,7 +382,12 @@ Object {
       Object {
         "chartName": "metrics-server",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084296",
         "name": "metrics-server",
         "namespace": "kube-system",
@@ -267,7 +397,12 @@ Object {
       Object {
         "chartName": "mgmt-repo",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085431",
         "name": "mgmt-repo",
         "namespace": "kube-system",
@@ -277,7 +412,12 @@ Object {
       Object {
         "chartName": "icp-mongodb",
         "chartVersion": "3.0.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084245",
         "name": "mongodb",
         "namespace": "kube-system",
@@ -287,7 +427,12 @@ Object {
       Object {
         "chartName": "ibm-icpmonitoring",
         "chartVersion": "1.2.0",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085374",
         "name": "monitoring",
         "namespace": "kube-system",
@@ -297,7 +442,12 @@ Object {
       Object {
         "chartName": "nginx-ingress",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084285",
         "name": "nginx-ingress",
         "namespace": "kube-system",
@@ -307,7 +457,12 @@ Object {
       Object {
         "chartName": "nvidia-device-plugin",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084233",
         "name": "nvidia-device-plugin",
         "namespace": "kube-system",
@@ -317,7 +472,12 @@ Object {
       Object {
         "chartName": "platform-api",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084292",
         "name": "platform-api",
         "namespace": "kube-system",
@@ -327,7 +487,12 @@ Object {
       Object {
         "chartName": "platform-ui",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085152",
         "name": "platform-ui",
         "namespace": "kube-system",
@@ -337,7 +502,12 @@ Object {
       Object {
         "chartName": "secret-watcher",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085435",
         "name": "secret-watcher",
         "namespace": "kube-system",
@@ -347,7 +517,12 @@ Object {
       Object {
         "chartName": "security-onboarding",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085439",
         "name": "security-onboarding",
         "namespace": "kube-system",
@@ -357,7 +532,12 @@ Object {
       Object {
         "chartName": "service-catalog",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536084281",
         "name": "service-catalog",
         "namespace": "kube-system",
@@ -367,7 +547,12 @@ Object {
       Object {
         "chartName": "unified-router",
         "chartVersion": "99.99.99",
-        "cluster": null,
+        "cluster": Object {
+          "clusterip": "9.42.23.230",
+          "metadata": Object {
+            "name": "hub-cluster",
+          },
+        },
         "lastDeployed": "1536085369",
         "name": "unified-router",
         "namespace": "kube-system",

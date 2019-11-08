@@ -20,39 +20,34 @@ function getCPUPercentage(usage, capacity) {
 }
 
 function getStatus(cluster) {
-  const status = _.get(cluster, 'status.conditions[0].type', 'offline');
+  // Empty status indicates cluster has not been imported
+  // status with conditions[0].type === '' indicates cluster is offline
+  const status = _.get(cluster, 'status.conditions[0].type', 'pending');
   return status === '' ? 'offline' : status.toLowerCase();
 }
 
-function findClusterIntersection(clusters, clusterstatuses) {
-  const uniqueNameForCluster = (name, namespace) => `${name}_${namespace}`;
-  const clusterSet = new Set(clusters.map(item =>
-    ((item && item.metadata)
-      ? uniqueNameForCluster(item.metadata.name, item.metadata.namespace)
-      : null)));
-  const clusterStatusSet = new Set(clusterstatuses.map(item =>
-    ((item && item.metadata)
-      ? uniqueNameForCluster(item.metadata.name, item.metadata.namespace)
-      : null)));
-  const intersect = new Set([...clusterSet].filter(name => clusterStatusSet.has(name)));
+function getUniqueClusterName(cluster) {
+  const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
+  const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
+  return `${clusterName}_${clusterNamespace}`;
+}
+
+function mapClusters(clusters) {
   const resultMap = new Map();
   clusters.forEach((cluster) => {
-    const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
-    const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
-    if (intersect.has(uniqueNameForCluster(clusterName, clusterNamespace))) {
-      resultMap.set(clusterName, { metadata: cluster.metadata, raw: cluster });
-    }
+    const uniqueClusterName = getUniqueClusterName(cluster);
+    resultMap.set(uniqueClusterName, { metadata: cluster.metadata, raw: cluster });
   });
   return resultMap;
 }
 
 function findMatchedStatus(clusters, clusterstatuses) {
-  const resultMap = findClusterIntersection(clusters, clusterstatuses);
+  const resultMap = mapClusters(clusters);
   clusterstatuses.forEach((clusterstatus) => {
-    const clusterName = _.get(clusterstatus, 'metadata.name');
-    if (resultMap.has(clusterName)) {
+    const uniqueClusterName = getUniqueClusterName(clusterstatus);
+    if (resultMap.has(uniqueClusterName)) {
       const data = {
-        metadata: resultMap.get(clusterName).metadata,
+        metadata: resultMap.get(uniqueClusterName).metadata,
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
@@ -60,30 +55,29 @@ function findMatchedStatus(clusters, clusterstatuses) {
         klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
         k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
       };
-      resultMap.set(clusterName, data);
+      resultMap.set(uniqueClusterName, data);
     }
   });
   return [...resultMap.values()];
 }
 
 function findMatchedStatusForOverview(clusters, clusterstatuses) {
-  const resultMap = findClusterIntersection(clusters, clusterstatuses);
-  clusterstatuses.forEach((clusterstatus) => {
-    const clusterName = _.get(clusterstatus, 'metadata.name');
-    if (resultMap.has(clusterName)) {
-      const cluster = resultMap.get(clusterName);
-      const data = {
-        metadata: cluster.metadata,
-        status: getStatus(cluster.raw),
-        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
-        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
-        capacity: _.get(clusterstatus, 'spec.capacity'),
-        usage: _.get(clusterstatus, 'spec.usage'),
-        rawCluster: cluster.raw,
-        rawStatus: clusterstatus,
-      };
-      resultMap.set(clusterName, data);
-    }
+  const resultMap = new Map();
+  const clusterstatusResultMap = mapClusters(clusterstatuses);
+  clusters.forEach((cluster) => {
+    const uniqueClusterName = getUniqueClusterName(cluster);
+    const clusterstatus = clusterstatusResultMap.get(uniqueClusterName);
+    const data = {
+      metadata: cluster.metadata,
+      status: getStatus(cluster),
+      clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
+      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL'),
+      capacity: _.get(clusterstatus, 'raw.spec.capacity'),
+      usage: _.get(clusterstatus, 'raw.spec.usage'),
+      rawCluster: cluster,
+      rawStatus: _.get(clusterstatus, 'raw'),
+    };
+    resultMap.set(uniqueClusterName, data);
   });
   return [...resultMap.values()];
 }
@@ -124,8 +118,10 @@ export default class ClusterModel extends KubeModel {
   }
 
   static resolveUsage(kind, clusterstatus) {
-    const usage = _.get(clusterstatus, `spec.usage.${kind}`, '0000Mi');
-    const capacity = _.get(clusterstatus, `spec.capacity.${kind}`, '0001Mi');
+    const defaultUsage = kind === 'cpu' ? '0m' : '0Mi';
+    const defaultCapacity = kind === 'cpu' ? '1' : '1Mi';
+    const usage = _.get(clusterstatus, `spec.usage.${kind}`, defaultUsage);
+    const capacity = _.get(clusterstatus, `spec.capacity.${kind}`, defaultCapacity);
     if (kind === 'cpu') {
       return parseInt(getCPUPercentage(usage, capacity), 10);
     }
@@ -133,13 +129,19 @@ export default class ClusterModel extends KubeModel {
     return parseInt(getPercentage(usage, capacity), 10);
   }
 
-  async getStatus(clusterstatus) {
-    const [cluster] = await this.kubeConnector.getResources(
+  async getStatus(cluster) {
+    const clusters = await this.kubeConnector.getResources(
       ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
-      { namespaces: [clusterstatus.metadata.namespace] },
+      { namespaces: [cluster.metadata.namespace] },
     );
 
-    const status = _.get(cluster, 'status.conditions[0].type', 'offline');
+    const resultMap = mapClusters(clusters);
+    const uniqueClusterName = getUniqueClusterName(cluster);
+    const { raw } = resultMap.get(uniqueClusterName);
+
+    // Empty status indicates cluster has not been imported
+    // status with conditions[0].type === '' indicates cluster is offline
+    const status = _.get(raw, 'status.conditions[0].type', 'pending');
     return status === '' ? 'offline' : status.toLowerCase();
   }
 

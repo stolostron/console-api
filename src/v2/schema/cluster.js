@@ -35,7 +35,7 @@ export const resolver = {
       clusterModel.getClusters({ ...args, user: req.user }),
   },
   Cluster: {
-    status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent.rawStatus),
+    status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
     totalCPU: parent => ClusterModel.resolveUsage('cpu', parent.rawStatus),
     totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
     totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),

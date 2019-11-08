@@ -28,6 +28,7 @@ describe('Cluster Resolver', () => {
             }
             nodes
             status
+            totalCPU
             totalMemory
             totalStorage
           }
