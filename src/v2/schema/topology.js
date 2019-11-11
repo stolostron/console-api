@@ -53,14 +53,20 @@ input TopologyFilter {
   namespace: [String]
   type: [String]
 }
+
+type TopologyDetails {
+  pods: [JSON]
+}
+
+input TopologyDetailsFilter {
+  clusterNames: [String]
+}
 `;
 
 export const resolver = {
   Query: {
-    topology: async (root, { filter },
-      {
-        clusterModel, applicationModel,
-      }) => {
+    // first pass--get the main topology
+    topology: async (root, { filter }, { clusterModel, applicationModel }) => {
       let resources = [];
       let relationships = [];
       const { name, namespace, channel } = filter.application[0];
@@ -70,6 +76,38 @@ export const resolver = {
           await getApplicationElements(application, clusterModel));
       }
       return { resources, relationships };
+    },
+
+    // second pass--get topology details
+    topologyDetails: async (root, data, { resourceViewModel }) => {
+      //      resourceViewModel.fetchResource('pods', args.clusterName, args.name, args.namespace),
+      let pods = await resourceViewModel.fetchResources({ type: 'pods' });
+      pods = pods.map((pod) => {
+        const {
+          metadata, cluster, containers: cntrs, status, hostIP, podIP, restarts, startedAt,
+        } = pod;
+        const {
+          name, namespace, creationTimestamp, labels,
+        } = metadata;
+        const containers = cntrs.map(({ name: n, image }) => ({
+          name: n,
+          image,
+        }));
+        return {
+          name,
+          namespace,
+          status,
+          cluster,
+          containers,
+          creationTimestamp,
+          labels,
+          hostIP,
+          podIP,
+          restarts,
+          startedAt,
+        };
+      });
+      return { pods };
     },
   },
 };

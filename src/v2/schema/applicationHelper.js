@@ -20,7 +20,7 @@ function addSubscription(appId, subscription, isPlaced, links, nodes) {
     id: subscriptionId,
     uid: subscriptionId,
     specs: {
-      isDesign: true, isDivider: true, hasRules: !!rule, isPlaced, raw: subscription,
+      isDesign: true, hasRules: !!rule, isPlaced, raw: subscription,
     },
   });
 
@@ -54,17 +54,25 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
-function addClusters(parentId, subscription, clusterNames, links, nodes) {
+function addClusters(parentId, subscription, clusterNames, clusters, links, nodes) {
   const [namespace, name] = _.get(subscription, 'spec.channel', '').split('/');
   const cns = clusterNames.join(', ');
   const clusterId = `member--clusters--${namespace}--${name}--${cns}`;
+  const filteredClusters = clusters.filter((cluster) => {
+    const cname = _.get(cluster, 'metadata.name');
+    return cname && clusterNames.includes(cname);
+  });
   nodes.push({
     name: cns,
     namespace: '',
-    type: 'clusters',
+    type: 'cluster',
     id: clusterId,
     uid: clusterId,
-    specs: { clusterNames, isDivider: true },
+    specs: {
+      cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
+      clusters: filteredClusters,
+      clusterNames,
+    },
   });
   links.push({
     from: { uid: parentId },
@@ -85,7 +93,7 @@ function addSubscriptionDeployable(parentId, deployable, links, nodes, isPlaced)
     type: 'deployable',
     id: deployableId,
     uid: deployableId,
-    specs: { isDesign: true, raw: deployable },
+    specs: { isDesign: true, raw: deployable, isDivider: true },
   });
   links.push({
     from: { uid: parentId },
@@ -152,7 +160,6 @@ async function getApplicationElements(application, clusterModel) {
     uid: appId,
     specs: {
       isDesign: true,
-      isDivider: true,
       raw: application.app,
       activeChannel: application.activeChannel,
       channels: application.channels,
@@ -162,17 +169,15 @@ async function getApplicationElements(application, clusterModel) {
 
   // get clusters labels
   const labelMap = [];
-  if (clusterModel) {
-    const clusters = await clusterModel.getAllClusters();
-    clusters.forEach(({
-      metadata,
-    }) => {
-      const { labels } = metadata;
-      Object.entries(labels).forEach(([key, value]) => {
-        labelMap[`${key}: "${value}"`] = { key, value };
-      });
+  const clusters = await clusterModel.getAllClusters();
+  clusters.forEach(({
+    metadata,
+  }) => {
+    const { labels } = metadata;
+    Object.entries(labels).forEach(([key, value]) => {
+      labelMap[`${key}: "${value}"`] = { key, value };
     });
-  }
+  });
   const clusterLabels = Object.keys(labelMap);
 
 
@@ -208,7 +213,7 @@ async function getApplicationElements(application, clusterModel) {
 
       // add cluster(s) if any
       if (isPlaced) {
-        parentId = addClusters(parentId, subscription, clusterNames, links, nodes);
+        parentId = addClusters(parentId, subscription, clusterNames, clusters, links, nodes);
       }
 
       // add deployables if any
@@ -265,7 +270,8 @@ async function getApplicationElements(application, clusterModel) {
     });
   }
 
-  return { resources: nodes, relationships: links };
+  // remove duplicate nodes
+  return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
 }
 
 export { getApplicationElements as default };

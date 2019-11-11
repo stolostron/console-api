@@ -10,6 +10,9 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
+
+const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
+
 const filterByName = (names, items) =>
   items.filter(item => names.find(name => name === item.metadata.name));
 
@@ -19,13 +22,92 @@ const filterByNameNamespace = (names, items) =>
     return path[1] === metadata.name && path[0] === metadata.namespace;
   }));
 
-const getChannelName = (subscription) => {
-  const { metadata: { name: nm, namespace: ns } } = subscription;
-  const chn = _.get(subscription, 'spec.channel');
-  return `${ns}/${nm}//${chn}`;
+
+const longestCommonSubstring = (str1, str2) => {
+  let sequence = '';
+  const str1Length = str1.length;
+  const str2Length = str2.length;
+  const num = new Array(str1Length);
+  let maxlen = 0;
+  let lastSubsBegin = 0;
+  let i = 0;
+  let j = 0;
+
+  // create matrix
+  while (i < str1Length) {
+    const subArray = new Array(str2Length);
+    j = 0;
+    while (j < str2Length) {
+      subArray[j] = 0;
+      j += 1;
+    }
+    num[i] = subArray;
+    i += 1;
+  }
+
+  // search matrix
+  let thisSubsBegin = null;
+  i = 0;
+  while (i < str1Length) {
+    j = 0;
+    while (j < str2Length) {
+      if (str1[i] !== str2[j]) {
+        num[i][j] = 0;
+      } else {
+        if ((i === 0) || (j === 0)) {
+          num[i][j] = 1;
+        } else {
+          num[i][j] = 1 + num[i - 1][j - 1];
+        }
+        if (num[i][j] > maxlen) {
+          maxlen = num[i][j];
+          thisSubsBegin = (i - num[i][j]) + 1;
+          if (lastSubsBegin === thisSubsBegin) {
+            sequence += str1[i];
+          } else {
+            lastSubsBegin = thisSubsBegin;
+            sequence = str1.substr(lastSubsBegin, (i + 1) - lastSubsBegin);
+          }
+        }
+      }
+      j += 1;
+    }
+    i += 1;
+  }
+  return sequence;
 };
 
-const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
+
+// if channel has sub channels, get subchannel name
+const getSubChannelName = (paths, isChucked) => {
+  if (isChucked) {
+    const getName = (rname) => {
+      let [, name] = rname.split('/');
+      name = name.replace(/.[\d.]+$/, '');
+      return name;
+    };
+
+    // get first and last path
+    const len = paths.length - 1;
+    let begName = getName(paths[0]);
+    let endName = getName(paths[len]);
+
+    // find longest common string between paths
+    const common = longestCommonSubstring(begName, endName);
+
+    // replace common string in both paths
+    begName = begName.replace(common, '');
+    endName = endName.replace(common, '');
+    return `///${begName}///${endName}`;
+  }
+  return '';
+};
+
+const getChannelName = (subscription) => {
+  const { metadata: { name: nm, namespace: ns }, deployablePaths: paths, isChucked } = subscription;
+  const chn = _.get(subscription, 'spec.channel');
+  return `${ns}/${nm}//${chn}${getSubChannelName(paths, isChucked)}`;
+};
 
 export default class ApplicationModel extends KubeModel {
   async createApplication(resources) {
@@ -123,16 +205,36 @@ export default class ApplicationModel extends KubeModel {
         _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
-        const subscriptions =
+        const allSubscriptions =
           await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
+
+        // if a subscription has lots and lots of deployables, break into smaller subscriptions
+        let allowAllChannel = true;
+        const subscriptions = [];
+        allSubscriptions.forEach((subscription) => {
+          const deployablePaths = _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]', '').split(',').sort();
+          if (deployablePaths.length > 10) {
+            const chunks = _.chunk(deployablePaths, 6);
+            // if last chunk is just one, append to 2nd to last chunk
+            const len = chunks.length - 1;
+            if (chunks[len].length === 1) {
+              chunks[len - 1].push(chunks[len][0]);
+              chunks.pop();
+            }
+            chunks.forEach((chuck) => {
+              subscriptions.push({ ...subscription, deployablePaths: chuck, isChucked: true });
+            });
+            allowAllChannel = false;
+          } else {
+            subscriptions.push({ ...subscription, deployablePaths });
+          }
+        });
 
         // pick subscription based on channel requested by ui
         model.activeChannel = selectedChannel;
 
-        // the everything channel (all subscriptions/all channels)
-        model.channels = [EVERYTHING_CHANNEL];
-
         // what subscriptions does user want to see
+        model.channels = [];
         model.subscriptions = [];
         const rulesMap = {};
         const deployableMap = {};
@@ -149,24 +251,33 @@ export default class ApplicationModel extends KubeModel {
           }
         });
 
-        // get all subscriptions
+        // add an ALL channel?
+        if (allowAllChannel) {
+          if (model.channels.length > 1) {
+            model.channels.unshift(EVERYTHING_CHANNEL);
+          }
+        } else if (!selectedSubscription) {
+          selectedSubscription = [subscriptions[0]];
+        }
+
+        // get all requested subscriptions
         (selectedSubscription || subscriptions).forEach((subscription) => {
           model.subscriptions.push(subscription);
 
           // build up map of what deployables to get for a bulk fetch
-          _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]', '')
-            .split(',').forEach((deployablePath) => {
-              if (deployablePath && deployablePath.split('/').length > 0) {
-                const [deployableNamespace, deployableName] = deployablePath.split('/');
+          subscription.deployablePaths.forEach((deployablePath) => {
+            if (deployablePath && deployablePath.split('/').length > 0) {
+              const [deployableNamespace, deployableName] = deployablePath.split('/');
+              arr = deployableMap[deployableNamespace];
+              if (!arr) {
+                deployableMap[deployableNamespace] = [];
                 arr = deployableMap[deployableNamespace];
-                if (!arr) {
-                  deployableMap[deployableNamespace] = [];
-                  arr = deployableMap[deployableNamespace];
-                }
-                arr.push({ deployableName, subscription });
-                subscription.deployables = [];
               }
-            });
+              arr.push({ deployableName, subscription });
+              subscription.deployables = [];
+            }
+          });
+          delete subscription.deployablePaths;
 
           // ditto for rules
           const ruleNamespace = _.get(subscription, 'metadata.namespace');
