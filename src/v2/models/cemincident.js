@@ -62,6 +62,7 @@ export default class CemModel extends KubeModel {
     const params = {
       starttime: `${startTime}`,
       event_filter_1: `resource.application == '${name}'`,
+      incident_filter: "state != 'closed'",
     };
     const qString = queryString.stringify(params);
     const opts = {
