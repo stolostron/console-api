@@ -34,8 +34,10 @@ async function getKubeToken({
     idToken = config.get('localKubeToken') || 'localdev';
   } else {
     const accessToken = authorization.substring(7);
-    idToken = cache.get(accessToken);
-    if (!idToken) {
+
+    // We cache the promise to prevent starting the same request multiple times.
+    let kubeTokenPromise = cache.get(`kubeToken_${accessToken}`);
+    if (!kubeTokenPromise) {
       const options = {
         url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/exchangetoken`,
         headers: {
@@ -47,14 +49,14 @@ async function getKubeToken({
           access_token: accessToken,
         },
       };
+      kubeTokenPromise = httpLib(options);
+      cache.set(`kubeToken_${accessToken}`, kubeTokenPromise);
+    }
 
-      const response = await httpLib(options);
-      idToken = _.get(response, 'body.id_token');
-      if (idToken) {
-        cache.set(accessToken, idToken);
-      } else {
-        throw new Error(`Authentication error: ${JSON.stringify(response.body)}`);
-      }
+    const response = await kubeTokenPromise;
+    idToken = _.get(response, 'body.id_token');
+    if (!idToken) {
+      throw new Error(`Authentication error: ${JSON.stringify(response.body)}`);
     }
   }
 
@@ -86,7 +88,7 @@ async function getAccountData({ iamToken, user }) {
 export default function createAuthMiddleWare({
   cache = lru({
     max: 1000,
-    maxAge: 60 * 60 * 1000, // 1hr
+    maxAge: 2 * 60 * 1000, // 2 mins. Must keep low because user's permissions can change.
   }),
   httpLib = request,
   shouldLocalAuth,
@@ -109,38 +111,57 @@ export default function createAuthMiddleWare({
     }
     // special case for redhat openshift, can't get user from idtoken
     if (!userName) {
-      const options = {
-        url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/userinfo`,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        method: 'POST',
-        json: true,
-        form: {
-          access_token: iamToken,
-        },
-      };
+      // We cache the promise to prevent starting the same request multiple times.
+      let userInfoPromise = cache.get(`userInfo_${iamToken}`);
+      if (!userInfoPromise) {
+        const options = {
+          url: `${config.get('PLATFORM_IDENTITY_PROVIDER_URL')}/v1/auth/userinfo`,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          method: 'POST',
+          json: true,
+          form: {
+            access_token: iamToken,
+          },
+        };
+        userInfoPromise = httpLib(options);
+        cache.set(`userInfo_${iamToken}`, userInfoPromise);
+      }
 
-      const response = await httpLib(options);
+      const response = await userInfoPromise;
       userName = _.get(response, 'body.sub') || _.get(response, 'body.name');
       if (!userName) {
         throw new Error(`Authentication error: ${response.body}`);
       }
     }
 
+    // Get the namespaces for the user.
+    // We cache the promise to prevent starting the same request multiple times.
+    let nsPromise = cache.get(`namespaces_${iamToken}`);
+    if (!nsPromise) {
+      nsPromise = getNamespaces({
+        iamToken,
+        user: userName,
+      });
+      cache.set(`namespaces_${iamToken}`, nsPromise);
+    }
+
+    // Get user's account data.
+    // We cache the promise to prevent starting the same request multiple times.
+    let accountPromise = cache.get(`account_${iamToken}`);
+    if (!accountPromise) {
+      accountPromise = getAccountData({
+        iamToken,
+        user: userName,
+      });
+      cache.set(`account_${iamToken}`, accountPromise);
+    }
+
     req.user = {
       name: userName,
-      namespaces: await getNamespaces({
-        // cookies field doesn't exist on test case requests
-        iamToken,
-        user: userName,
-      }),
-      userAccount: await getAccountData({
-        // cookies field doesn't exist on test case requests
-        iamToken,
-        user: userName,
-      }),
-
+      namespaces: await nsPromise,
+      userAccount: await accountPromise,
     };
 
     next();

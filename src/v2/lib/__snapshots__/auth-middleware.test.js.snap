@@ -2,13 +2,17 @@
 
 exports[`Auth Middleware Caches token on first authorization 1`] = `
 Array [
-  "ng-for-auth",
-  "test-id-token",
+  "kubeToken_ng-for-auth",
+  Object {
+    "body": Object {
+      "id_token": "test-id-token",
+    },
+  },
 ]
 `;
 
 exports[`Auth Middleware Retrieves token from cache if present 1`] = `
 Array [
-  "ng-for-auth",
+  "kubeToken_ng-for-auth",
 ]
 `;

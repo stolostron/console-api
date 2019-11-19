@@ -40,7 +40,7 @@ describe('Auth Middleware', () => {
       expect(err).not.toBeDefined();
       expect(mockRequest.kubeToken).toBe('Bearer test-id-token');
       expect(mockHttpLib.mock.calls).toHaveLength(1);
-      expect(mockCache.set.mock.calls).toHaveLength(1);
+      expect(mockCache.set.mock.calls).toHaveLength(3);
       expect(mockCache.set.mock.calls[0]).toMatchSnapshot();
       done();
     });
@@ -51,7 +51,7 @@ describe('Auth Middleware', () => {
     mockCache.get.mockClear();
 
     const mockRequest = { headers: { authorization: 'substring-for-auth' } };
-    mockCache.get.mockReturnValueOnce('test-cached-token');
+    mockCache.get.mockReturnValueOnce(new Promise(resolve => resolve({ body: { id_token: 'test-cached-token' } })));
 
     const authMiddleware = createAuthMiddleWare({
       cache: mockCache,
@@ -63,7 +63,7 @@ describe('Auth Middleware', () => {
       expect(err).not.toBeDefined();
       expect(mockHttpLib.mock.calls).toHaveLength(0);
       expect(mockRequest.kubeToken).toBe('Bearer test-cached-token');
-      expect(mockCache.get.mock.calls).toHaveLength(1);
+      expect(mockCache.get.mock.calls).toHaveLength(3);
       expect(mockCache.get.mock.calls[0]).toMatchSnapshot();
       done();
     });
