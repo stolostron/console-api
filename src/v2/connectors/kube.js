@@ -198,11 +198,11 @@ export default class KubeConnector {
         },
       };
 
-      if (resourceNamespace) {
+      if (resourceName) {
         body.spec.scope = {
           resource: `${resourceType}${apiGroup ? `.${apiGroup}` : ''}`,
           resourceName,
-          namespace: resourceNamespace,
+          namespace: resourceNamespace || null,
         };
       }
     }
