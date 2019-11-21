@@ -496,3 +496,57 @@ Object {
   ],
 }
 `;
+
+exports[`RCM Api Resolver previewCluster test with all required fields but returns with error 1`] = `
+Object {
+  "data": Object {
+    "previewCluster": null,
+  },
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 17,
+          "line": 3,
+        },
+      ],
+      "message": "Cannot read property 'includes' of undefined",
+      "path": Array [
+        "previewCluster",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`RCM Api Resolver previewCluster test that we get an error when namespace not provided 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 46,
+          "line": 3,
+        },
+      ],
+      "message": "Syntax Error: Expected Name, found {",
+    },
+  ],
+}
+`;
+
+exports[`RCM Api Resolver previewCluster test that we get an error when cluster not provided 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 55,
+          "line": 3,
+        },
+      ],
+      "message": "Expected type JSON!, found null.",
+    },
+  ],
+}
+`;

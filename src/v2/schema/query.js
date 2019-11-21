@@ -156,6 +156,7 @@ type Mutation {
 
   # Create remote cluster
   createCluster(namespace: String!, cluster: JSON!) : JSON
+  previewCluster(namespace: String!, cluster: JSON!) : JSON
   createClusterResource(body: String): JSON
 
   automatedImport(namespace: String, name: String, body: JSON): JSON

@@ -267,6 +267,54 @@ describe('RCM Api Resolver', () => {
       });
   });
 
+  test('previewCluster test with all required fields but returns with error', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+            mutation {
+                previewCluster(namespace: "eks", cluster: {name:"llcao-aks-1"})
+            }
+          `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('previewCluster test that we get an error when namespace not provided', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+            mutation {
+                previewCluster(namespace:"", {name:"llcao-gke-1"})
+            }
+          `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('previewCluster test that we get an error when cluster not provided', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+            mutation {
+                previewCluster(namespace:"", cluster: null)
+            }
+          `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
   test('Update Kubernetes Cluster Resource for Import', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)

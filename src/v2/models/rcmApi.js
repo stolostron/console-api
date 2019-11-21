@@ -228,6 +228,20 @@ export default class RcmApiModel {
     return response;
   }
 
+  async previewCluster(args) {
+    let response;
+    const { namespace, cluster } = args;
+    if (!namespace || !cluster) {
+      throw new Error('Namespace and cluster are required for previewCluster');
+    } else {
+      response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters/manifest`, cluster);
+    }
+    if (response && this.responseHasError(response)) {
+      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/${namespace}/${cluster.name}/clusters/manifest`, response);
+    }
+    return response;
+  }
+
   async getAutomatedImportStatus(args) {
     let response;
     const { namespace, name } = args;
