@@ -81,6 +81,9 @@ type Query {
   # Get cloud event manager queries .
   cemIncidentsForApplication(name: String!, namespace: String): [cemIncident]
 
+  # Get cloud event manager queries .
+  applicationNamespaces(namespace: String): [ApplicationNamespace]
+  
   # Used for Topology.
   filters: Filters
 

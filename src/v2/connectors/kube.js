@@ -221,39 +221,39 @@ export default class KubeConnector {
     const promise = new Promise(async (resolve, reject) => {
       let pendingRequest = false;
       const intervalID =
-      // eslint-disable-next-line consistent-return
-      setInterval(async () => {
-        if (!pendingRequest) {
-          pendingRequest = true;
-          try {
-            const links = resourceViewLink.split('/');
-            const resourceViewName = links.pop();
-            const link = `${links.join('/')}?fieldSelector=metadata.name=${resourceViewName}`;
+        // eslint-disable-next-line consistent-return
+        setInterval(async () => {
+          if (!pendingRequest) {
+            pendingRequest = true;
+            try {
+              const links = resourceViewLink.split('/');
+              const resourceViewName = links.pop();
+              const link = `${links.join('/')}?fieldSelector=metadata.name=${resourceViewName}`;
 
-            logger.debug('start polling: ', new Date(), link);
-            const response = await this.get(link, {}, true);
-            pendingRequest = false;
-            if (response.code || response.message) {
-              clearInterval(intervalID);
-              return reject(response);
-            }
-            const isComplete = _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
-
-            if (isComplete === 'Completed') {
-              clearInterval(intervalID);
-              logger.debug('start to get resource: ', new Date(), resourceViewLink);
-              const result = await this.get(resourceViewLink, {}, true);
-              if (result.code || result.message) {
-                return reject(result);
+              logger.debug('start polling: ', new Date(), link);
+              const response = await this.get(link, {}, true);
+              pendingRequest = false;
+              if (response.code || response.message) {
+                clearInterval(intervalID);
+                return reject(response);
               }
-              resolve(result);
+              const isComplete = _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
+
+              if (isComplete === 'Completed') {
+                clearInterval(intervalID);
+                logger.debug('start to get resource: ', new Date(), resourceViewLink);
+                const result = await this.get(resourceViewLink, {}, true);
+                if (result.code || result.message) {
+                  return reject(result);
+                }
+                resolve(result);
+              }
+            } catch (err) {
+              clearInterval(intervalID);
+              reject(err);
             }
-          } catch (err) {
-            clearInterval(intervalID);
-            reject(err);
           }
-        }
-      }, this.pollInterval);
+        }, this.pollInterval);
 
       cancel = () => {
         clearInterval(intervalID);
@@ -284,5 +284,49 @@ export default class KubeConnector {
       cancel();
       throw e;
     }
+  }
+
+  /**
+   * Excecute Kube API GET all namespaces with the specified name.
+   * Required by the app ui to get the accountId, used by the ICAM action
+   *
+   * @param {*} namespaces: a list of namespace names to retrieve; if not provided will use the default namespaces list
+   */
+  async getNamespaceResources({ namespaces } = {}) {
+    const namespaceList = (namespaces || this.namespaces);
+
+    const requests = namespaceList.map(async (ns) => {
+      const urlTemplate = `/api/v1/namespaces/${ns}`;
+
+      let response;
+      try {
+        response = await this.get(urlTemplate);
+      } catch (err) {
+        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        return [];
+      }
+
+      if (response.code || response.message) {
+        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        return [];
+      }
+
+      // if all responses aren't objects, throw error
+      const strs = [];
+      const items = (response.items ? response.items : [response]);
+      items.forEach((item) => {
+        if (typeof item === 'string') {
+          strs.push(item);
+        }
+      });
+      if (strs.length > 0) {
+        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        return [];
+      }
+
+      return items.map(item => item);
+    });
+
+    return _.flatten(await Promise.all(requests));
   }
 }

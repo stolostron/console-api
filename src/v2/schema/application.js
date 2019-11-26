@@ -23,6 +23,10 @@ type Application implements K8sObject {
   selector: JSON
 }
 
+type ApplicationNamespace {
+  metadata: Metadata
+  raw: JSON
+}
 type ApplicationWorks implements K8sObject {
   metadata: Metadata
   release: String
@@ -111,12 +115,16 @@ type Deployer {
 
 }
 
+
 `;
 
 /* eslint-disable max-len */
 export const resolver = {
   Query: {
     applications: (root, args, { applicationModel }) => applicationModel.getApplications(args.name, args.namespace),
+    applicationNamespaces: (parent, args, { applicationModel }) =>
+      applicationModel.getApplicationNamespace(args.namespace),
+
     // deployables: (root, args, { applicationModel }) => applicationModel.getDeployables(args.selector),
     // placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
   },

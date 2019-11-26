@@ -157,6 +157,17 @@ export default class ApplicationModel extends KubeModel {
     };
   }
 
+
+  // return application namespace object
+  async getApplicationNamespace(namespace) {
+    const namespaces = await this.kubeConnector.getNamespaceResources({ namespaces: namespace.split(',') });
+    return namespaces.map(async ns => ({
+      metadata: ns.metadata,
+      name: ns.metadata.name || '',
+      raw: ns,
+    }));
+  }
+
   // //////////////// USED IN OVERVIEW PAGE /////////
   // //////////////// USED IN OVERVIEW PAGE /////////
   // //////////////// USED IN OVERVIEW PAGE /////////
@@ -331,7 +342,7 @@ export default class ApplicationModel extends KubeModel {
 
   async getAppRules(rulesMap) {
     const requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
-    // get all rules in this namespace
+      // get all rules in this namespace
       const response = await this.kubeConnector.getResources(
         ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
         { kind: 'PlacementRule', namespaces: [namespace] },
