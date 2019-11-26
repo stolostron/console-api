@@ -85,8 +85,13 @@ export default class CemModel extends KubeModel {
   async getClusterIncidents(args) {
     const { accountId, cluster } = args;
     const accessToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
+    const params = {
+      event_filter_1: `resource.cluster == '${cluster}'`,
+      incident_filter: "state != 'closed'",
+    };
+    const qString = queryString.stringify(params);
     const opts = {
-      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1??event_filter_1=resource.cluster == "${cluster}"`,
+      url: `${config.get('cfcRouterUrl')}/cem/api/incidentquery/v1??${qString}`,
       headers: {
         Authorization: `bearer origin:icp:${accessToken}`,
         'X-Subscription-ID': `${accountId}`,
