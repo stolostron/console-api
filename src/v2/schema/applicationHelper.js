@@ -38,7 +38,7 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
     const { metadata: { name, namespace } } = rule;
     const ruleId = `member--rules--${namespace}--${name}--${idx}`;
     nodes.push({
-      name: 'placement rules',
+      name,
       namespace,
       type: 'rules',
       id: ruleId,
@@ -83,10 +83,10 @@ function addClusters(parentId, subscription, clusterNames, clusters, links, node
   return clusterId;
 }
 
-function addSubscriptionDeployable(parentId, deployable, links, nodes, isPlaced) {
+function addSubscriptionDeployable(parentId, deployable, links, nodes, clusterMap, names) {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
-  const deployableId = `member--deployable--${namespace}--${name}`;
+  const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
   nodes.push({
     name,
     namespace,
@@ -103,43 +103,54 @@ function addSubscriptionDeployable(parentId, deployable, links, nodes, isPlaced)
   });
 
   // installs these K8 objects
-  if (isPlaced) {
-    const template = _.get(deployable, 'spec.template', { metadata: {} });
-    let { kind = 'container' } = template;
-    const { metadata: { name: k8Name } } = template;
-    kind = kind.toLowerCase();
-    const memberId = `member--${kind}--${k8Name}`;
+  let failed = false;
+  const deployStatuses = [];
+  names.forEach((cname) => {
+    const status = _.get(clusterMap, `${cname}.${name}`);
+    if (status) {
+      deployStatuses.push(status);
+      if (status.phase === 'Failed') {
+        failed = true;
+      }
+    }
+  });
+
+
+  const template = _.get(deployable, 'spec.template', { metadata: {} });
+  let { kind = 'container' } = template;
+  const { metadata: { name: k8Name } } = template;
+  kind = kind.toLowerCase();
+  const memberId = `member--${deployableId}--${kind}--${k8Name}`;
+  nodes.push({
+    name: k8Name,
+    namespace: '',
+    type: kind,
+    id: memberId,
+    uid: memberId,
+    specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
+  });
+  links.push({
+    from: { uid: deployableId },
+    to: { uid: memberId },
+    type: '',
+  });
+
+  // if deployment, show pod--unless deployable failed to deploy deployment
+  if (kind === 'deployment' && !failed) {
+    const podId = `member--pod--${deployableId}--${k8Name}`;
     nodes.push({
       name: k8Name,
       namespace: '',
-      type: kind,
-      id: memberId,
-      uid: memberId,
-      specs: { raw: template, isDesign: kind === 'deployable' || kind === 'subscription' },
+      type: 'pod',
+      id: podId,
+      uid: podId,
+      specs: { raw: template },
     });
     links.push({
-      from: { uid: deployableId },
-      to: { uid: memberId },
+      from: { uid: memberId },
+      to: { uid: podId },
       type: '',
     });
-
-    // if deployment, show pod
-    if (kind === 'deployment') {
-      const podId = `member--pod--${k8Name}`;
-      nodes.push({
-        name: k8Name,
-        namespace: '',
-        type: 'pod',
-        id: podId,
-        uid: podId,
-        specs: { raw: template },
-      });
-      links.push({
-        from: { uid: memberId },
-        to: { uid: podId },
-        type: '',
-      });
-    }
   }
 }
 
@@ -178,22 +189,27 @@ async function getApplicationElements(application, clusterModel) {
       labelMap[`${key}: "${value}"`] = { key, value };
     });
   });
-  const clusterLabels = Object.keys(labelMap);
 
 
   // if application has subscriptions
   let memberId;
   let parentId;
+  let clusterId;
   if (application.subscriptions) {
     application.subscriptions.forEach((subscription) => {
       // get cluster placement if any
       const clusterMap = {};
-      const decisions = _.get(subscription, 'status.statuses');
-      if (decisions) {
-        Object.entries(decisions).forEach(([clusterName, value]) => {
-          clusterMap[clusterName] = _.get(value, 'packages');
+      if (subscription.rules) {
+        subscription.rules.forEach((rule) => {
+          const decisions = _.get(rule, 'status.decisions');
+          if (decisions) {
+            decisions.forEach(({ clusterName, clusterNamespace }) => {
+              clusterMap[clusterName] = clusterNamespace;
+            });
+          }
         });
       }
+
       const clusterNames = Object.keys(clusterMap);
       const isPlaced = clusterNames.length > 0;
 
@@ -204,27 +220,31 @@ async function getApplicationElements(application, clusterModel) {
       let hasPlacementRules = false;
       if (subscription.rules) {
         addSubscriptionRules(parentId, subscription, links, nodes);
-        subscription.rules.clusterLabels = clusterLabels;
         delete subscription.rules;
         hasPlacementRules = true;
-      } else {
-        subscription.clusterLabels = clusterLabels;
       }
 
       // add cluster(s) if any
       if (isPlaced) {
-        parentId = addClusters(parentId, subscription, clusterNames, clusters, links, nodes);
+        // add cluster(s) if any or if too many
+        const clusterShapes = clusterNames.length > 3 ?
+          [clusterNames] : clusterNames.map(cn => [cn]);
+        clusterShapes.forEach((names) => {
+          clusterId = addClusters(parentId, subscription, names, clusters, links, nodes);
+
+          // add deployables if any
+          if (subscription.deployables) {
+            subscription.deployables.forEach((deployable) => {
+              addSubscriptionDeployable(clusterId, deployable, links, nodes, clusterMap, names);
+            });
+          }
+        });
       }
 
-      // add deployables if any
-      if (subscription.deployables) {
-        subscription.deployables.forEach((deployable) => {
-          addSubscriptionDeployable(parentId, deployable, links, nodes, isPlaced);
-        });
-        delete subscription.deployables;
-      } else if (!hasPlacementRules && decisions) {
+      // no deployables but packages were placed!
+      const decisions = _.get(subscription, 'status.statuses');
+      if (!subscription.deployables && !hasPlacementRules && decisions) {
         // TODO might be multiple clusters
-        // no deployables but packages were placed!
         Object.values(clusterMap).forEach((value) => {
           if (value) {
             const [packageName] = Object.keys(value);
@@ -245,6 +265,7 @@ async function getApplicationElements(application, clusterModel) {
           }
         });
       }
+      delete subscription.deployables;
     });
 
   // if application has deployables
