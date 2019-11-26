@@ -26,6 +26,20 @@ function getStatus(cluster) {
   return status === '' ? 'offline' : status.toLowerCase();
 }
 
+async function getClusterResources(kube) {
+  // Try cluster scope query, falling back to per-namespace
+  const allClusters = await kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
+  const clusters = allClusters.items ? allClusters.items : await kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`);
+
+  // For clusterstatuses, query only namespaces that have clusters
+  const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
+  const clusterstatuses = await kube.getResources(
+    ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
+    { namespaces },
+  );
+  return [clusters, clusterstatuses];
+}
+
 function getUniqueClusterName(cluster) {
   const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
   const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
@@ -94,10 +108,7 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getClusters(args = {}) {
-    const [clusters, clusterstatuses] = await Promise.all([
-      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
-      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
-    ]);
+    const [clusters, clusterstatuses] = await getClusterResources(this.kubeConnector);
     const results = findMatchedStatus(clusters, clusterstatuses);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
@@ -106,10 +117,7 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getAllClusters(args = {}) {
-    const [clusters, clusterstatuses] = await Promise.all([
-      this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`),
-      this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`),
-    ]);
+    const [clusters, clusterstatuses] = await getClusterResources(this.kubeConnector);
     const results = findMatchedStatusForOverview(clusters, clusterstatuses);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
@@ -139,10 +147,7 @@ export default class ClusterModel extends KubeModel {
     const uniqueClusterName = getUniqueClusterName(cluster);
     const { raw } = resultMap.get(uniqueClusterName);
 
-    // Empty status indicates cluster has not been imported
-    // status with conditions[0].type === '' indicates cluster is offline
-    const status = _.get(raw, 'status.conditions[0].type', 'pending');
-    return status === '' ? 'offline' : status.toLowerCase();
+    return getStatus(raw);
   }
 
   async getClusterStatus() {
