@@ -37,24 +37,13 @@ async function resolveStatus(parent) {
 async function resolveRoles(parent) {
   const { metadata: { labels } } = parent;
   const roles = [];
-  if (labels['node-role.kubernetes.io/proxy'] === 'true') {
-    roles.push('proxy');
-  }
-  if (labels['node-role.kubernetes.io/management'] === 'true') {
-    roles.push('management');
-  }
-  if (labels['node-role.kubernetes.io/master'] === 'true') {
-    roles.push('master');
-  }
-  if (labels['node-role.kubernetes.io/va'] === 'true') {
-    roles.push('va');
-  }
-  if (labels['node-role.kubernetes.io/etcd'] === 'true') {
-    roles.push('etcd');
-  }
-  if (labels['node-role.kubernetes.io/worker'] === 'true') {
-    roles.push('worker');
-  }
+  const nodeRolePrefix = 'node-role.kubernetes.io/';
+  const index = nodeRolePrefix.length;
+  Object.keys(labels).forEach((label) => {
+    if (label.startsWith(nodeRolePrefix)) {
+      roles.push(label.substring(index));
+    }
+  });
   return roles.length > 0 ? roles : ['worker'];
 }
 

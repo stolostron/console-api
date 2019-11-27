@@ -86,10 +86,10 @@ Object {
         "operatingSystem": "linux",
         "osImage": "Ubuntu 16.04.4 LTS",
         "roles": Array [
-          "proxy",
+          "etcd",
           "management",
           "master",
-          "etcd",
+          "proxy",
         ],
         "status": "True",
       },
