@@ -60,8 +60,10 @@ Object {
 exports[`RCM Api Resolver Correctly Resolves Get Cloud Providers 1`] = `
 Object {
   "data": Object {
-    "providers": Array [
+    "orchestrations": Array [
       Object {
+        "categoryLongname": null,
+        "categoryName": null,
         "clusterMetadata": null,
         "clusterValues": null,
         "configMetadata": null,
@@ -78,12 +80,12 @@ Object {
       "locations": Array [
         Object {
           "column": 17,
-          "line": 11,
+          "line": 13,
         },
       ],
       "message": "Int cannot represent non 32-bit signed integer value: (empty string)",
       "path": Array [
-        "providers",
+        "orchestrations",
         0,
         "statusCode",
       ],

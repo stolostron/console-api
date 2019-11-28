@@ -39,9 +39,8 @@ type Query {
   # Get Cluster incidents.
   incidents(accountId: String, cluster: String): [cemIncident]
   
-  # List all cloud connections, providers and orchestrations
+  # List all cloud connections and orchestrations
   connections: [Connection]
-  providers: [Provider]
   orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.

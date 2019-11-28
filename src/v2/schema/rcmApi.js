@@ -14,20 +14,17 @@ type Connection implements ConnectionObject {
   statusCode: Int
   errorMsg: String
 }
-type Provider {
+
+type Orchestration {
   name: String
   longname: String
+  categoryName: String
+  categoryLongname: String
   type: String
   configMetadata: String
   configValues: String
   clusterMetadata: String
   clusterValues: String
-  statusCode: Int
-}
-type Orchestration {
-  name: String
-  longname: String
-  providers: [Provider]
   statusCode: Int
 }
 `;
@@ -40,8 +37,6 @@ export const resolver = {
       rcmApiModel.getConnections({ user: req.user }),
     orchestrations: (parent, args, { rcmApiModel }) =>
       rcmApiModel.getOrchestrations(),
-    providers: (parent, args, { rcmApiModel }) =>
-      rcmApiModel.getProviders(),
   },
   Mutation: {
     createClusterResource: (parent, args, { rcmApiModel }) => rcmApiModel.createClusterResource(args),

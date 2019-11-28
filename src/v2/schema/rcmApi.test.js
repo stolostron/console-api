@@ -138,7 +138,7 @@ describe('RCM Api Resolver', () => {
       .send({
         query: `
             {
-              providers {
+              orchestrations {
                 name
                 longname
                 type
@@ -146,6 +146,8 @@ describe('RCM Api Resolver', () => {
                 configValues
                 clusterMetadata
                 clusterValues
+                categoryName
+                categoryLongname              
                 statusCode
               }
             }`,
