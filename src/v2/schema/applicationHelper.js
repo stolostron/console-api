@@ -54,26 +54,32 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
-function addClusters(parentId, subscription, clusterNames, clusters, links, nodes) {
-  const [namespace, name] = _.get(subscription, 'spec.channel', '').split('/');
+function addClusters(
+  parentId, createdClusterElements, subscription,
+  clusterNames, clusters, links, nodes,
+) {
+  // create element if not already created
   const cns = clusterNames.join(', ');
-  const clusterId = `member--clusters--${namespace}--${name}--${cns}`;
-  const filteredClusters = clusters.filter((cluster) => {
-    const cname = _.get(cluster, 'metadata.name');
-    return cname && clusterNames.includes(cname);
-  });
-  nodes.push({
-    name: cns,
-    namespace: '',
-    type: 'cluster',
-    id: clusterId,
-    uid: clusterId,
-    specs: {
-      cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
-      clusters: filteredClusters,
-      clusterNames,
-    },
-  });
+  const clusterId = `member--clusters--${cns}`;
+  if (!createdClusterElements.has(clusterId)) {
+    const filteredClusters = clusters.filter((cluster) => {
+      const cname = _.get(cluster, 'metadata.name');
+      return cname && clusterNames.includes(cname);
+    });
+    nodes.push({
+      name: cns,
+      namespace: '',
+      type: 'cluster',
+      id: clusterId,
+      uid: clusterId,
+      specs: {
+        cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
+        clusters: filteredClusters,
+        clusterNames,
+      },
+    });
+    createdClusterElements.add(clusterId);
+  }
   links.push({
     from: { uid: parentId },
     to: { uid: clusterId },
@@ -83,7 +89,10 @@ function addClusters(parentId, subscription, clusterNames, clusters, links, node
   return clusterId;
 }
 
-function addSubscriptionDeployable(parentId, deployable, links, nodes, clusterMap, names) {
+function addSubscriptionDeployable(
+  parentId, deployable, links, nodes,
+  subscriptionStatusMap, names,
+) {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -106,7 +115,7 @@ function addSubscriptionDeployable(parentId, deployable, links, nodes, clusterMa
   let failed = false;
   const deployStatuses = [];
   names.forEach((cname) => {
-    const status = _.get(clusterMap, `${cname}.${name}`);
+    const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
     if (status) {
       deployStatuses.push(status);
       if (status.phase === 'Failed') {
@@ -154,6 +163,33 @@ function addSubscriptionDeployable(parentId, deployable, links, nodes, clusterMa
   }
 }
 
+function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links) {
+  Object.values(subscriptionStatusMap).forEach((value) => {
+    if (value) {
+      const [packageName] = Object.keys(value);
+      const memberId = `member--package--${packageName}`;
+      const status = value[packageName];
+      const deployStatuses = [];
+      if (status) {
+        deployStatuses.push(status);
+      }
+      nodes.push({
+        name: packageName,
+        namespace: '',
+        type: 'package',
+        id: memberId,
+        uid: memberId,
+        specs: { raw: value, deployStatuses, isDesign: false },
+      });
+      links.push({
+        from: { uid: parentId },
+        to: { uid: memberId },
+        type: '',
+      });
+    }
+  });
+}
+
 async function getApplicationElements(application, clusterModel) {
   const links = [];
   const nodes = [];
@@ -196,25 +232,36 @@ async function getApplicationElements(application, clusterModel) {
   let parentId;
   let clusterId;
   if (application.subscriptions) {
+    const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
       // get cluster placement if any
-      const clusterMap = {};
+      const ruleDecisionMap = {};
       if (subscription.rules) {
         subscription.rules.forEach((rule) => {
-          const decisions = _.get(rule, 'status.decisions');
-          if (decisions) {
-            decisions.forEach(({ clusterName, clusterNamespace }) => {
-              clusterMap[clusterName] = clusterNamespace;
+          const ruleDecisions = _.get(rule, 'status.decisions');
+          if (ruleDecisions) {
+            ruleDecisions.forEach(({ clusterName, clusterNamespace }) => {
+              ruleDecisionMap[clusterName] = clusterNamespace;
             });
           }
         });
       }
 
-      const clusterNames = Object.keys(clusterMap);
-      const isPlaced = clusterNames.length > 0;
+      const ruleClusterNames = Object.keys(ruleDecisionMap);
+      const isRulePlaced = ruleClusterNames.length > 0;
+
+      // get subscription statuses
+      const subscriptionStatusMap = {};
+      const subscribeDecisions = _.get(subscription, 'status.statuses');
+      if (subscribeDecisions) {
+        Object.entries(subscribeDecisions).forEach(([clusterName, value]) => {
+          subscriptionStatusMap[clusterName] = _.get(value, 'packages');
+        });
+      }
+      const isSubscriptionPlaced = Object.keys(subscriptionStatusMap).length > 0;
 
       // add subscription
-      parentId = addSubscription(appId, subscription, isPlaced, links, nodes);
+      parentId = addSubscription(appId, subscription, isRulePlaced, links, nodes);
 
       // add rules if any
       let hasPlacementRules = false;
@@ -225,45 +272,35 @@ async function getApplicationElements(application, clusterModel) {
       }
 
       // add cluster(s) if any
-      if (isPlaced) {
+      if (isRulePlaced) {
         // add cluster(s) if any or if too many
-        const clusterShapes = clusterNames.length > 3 ?
-          [clusterNames] : clusterNames.map(cn => [cn]);
+        const clusterShapes = ruleClusterNames.length > 3 ?
+          [ruleClusterNames] : ruleClusterNames.map(cn => [cn]);
         clusterShapes.forEach((names) => {
-          clusterId = addClusters(parentId, subscription, names, clusters, links, nodes);
+          // add cluster element
+          clusterId = addClusters(
+            parentId, createdClusterElements, subscription,
+            names, clusters, links, nodes,
+          );
 
           // add deployables if any
           if (subscription.deployables) {
             subscription.deployables.forEach((deployable) => {
-              addSubscriptionDeployable(clusterId, deployable, links, nodes, clusterMap, names);
+              addSubscriptionDeployable(
+                clusterId, deployable, links, nodes,
+                subscriptionStatusMap, names,
+              );
             });
+          } else if (isSubscriptionPlaced) {
+          // else add charts which does deployment
+            addSubscriptionCharts(clusterId, subscriptionStatusMap, nodes, links);
           }
         });
       }
 
-      // no deployables but packages were placed!
-      const decisions = _.get(subscription, 'status.statuses');
-      if (!subscription.deployables && !hasPlacementRules && decisions) {
-        // TODO might be multiple clusters
-        Object.values(clusterMap).forEach((value) => {
-          if (value) {
-            const [packageName] = Object.keys(value);
-            memberId = `member--package--${packageName}`;
-            nodes.push({
-              name: packageName,
-              namespace: '',
-              type: 'package',
-              id: memberId,
-              uid: memberId,
-              specs: { raw: value, isDesign: false },
-            });
-            links.push({
-              from: { uid: parentId },
-              to: { uid: memberId },
-              type: '',
-            });
-          }
-        });
+      // no deployables was placed on a clutser but there were subscription decisions
+      if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
+        addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links);
       }
       delete subscription.deployables;
     });
