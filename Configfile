@@ -37,3 +37,6 @@ DOCKER_SCRATCH_REGISTRY			?= hyc-cloud-private-scratch-docker-local.artifactory.
 DOCKER_EDGE_REGISTRY 				?= hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com
 DOCKER_INTEGRATION_REGISTRY ?= hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com
 DOCKER_REGISTRY             ?=$(DOCKER_INTEGRATION_REGISTRY)
+QUAY_REGISTRY ?= quay.io
+QUAY_ORGANIZATION ?= rhibmcollab
+

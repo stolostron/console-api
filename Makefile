@@ -110,11 +110,24 @@ endif
 	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD) $(DOCKER_SCRATCH_REGISTRY)
 	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD) $(DOCKER_INTEGRATION_REGISTRY)
 
+.PHONY: quay-login
+quay-login:
+ifndef $(and QUAY_USERNAME, QUAY_PASSWORD)
+	$(error QUAY_USERNAME and QUAY_PASSWORD must be defined, required for goal (quay-login))
+endif
+	@docker login -u $(QUAY_USERNAME) -p $(QUAY_PASSWORD) $(QUAY_REGISTRY)
 
 .PHONY: push
 push: check-env app-version
 	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(SHORT_COMMIT_NAME)
 	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(SHORT_COMMIT_NAME)
+
+.PHONY: quay-release
+quay-release:
+ifeq ($(ARCH), x86_64)
+	make docker:tag DOCKER_NAMESPACE=$(QUAY_ORGANIZATION) DOCKER_REGISTRY=${QUAY_REGISTRY} DOCKER_TAG=${SEMVERSION}
+	make docker:push DOCKER_NAMESPACE=$(QUAY_ORGANIZATION) DOCKER_REGISTRY=$(QUAY_REGISTRY) DOCKER_TAG=$(SEMVERSION)
+endif
 
 .PHONY: release
 release:

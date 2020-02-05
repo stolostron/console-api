@@ -301,7 +301,10 @@ Object {
   "data": Object {
     "clusters": Array [
       Object {
+        "availableVersions": null,
         "clusterip": null,
+        "desiredVersion": null,
+        "distributionVersion": null,
         "metadata": Object {
           "creationTimestamp": "2018-08-13T16:56:41Z",
           "labels": Object {
@@ -322,9 +325,18 @@ Object {
         "totalCPU": "0",
         "totalMemory": "0",
         "totalStorage": "0",
+        "upgradeFailed": null,
       },
       Object {
+        "availableVersions": Array [
+          "4.2.8",
+          "4.2.7",
+          "4.2.2",
+          "4.2.9",
+        ],
         "clusterip": "9.42.23.230",
+        "desiredVersion": "4.2.2",
+        "distributionVersion": "4.2.0",
         "metadata": Object {
           "creationTimestamp": "2018-08-13T16:56:41Z",
           "labels": Object {
@@ -345,9 +357,13 @@ Object {
         "totalCPU": "41",
         "totalMemory": "21",
         "totalStorage": "75",
+        "upgradeFailed": false,
       },
       Object {
+        "availableVersions": null,
         "clusterip": "9.42.23.230",
+        "desiredVersion": null,
+        "distributionVersion": null,
         "metadata": Object {
           "creationTimestamp": "2018-08-13T16:56:41Z",
           "labels": Object {
@@ -368,6 +384,7 @@ Object {
         "totalCPU": "46",
         "totalMemory": "16",
         "totalStorage": "78",
+        "upgradeFailed": null,
       },
     ],
   },

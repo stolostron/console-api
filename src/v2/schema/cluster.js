@@ -11,8 +11,11 @@ import ClusterModel from '../models/cluster';
 
 export const typeDef = `
 type Cluster implements K8sObject {
+  availableVersions: [String]
   clusterip: String
   consoleURL: String
+  desiredVersion: String
+  distributionVersion: String
   metadata: Metadata
   nodes: Int
   status: String
@@ -24,6 +27,7 @@ type Cluster implements K8sObject {
   totalCPU: String
   klusterletVersion: String
   k8sVersion: String
+  upgradeFailed: Boolean
 }
 `;
 

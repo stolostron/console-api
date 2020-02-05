@@ -26,11 +26,15 @@ describe('Cluster Resolver', () => {
               namespace
               uid
             }
+            availableVersions
+            desiredVersion
+            distributionVersion
             nodes
             status
             totalCPU
             totalMemory
             totalStorage
+            upgradeFailed
           }
         }
       `,

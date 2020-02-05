@@ -9,10 +9,12 @@
 
 import _ from 'lodash';
 import lru from 'lru-cache';
+import uuid from 'uuid';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
 import config from '../../../config';
 import requestLib from '../lib/request';
+
 
 function selectNamespace(namespaces) {
   return namespaces.find(ns => ns === 'default') || namespaces[0];
@@ -27,7 +29,7 @@ export default class KubeConnector {
     namespaces = isRequired('namespaces'),
     pollTimeout = config.get('hcmPollTimeout'),
     pollInterval = config.get('hcmPollInterval'),
-    uid = Date.now,
+    uid = uuid,
   } = {}) {
     // Caches requests for a single query.
     this.cache = cache;
@@ -173,7 +175,7 @@ export default class KubeConnector {
 
   /* eslint-disable max-len */
   async createResourceView(resourceType, clusterName, resourceName, resourceNamespace, apiGroup, summaryOnly) {
-    const name = `${resourceType}-${this.uid()}`;
+    const name = `${resourceType}-${this.uid()}`.substr(0, 63);
     const body = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'ResourceView',

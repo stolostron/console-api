@@ -32,12 +32,16 @@ async function getClusterResources(kube) {
   const clusters = allClusters.items ? allClusters.items : await kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`);
 
   // For clusterstatuses, query only namespaces that have clusters
+  const names = Array.from(new Set(clusters.map(c => c.metadata.name)));
   const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
-  const clusterstatuses = await kube.getResources(
-    ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
-    { namespaces },
-  );
-  return [clusters, clusterstatuses];
+  const [clusterstatuses, ...clusterversions] = await Promise.all([
+    kube.getResources(
+      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
+      { namespaces },
+    ),
+    ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io')),
+  ]);
+  return [clusters, clusterstatuses, clusterversions];
 }
 
 function getUniqueClusterName(cluster) {
@@ -55,8 +59,20 @@ function mapClusters(clusters) {
   return resultMap;
 }
 
-function findMatchedStatus(clusters, clusterstatuses) {
+function mapClusterVersions(rawClusterversions) {
+  let clusterversions = {};
+  rawClusterversions.forEach((cv) => {
+    if (_.has(cv, 'status.results')) {
+      const clusterversion = _.get(cv, 'status.results', {});
+      clusterversions = { ...clusterversions, ...clusterversion };
+    }
+  });
+  return clusterversions;
+}
+
+function findMatchedStatus(clusters, clusterstatuses, rawClusterversions) {
   const resultMap = mapClusters(clusters);
+  const clusterversions = mapClusterVersions(rawClusterversions);
   clusterstatuses.forEach((clusterstatus) => {
     const uniqueClusterName = getUniqueClusterName(clusterstatus);
     if (resultMap.has(uniqueClusterName)) {
@@ -69,6 +85,17 @@ function findMatchedStatus(clusters, clusterstatuses) {
         klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
         k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
       };
+      const clusterName = _.get(clusterstatus, 'metadata.name', 'noClusterName');
+      if (_.has(clusterversions, clusterName)) {
+        const clusterversion = _.get(clusterversions, clusterName);
+        const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
+        data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
+        data.desiredVersion = _.get(clusterversion, 'status.desired.version');
+        const versionHistory = _.get(clusterversion, 'status.history', []);
+        data.distributionVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0].version : null;
+        const conditions = _.get(clusterversion, 'status.conditions', []);
+        data.upgradeFailed = conditions ? conditions.filter(c => c.type === 'Failing')[0].status === 'True' : false;
+      }
       resultMap.set(uniqueClusterName, data);
     }
   });
@@ -99,17 +126,19 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
 export default class ClusterModel extends KubeModel {
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
-    const [clusters, clusterstatuses] = await Promise.all([
+    const [clusters, clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
+      this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io'),
     ]);
-    const results = findMatchedStatus([clusters], [clusterstatuses]);
+    const results = findMatchedStatus([clusters], [clusterstatuses], clusterversions);
     return results;
   }
 
   async getClusters(args = {}) {
-    const [clusters, clusterstatuses] = await getClusterResources(this.kubeConnector);
-    const results = findMatchedStatus(clusters, clusterstatuses);
+    const [clusters, clusterstatuses, clusterversions] =
+      await getClusterResources(this.kubeConnector);
+    const results = findMatchedStatus(clusters, clusterstatuses, clusterversions);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }

@@ -19,6 +19,7 @@ branches:
   only:
     - master
     - development
+    - hive-poc
     - /^[0-9]+\..*$/
     - /^v[0-9]+\..*$/
     - /^release-[0-9]+\..*$/
@@ -31,6 +32,7 @@ before_install:
   # - "sh -e /etc/init.d/xvfb start"
   - make init
   - make docker-logins
+  - make quay-login
   - chmod +x copyright-check.sh
 
 install:
@@ -45,7 +47,8 @@ script:
 
 after_success:
   - test "$TRAVIS_EVENT_TYPE" = "pull_request" && make push
-  - test "$TRAVIS_EVENT_TYPE" != "pull_request" && make release || echo "not pushing to integration"
+  - test "$TRAVIS_EVENT_TYPE" != "pull_request" -a "$TRAVIS_BRANCH" = "hive-poc" && make quay-release  || echo "not pushing to quay.io"
+  - test "$TRAVIS_EVENT_TYPE" != "pull_request" -a "$TRAVIS_BRANCH" != "hive-poc" && make release || echo "not pushing to integration"
   - |
       if [[ "$TRAVIS_EVENT_TYPE" != "pull_request" && "$TRAVIS_BRANCH" != "development" ]]; then
         curl -Lo travis_after_all.py https://raw.github.com/dmakhno/travis_after_all/master/travis_after_all.py

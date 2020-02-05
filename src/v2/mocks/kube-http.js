@@ -26,6 +26,7 @@ export default function createMockHttp() {
       apiPath: require('./APIList').apiPath,
     },
     clusterStatus: require('./ClusterStatusList').default,
+    clusterVersions: require('./ClusterVersionsList'),
     repos: require('./ReposList').default,
     repoMutations: require('./RepoMutationsList').default,
     relMutations: require('./RelMutationList').default,
@@ -65,6 +66,8 @@ export default function createMockHttp() {
           return state.policies.mockPolicyListResponse;
         case params.json.metadata.name.includes('persistentvolumeclaim'):
           return state.pvs.mockPVsClaimResourceView;
+        case params.json.metadata.name.includes('clusterversions'):
+          return state.clusterVersions.mockClusterVersionsResourceView;
         case params.url.includes('default/helmrepos'):
           return state.repoMutations;
         case params.json.metadata.name.includes('test-acs-engine'):
@@ -142,6 +145,8 @@ export default function createMockHttp() {
         return state.namespace.mockResponse;
       case params.url.includes('resourceviews/release'):
         return state.release.mockResponse;
+      case params.url.includes('resourceviews/clusterversions'):
+        return state.clusterVersions.mockClusterVersionsResponse;
       case params.url.includes('default/policies/test-policy'):
         return state.policies.mockDeleteResponse;
       case params.url.includes('kube-system/placementpolicies'):
