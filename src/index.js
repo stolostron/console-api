@@ -30,7 +30,7 @@ const server = https.createServer(credentials, graphQLServer);
 
 server.listen(GRAPHQL_PORT, () => {
   logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] [version V2] started.`);
-  logger.info(`HCM UI API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
+  logger.info(`Console API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
   if (process.env.NODE_ENV !== 'production') {
     logger.info(`GraphiQL is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
   }

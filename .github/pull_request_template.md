@@ -1,4 +1,4 @@
-**Related Issue:** [closes|resolves|fixes] IBMPrivateCloud/roadmap/issues/<ISSUE_NUMBER>
+**Related Issue:** [closes|resolves|fixes] open-cluster-management/backlog/<ISSUE_NUMBER>
 
 **Description of Changes**
 

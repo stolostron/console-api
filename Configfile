@@ -1,8 +1,10 @@
 GIT_REMOTE_URL = $(shell git config --get remote.origin.url)
+COMPONENT_NAME = $(shell cat COMPONENT_NAME)
 DOCKER_SERVER ?=
 DOCKER_USERNAME ?= token
+DOCKER_IMAGE = $(COMPONENT_NAME)
 IMAGE_DESCRIPTION =
-IMAGE_NAME = mcm-ui-api
+IMAGE_NAME = $(COMPONENT_NAME)
 IMAGE_REPO ?=
 RELEASE_TAG ?= latest
 RELEASE_TAG_RED_HAT ?=$(RELEASE_TAG)-rhel
@@ -13,6 +15,7 @@ CONTAINER_PORT ?= 4000
 ARCH = $(shell uname -m)
 DOCKER_FLAG =
 MAX_IMAGE_SIZE=1000000000
+UNIT_TESTS ?= TRUE
 
 ifeq ($(ARCH), x86_64)
 	IMAGE_NAME_ARCH = $(IMAGE_NAME)-amd64
@@ -25,18 +28,9 @@ IMAGE_NAME_S390X ?= ${IMAGE_REPO}/${IMAGE_NAME}-s390x:${RELEASE_TAG}
 
 #new additions for the UBI image
 #Variables for redhat required labels
-IMAGE_DISPLAY_NAME=MCM UI API
-IMAGE_MAINTAINER=ericabr@us.ibm.com
-IMAGE_VENDOR=IBM
+IMAGE_DISPLAY_NAME=Console API
+IMAGE_MAINTAINER=kcormier@redhat.com
+IMAGE_VENDOR=Red Hat
 IMAGE_VERSION=$(SEMVERSION)
 IMAGE_SUMMARY=$(IMAGE_DESCRIPTION)
-IMAGE_OPENSHIFT_TAGS=mcm ui api
-
-
-DOCKER_SCRATCH_REGISTRY			?= hyc-cloud-private-scratch-docker-local.artifactory.swg-devops.com
-DOCKER_EDGE_REGISTRY 				?= hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com
-DOCKER_INTEGRATION_REGISTRY ?= hyc-cloud-private-integration-docker-local.artifactory.swg-devops.com
-DOCKER_REGISTRY             ?=$(DOCKER_INTEGRATION_REGISTRY)
-QUAY_REGISTRY ?= quay.io
-QUAY_ORGANIZATION ?= rhibmcollab
-
+IMAGE_OPENSHIFT_TAGS=console api

@@ -31,7 +31,7 @@ ERROR=0
 
 echo "##### Copyright check #####"
 #Loop through all files. Ignore .FILENAME types
-for f in `find . -type f ! -path "./.eslintrc.js" ! -path "./build-harness/*" ! -path "./sslcert/*" ! -path "./node_modules/*" ! -path "./coverage/*" ! -path "./test-output/*"`; do
+for f in `find . -type f ! -path "./.eslintrc.js" ! -path "./build-harness/*" ! -path "./build-harness-extensions/*" ! -path "./sslcert/*" ! -path "./node_modules/*" ! -path "./coverage/*" ! -path "./test-output/*"`; do
   if [ ! -f "$f" ] || [ "$f" = "./copyright-check.sh" ]; then
     continue
   fi
@@ -63,10 +63,11 @@ for f in `find . -type f ! -path "./.eslintrc.js" ! -path "./build-harness/*" ! 
        && "$HEADER" != *"${CHECK2b}"* ]]; then
         printf "Missing copyright\n  >>Could not find [${LIC_ARY[$i]}] in the file $f\n"
         ERROR=1
-        break
+        break 2
       fi
     fi
   done
+
 done
 
 echo "##### Copyright check ##### ReturnCode: ${ERROR}"
