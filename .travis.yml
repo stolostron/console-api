@@ -45,7 +45,7 @@ jobs:
           make 
           make component/pull 
           make component/test/unit
-          sonar-scanner --debug
+          #sonar-scanner --debug
     - stage: test-e2e
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request
