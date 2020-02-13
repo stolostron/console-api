@@ -124,5 +124,3 @@ multi-arch:
 	make docker:manifest-tool
 	make docker:multi-arch DOCKER_TAG=$(RELEASE_TAG)
 	make docker:multi-arch DOCKER_TAG=$(SEMVERSION)
-
-include Makefile.cicd
