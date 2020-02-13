@@ -1,4 +1,4 @@
-FROM hyc-cloud-private-edge-docker-local.artifactory.swg-devops.com/build-images/node-dubnium-ubi8-minimal-amd64:8.1-279
+FROM registry.access.redhat.com/ubi8/nodejs-10:latest
 
 ARG VCS_REF
 ARG VCS_URL
@@ -31,11 +31,12 @@ LABEL org.label-schema.vendor="IBM" \
       io.k8s.description="$IMAGE_DESCRIPTION" \
       io.openshift.tags="$IMAGE_OPENSHIFT_TAGS"
 
-RUN mkdir -p /opt/ibm/mcm-ui-api /licenses
-ADD license.txt /licenses
-WORKDIR /opt/ibm/mcm-ui-api
+RUN mkdir -p /opt/app-root/console-api
+RUN mkdir -p /opt/app-root/licenses
+ADD license.txt /opt/app-root/licenses
+WORKDIR /opt/app-root/console-api
 
-COPY . /opt/ibm/mcm-ui-api
+COPY . /opt/app-root/console-api
 
 EXPOSE 4000
 

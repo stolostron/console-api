@@ -5,6 +5,8 @@ config/config-development.json
 .idea
 coverage
 build-harness
+build-harness-extensions
 .build-harness
+.build-harness-bootstrap
 .history
 .project

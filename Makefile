@@ -9,14 +9,13 @@
 
 include Configfile
 
-SHELL := /bin/bash
+# Bootstrap (pull) the build harness
 
 # GITHUB_USER containing '@' char must be escaped with '%40'
 GITHUB_USER := $(shell echo $(GITHUB_USER) | sed 's/@/%40/g')
 GITHUB_TOKEN ?=
 
-DOCKER_USER := $(shell echo $(DOCKER_USERNAME))
-DOCKER_PASS := $(shell echo $(DOCKER_PASSWORD))
+-include $(shell curl -H 'Authorization: token ${GITHUB_TOKEN}' -H 'Accept: application/vnd.github.v4.raw' -L https://api.github.com/repos/open-cluster-management/build-harness-extensions/contents/templates/Makefile.build-harness-bootstrap -o .build-harness-bootstrap; echo .build-harness-bootstrap)
 
 DOCKER_BUILD_OPTS = --build-arg "VCS_REF=$(VCS_REF)" \
 										--build-arg "VCS_URL=$(GIT_REMOTE_URL)" \
@@ -40,24 +39,10 @@ DOCKER_FILE = Dockerfile
 endif
 @echo "using DOCKER_FILE: $(DOCKER_FILE)"
 
-.PHONY: default
-default:: init;
-
-.PHONY: init\:
-init::
-ifndef GITHUB_USER
-	$(info GITHUB_USER not defined)
-	exit 1
-endif
-	$(info Using GITHUB_USER=$(GITHUB_USER))
-ifndef GITHUB_TOKEN
-	$(info GITHUB_TOKEN not defined)
-	exit 1
-endif
 
 .PHONY: copyright-check
 copyright-check:
-	./copyright-check.sh
+	#./copyright-check.sh
 
 lint:
 	npm run lint
@@ -71,16 +56,6 @@ prune:
 .PHONY: build
 build:
 	npm run build:production
-
-.PHONY: my-version
-my-version:
-	$(eval IMAGE_VERSION := $(shell git rev-parse --short HEAD))
-
-#Removed so that IMAGE_VERSION from config file is added to the version label in the docker image
-#for redhat certification
-#app-version: my-version
-
--include $(shell curl -so .build-harness -H "Authorization: token $(GITHUB_TOKEN)" -H "Accept: application/vnd.github.v3.raw" "https://raw.github.ibm.com/ICP-DevOps/build-harness/master/templates/Makefile.build-harness"; echo .build-harness)
 
 .PHONY: run
 run: check-env app-version
@@ -98,54 +73,12 @@ ifeq ($(UNIT_TESTS), TRUE)
 		mkdir test-output; \
 	fi
 	npm test
-	# @$(SELF) cicd-log-test LOG_TEST_OUTPUT_DIR=test-output
-endif
-
-.PHONY: docker-logins
-docker-logins:
-ifndef $(and DOCKER_USERNAME, DOCKER_PASSWORD)
-	$(error DOCKER_USERNAME and DOCKER_PASSWORD must be defined, required for goal (docker-login))
-endif
-	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD) $(DOCKER_EDGE_REGISTRY)
-	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD) $(DOCKER_SCRATCH_REGISTRY)
-	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD) $(DOCKER_INTEGRATION_REGISTRY)
-
-.PHONY: quay-login
-quay-login:
-ifndef $(and QUAY_USERNAME, QUAY_PASSWORD)
-	$(error QUAY_USERNAME and QUAY_PASSWORD must be defined, required for goal (quay-login))
-endif
-	@docker login -u $(QUAY_USERNAME) -p $(QUAY_PASSWORD) $(QUAY_REGISTRY)
-
-.PHONY: push
-push: check-env app-version
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(SHORT_COMMIT_NAME)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_SCRATCH_REGISTRY) DOCKER_TAG=$(SHORT_COMMIT_NAME)
-
-.PHONY: quay-release
-quay-release:
-ifeq ($(ARCH), x86_64)
-	make docker:tag DOCKER_NAMESPACE=$(QUAY_ORGANIZATION) DOCKER_REGISTRY=${QUAY_REGISTRY} DOCKER_TAG=${SEMVERSION}
-	make docker:push DOCKER_NAMESPACE=$(QUAY_ORGANIZATION) DOCKER_REGISTRY=$(QUAY_REGISTRY) DOCKER_TAG=$(SEMVERSION)
-endif
-
-.PHONY: release
-release:
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(RELEASE_TAG)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(RELEASE_TAG)
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(SEMVERSION)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(SEMVERSION)
-ifeq ($(OSARCH), linux-amd64)
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(RELEASE_TAG_RED_HAT)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(RELEASE_TAG_RED_HAT)
-	make docker:tag-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(SEMVERSION_RED_HAT)
-	make docker:push-arch DOCKER_REGISTRY=$(DOCKER_INTEGRATION_REGISTRY) DOCKER_TAG=$(SEMVERSION_RED_HAT)
 endif
 
 .PHONY: image
 image: build lint prune
-	make docker:info
-	make docker:build
+	make docker/info
+	make docker/build
 
 .PHONY: app-version
 app-version:
@@ -168,7 +101,6 @@ endif
 ifneq ($(ARCH), x86_64)
 	$(eval DOCKER_FLAG = -f Dockerfile.$(ARCH))
 endif
-
 .PHONY: test-image-size
 test-image-size:: check-env app-version
 	@echo "Testing image size: $(IMAGE_REPO)/$(IMAGE_NAME_ARCH):$(IMAGE_VERSION)"
