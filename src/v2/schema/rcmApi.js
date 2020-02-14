@@ -15,6 +15,13 @@ type Connection implements ConnectionObject {
   errorMsg: String
 }
 
+type ConnectionDetail {
+  name: String
+  namespace: String
+  provider: String
+  metadata: JSON
+}
+
 type Orchestration {
   name: String
   longname: String
@@ -35,6 +42,8 @@ export const resolver = {
     getImportYamlTemplate: (parent, args, { rcmApiModel }) => rcmApiModel.getImportYamlTemplate(),
     connections: (parent, args, { rcmApiModel, req }) =>
       rcmApiModel.getConnections({ user: req.user }),
+    connectionDetails: (parent, args, { rcmApiModel, req }) =>
+      rcmApiModel.getConnectionDetails({ user: req.user }),
     orchestrations: (parent, args, { rcmApiModel }) =>
       rcmApiModel.getOrchestrations(),
   },

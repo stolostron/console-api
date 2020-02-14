@@ -9,6 +9,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import yaml from 'js-yaml';
 import logger from '../lib/logger';
 
 export default class RcmApiModel {
@@ -118,6 +119,37 @@ export default class RcmApiModel {
     });
     return (formattedItems.filter(connection => userNamespaces &&
       userNamespaces.includes(connection.metadata.namespace)));
+  }
+
+  async getConnectionDetails() {
+    const connections = await this.rcmApiConnector.get('/cloudconnections');
+    // eslint-disable-next-line arrow-body-style
+    if (connections.statusCode !== 200) {
+      const errors = [];
+      const error = {
+        metadata: {},
+        statusCode: connections.statusCode,
+        errorMsg: connections.statusMessage,
+      };
+      errors.push(error);
+      return errors;
+    }
+    if (connections.statusCode === 200 && !connections.Items) {
+      return [];
+    }
+    const ret = [];
+    const { Items = [] } = connections;
+    Items.forEach(({ name, provider, metadata }) => {
+      const data = yaml.safeLoad(metadata);
+      if (data.isOcp) {
+        ret.push({
+          name,
+          provider,
+          metadata: data.secret,
+        });
+      }
+    });
+    return ret;
   }
 
   async deleteConnection(args) {
