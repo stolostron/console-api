@@ -87,7 +87,8 @@ export default class RcmApiModel {
   }
 
   async getConnections(args = {}) {
-    const userNamespaces = args.user.namespaces && args.user.namespaces.map(ns => ns.namespaceId);
+    const userNamespaces = args.user.namespaces.items &&
+      args.user.namespaces.items.map(ns => ns.namespaceId);
     const connections = await this.rcmApiConnector.get('/cloudconnections');
     // eslint-disable-next-line arrow-body-style
     if (connections.statusCode !== 200) {

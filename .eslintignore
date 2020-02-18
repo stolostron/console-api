@@ -3,5 +3,5 @@ build-harness
 build
 coverage
 package.json
-npm-shrinkwrap.json
+package-lock.json
 config/config-defaults.json

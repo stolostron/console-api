@@ -14,7 +14,7 @@ import config from '../../../config';
 export default class SFModel extends KubeModel {
   async getOccurrences(args) {
     const url = config.get('NODE_ENV') === 'test' ? 'http://0.0.0.0' : config.get('cfcRouterUrl');
-    const iamToken = _.get(args.req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie');
+    const iamToken = _.get(args.req, "cookies['acm-access-token-cookie']") || config.get('acm-access-token-cookie');
     const opts = {
       url: `${url}/findings/v1/id-mycluster-account/graph`,
       headers: {

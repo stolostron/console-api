@@ -55,7 +55,7 @@ export default class CemModel extends KubeModel {
   }
 
   async getIncidentsForApplication(args) {
-    const icpToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
+    const icpToken = _.get(args.req, "cookies['acm-access-token-cookie']");
     const subscriptionId = args.req.user.userAccount && args.req.user.userAccount.activeAccountId;
     const { name } = args;
     const startTime = moment().subtract(20, 'days').format('YYYY-MM-DDTHH:mm:ssZ');
@@ -84,7 +84,7 @@ export default class CemModel extends KubeModel {
 
   async getClusterIncidents(args) {
     const { accountId, cluster } = args;
-    const accessToken = _.get(args.req, "cookies['cfc-access-token-cookie']");
+    const accessToken = _.get(args.req, "cookies['acm-access-token-cookie']");
     const params = {
       event_filter_1: `resource.cluster == '${cluster}'`,
       incident_filter: "state != 'closed'",
