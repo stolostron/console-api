@@ -13,8 +13,6 @@ import config from '../../../config';
 import createMockIAMHTTP from '../mocks/iam-http';
 import request from './request';
 
-const authConfig = require('../config/config');
-
 // Async middleware error handler
 const asyncMiddleware = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next))
@@ -84,7 +82,7 @@ async function getKubeToken({
 
 async function getNamespaces(usertoken) {
   const options = {
-    url: `${authConfig.ocp.apiserver_url}/apis/project.openshift.io/v1/projects`,
+    url: `${process.env.API_SERVER_URL || 'https://kubernetes.default.svc'} /apis/project.openshift.io/v1/projects`,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
