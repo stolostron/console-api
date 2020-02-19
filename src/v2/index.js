@@ -11,11 +11,11 @@ import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { isInstance as isApolloErrorInstance, formatError as formatApolloError } from 'apollo-errors';
 import bodyParser from 'body-parser';
-import { app as inspect } from '@icp/security-middleware';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import inspect from 'security-middleware';
 import _ from 'lodash';
 
 import logger from './lib/logger';
@@ -86,7 +86,7 @@ const auth = [];
 
 if (isProd) {
   logger.info('Authentication enabled');
-  auth.push(inspect, authMiddleware());
+  auth.push(inspect.app, authMiddleware());
 } else {
   auth.push(authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
@@ -104,7 +104,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   }
 
   let namespaces = _.get(req, 'user.namespaces', []);
-  namespaces = Array.isArray(namespaces) ? namespaces.map(ns => ns.namespaceId) : [];
+  namespaces = Array.isArray(namespaces.items) ? namespaces.items.map(ns => ns.metadata.name) : [];
 
   const kubeConnector = new KubeConnector({
     token: req.kubeToken,
@@ -113,7 +113,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   });
 
   const rcmApiConnector = new RcmApiConnector({
-    token: _.get(req, "cookies['cfc-access-token-cookie']") || config.get('cfc-access-token-cookie'),
+    token: _.get(req, "cookies['acm-access-token-cookie']") || config.get('acm-access-token-cookie'),
     httpLib: kubeHTTP,
   });
 
