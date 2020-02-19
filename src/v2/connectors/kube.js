@@ -25,7 +25,7 @@ export default class KubeConnector {
     cache = lru(),
     token = 'Bearer localdev',
     httpLib = requestLib,
-    kubeApiEndpoint = `${process.env.API_SERVER_URL}`,
+    kubeApiEndpoint = `${process.env.API_SERVER_URL}` || 'https://kubernetes.default.svc',
     namespaces = isRequired('namespaces'),
     pollTimeout = config.get('hcmPollTimeout'),
     pollInterval = config.get('hcmPollInterval'),

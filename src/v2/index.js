@@ -15,6 +15,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import inspect from 'security-middleware';
 import _ from 'lodash';
 
 import logger from './lib/logger';
@@ -41,7 +42,6 @@ import RcmApiModel from './models/rcmApi';
 import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
 import config from '../../config';
-import { app as inspect } from './lib/inspect';
 import authMiddleware from './lib/auth-middleware';
 
 export const GRAPHQL_PATH = `${config.get('contextPath')}/graphql`;
@@ -86,7 +86,7 @@ const auth = [];
 
 if (isProd) {
   logger.info('Authentication enabled');
-  auth.push(inspect, authMiddleware());
+  auth.push(inspect.app, authMiddleware());
 } else {
   auth.push(authMiddleware({ shouldLocalAuth: true }));
   graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
