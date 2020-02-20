@@ -82,7 +82,7 @@ async function getKubeToken({
 
 async function getNamespaces(usertoken) {
   const options = {
-    url: `${process.env.API_SERVER_URL || 'https://kubernetes.default.svc'} /apis/project.openshift.io/v1/projects`,
+    url: `${process.env.API_SERVER_URL || 'https://kubernetes.default.svc'}/apis/project.openshift.io/v1/projects`,
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
