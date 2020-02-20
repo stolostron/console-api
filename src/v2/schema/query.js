@@ -26,7 +26,7 @@ type Query {
   # Get Nodes and node info
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   node(namespace: String, name: String): [Node]
-  
+
   # Account id for user.
   accountId: AccountId
 
@@ -38,9 +38,10 @@ type Query {
 
   # Get Cluster incidents.
   incidents(accountId: String, cluster: String): [cemIncident]
-  
+
   # List all cloud connections and orchestrations
   connections: [Connection]
+  connectionDetails: [ConnectionDetail]
   orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.
@@ -82,7 +83,7 @@ type Query {
 
   # Get cloud event manager queries .
   applicationNamespaces(namespace: String): [ApplicationNamespace]
-  
+
   # Used for Topology.
   filters: Filters
 
