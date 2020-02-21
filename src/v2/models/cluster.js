@@ -92,7 +92,8 @@ function findMatchedStatus(clusters, clusterstatuses, rawClusterversions) {
         data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
         data.desiredVersion = _.get(clusterversion, 'status.desired.version');
         const versionHistory = _.get(clusterversion, 'status.history', []);
-        data.distributionVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0].version : null;
+        const completedVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0] : null;
+        data.distributionVersion = completedVersion ? completedVersion.version : null;
         const conditions = _.get(clusterversion, 'status.conditions', []);
         data.upgradeFailed = conditions ? conditions.filter(c => c.type === 'Failing')[0].status === 'True' : false;
       }
