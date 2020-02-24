@@ -1,11 +1,16 @@
 os:
   - linux
 
-sudo: required
 language: node_js
 
 services:
   - docker
+
+addons:
+  sonarcloud:
+    organization: "open-cluster-management"
+    token:
+      secure: "gBTBmqMJwT10RClA75I8fKHun+05Ja4MYu1yDegRSg/7GCS+SGQHSLX6AaDiiP/zgaX0ffXACMS/RiLTs8pQauQQUEy5bTwUIxbkHHYZlSMQDtmuaQerRVsI5017zqrfd56c2qMvRFg+7ekd72pl8qgRI8CJaMaa27lnKxlagBgthXANwcJqKxqYfuJStIF23hzOagOonh1FNsO7kqNWErEJGNvi99mA4GVMfnllZliZeXWILn7tdjgvKZiwz7UoGHYSqJkchW7RSNaJe0IDjMyDKzKpn5DMTE48VsjY+qZbaar3TvKMkjoUmnPRGe/1eJU2MA29v3EEJ/bCG15b3lZ2v/ZMiN5jMsGorCzAeokLc7TQ+/ssyVC1UwwlGdpb7kM8QjYyD+pgEXWurJozdVzUw6TrpSEXWBzAjaF+R4D6/9dtyb2Bn1QzDgukPr0+U0iLj/23+3MklfD0wLcC7Hd5YDYxAihbdkEujXWTryvgzj8hOmUUjynAdBT5J49earzVvhJTPSZWpyPfqFPJAi1c5OzTSJgvUEeqxUYswIX1qDWddNYVSvtr6mQmwTj4GKuC2rOWUvgN8Vp2vtLPCBl5UZBIeFuN+L/+DgqGewudkFognKPg2DCuBlKrogZHwo1MyK4kj5VCH4QkpVZAtzVuMcsnjDPeaAO0oV5vTdc="
 
 env:
   global:
@@ -35,6 +40,7 @@ jobs:
           make
           make component/build
           make component/push
+          make security/scans
     - stage: unit-test
       name: "Run unit tests"
       if: type = pull_request
@@ -45,8 +51,9 @@ jobs:
         - | 
           make 
           make component/pull 
+          make sonar/js/jest-init
           make component/test/unit
-          #sonar-scanner --debug
+          make sonar/js
     - stage: test-e2e
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request
