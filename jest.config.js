@@ -25,6 +25,7 @@ const jestConfig = {
     'lcov',
     'text',
   ],
+  testResultsProcessor: 'jest-sonar-reporter',
   coverageThreshold: {
     global: {
       branches: 35,
