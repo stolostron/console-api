@@ -5,6 +5,5 @@
   "hcmPollTimeout": 50000,
   "hcmUrl": "",
   "httpPort": 4000,
-  "localKubeToken": "",
-  "mongodbUrl": "mongodb://localhost:27017/weave"
+  "localKubeToken": ""
 }

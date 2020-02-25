@@ -61,7 +61,6 @@ build:
 run: check-env app-version
 	docker run \
 	-e NODE_ENV=development \
-	-e PLATFORM_IDENTITY_PROVIDER_URL=$(PLATFORM_IDENTITY_PROVIDER_URL) \
 	-d -p $(HOST):$(APP_PORT):$(CONTAINER_PORT) $(IMAGE_REPO)/$(IMAGE_NAME_ARCH):$(IMAGE_VERSION)
 
 push: check-env app-version

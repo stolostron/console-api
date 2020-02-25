@@ -33,7 +33,6 @@ import UserInfoModel from './models/userinfo';
 import CemModel from './models/cemincident';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
-import MongoModel from './models/mongo';
 import ResourceViewModel from './models/resourceview';
 import AccountIdModel from './models/user-accountid';
 import SFModel from './models/findings';
@@ -129,7 +128,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     cemModel: new CemModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
-    mongoModel: new MongoModel(config.get('mongodbUrl'), { namespaces }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     accountModel: new AccountIdModel({ kubeConnector, req }),
     sfModel: new SFModel({ kubeConnector, req }),
