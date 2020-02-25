@@ -1,4 +1,0 @@
-{
-  "localKubeToken": "localdev",
-  "mongodbUrl": "mongodb://localhost:27017/weave"
-}
