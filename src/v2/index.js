@@ -29,12 +29,10 @@ import SubscriptionModel from './models/subscription';
 import PlacementRuleModel from './models/placementrule';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
-import UserInfoModel from './models/userinfo';
 import CemModel from './models/cemincident';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
-import AccountIdModel from './models/user-accountid';
 import SFModel from './models/findings';
 import RcmApiModel from './models/rcmApi';
 
@@ -124,12 +122,10 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     placementRuleModel: new PlacementRuleModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
-    userInfoModel: new UserInfoModel({ kubeConnector, req }),
     cemModel: new CemModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
-    accountModel: new AccountIdModel({ kubeConnector, req }),
     sfModel: new SFModel({ kubeConnector, req }),
     rcmApiModel: new RcmApiModel({ rcmApiConnector }),
   };

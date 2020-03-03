@@ -27,9 +27,6 @@ type Query {
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   node(namespace: String, name: String): [Node]
 
-  # Account id for user.
-  accountId: AccountId
-
   # Get Compliance/Policy info
   compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
 
@@ -71,9 +68,6 @@ type Query {
 
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
-
-  # Get logged in user information
-  userInfo: userInfo
 
   # Get cloud event manager queries .
   cemIncidents: [cemIncident]

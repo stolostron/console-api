@@ -41,14 +41,10 @@ export default function createMockHttp() {
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
     rcmApi: require('./RcmApi'),
-    userInfo: require('./UserInfo'),
   };
 
   return async function MockLib(params) {
     if (params.json) {
-      if (params.json.userinfo) {
-        return state.userInfo;
-      }
       switch (true) {
         case params.json.kind.includes('SelfSubjectAccessReview'):
           return state.userAccess;
