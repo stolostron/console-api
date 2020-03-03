@@ -48,7 +48,7 @@ export default class RcmApiModel {
     // eslint-disable-next-line arrow-body-style
     const response = await this.rcmApiConnector.get('/cloudproviders');
     if (response && (response.code || response.message)) {
-      logger.error(`RCM API ERROR: POST ${this.rcmApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
+      logger.error(`RCM API ERROR: POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
       return {
         error: {
           rawResponse: response,
