@@ -19,7 +19,6 @@ import * as compliance from './compliance';
 import * as placementrules from './placementrule';
 import * as filter from './filter';
 import * as overview from './overview';
-import * as accountId from './user-accountid';
 import * as occurrence from './occurrence';
 import * as json from './json';
 import * as namespace from './namespace';
@@ -33,7 +32,6 @@ import * as releases from './helmrels';
 import * as repo from './helmrepo';
 import * as topology from './topology';
 import * as userAccess from './user-access';
-import * as userInfo from './user-info';
 import * as cemIncident from './cem-incident';
 import * as rcmApi from './rcmApi';
 
@@ -47,7 +45,6 @@ const modules = [
   compliance,
   filter,
   overview,
-  accountId,
   occurrence,
   json,
   namespace,
@@ -61,7 +58,6 @@ const modules = [
   repo,
   topology,
   userAccess,
-  userInfo,
   cemIncident,
   rcmApi,
 ];
