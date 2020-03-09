@@ -39,7 +39,6 @@ type Orchestration {
 export const resolver = {
   Query: {
     getAutomatedImportStatus: (parent, args, { rcmApiModel }) => rcmApiModel.getAutomatedImportStatus(args),
-    getImportYamlTemplate: (parent, args, { rcmApiModel }) => rcmApiModel.getImportYamlTemplate(),
     connections: (parent, args, { rcmApiModel, req }) =>
       rcmApiModel.getConnections({ user: req.user }),
     connectionDetails: (parent, args, { rcmApiModel, req }) =>

@@ -37,7 +37,9 @@ export const resolver = {
       clusterModel.getSingleCluster({ ...args, user: req.user }),
     clusters: (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, user: req.user }),
-  },
+    getImportYamlTemplate: (parent, args, { clusterModel }) => 
+      clusterModel.getImportYamlTemplate(),
+    },
   Cluster: {
     status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
     totalCPU: parent => ClusterModel.resolveUsage('cpu', parent.rawStatus),

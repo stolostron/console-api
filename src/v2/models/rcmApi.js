@@ -268,12 +268,5 @@ export default class RcmApiModel {
     return response;
   }
 
-  async getImportYamlTemplate() {
-    const response = await this.rcmApiConnector.get('/import.yaml');
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/import.yaml`, response);
-    }
-    return response;
-  }
 }
 
