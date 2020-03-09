@@ -25,7 +25,7 @@ export default class BareMetalAssetModel extends KubeModel {
       // TODO: do we need secrets?
     ]);
     if (bareMetalAsset.metadata !== undefined) {
-      return transform(bareMetalAsset);
+      return [transform(bareMetalAsset)];
     }
     return [];
   }

@@ -24,7 +24,7 @@ type Query {
   clusters: [Cluster]
 
   # BareMetalAssests
-  bareMetalAsset(name: String, namespace: String): BareMetalAsset
+  bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
   bareMetalAssets: [BareMetalAsset]
 
   # Get Nodes and node info

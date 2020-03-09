@@ -44,6 +44,7 @@ export default function createMockHttp() {
     genericResourceList: require('./GenericResourceList'),
     rcmApi: require('./RcmApi'),
     connectionApi: require('./ConnectionApi'),
+    bareMetalAssets: require('./BareMetalAssetList').default,
   };
 
   return async function MockLib(params) {
@@ -190,6 +191,8 @@ export default function createMockHttp() {
         return state.connectionApi.getCloudConnectionSecrets;
       case params.url.includes('/api/v1/namespaces/ocm/secrets/microsoft'):
         return state.connectionApi.deleteCloudConnection;
+      case params.url.includes('v1alpha1/baremetalassets'):
+        return state.bareMetalAssets;
       default:
         return state.apiList.mockResponse;
     }
