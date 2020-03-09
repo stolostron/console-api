@@ -24,6 +24,11 @@ env:
     - COMPONENT_UNIT_TEST_COMMAND=${TRAVIS_BUILD_DIR}/unit-test.sh
     - COMPONENT_E2E_TEST_COMMAND=${TRAVIS_BUILD_DIR}/e2e-test.sh
 
+branches:
+  only:
+    - master
+    - /^release-[0-9]+\..*$/
+
 stages:
   - build
   - unit-test
