@@ -41,6 +41,7 @@ export default function createMockHttp() {
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
     rcmApi: require('./RcmApi'),
+    bareMetalAssets: require('./BareMetalAssetList').default,
   };
 
   return async function MockLib(params) {
@@ -78,6 +79,8 @@ export default function createMockHttp() {
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/clusters') && params.url.includes('/imports'):
           return state.rcmApi.getAutomatedImportStatusResponse;
+        case params.url.includes('v1alpha1/baremetalassets'):
+          return state.bareMetalAssets.mockBMAsResourceView;
         default:
           return state.pods;
       }
