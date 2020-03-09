@@ -23,6 +23,10 @@ type Query {
   # List all managed clusters.
   clusters: [Cluster]
 
+  # BareMetalAssests
+  bareMetalAsset(name: String, namespace: String): BareMetalAsset
+  bareMetalAssets: [BareMetalAsset]
+
   # Get Nodes and node info
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   node(namespace: String, name: String): [Node]
