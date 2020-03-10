@@ -45,7 +45,7 @@ jobs:
           make
           make component/build
           make component/push
-          make security/scans
+        - if [ "$IMAGE_SCAN" != "false" ]; then make security/scans; fi;
     - stage: unit-test
       name: "Run unit tests"
       if: type = pull_request
