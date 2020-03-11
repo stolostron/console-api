@@ -1,12 +1,7 @@
 /** *****************************************************************************
- * Licensed Materials - Property of IBM
- * (c) Copyright IBM Corporation 2020. All Rights Reserved.
- *
- * Note to U.S. Government Users Restricted Rights:
- * Use, duplication or disclosure restricted by GSA ADP Schedule
- * Contract with IBM Corp.
+ * Licensed Materials - Property of Red Hat, Inc.
+ * (c) Copyright Red Hat, Inc. All Rights Reserved.
  ****************************************************************************** */
-
 import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
