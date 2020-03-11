@@ -10,7 +10,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import yaml from 'js-yaml';
 import logger from '../lib/logger';
 
 export default class RcmApiModel {
@@ -85,89 +84,6 @@ export default class RcmApiModel {
     return (formattedItems);
   }
 
-  async createConnection(args) {
-    const { body } = args;
-    const response = await this.rcmApiConnector.post('/cloudconnections', body);
-    return response;
-  }
-
-  async getConnections(args = {}) {
-    const userNamespaces = args.user.namespaces.items &&
-      args.user.namespaces.items.map(ns => ns.namespaceId);
-    const connections = await this.rcmApiConnector.get('/cloudconnections');
-    // eslint-disable-next-line arrow-body-style
-    if (connections.statusCode !== 200) {
-      const errors = [];
-      const error = {
-        metadata: {},
-        statusCode: connections.statusCode,
-        errorMsg: connections.statusMessage,
-      };
-      errors.push(error);
-      return errors;
-    }
-    if (connections.statusCode === 200 && !connections.Items) {
-      return [];
-    }
-    // eslint-disable-next-line arrow-body-style
-    const formattedItems = connections.Items && connections.Items.map((item) => {
-      return {
-        metadata: {
-          name: item.name,
-          provider: item.provider,
-          namespace: item.namespace,
-          name_namespace: item.name.concat(item.namespace),
-        },
-        statusCode: connections.statusCode,
-        errorMsg: '',
-      };
-    });
-    return (formattedItems.filter(connection => userNamespaces &&
-      userNamespaces.includes(connection.metadata.namespace)));
-  }
-
-  async getConnectionDetails() {
-    const connections = await this.rcmApiConnector.get('/cloudconnections');
-    // eslint-disable-next-line arrow-body-style
-    if (connections.statusCode !== 200) {
-      const errors = [];
-      const error = {
-        metadata: {},
-        statusCode: connections.statusCode,
-        errorMsg: connections.statusMessage,
-      };
-      errors.push(error);
-      return errors;
-    }
-    if (connections.statusCode === 200 && !connections.Items) {
-      return [];
-    }
-    const ret = [];
-    const { Items = [] } = connections;
-    Items.forEach(({ name, provider, metadata }) => {
-      const data = yaml.safeLoad(metadata);
-      if (data.isOcp) {
-        ret.push({
-          name,
-          provider,
-          metadata: data.secret,
-        });
-      }
-    });
-    return ret;
-  }
-
-  async deleteConnection(args) {
-    const { namespace, name } = args;
-    const response = await this.rcmApiConnector.delete(`/cloudconnections/${namespace}/${name}`);
-    return response;
-  }
-
-  async editConnection(args) {
-    const { body, namespace, name } = args;
-    const response = await this.rcmApiConnector.put(`/cloudconnections/${namespace}/${name}`, body);
-    return response;
-  }
 
   async createClusterResource(args) {
     const { body } = args;

@@ -35,6 +35,7 @@ import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
 import RcmApiModel from './models/rcmApi';
+import ConnectionModel from './models/connection';
 
 import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
@@ -128,6 +129,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
     rcmApiModel: new RcmApiModel({ rcmApiConnector, kubeConnector }),
+    connectionModel: new ConnectionModel({ kubeConnector }),
   };
 
   return { formatError, schema, context };
