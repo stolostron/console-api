@@ -202,11 +202,19 @@ export default class ClusterModel extends KubeModel {
     }, []);
   }
 
-  async getImportYamlTemplate() {
-    const response = await this.kubeConnector.get(`/api/v1/configmaps?labelSelector=config=cluster-import-config`);
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET cluster-import-config ConfigMap`, response);
-    }
-    return response;
-  }
+  // responseHasError(response) {
+  //   return (response.statusCode < 200 || response.statusCode >= 300);
+  // }
+
+
+  // responseForError(errorTitle, response) {
+  //   logger.error(`RCM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+  //   return {
+  //     error: {
+  //       rawResponse: response,
+  //       statusCode: response.statusCode,
+  //       statusMsg: response.message || response.description || response.statusMessage,
+  //     },
+  //   };
+  // }
 }

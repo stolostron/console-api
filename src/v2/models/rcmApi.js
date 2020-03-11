@@ -9,15 +9,17 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import logger from '../lib/logger';
 
 export default class RcmApiModel {
-  constructor({ rcmApiConnector }) {
+  constructor({ rcmApiConnector, kubeConnector }) {
     if (!rcmApiConnector) {
       throw new Error('rcmApiConnector is a required parameter');
     }
     this.rcmApiConnector = rcmApiConnector;
+    this.kubeConnector = kubeConnector;
   }
 
   getErrorMsg(response) {
@@ -30,16 +32,18 @@ export default class RcmApiModel {
   }
 
   responseHasError(response) {
-    return (response.statusCode < 200 || response.statusCode >= 300);
+    const code = response.statusCode || response.code;
+    return (code < 200 || code >= 300);
   }
 
 
   responseForError(errorTitle, response) {
+    const code = response.statusCode || response.code;
     logger.error(`RCM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
     return {
       error: {
         rawResponse: response,
-        statusCode: response.statusCode,
+        statusCode: code,
         statusMsg: response.message || response.description || response.statusMessage,
       },
     };
@@ -166,18 +170,48 @@ export default class RcmApiModel {
   }
 
   async createClusterResource(args) {
-    let response;
     const { body } = args;
 
-    if (!body) {
-      throw new Error('Body is required for createClusterResource');
-    } else {
-      response = await this.rcmApiConnector.postWithString('/clusters', body);
+    if (!body) throw new Error('Body is required for createClusterResource');
+
+    let config = {};
+    try {
+      config = JSON.parse(body);
+    } catch (e) {
+      throw new Error(e);
     }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters`, response);
+
+    const { clusterName, clusterNamespace } = config;
+
+    console.log('body', body);
+    const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: clusterNamespace } });
+    console.log('namespaceResponse', namespaceResponse);
+
+    if (this.responseHasError(namespaceResponse)) {
+      if (namespaceResponse.code === 409) {
+        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
+        if (existingNamespaceClusters.items.length > 0) throw new Error(`Create Cluster failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
+      }
+      return namespaceResponse;
     }
-    return response;
+
+    const endpointTemplate = this.endpointConfigTemplate(config);
+    const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
+    if (this.responseHasError(endpointConfigResponse)) {
+      return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
+    }
+
+    const clusterTemplate = this.clusterTemplate(config);
+    const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
+    if (this.responseHasError(clusterResponse)) {
+      if (clusterResponse.code === 409) return clusterResponse;
+
+      // Delete the endpointconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs/${clusterName}`);
+      return this.responseForError('Create Cluster resource failed', clusterResponse);
+    }
+
+    return clusterResponse;
   }
 
   async updateClusterResource(args) {
@@ -268,5 +302,77 @@ export default class RcmApiModel {
     return response;
   }
 
-}
+  async getImportYamlTemplate() {
+    const response = await this.kubeConnector.get('/api/v1/configmaps?labelSelector=config=cluster-import-config');
+    if (response && this.responseHasError(response)) {
+      return this.responseForError('GET cluster-import-config ConfigMap', response);
+    }
+    return _.get(response, 'items[0]', {});
+  }
 
+  endpointConfigTemplate(config) {
+    const {
+      clusterName,
+      clusterNamespace,
+      imageRegistry,
+      imagePullSecret,
+      imageNamePostfix,
+      version,
+      clusterLabels: { cloud, vendor },
+      applicationManager,
+      policyController,
+      prometheusIntegration,
+      searchCollector,
+      serviceRegistry,
+      topologyCollector,
+    } = config;
+
+    return {
+      apiVersion: 'multicloud.ibm.com/v1alpha1',
+      kind: 'EndpointConfig',
+      metadata: {
+        name: clusterName,
+        namespace: clusterNamespace,
+      },
+      spec: {
+        clusterName,
+        clusterNamespace,
+        clusterLabels: { cloud, vendor },
+        imageRegistry,
+        imagePullSecret,
+        imageNamePostfix,
+        version,
+        applicationManager: { enabled: applicationManager.enabled },
+        // bootstrapConfig: { hubSecret: '' },
+        // connectionManager: { enabledGlobalView: },
+        // metering: { enabled: },
+        policyController: { enabled: policyController.enabled },
+        prometheusIntegration: { enabled: prometheusIntegration.enabled },
+        searchCollector: { enabled: searchCollector.enabled },
+        serviceRegistry: { enabled: serviceRegistry.enabled },
+        // tillerIntegration: { enabled: },
+        topologyCollector: {
+          enabled: topologyCollector.enabled,
+          updateInterval: topologyCollector.updateInterval,
+        },
+      },
+    };
+  }
+
+  clusterTemplate(config) {
+    const { clusterName, clusterNamespace, clusterLabels: { cloud, vendor } } = config;
+    return {
+      apiVersion: 'clusterregistry.k8s.io/v1alpha1',
+      kind: 'Cluster',
+      metadata: {
+        name: clusterName,
+        namespace: clusterNamespace,
+        labels: {
+          name: clusterName,
+          vendor,
+          cloud,
+        },
+      },
+    };
+  }
+}
