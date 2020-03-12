@@ -160,7 +160,7 @@ export default class KubeConnector {
     return newRequest;
   }
 
-  put(path = '', opts = {}, jsonBody) {
+  put(path = '', opts = {}, jsonBody = null) {
     const defaults = {
       url: `${this.kubeApiEndpoint}${path}`,
       method: 'PUT',
