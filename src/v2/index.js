@@ -127,7 +127,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
-    rcmApiModel: new RcmApiModel({ rcmApiConnector }),
+    rcmApiModel: new RcmApiModel({ rcmApiConnector, kubeConnector }),
   };
 
   return { formatError, schema, context };

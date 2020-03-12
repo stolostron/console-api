@@ -9,15 +9,17 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import logger from '../lib/logger';
 
 export default class RcmApiModel {
-  constructor({ rcmApiConnector }) {
+  constructor({ rcmApiConnector, kubeConnector }) {
     if (!rcmApiConnector) {
       throw new Error('rcmApiConnector is a required parameter');
     }
     this.rcmApiConnector = rcmApiConnector;
+    this.kubeConnector = kubeConnector;
   }
 
   getErrorMsg(response) {
@@ -30,16 +32,18 @@ export default class RcmApiModel {
   }
 
   responseHasError(response) {
-    return (response.statusCode < 200 || response.statusCode >= 300);
+    const code = response.statusCode || response.code;
+    return (code < 200 || code >= 300);
   }
 
 
   responseForError(errorTitle, response) {
+    const code = response.statusCode || response.code;
     logger.error(`RCM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
     return {
       error: {
         rawResponse: response,
-        statusCode: response.statusCode,
+        statusCode: code,
         statusMsg: response.message || response.description || response.statusMessage,
       },
     };
@@ -166,18 +170,82 @@ export default class RcmApiModel {
   }
 
   async createClusterResource(args) {
-    let response;
     const { body } = args;
 
-    if (!body) {
-      throw new Error('Body is required for createClusterResource');
-    } else {
-      response = await this.rcmApiConnector.postWithString('/clusters', body);
+    if (!body) throw new Error('Body is required for createClusterResource');
+
+    let config = {};
+    try {
+      config = JSON.parse(body);
+    } catch (e) {
+      throw new Error(e);
     }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters`, response);
+
+    const { clusterName, clusterNamespace } = config;
+
+    const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: clusterNamespace } });
+
+    if (this.responseHasError(namespaceResponse)) {
+      if (namespaceResponse.code === 409) {
+        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
+        if (existingNamespaceClusters.items.length > 0) throw new Error(`Create Cluster failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
+      }
+      return namespaceResponse;
     }
-    return response;
+
+    if (config.privateRegistryEnabled) {
+      const { imageRegistry, registryUsername, registryPassword } = config;
+      const auth = Buffer.from(`${registryUsername}:${registryPassword}`).toString('base64');
+      const dockerConfigJson = Buffer.from(JSON.stringify({ auths: { [`${imageRegistry}`]: { auth } } })).toString('base64');
+      const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
+
+      const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
+      if (this.responseHasError(registrySecretResponse)) {
+        // skip error for existing secret
+        if (registrySecretResponse.code !== 409) {
+          return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
+        }
+      }
+    }
+
+    const endpointTemplate = this.endpointConfigTemplate(config);
+    const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
+    if (this.responseHasError(endpointConfigResponse)) {
+      return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
+    }
+
+    const clusterTemplate = this.clusterTemplate(config);
+    const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
+    if (this.responseHasError(clusterResponse)) {
+      if (clusterResponse.code === 409) return clusterResponse;
+
+      // Delete the endpointconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs/${clusterName}`);
+      return this.responseForError('Create Cluster resource failed', clusterResponse);
+    }
+
+    // fetch and return the generated secret
+    const importYamlSecret = await this.pollImportYamlSecret(clusterNamespace, clusterName);
+    return importYamlSecret;
+  }
+
+  async pollImportYamlSecret(clusterNamespace, clusterName) {
+    let count = 0;
+    let importYamlSecret;
+
+    const poll = async (resolve, reject) => {
+      const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
+      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true);
+
+      if (importYamlSecret.code === 404 && count < 5) {
+        count += 1;
+        setTimeout(poll, 2000, resolve, reject);
+      } else {
+        resolve(importYamlSecret);
+      }
+    };
+
+    return new Promise(poll);
   }
 
   async updateClusterResource(args) {
@@ -269,11 +337,74 @@ export default class RcmApiModel {
   }
 
   async getImportYamlTemplate() {
-    const response = await this.rcmApiConnector.get('/import.yaml');
+    const response = await this.kubeConnector.get('/api/v1/configmaps?labelSelector=config=cluster-import-config');
     if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/import.yaml`, response);
+      return this.responseForError('GET cluster-import-config ConfigMap', response);
     }
-    return response;
+    return _.get(response, 'items[0]', {});
+  }
+
+  endpointConfigTemplate(config) {
+    const {
+      clusterName,
+      clusterNamespace,
+      imageRegistry,
+      imageNamePostfix,
+      imageTagPostfix,
+      version,
+      clusterLabels: { cloud, vendor },
+      applicationManager,
+      policyController,
+      searchCollector,
+      serviceRegistry,
+      topologyCollector,
+      privateRegistryEnabled,
+    } = config;
+
+    const imagePullSecret = privateRegistryEnabled ? clusterName : undefined;
+
+    return {
+      apiVersion: 'multicloud.ibm.com/v1alpha1',
+      kind: 'EndpointConfig',
+      metadata: {
+        name: clusterName,
+        namespace: clusterNamespace,
+      },
+      spec: {
+        clusterName,
+        clusterNamespace,
+        clusterLabels: { cloud, vendor },
+        imageRegistry,
+        imagePullSecret,
+        imageNamePostfix,
+        imageTagPostfix,
+        version,
+        applicationManager: { enabled: applicationManager.enabled },
+        policyController: { enabled: policyController.enabled },
+        searchCollector: { enabled: searchCollector.enabled },
+        serviceRegistry: { enabled: serviceRegistry.enabled },
+        topologyCollector: {
+          enabled: topologyCollector.enabled,
+          updateInterval: topologyCollector.updateInterval,
+        },
+      },
+    };
+  }
+
+  clusterTemplate(config) {
+    const { clusterName, clusterNamespace, clusterLabels: { cloud, vendor } } = config;
+    return {
+      apiVersion: 'clusterregistry.k8s.io/v1alpha1',
+      kind: 'Cluster',
+      metadata: {
+        name: clusterName,
+        namespace: clusterNamespace,
+        labels: {
+          name: clusterName,
+          vendor,
+          cloud,
+        },
+      },
+    };
   }
 }
-
