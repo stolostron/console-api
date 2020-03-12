@@ -269,18 +269,17 @@ export default class RcmApiModel {
       imageTagPostfix,
       version,
       clusterLabels: { cloud, vendor },
-      applicationManager,
-      certPolicyController,
-      cisController,
-      iamPolicyController,
-      policyController,
-      searchCollector,
-      serviceRegistry,
-      topologyCollector,
       privateRegistryEnabled,
     } = config;
 
     const imagePullSecret = privateRegistryEnabled ? clusterName : undefined;
+
+    const componentConfig = {};
+    Object.keys(config).forEach((key) => {
+      if (_.has(config[key], 'enabled')) {
+        componentConfig[key] = config[key];
+      }
+    });
 
     return {
       apiVersion: 'multicloud.ibm.com/v1alpha1',
@@ -298,17 +297,7 @@ export default class RcmApiModel {
         imageNamePostfix,
         imageTagPostfix,
         version,
-        applicationManager: { enabled: applicationManager.enabled },
-        certPolicyController: { enabled: certPolicyController.enabled },
-        cisController: { enabled: cisController.enabled },
-        iamPolicyController: { enabled: iamPolicyController.enabled },
-        policyController: { enabled: policyController.enabled },
-        searchCollector: { enabled: searchCollector.enabled },
-        serviceRegistry: { enabled: serviceRegistry.enabled },
-        topologyCollector: {
-          enabled: topologyCollector.enabled,
-          updateInterval: topologyCollector.updateInterval,
-        },
+        ...componentConfig,
       },
     };
   }
