@@ -8,6 +8,8 @@
  ****************************************************************************** */
 /* eslint-disable global-require */
 
+import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
+
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
@@ -41,6 +43,7 @@ export default function createMockHttp() {
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
     rcmApi: require('./RcmApi'),
+    connectionApi: require('./ConnectionApi'),
   };
 
   return async function MockLib(params) {
@@ -78,6 +81,14 @@ export default function createMockHttp() {
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/clusters') && params.url.includes('/imports'):
           return state.rcmApi.getAutomatedImportStatusResponse;
+        case params.url.includes('/api/v1/namespaces/default/secrets') && params.json.metadata && params.json.metadata.name === 'new-aws':
+          return state.connectionApi.createCloudConnection;
+        case params.url.includes('/api/v1/namespaces/hive/secrets') && params.json.metadata && params.json.metadata.name === 'google':
+          return state.connectionApi.createCloudConnectionError;
+        case params.url.includes('/api/v1/namespaces/default/secrets/aws') && params.json.metadata && params.json.metadata.name === 'aws':
+          return state.connectionApi.editCloudConnection;
+        case params.url.includes('/api/v1/namespaces/hive/secrets/google') && params.json.metadata && params.json.metadata.name === 'google':
+          return state.connectionApi.editCloudConnectionError;
         default:
           return state.pods;
       }
@@ -175,6 +186,10 @@ export default function createMockHttp() {
         return state.rcmApi.getCloudProvidersResponse;
       case params.url.includes('api/v1/cloudconnections/iks/ericabrtest4/clusters'):
         return state.rcmApi.getClusterCreationResponse;
+      case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
+        return state.connectionApi.getCloudConnectionSecrets;
+      case params.url.includes('/api/v1/namespaces/ocm/secrets/microsoft'):
+        return state.connectionApi.deleteCloudConnection;
       default:
         return state.apiList.mockResponse;
     }

@@ -12,10 +12,10 @@
 import yaml from 'js-yaml';
 import KubeModel from './kube';
 
-const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
-const CONNECTION_LABEL = `${CLUSTER_DOMAIN}/cloudconnection`;
-const CONNECTION_LABEL_SELECTOR = `labelSelector=${CONNECTION_LABEL}`;
-const PROVIDER_LABEL = `${CLUSTER_DOMAIN}/provider`;
+export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
+export const CONNECTION_LABEL = `${CLUSTER_DOMAIN}/cloudconnection`;
+export const CONNECTION_LABEL_SELECTOR = `labelSelector=${CONNECTION_LABEL}`;
+export const PROVIDER_LABEL = `${CLUSTER_DOMAIN}/provider`;
 
 const generateSecret = body => ({
   apiVersion: 'v1',
@@ -80,9 +80,9 @@ export default class ConnectionModel extends KubeModel {
   }
 
   async editConnection(args) {
-    const { body } = args;
-    const original = generateSecret(body);
-    const response = await this.kubeConnector.put(`/api/v1/namespaces/${body.namespace}/secrets/${body.name}`, original);
+    const { body, namespace, name } = args;
+    const resource = generateSecret(body);
+    const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, resource);
     const statusCode = response.kind === 'Status' ? response.code : 200;
     return { ...response, statusCode };
   }
