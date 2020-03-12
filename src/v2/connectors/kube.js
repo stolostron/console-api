@@ -160,7 +160,7 @@ export default class KubeConnector {
     return newRequest;
   }
 
-  put(path = '', opts = {}) {
+  put(path = '', opts = {}, jsonBody = null) {
     const defaults = {
       url: `${this.kubeApiEndpoint}${path}`,
       method: 'PUT',
@@ -168,6 +168,7 @@ export default class KubeConnector {
         Authorization: this.token,
         'Content-Type': 'application/json',
       },
+      json: jsonBody,
     };
     const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
     return newRequest;

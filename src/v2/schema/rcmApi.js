@@ -9,19 +9,6 @@
  ****************************************************************************** */
 
 export const typeDef = `
-type Connection implements ConnectionObject {
-  metadata: ConnectionMetadata
-  statusCode: Int
-  errorMsg: String
-}
-
-type ConnectionDetail {
-  name: String
-  namespace: String
-  provider: String
-  metadata: JSON
-}
-
 type Orchestration {
   name: String
   longname: String
@@ -40,10 +27,6 @@ export const resolver = {
   Query: {
     getAutomatedImportStatus: (parent, args, { rcmApiModel }) => rcmApiModel.getAutomatedImportStatus(args),
     getImportYamlTemplate: (parent, args, { rcmApiModel }) => rcmApiModel.getImportYamlTemplate(),
-    connections: (parent, args, { rcmApiModel, req }) =>
-      rcmApiModel.getConnections({ user: req.user }),
-    connectionDetails: (parent, args, { rcmApiModel, req }) =>
-      rcmApiModel.getConnectionDetails({ user: req.user }),
     orchestrations: (parent, args, { rcmApiModel }) =>
       rcmApiModel.getOrchestrations(),
   },
@@ -54,12 +37,6 @@ export const resolver = {
     automatedImport: (parent, args, { rcmApiModel }) => rcmApiModel.automatedImport(args),
     deleteCluster: (parent, args, { rcmApiModel }) => rcmApiModel.deleteCluster(args),
     updateClusterResource: (parent, args, { rcmApiModel }) => rcmApiModel.updateClusterResource(args),
-    createCloudConnection: (parent, args, { rcmApiModel }) =>
-      rcmApiModel.createConnection(args),
-    deleteCloudConnection: (parent, args, { rcmApiModel }) =>
-      rcmApiModel.deleteConnection(args),
-    editCloudConnection: (parent, args, { rcmApiModel }) =>
-      rcmApiModel.editConnection(args),
   },
 };
 

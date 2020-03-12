@@ -110,27 +110,6 @@ describe('RCM Api Resolver', () => {
         done();
       });
   });
-  test('Correctly Resolves Get Cloud Connections', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            {
-              connections {
-                 metadata{
-                    name
-                    namespace
-                    provider
-                    name_namespace
-                 }
-              }
-            }`,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
 
   test('Correctly Resolves Get Cloud Providers', (done) => {
     supertest(server)
@@ -151,54 +130,6 @@ describe('RCM Api Resolver', () => {
                 statusCode
               }
             }`,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-
-  test('Correctly Resolves Create Cloud Connection', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                createCloudConnection(body: {name: "iks-test", namespace: "default", provider: "iks", metadata: "secret:\n  apiKey: iks-test\n"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-
-  test('Correctly Resolves Edit Cloud Connection', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                editCloudConnection(body: {name: "iks-test", namespace: "default", provider: "iks", metadata: "secret:\n  apiKey: iks-test\n"}, namespace:"default", name:"iks-test")
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-
-  test('Correctly Resolves Delete Cloud Connection', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                deleteCloudConnection(namespace:"default", name:"iks-test")
-            }
-          `,
       })
       .end((err, res) => {
         expect(JSON.parse(res.text)).toMatchSnapshot();

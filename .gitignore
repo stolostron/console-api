@@ -10,3 +10,4 @@ build-harness-extensions
 .build-harness-bootstrap
 .history
 .project
+test-report.xml
