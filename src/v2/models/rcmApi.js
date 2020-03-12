@@ -183,9 +183,7 @@ export default class RcmApiModel {
 
     const { clusterName, clusterNamespace } = config;
 
-    console.log('body', body);
     const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: clusterNamespace } });
-    console.log('namespaceResponse', namespaceResponse);
 
     if (this.responseHasError(namespaceResponse)) {
       if (namespaceResponse.code === 409) {
@@ -193,6 +191,21 @@ export default class RcmApiModel {
         if (existingNamespaceClusters.items.length > 0) throw new Error(`Create Cluster failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
       }
       return namespaceResponse;
+    }
+
+    if (config.privateRegistryEnabled) {
+      const { imageRegistry, registryUsername, registryPassword } = config;
+      const auth = Buffer.from(`${registryUsername}:${registryPassword}`).toString('base64');
+      const dockerConfigJson = Buffer.from(JSON.stringify({ auths: { [`${imageRegistry}`]: { auth } } })).toString('base64');
+      const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
+
+      const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
+      if (this.responseHasError(registrySecretResponse)) {
+        // skip error for existing secret
+        if (registrySecretResponse.code !== 409) {
+          return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
+        }
+      }
     }
 
     const endpointTemplate = this.endpointConfigTemplate(config);
@@ -211,7 +224,28 @@ export default class RcmApiModel {
       return this.responseForError('Create Cluster resource failed', clusterResponse);
     }
 
-    return clusterResponse;
+    // fetch and return the generated secret
+    const importYamlSecret = await this.pollImportYamlSecret(clusterNamespace, clusterName);
+    return importYamlSecret;
+  }
+
+  async pollImportYamlSecret(clusterNamespace, clusterName) {
+    let count = 0;
+    let importYamlSecret;
+
+    const poll = async (resolve, reject) => {
+      const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
+      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true);
+
+      if (importYamlSecret.code === 404 && count < 5) {
+        count += 1;
+        setTimeout(poll, 2000, resolve, reject);
+      } else {
+        resolve(importYamlSecret);
+      }
+    };
+
+    return new Promise(poll);
   }
 
   async updateClusterResource(args) {
@@ -315,17 +349,19 @@ export default class RcmApiModel {
       clusterName,
       clusterNamespace,
       imageRegistry,
-      imagePullSecret,
       imageNamePostfix,
+      imageTagPostfix,
       version,
       clusterLabels: { cloud, vendor },
       applicationManager,
       policyController,
-      prometheusIntegration,
       searchCollector,
       serviceRegistry,
       topologyCollector,
+      privateRegistryEnabled,
     } = config;
+
+    const imagePullSecret = privateRegistryEnabled ? clusterName : undefined;
 
     return {
       apiVersion: 'multicloud.ibm.com/v1alpha1',
@@ -341,16 +377,12 @@ export default class RcmApiModel {
         imageRegistry,
         imagePullSecret,
         imageNamePostfix,
+        imageTagPostfix,
         version,
         applicationManager: { enabled: applicationManager.enabled },
-        // bootstrapConfig: { hubSecret: '' },
-        // connectionManager: { enabledGlobalView: },
-        // metering: { enabled: },
         policyController: { enabled: policyController.enabled },
-        prometheusIntegration: { enabled: prometheusIntegration.enabled },
         searchCollector: { enabled: searchCollector.enabled },
         serviceRegistry: { enabled: serviceRegistry.enabled },
-        // tillerIntegration: { enabled: },
         topologyCollector: {
           enabled: topologyCollector.enabled,
           updateInterval: topologyCollector.updateInterval,
