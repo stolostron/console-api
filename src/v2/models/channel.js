@@ -27,7 +27,7 @@ export default class ChannelModel extends KubeModel {
       }
       if (channelKinds[resource.kind] === 'channels') {
         return this.kubeConnector
-          .post(`/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${namespace}/channels`, resource)
+          .post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/channels`, resource)
           .catch(err => ({
             status: 'Failure',
             message: err.message,
@@ -62,11 +62,11 @@ export default class ChannelModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/channels/${name}`,
+        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
     }
     chs = await Promise.all(chs);
     return chs.map(channel => ({
@@ -79,11 +79,11 @@ export default class ChannelModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/channels/${name}`,
+        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
     }
     return chs.map(async channel => ({
       metadata: channel.metadata,

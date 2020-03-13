@@ -323,7 +323,7 @@ export default class ApplicationModel extends KubeModel {
     const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
       // get all deployables in this namespace
       const response = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/deployables`,
+        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
         { kind: 'Deployable', namespaces: [namespace] },
       ) || [];
 
@@ -344,7 +344,7 @@ export default class ApplicationModel extends KubeModel {
     const requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
       // get all rules in this namespace
       const response = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/placementrules`,
+        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
         { kind: 'PlacementRule', namespaces: [namespace] },
       ) || [];
 
@@ -364,7 +364,7 @@ export default class ApplicationModel extends KubeModel {
   async getApplicationResources(names, type, kind) {
     const namespaces = new Set(names.map(name => name.split('/')[0]));
     const response = await this.kubeConnector.getResources(
-      ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/${type}`,
+      ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/${type}`,
       { kind, namespaces: Array.from(namespaces) },
     );
     return filterByNameNamespace(names, response);
@@ -377,7 +377,7 @@ export default class ApplicationModel extends KubeModel {
       if (name) {
         const namespace = _.get(resource, 'metadata.namespace');
         const response = await this.kubeConnector.getResources(
-          ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/placementrules`,
+          ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
           { kind: 'PlacementRule', namespaces: [namespace] },
         );
         if (Array.isArray(response)) {
