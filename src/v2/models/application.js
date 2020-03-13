@@ -184,7 +184,7 @@ export default class ApplicationModel extends KubeModel {
       apps = await this.kubeConnector.getResources(ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
     }
     apps = await Promise.all(apps);
-    return apps
+    return apps.filter(app => app.metadata)
       .map(app => ({
         metadata: app.metadata,
       }));
@@ -406,7 +406,7 @@ export default class ApplicationModel extends KubeModel {
     } else {
       apps = await this.kubeConnector.getResources(ns => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
     }
-    return apps
+    return apps.filter(app => app.metadata)
       .map(async (app) => {
         const deployableNames = _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]').split(',') : [];
         const placementBindingNames = _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]').split(',') : [];
