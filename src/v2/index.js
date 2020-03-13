@@ -41,6 +41,7 @@ import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema/';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
+import BareMetalAssetModel from './models/bare-metal-asset';
 
 export const GRAPHQL_PATH = `${config.get('contextPath')}/graphql`;
 export const GRAPHIQL_PATH = `${config.get('contextPath')}/graphiql`;
@@ -130,6 +131,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     sfModel: new SFModel({ kubeConnector, req }),
     rcmApiModel: new RcmApiModel({ rcmApiConnector, kubeConnector }),
     connectionModel: new ConnectionModel({ kubeConnector }),
+    bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
   };
 
   return { formatError, schema, context };
