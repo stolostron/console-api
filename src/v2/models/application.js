@@ -210,9 +210,9 @@ export default class ApplicationModel extends KubeModel {
 
       // get subscriptions to channels (pipelines)
       let arr = null;
-      let subscriptionNames = _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]') ||
+      let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]') ||
         _.get(app, 'metadata.annotations["apps.ibm.com/subscriptions"]');
-      let deployableNames = _.get(app, 'metadata.annotations["app.ibm.com/deployables"]') ||
+      let deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ||
         _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
@@ -223,7 +223,7 @@ export default class ApplicationModel extends KubeModel {
         let allowAllChannel = true;
         const subscriptions = [];
         allSubscriptions.forEach((subscription) => {
-          const deployablePaths = _.get(subscription, 'metadata.annotations["app.ibm.com/deployables"]', '').split(',').sort();
+          const deployablePaths = _.get(subscription, 'metadata.annotations["apps.open-cluster-management.io/deployables"]', '').split(',').sort();
           if (deployablePaths.length > 10) {
             const chunks = _.chunk(deployablePaths, 6);
             // if last chunk is just one, append to 2nd to last chunk
@@ -323,7 +323,7 @@ export default class ApplicationModel extends KubeModel {
     const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
       // get all deployables in this namespace
       const response = await this.kubeConnector.getResources(
-        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/deployables`,
+        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/deployables`,
         { kind: 'Deployable', namespaces: [namespace] },
       ) || [];
 
@@ -344,7 +344,7 @@ export default class ApplicationModel extends KubeModel {
     const requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
       // get all rules in this namespace
       const response = await this.kubeConnector.getResources(
-        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
+        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/placementrules`,
         { kind: 'PlacementRule', namespaces: [namespace] },
       ) || [];
 
@@ -364,7 +364,7 @@ export default class ApplicationModel extends KubeModel {
   async getApplicationResources(names, type, kind) {
     const namespaces = new Set(names.map(name => name.split('/')[0]));
     const response = await this.kubeConnector.getResources(
-      ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/${type}`,
+      ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/${type}`,
       { kind, namespaces: Array.from(namespaces) },
     );
     return filterByNameNamespace(names, response);
@@ -377,7 +377,7 @@ export default class ApplicationModel extends KubeModel {
       if (name) {
         const namespace = _.get(resource, 'metadata.namespace');
         const response = await this.kubeConnector.getResources(
-          ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/placementrules`,
+          ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/placementrules`,
           { kind: 'PlacementRule', namespaces: [namespace] },
         );
         if (Array.isArray(response)) {
