@@ -191,8 +191,37 @@ const getClusterCreationResponseWithError = {
   'statusMessage':'Invalid body',
 };
 
+const getNamespaceCreationResponse = {
+  body: {
+    kind: 'Namespace',
+  },
+  statusCode: 201,
+};
+
+const getEndpointConfigsResponse = {
+  body: {
+    kind: 'EndpointConfig',
+  },
+  statusCode: 201,
+};
+
+const getClusterResponse = {
+  body: {
+    kind: 'Cluster',
+  },
+  statusCode: 201,
+};
+
+const getImportYamlSecret = {
+  body: {
+    kind: 'Secret',
+  },
+  statusCode: 200,
+};
+
 export {
   createClusterResourceResponse, automatedImportResponse, getAutomatedImportStatusResponse,
   getCloudConnectionsResponse, getCloudProvidersResponse, getClusterCreationResponse,
-  getClusterCreationResponseWithError,
+  getClusterCreationResponseWithError, getNamespaceCreationResponse, getEndpointConfigsResponse,
+  getClusterResponse, getImportYamlSecret,
 };

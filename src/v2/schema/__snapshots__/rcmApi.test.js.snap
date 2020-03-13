@@ -41,157 +41,7 @@ exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import 1`] = `
 Object {
   "data": Object {
     "createClusterResource": Object {
-      "error": Object {
-        "rawResponse": Object {
-          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "items": Array [
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "toronto",
-                  "environment": "Dev",
-                  "name": "managed-cluster",
-                  "owner": "marketing",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "managed-cluster",
-                "namespace": "default",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "2.2.2.2:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {},
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "hub-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "hub-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "1.1.1.1:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "OK",
-                  },
-                ],
-              },
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "new-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "new-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "137558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster",
-                "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "3.3.3.3:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "",
-                  },
-                ],
-              },
-            },
-          ],
-          "kind": "ClusterList",
-          "metadata": Object {
-            "resourceVersion": "136667",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
-          },
-          "statusCode": "",
-          "statusMessage": "",
-        },
-        "statusCode": "",
-        "statusMsg": "",
-      },
+      "kind": "Secret",
     },
   },
 }
@@ -223,157 +73,151 @@ exports[`RCM Api Resolver Get Automated Import Status 1`] = `
 Object {
   "data": Object {
     "getAutomatedImportStatus": Object {
-      "error": Object {
-        "rawResponse": Object {
+      "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+      "items": Array [
+        Object {
           "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "items": Array [
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "toronto",
-                  "environment": "Dev",
-                  "name": "managed-cluster",
-                  "owner": "marketing",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "managed-cluster",
-                "namespace": "default",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "2.2.2.2:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {},
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "hub-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "hub-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "1.1.1.1:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "OK",
-                  },
-                ],
-              },
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "new-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "new-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "137558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster",
-                "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "3.3.3.3:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "",
-                  },
-                ],
-              },
-            },
-          ],
-          "kind": "ClusterList",
+          "kind": "Cluster",
           "metadata": Object {
-            "resourceVersion": "136667",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "toronto",
+              "environment": "Dev",
+              "name": "managed-cluster",
+              "owner": "marketing",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "managed-cluster",
+            "namespace": "default",
+            "resourceVersion": "136558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
           },
-          "statusCode": "",
-          "statusMessage": "",
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "2.2.2.2:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {},
         },
-        "statusCode": "",
-        "statusMsg": "",
+        Object {
+          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+          "kind": "Cluster",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "hub-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "hub-cluster",
+            "namespace": "kube-system",
+            "resourceVersion": "136558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+          },
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "1.1.1.1:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {
+            "conditions": Array [
+              Object {
+                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                "lastTransitionTime": null,
+                "status": "",
+                "type": "OK",
+              },
+            ],
+          },
+        },
+        Object {
+          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+          "kind": "Cluster",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "new-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "new-cluster",
+            "namespace": "kube-system",
+            "resourceVersion": "137558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster",
+            "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
+          },
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "3.3.3.3:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {
+            "conditions": Array [
+              Object {
+                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                "lastTransitionTime": null,
+                "status": "",
+                "type": "",
+              },
+            ],
+          },
+        },
+      ],
+      "kind": "ClusterList",
+      "metadata": Object {
+        "resourceVersion": "136667",
+        "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
       },
+      "statusCode": "",
+      "statusMessage": "",
     },
   },
 }
@@ -404,22 +248,11 @@ Object {
 exports[`RCM Api Resolver Start Automated Import Process 1`] = `
 Object {
   "data": Object {
-    "automatedImport": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 13,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "automatedImport",
-      ],
+    "automatedImport": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -449,157 +282,151 @@ exports[`RCM Api Resolver Update Kubernetes Cluster Resource for Import 1`] = `
 Object {
   "data": Object {
     "updateClusterResource": Object {
-      "error": Object {
-        "rawResponse": Object {
+      "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+      "items": Array [
+        Object {
           "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-          "items": Array [
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "toronto",
-                  "environment": "Dev",
-                  "name": "managed-cluster",
-                  "owner": "marketing",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "managed-cluster",
-                "namespace": "default",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "2.2.2.2:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {},
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "hub-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "hub-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "136558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster",
-                "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "1.1.1.1:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "OK",
-                  },
-                ],
-              },
-            },
-            Object {
-              "apiVersion": "clusterregistry.k8s.io/v1alpha1",
-              "kind": "Cluster",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-08-13T16:56:41Z",
-                "finalizers": Array [
-                  "finalizer.hcm.ibm.com",
-                ],
-                "labels": Object {
-                  "cloud": "IBM",
-                  "datacenter": "raleigh",
-                  "environment": "Dev",
-                  "name": "new-cluster",
-                  "owner": "development",
-                  "region": "US",
-                  "vendor": "ICP",
-                },
-                "name": "new-cluster",
-                "namespace": "kube-system",
-                "resourceVersion": "137558",
-                "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster",
-                "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
-              },
-              "spec": Object {
-                "authInfo": Object {},
-                "kubernetesApiEndpoints": Object {
-                  "serverEndpoints": Array [
-                    Object {
-                      "serverAddress": "3.3.3.3:8001",
-                    },
-                  ],
-                },
-              },
-              "status": Object {
-                "conditions": Array [
-                  Object {
-                    "lastHeartbeatTime": "2018-08-15T19:41:20Z",
-                    "lastTransitionTime": null,
-                    "status": "",
-                    "type": "",
-                  },
-                ],
-              },
-            },
-          ],
-          "kind": "ClusterList",
+          "kind": "Cluster",
           "metadata": Object {
-            "resourceVersion": "136667",
-            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "toronto",
+              "environment": "Dev",
+              "name": "managed-cluster",
+              "owner": "marketing",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "managed-cluster",
+            "namespace": "default",
+            "resourceVersion": "136558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/default/clusters/mycluster.icp",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
           },
-          "statusCode": "",
-          "statusMessage": "",
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "2.2.2.2:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {},
         },
-        "statusCode": "",
-        "statusMsg": "",
+        Object {
+          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+          "kind": "Cluster",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "hub-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "hub-cluster",
+            "namespace": "kube-system",
+            "resourceVersion": "136558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/hub-cluster",
+            "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
+          },
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "1.1.1.1:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {
+            "conditions": Array [
+              Object {
+                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                "lastTransitionTime": null,
+                "status": "",
+                "type": "OK",
+              },
+            ],
+          },
+        },
+        Object {
+          "apiVersion": "clusterregistry.k8s.io/v1alpha1",
+          "kind": "Cluster",
+          "metadata": Object {
+            "annotations": Object {
+              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
+            },
+            "creationTimestamp": "2018-08-13T16:56:41Z",
+            "finalizers": Array [
+              "finalizer.hcm.ibm.com",
+            ],
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "new-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "new-cluster",
+            "namespace": "kube-system",
+            "resourceVersion": "137558",
+            "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/namespaces/kube-system/clusters/new-cluster",
+            "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
+          },
+          "spec": Object {
+            "authInfo": Object {},
+            "kubernetesApiEndpoints": Object {
+              "serverEndpoints": Array [
+                Object {
+                  "serverAddress": "3.3.3.3:8001",
+                },
+              ],
+            },
+          },
+          "status": Object {
+            "conditions": Array [
+              Object {
+                "lastHeartbeatTime": "2018-08-15T19:41:20Z",
+                "lastTransitionTime": null,
+                "status": "",
+                "type": "",
+              },
+            ],
+          },
+        },
+      ],
+      "kind": "ClusterList",
+      "metadata": Object {
+        "resourceVersion": "136667",
+        "selfLink": "/apis/clusterregistry.k8s.io/v1alpha1/clusters",
       },
+      "statusCode": "",
+      "statusMessage": "",
     },
   },
 }
@@ -630,22 +457,11 @@ Object {
 exports[`RCM Api Resolver createCluster test that we can create cluster correctly 1`] = `
 Object {
   "data": Object {
-    "createCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "createCluster",
-      ],
+    "createCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -684,22 +500,11 @@ Object {
 exports[`RCM Api Resolver createCluster test with all required fields but returns with error 1`] = `
 Object {
   "data": Object {
-    "createCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "createCluster",
-      ],
+    "createCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -738,21 +543,10 @@ Object {
 exports[`RCM Api Resolver previewCluster test with all required fields but returns with error 1`] = `
 Object {
   "data": Object {
-    "previewCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "previewCluster",
-      ],
+    "previewCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;

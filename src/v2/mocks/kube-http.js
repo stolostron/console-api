@@ -8,6 +8,7 @@
  ****************************************************************************** */
 /* eslint-disable global-require */
 
+import _ from 'lodash';
 import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
 
 export default function createMockHttp() {
@@ -50,28 +51,29 @@ export default function createMockHttp() {
   return async function MockLib(params) {
     if (params.json) {
       switch (true) {
-        case params.json.kind.includes('SelfSubjectAccessReview'):
+        case _.includes(_.get(params.json, 'kind'), 'SelfSubjectAccessReview'):
           return state.userAccess;
-        case params.json.metadata.name.includes('pods'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'pods'):
           return state.pods.mockResourceView;
-        case params.json.metadata.name.includes('nodes'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'nodes'):
           return state.nodes.mockResourceView;
-        case params.json.metadata.name.includes('namespace'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'namespace'):
           return state.namespace.mockResourceView;
-        case params.json.metadata.name.includes('releases'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'releases'):
           return state.release.mockResourceView;
-        case params.json.metadata.name.includes('persistentvolumes'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'persistentvolumes'):
           return state.pvs.mockPVsResourceView;
-        case params.json.metadata.name.includes('policy'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'policy'):
           return state.policies.mockPolicyListResponse;
-        case params.json.metadata.name.includes('persistentvolumeclaim'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'persistentvolumeclaim'):
           return state.pvs.mockPVsClaimResourceView;
-        case params.json.metadata.name.includes('clusterversions'):
+        case _.includes(_.get(params.json, 'metadata.name'), 'clusterversions'):
           return state.clusterVersions.mockClusterVersionsResourceView;
+
+        case _.includes(_.get(params.json, 'metadata.name'), 'test-acs-engine'):
+          return state.relMutations;
         case params.url.includes('default/helmrepos'):
           return state.repoMutations;
-        case params.json.metadata.name.includes('test-acs-engine'):
-          return state.relMutations;
         case params.url.includes('policies'):
           return state.policies.mockCreatePolicy;
         case params.url.includes('compliances'):
@@ -82,14 +84,20 @@ export default function createMockHttp() {
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/clusters') && params.url.includes('/imports'):
           return state.rcmApi.getAutomatedImportStatusResponse;
-        case params.url.includes('/api/v1/namespaces/default/secrets') && params.json.metadata && params.json.metadata.name === 'new-aws':
+        case params.url.includes('/api/v1/namespaces/default/secrets') && _.get(params.json, 'metadata.name') === 'new-aws':
           return state.connectionApi.createCloudConnection;
-        case params.url.includes('/api/v1/namespaces/hive/secrets') && params.json.metadata && params.json.metadata.name === 'google':
+        case params.url.includes('/api/v1/namespaces/hive/secrets') && _.get(params.json, 'metadata.name') === 'google':
           return state.connectionApi.createCloudConnectionError;
-        case params.url.includes('/api/v1/namespaces/default/secrets/aws') && params.json.metadata && params.json.metadata.name === 'aws':
+        case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.json, 'metadata.name') === 'aws':
           return state.connectionApi.editCloudConnection;
-        case params.url.includes('/api/v1/namespaces/hive/secrets/google') && params.json.metadata && params.json.metadata.name === 'google':
+        case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.json, 'metadata.name') === 'google':
           return state.connectionApi.editCloudConnectionError;
+        case params.url.includes('/api/v1/namespaces') && _.get(params.json, 'metadata.name') === 'foo':
+          return state.rcmApi.getNamespaceCreationResponse;
+        case params.url.includes('/apis/multicloud.ibm.com/v1alpha1/namespaces/foo/endpointconfigs'):
+          return state.rcmApi.getEndpointConfigsResponse;
+        case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
+          return state.rcmApi.getClusterResponse;
         default:
           return state.pods;
       }
@@ -193,6 +201,8 @@ export default function createMockHttp() {
         return state.connectionApi.deleteCloudConnection;
       case params.url.includes('v1alpha1/baremetalassets'):
         return state.bareMetalAssets;
+      case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
+        return state.rcmApi.getImportYamlSecret;
       default:
         return state.apiList.mockResponse;
     }

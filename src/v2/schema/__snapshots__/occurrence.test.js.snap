@@ -13,7 +13,7 @@ Object {
           "line": 3,
         },
       ],
-      "message": "Cannot read property 'includes' of undefined",
+      "message": "Cannot read property 'errors' of undefined",
       "path": Array [
         "occurrences",
       ],

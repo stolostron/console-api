@@ -49,7 +49,7 @@ describe('RCM Api Resolver', () => {
       .send({
         query: `
         mutation {
-            createClusterResource(body: "test")
+            createClusterResource(body: "{\\"clusterName\\":\\"foo\\", \\"clusterNamespace\\":\\"foo\\", \\"clusterLabels\\": {}}")
           }
       `,
       })
