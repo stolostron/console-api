@@ -27,7 +27,7 @@ export default class SubscriptionModel extends KubeModel {
       }
       if (subscriptionKinds[resource.kind] === 'subscriptions') {
         return this.kubeConnector
-          .post(`/apis/app.ibm.com/v1alpha1/namespaces/${namespace}/subscriptions`, resource)
+          .post(`/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${namespace}/subscriptions`, resource)
           .catch(err => ({
             status: 'Failure',
             message: err.message,
@@ -62,11 +62,11 @@ export default class SubscriptionModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions/${name}`,
+        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/subscriptions`);
     }
     chs = await Promise.all(chs);
     return chs.map(subscription => ({
@@ -79,11 +79,11 @@ export default class SubscriptionModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions/${name}`,
+        ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/subscriptions`);
     }
     return chs.map(async subscription => ({
       metadata: subscription.metadata,
