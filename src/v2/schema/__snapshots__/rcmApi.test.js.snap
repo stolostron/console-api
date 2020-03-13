@@ -37,6 +37,16 @@ Object {
 }
 `;
 
+exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import 1`] = `
+Object {
+  "data": Object {
+    "createClusterResource": Object {
+      "kind": "Secret",
+    },
+  },
+}
+`;
+
 exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
 Object {
   "data": Object {
@@ -238,22 +248,11 @@ Object {
 exports[`RCM Api Resolver Start Automated Import Process 1`] = `
 Object {
   "data": Object {
-    "automatedImport": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 13,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "automatedImport",
-      ],
+    "automatedImport": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -458,22 +457,11 @@ Object {
 exports[`RCM Api Resolver createCluster test that we can create cluster correctly 1`] = `
 Object {
   "data": Object {
-    "createCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "createCluster",
-      ],
+    "createCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -512,22 +500,11 @@ Object {
 exports[`RCM Api Resolver createCluster test with all required fields but returns with error 1`] = `
 Object {
   "data": Object {
-    "createCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "createCluster",
-      ],
+    "createCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
 
@@ -566,21 +543,10 @@ Object {
 exports[`RCM Api Resolver previewCluster test with all required fields but returns with error 1`] = `
 Object {
   "data": Object {
-    "previewCluster": null,
-  },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 17,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'includes' of undefined",
-      "path": Array [
-        "previewCluster",
-      ],
+    "previewCluster": Object {
+      "statusCode": "",
+      "statusMessage": "",
     },
-  ],
+  },
 }
 `;
