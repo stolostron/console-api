@@ -1,5 +1,6 @@
 GIT_REMOTE_URL = $(shell git config --get remote.origin.url)
 COMPONENT_NAME = $(shell cat COMPONENT_NAME)
+RELEASE_FF_BRANCH = $(shell cat RELEASE_FF_BRANCH)
 DOCKER_SERVER ?=
 DOCKER_USERNAME ?= token
 DOCKER_IMAGE = $(COMPONENT_NAME)
