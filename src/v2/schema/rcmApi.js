@@ -27,6 +27,8 @@ export const resolver = {
   Query: {
     getAutomatedImportStatus: (parent, args, { rcmApiModel }) => rcmApiModel.getAutomatedImportStatus(args),
     getImportYamlTemplate: (parent, args, { rcmApiModel }) => rcmApiModel.getImportYamlTemplate(),
+    connectionDetails: (parent, args, { rcmApiModel, req }) =>
+      rcmApiModel.getConnectionDetails({ user: req.user }),
     orchestrations: (parent, args, { rcmApiModel }) =>
       rcmApiModel.getOrchestrations(),
   },
