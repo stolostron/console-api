@@ -76,14 +76,16 @@ function findMatchedStatus(clusters, clusterstatuses, rawClusterversions) {
   clusterstatuses.forEach((clusterstatus) => {
     const uniqueClusterName = getUniqueClusterName(clusterstatus);
     if (resultMap.has(uniqueClusterName)) {
+      const cluster = resultMap.get(uniqueClusterName);
       const data = {
-        metadata: resultMap.get(uniqueClusterName).metadata,
+        metadata: _.get(cluster, 'metadata'),
         nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
         clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
         consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
         rawStatus: clusterstatus,
         klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
         k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
+        serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
       };
       const clusterName = _.get(clusterstatus, 'metadata.name', 'noClusterName');
       if (_.has(clusterversions, clusterName)) {
@@ -118,6 +120,7 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
       usage: _.get(clusterstatus, 'raw.spec.usage'),
       rawCluster: cluster,
       rawStatus: _.get(clusterstatus, 'raw'),
+      serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
     };
     resultMap.set(uniqueClusterName, data);
   });
