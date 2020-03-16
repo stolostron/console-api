@@ -22,6 +22,10 @@ type BareMetalAsset implements K8sObject {
   hardwareProfile: String
   role: String
 }
+
+type BareMetalAssetSubresources {
+  namespaces: [String]
+}
 `;
 
 export const resolver = {
@@ -30,11 +34,12 @@ export const resolver = {
       bareMetalAssetModel.getBareMetalAssets({ ...args }),
     bareMetalAsset: (root, args, { bareMetalAssetModel }) =>
       bareMetalAssetModel.getSingleBareMetalAsset({ ...args }),
+    bareMetalAssetSubresources: (root, args, { bareMetalAssetModel }) =>
+      bareMetalAssetModel.getBareMetalAssetSubresources({ ...args }),
   },
   Mutation: {
-    // TODO
-    // createBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
-    //  bareMetalAssetModel.createBareMetalAsset(args),
+    createBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
+      bareMetalAssetModel.createBareMetalAsset(args),
   },
 
 };

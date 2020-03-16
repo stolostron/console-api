@@ -26,6 +26,7 @@ type Query {
   # BareMetalAssests
   bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
   bareMetalAssets: [BareMetalAsset]
+  bareMetalAssetSubresources: BareMetalAssetSubresources
 
   # Get Nodes and node info
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
@@ -164,6 +165,9 @@ type Mutation {
 
   deleteCluster(namespace: String, cluster: String): JSON
   updateClusterResource(namespace: String, name: String, body: String): JSON
+
+  # BareMetalAssests
+  createBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
