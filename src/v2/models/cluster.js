@@ -134,7 +134,7 @@ export default class ClusterModel extends KubeModel {
     const [clusters, clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
-      this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io'),
+      this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
     const results = findMatchedStatus([clusters], [clusterstatuses], clusterversions);
     return results;
