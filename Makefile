@@ -123,7 +123,3 @@ multi-arch:
 	make docker:manifest-tool
 	make docker:multi-arch DOCKER_TAG=$(RELEASE_TAG)
 	make docker:multi-arch DOCKER_TAG=$(SEMVERSION)
-
-.PHONY: release-ff
-release-ff:
-	./release_ff.sh $(RELEASE_FF_BRANCH)
