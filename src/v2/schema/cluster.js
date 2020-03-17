@@ -18,6 +18,7 @@ type Cluster implements K8sObject {
   distributionVersion: String
   metadata: Metadata
   nodes: Int
+  serverAddress: String
   status: String
   # Returns % of memory used.
   totalMemory: String
