@@ -26,7 +26,7 @@ type Query {
   # BareMetalAssests
   bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
   bareMetalAssets: [BareMetalAsset]
-  bareMetalAssetSubresources: BareMetalAssetSubresources
+  bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
 
   # Get Nodes and node info
   nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
@@ -168,6 +168,7 @@ type Mutation {
 
   # BareMetalAssests
   createBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
+  updateBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
