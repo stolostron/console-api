@@ -32,14 +32,15 @@ async function getClusterResources(kube) {
   const clusters = allClusters.items ? allClusters.items : await kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`);
 
   // For clusterstatuses, query only namespaces that have clusters
-  const names = Array.from(new Set(clusters.map(c => c.metadata.name)));
+  // For clusterversions, query only clusters that are online
+  const names = Array.from(new Set(clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name)));
   const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
   const [clusterstatuses, ...clusterversions] = await Promise.all([
     kube.getResources(
       ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
       { namespaces },
     ),
-    ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io')),
+    ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
   ]);
   return [clusters, clusterstatuses, clusterversions];
 }
