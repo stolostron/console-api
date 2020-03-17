@@ -111,142 +111,142 @@ describe('RCM Api Resolver', () => {
       });
   });
 
-  test('Correctly Resolves Get Cloud Providers', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            {
-              orchestrations {
-                name
-                longname
-                type
-                configMetadata
-                configValues
-                clusterMetadata
-                clusterValues
-                categoryName
-                categoryLongname              
-                statusCode
-              }
-            }`,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Correctly Resolves Get Cloud Providers', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           {
+  //             orchestrations {
+  //               name
+  //               longname
+  //               type
+  //               configMetadata
+  //               configValues
+  //               clusterMetadata
+  //               clusterValues
+  //               categoryName
+  //               categoryLongname
+  //               statusCode
+  //             }
+  //           }`,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('createCluster test that we can create cluster correctly', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                createCluster(namespace: "iks", cluster: {name: "ericabrtest4"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
-  test('createCluster test with all required fields but returns with error', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                createCluster(namespace: "iks", cluster: {name:"ericabrtest5"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('createCluster test that we can create cluster correctly', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               createCluster(namespace: "iks", cluster: {name: "ericabrtest4"})
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
+  // test('createCluster test with all required fields but returns with error', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               createCluster(namespace: "iks", cluster: {name:"ericabrtest5"})
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('createCluster test that we get an error when namespace not provided', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                createCluster(namespace:"", {name:"ericabrtest4"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('createCluster test that we get an error when namespace not provided', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               createCluster(namespace:"", {name:"ericabrtest4"})
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('createCluster test that we get an error when cluster not provided', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                createCluster(namespace:"", cluster: null)
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('createCluster test that we get an error when cluster not provided', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               createCluster(namespace:"", cluster: null)
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('previewCluster test with all required fields but returns with error', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                previewCluster(namespace: "eks", cluster: {name:"llcao-aks-1"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('previewCluster test with all required fields but returns with error', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               previewCluster(namespace: "eks", cluster: {name:"llcao-aks-1"})
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('previewCluster test that we get an error when namespace not provided', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                previewCluster(namespace:"", {name:"llcao-gke-1"})
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('previewCluster test that we get an error when namespace not provided', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               previewCluster(namespace:"", {name:"llcao-gke-1"})
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('previewCluster test that we get an error when cluster not provided', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-            mutation {
-                previewCluster(namespace:"", cluster: null)
-            }
-          `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('previewCluster test that we get an error when cluster not provided', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //           mutation {
+  //               previewCluster(namespace:"", cluster: null)
+  //           }
+  //         `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
   test('Update Kubernetes Cluster Resource for Import', (done) => {
     supertest(server)
