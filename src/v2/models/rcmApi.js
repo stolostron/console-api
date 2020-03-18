@@ -47,42 +47,44 @@ export default class RcmApiModel {
       },
     };
   }
-  async getOrchestrations() {
-    // eslint-disable-next-line arrow-body-style
-    const response = await this.rcmApiConnector.get('/cloudproviders');
-    if (response && (response.code || response.message)) {
-      logger.error(`RCM API ERROR: POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudproviders - ${this.getErrorMsg(response)}`);
-      return {
-        error: {
-          rawResponse: response,
-          statusCode: response.statusCode,
-        },
-      };
-    }
-    if (response.statusCode !== 200) {
-      const Items = [];
-      const item = { statusCode: response.statusCode };
-      Items.push(item);
-      return Items;
-    }
-    const Items = response && response.Items;
-    // eslint-disable-next-line arrow-body-style
-    const formattedItems = Items && Items.map((item) => {
-      return ({
-        name: item.name,
-        longname: item.longname,
-        categoryName: item.categoryName,
-        categoryLongname: item.categoryLongname,
-        type: item.type,
-        configMetadata: item.configMetadata,
-        configValues: item.configValues,
-        clusterMetadata: item.clusterMetadata,
-        clusterValues: item.clusterValues,
-        statusCode: response.statusCode,
-      });
-    });
-    return (formattedItems);
-  }
+  // async getOrchestrations() {
+  //   // eslint-disable-next-line arrow-body-style
+  //   const response = await this.rcmApiConnector.get('/cloudproviders');
+  //   if (response && (response.code || response.message)) {
+  //     logger.error(
+  //       `RCM API ERROR: POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudproviders - `
+  //       + `${this.getErrorMsg(response)}`);
+  //     return {
+  //       error: {
+  //         rawResponse: response,
+  //         statusCode: response.statusCode,
+  //       },
+  //     };
+  //   }
+  //   if (response.statusCode !== 200) {
+  //     const Items = [];
+  //     const item = { statusCode: response.statusCode };
+  //     Items.push(item);
+  //     return Items;
+  //   }
+  //   const Items = response && response.Items;
+  //   // eslint-disable-next-line arrow-body-style
+  //   const formattedItems = Items && Items.map((item) => {
+  //     return ({
+  //       name: item.name,
+  //       longname: item.longname,
+  //       categoryName: item.categoryName,
+  //       categoryLongname: item.categoryLongname,
+  //       type: item.type,
+  //       configMetadata: item.configMetadata,
+  //       configValues: item.configValues,
+  //       clusterMetadata: item.clusterMetadata,
+  //       clusterValues: item.clusterValues,
+  //       statusCode: response.statusCode,
+  //     });
+  //   });
+  //   return (formattedItems);
+  // }
 
 
   async createClusterResource(args) {
@@ -195,33 +197,40 @@ export default class RcmApiModel {
     return response;
   }
 
-  async createCluster(args) {
-    let response;
-    const { namespace, cluster } = args;
-    if (!namespace || !cluster) {
-      throw new Error('Namespace and cluster are required for createCluster');
-    } else {
-      response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters`, cluster);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/${namespace}/${cluster.name}/clusters`, response);
-    }
-    return response;
-  }
+  // async createCluster(args) {
+  //   let response;
+  //   const { namespace, cluster } = args;
+  //   if (!namespace || !cluster) {
+  //     throw new Error('Namespace and cluster are required for createCluster');
+  //   } else {
+  //     response = await
+  //       this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters`,
+  //       cluster);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  //     return this.
+  //       responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/` +
+  //       `cloudconnections/${namespace}/${cluster.name}/clusters`, response);
+  //   }
+  //   return response;
+  // }
 
-  async previewCluster(args) {
-    let response;
-    const { namespace, cluster } = args;
-    if (!namespace || !cluster) {
-      throw new Error('Namespace and cluster are required for previewCluster');
-    } else {
-      response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters/manifest`, cluster);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/${namespace}/${cluster.name}/clusters/manifest`, response);
-    }
-    return response;
-  }
+  // async previewCluster(args) {
+  //   let response;
+  //   const { namespace, cluster } = args;
+  //   if (!namespace || !cluster) {
+  //     throw new Error('Namespace and cluster are required for previewCluster');
+  //   } else {
+  //     response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/` +
+  //       `${cluster.name}/clusters/manifest`, cluster);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  //     return
+  //       this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/` +
+  //         `${namespace}/${cluster.name}/clusters/manifest`, response);
+  //   }
+  //   return response;
+  // }
 
   async getAutomatedImportStatus(args) {
     let response;

@@ -299,8 +299,8 @@ export default class GenericModel extends KubeModel {
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
     // eslint-disable-next-line
-    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup);
-    if (response.status.results) {
+    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup).catch(() => null);
+    if (response && response.status.results) {
       return response.status.results[cluster];
     }
     return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
