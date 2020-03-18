@@ -107,8 +107,9 @@ export default class RcmApiModel {
       if (namespaceResponse.code === 409) {
         const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
         if (existingNamespaceClusters.items.length > 0) throw new Error(`Create Cluster failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
+      } else {
+        return namespaceResponse;
       }
-      return namespaceResponse;
     }
 
     if (config.privateRegistryEnabled) {
