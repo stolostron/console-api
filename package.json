@@ -8,6 +8,7 @@
     "start:production": "cross-env NODE_ENV=production node ./build/index.js",
     "start:test": "cross-env NODE_ENV=test MOCK=true node ./build/index.js",
     "start:development": "cross-env NODE_ENV=development node ./build/index.js",
+    "start:debug": "cross-env NODE_ENV=development node --inspect ./build/index.js",
     "build-server": "babel -d ./build ./src -s",
     "build": "npm run clean && npm run build-server",
     "build:production": "npm run build",
