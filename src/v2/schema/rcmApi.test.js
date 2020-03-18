@@ -11,37 +11,37 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('RCM Api Resolver', () => {
-  test('Get Automated Import Status', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-          {
-            getAutomatedImportStatus(namespace: "test", name:"test")
-          }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Get Automated Import Status', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //         {
+  //           getAutomatedImportStatus(namespace: "test", name:"test")
+  //         }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('Get Automated Import Status should return error msg', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-          {
-            getAutomatedImportStatus(namespace: "", name:"test")
-          }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Get Automated Import Status should return error msg', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //         {
+  //           getAutomatedImportStatus(namespace: "", name:"test")
+  //         }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
   test('Create Kubernetes Cluster Resource for Import', (done) => {
     supertest(server)
@@ -75,41 +75,41 @@ describe('RCM Api Resolver', () => {
       });
   });
 
-  test('Start Automated Import Process', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-            automatedImport(
-              namespace:"test",
-              name:"test",
-              body: "test"
-              )
-          }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Start Automated Import Process', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //       mutation {
+  //           automatedImport(
+  //             namespace:"test",
+  //             name:"test",
+  //             body: "test"
+  //             )
+  //         }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
-  test('Start Automated Import Process should return error msg', (done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        mutation {
-            automatedImport(namespace:"", name:"test", body: "test")
-          }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  });
+  // test('Start Automated Import Process should return error msg', (done) => {
+  //   supertest(server)
+  //     .post(GRAPHQL_PATH)
+  //     .send({
+  //       query: `
+  //       mutation {
+  //           automatedImport(namespace:"", name:"test", body: "test")
+  //         }
+  //     `,
+  //     })
+  //     .end((err, res) => {
+  //       expect(JSON.parse(res.text)).toMatchSnapshot();
+  //       done();
+  //     });
+  // });
 
   // test('Correctly Resolves Get Cloud Providers', (done) => {
   //   supertest(server)
