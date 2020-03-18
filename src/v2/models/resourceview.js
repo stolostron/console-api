@@ -89,7 +89,7 @@ export default class ResourceView extends KubeModel {
   }
 
   async fetchResources({ type = isRequired('type') }) {
-    const response = await this.kubeConnector.resourceViewQuery(type);
+    const response = await this.kubeConnector.resourceViewQuery(type).catch(() => null);
     const results = _.get(response, 'status.results', {});
 
     const transform = this.transforms[type];
@@ -102,16 +102,18 @@ export default class ResourceView extends KubeModel {
   }
 
   async fetchResource(type, clusterName, name, namespace) {
-    const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace);
+    const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace)
+      .catch(() => null);
     const transform = this.transforms[type];
-    if (response.status.results !== undefined) {
+    if (response && response.status.results !== undefined) {
       return [transform(clusterName, response.status.results[clusterName])];
     }
     return [];
   }
 
   async fetchNodeResource(type, clusterName, namespace) {
-    const response = await this.kubeConnector.resourceViewQuery(type, clusterName, namespace);
+    const response = await this.kubeConnector.resourceViewQuery(type, clusterName, namespace)
+      .catch(() => null);
     const results = _.get(response, 'status.results', {});
     const transform = this.transforms[type];
     return Object.keys(results).reduce((accum, cluster) => {
