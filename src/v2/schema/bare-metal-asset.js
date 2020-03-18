@@ -7,6 +7,8 @@ export const typeDef = `
 type BmcType {
   address: String
   credentialsName: String
+  username: String
+  password: String
 }
 
 type BmcClusterDeploymentType {
@@ -24,7 +26,8 @@ type BareMetalAsset implements K8sObject {
 }
 
 type BareMetalAssetSubresources {
-  namespaces: [String]
+  namespaces: [String],
+  bareMetalAsset: [BareMetalAsset]
 }
 `;
 
@@ -40,6 +43,8 @@ export const resolver = {
   Mutation: {
     createBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
       bareMetalAssetModel.createBareMetalAsset(args),
+    updateBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
+      bareMetalAssetModel.updateBareMetalAsset(args),
   },
 
 };
