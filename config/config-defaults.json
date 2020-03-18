@@ -2,7 +2,7 @@
   "complianceNamespace": "mcm",
   "contextPath": "/hcmuiapi",
   "hcmPollInterval": 100,
-  "hcmPollTimeout": 50000,
+  "hcmPollTimeout": 15000,
   "hcmUrl": "",
   "httpPort": 4000,
   "localKubeToken": ""
