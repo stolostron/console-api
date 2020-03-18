@@ -123,19 +123,20 @@ export default class BareMetalAssetModel extends KubeModel {
     return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
   }
 
-  async patchBMA(namespace, name, address, credentialsName, bootMACAddress) {
+  async patchBMA(oldSpec, namespace, name, address, credentialsName, bootMACAddress) {
+    const newSpec = Object.assign({}, oldSpec, {
+      bmc: {
+        address,
+        credentialsName,
+      },
+      bootMACAddress,
+    });
     const bmaBody = {
       body: [
         {
           op: 'replace',
           path: '/spec',
-          value: {
-            bmc: {
-              address,
-              credentialsName,
-            },
-            bootMACAddress,
-          },
+          value: newSpec,
         },
       ],
     };
@@ -196,6 +197,7 @@ export default class BareMetalAssetModel extends KubeModel {
       }
 
       const bmaResult = await this.patchBMA(
+        bareMetalAsset.spec,
         namespace,
         name,
         bmcAddress,
