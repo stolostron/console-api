@@ -283,7 +283,7 @@ export default class KubeConnector {
       }
       return result;
     } catch (e) {
-      logger.error('Resource View Query Error', e.message);
+      logger.error(`Resource View Query Error for ${resourceType}`, e.message);
       cancel();
       throw e;
     }
