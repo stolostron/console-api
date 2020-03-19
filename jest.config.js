@@ -28,7 +28,7 @@ const jestConfig = {
   testResultsProcessor: 'jest-sonar-reporter',
   coverageThreshold: {
     global: {
-      branches: 35,
+      branches: 30,
       functions: 40,
       lines: 46,
       statements: 47,
