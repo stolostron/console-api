@@ -167,35 +167,38 @@ export default class RcmApiModel {
     return new Promise(poll);
   }
 
-  async updateClusterResource(args) {
-    let response;
-    const { namespace, name, body } = args;
+  // async updateClusterResource(args) {
+  //   let response;
+  //   const { namespace, name, body } = args;
 
-    if (!body || !namespace || !name) {
-      throw new Error('Body, namespace, and name are required for updateClusterResource');
-    } else {
-      response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
-    }
-    return response;
-  }
+  //   if (!body || !namespace || !name) {
+  //     throw new Error('Body, namespace, and name are required for updateClusterResource');
+  //   } else {
+  // eslint-disable-next-line max-len
+  //     response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  // eslint-disable-next-line max-len
+  //     return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
+  //   }
+  //   return response;
+  // }
 
-  async automatedImport(args) {
-    let response;
-    const { namespace, name, body } = args;
+  // async automatedImport(args) {
+  //   let response;
+  //   const { namespace, name, body } = args;
 
-    if (!body || !namespace || !name) {
-      throw new Error('Body, namespace, and name are required for automatedImport');
-    } else {
-      response = await this.rcmApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
-    }
-    return response;
-  }
+  //   if (!body || !namespace || !name) {
+  //     throw new Error('Body, namespace, and name are required for automatedImport');
+  //   } else {
+  //     response = await this.rcmApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  // eslint-disable-next-line max-len
+  //     return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
+  //   }
+  //   return response;
+  // }
 
   // async createCluster(args) {
   //   let response;
@@ -232,20 +235,21 @@ export default class RcmApiModel {
   //   return response;
   // }
 
-  async getAutomatedImportStatus(args) {
-    let response;
-    const { namespace, name } = args;
+  // async getAutomatedImportStatus(args) {
+  //   let response;
+  //   const { namespace, name } = args;
 
-    if (!namespace || !name) {
-      throw new Error('namespace and name are required for getAutomatedImportStatus');
-    } else {
-      response = await this.rcmApiConnector.get(`/clusters/${namespace}/${name}/imports`);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
-    }
-    return response;
-  }
+  //   if (!namespace || !name) {
+  //     throw new Error('namespace and name are required for getAutomatedImportStatus');
+  //   } else {
+  //     response = await this.rcmApiConnector.get(`/clusters/${namespace}/${name}/imports`);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  // eslint-disable-next-line max-len
+  //     return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
+  //   }
+  //   return response;
+  // }
 
   async deleteCluster(args) {
     let response;
