@@ -2,6 +2,7 @@
  * Licensed Materials - Property of Red Hat, Inc.
  * (c) Copyright Red Hat, Inc. All Rights Reserved.
  ****************************************************************************** */
+import _ from 'lodash';
 import KubeModel from './kube';
 
 function transform(bareMetalAsset, secret = {}) {
@@ -78,7 +79,8 @@ export default class BareMetalAssetModel extends KubeModel {
       apiVersion: 'v1',
       kind: 'Secret',
       metadata: {
-        name: secretName,
+        generateName: secretName,
+        ownerReferences: [],
       },
       type: 'Opaque',
       data: {
@@ -123,6 +125,24 @@ export default class BareMetalAssetModel extends KubeModel {
     return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
   }
 
+  async patchSecretOwnerRef(namespace, secretName, ownerName, ownerUID) {
+    const secretBody = {
+      body: [
+        {
+          op: 'replace',
+          path: '/metadata/ownerReferences',
+          value: [{
+            apiVersion: 'midas.io/v1alpha1',
+            kind: 'BareMetalAsset',
+            name: ownerName,
+            uid: ownerUID,
+          }],
+        },
+      ],
+    };
+    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
+  }
+
   async patchBMA(oldSpec, namespace, name, address, credentialsName, bootMACAddress) {
     const newSpec = Object.assign({}, oldSpec, {
       bmc: {
@@ -148,20 +168,24 @@ export default class BareMetalAssetModel extends KubeModel {
       namespace, name, bmcAddress, username, password, bootMac,
     } = args;
     try {
-      const secretName = `${name}-bmc-secret`;
-      const secretResult = await this.createSecret(namespace, secretName, username, password);
+      const secretResult = await this.createSecret(namespace, `${name}-bmc-secret-`, username, password);
+      const secretName = _.get(secretResult, 'metadata.name', '');
       const bmaResult = await this.createBMA(namespace, name, bmcAddress, secretName, bootMac);
+      const patchedSecretResult = await this.patchSecretOwnerRef(namespace, secretName, name, _.get(bmaResult, 'metadata.uid'));
 
       let statusCode = 201;
-      if (secretResult.metadata.name !== secretName) {
+      if (!secretResult.metadata.name) {
         statusCode = secretResult.code;
       } else if (bmaResult.metadata.name !== name) {
         statusCode = bmaResult.code;
+      } else if (!patchedSecretResult.metadata.name) {
+        statusCode = patchedSecretResult.code;
       }
 
       return {
         statusCode,
         secretResult,
+        patchedSecretResult,
         bmaResult,
       };
     } catch (error) {
@@ -177,6 +201,7 @@ export default class BareMetalAssetModel extends KubeModel {
     const bareMetalAsset = await this.kubeConnector.get(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
     if (bareMetalAsset.metadata !== undefined) {
       let secretResult;
+      let patchedSecretResult;
       if (bareMetalAsset.spec.bmc && bareMetalAsset.spec.bmc.credentialsName) {
         secretResult = await this.patchSecret(
           namespace,
@@ -186,12 +211,14 @@ export default class BareMetalAssetModel extends KubeModel {
         );
       } else {
         // Secret does not exist, create one
-        secretResult = await this.createSecret(namespace, `${name}-bmc-secret`, username, password);
+        secretResult = await this.createSecret(namespace, `${name}-bmc-secret-`, username, password);
+        patchedSecretResult = await this.patchSecretOwnerRef(namespace, _.get(secretResult, 'metadata.name'), name, _.get(bareMetalAsset, 'metadata.uid'));
       }
       if (secretResult && (secretResult.code || secretResult.message)) {
         return {
           statusCode: secretResult.code || 500,
           secretResult,
+          patchedSecretResult,
           bmaResult: {},
         };
       }
@@ -208,6 +235,7 @@ export default class BareMetalAssetModel extends KubeModel {
         return {
           statusCode: bmaResult.code || 500,
           secretResult,
+          patchedSecretResult,
           bmaResult,
         };
       }
@@ -215,6 +243,7 @@ export default class BareMetalAssetModel extends KubeModel {
       return {
         statusCode: 200,
         secretResult,
+        patchedSecretResult,
         bmaResult,
       };
     }
@@ -224,6 +253,7 @@ export default class BareMetalAssetModel extends KubeModel {
       statusCode: 400,
       secretResult: {},
       bmaResult: {},
+      patchedSecretResult: {},
     };
   }
 }
