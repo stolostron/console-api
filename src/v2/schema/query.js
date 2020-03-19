@@ -157,7 +157,7 @@ type Mutation {
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
 
   # Create remote cluster
-  createCluster(namespace: String!, cluster: JSON!) : JSON
+  createCluster(cluster: JSON!) : JSON
   previewCluster(namespace: String!, cluster: JSON!) : JSON
   createClusterResource(body: String): JSON
 
