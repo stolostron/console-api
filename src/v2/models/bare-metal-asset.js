@@ -2,7 +2,10 @@
  * Licensed Materials - Property of Red Hat, Inc.
  * (c) Copyright Red Hat, Inc. All Rights Reserved.
  ****************************************************************************** */
+import _ from 'lodash';
 import KubeModel from './kube';
+
+const MAX_PARALLEL_REQUESTS = 5;
 
 function transform(bareMetalAsset, secret = {}) {
   const { spec } = bareMetalAsset;
@@ -78,7 +81,8 @@ export default class BareMetalAssetModel extends KubeModel {
       apiVersion: 'v1',
       kind: 'Secret',
       metadata: {
-        name: secretName,
+        generateName: secretName,
+        ownerReferences: [],
       },
       type: 'Opaque',
       data: {
@@ -123,19 +127,38 @@ export default class BareMetalAssetModel extends KubeModel {
     return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
   }
 
-  async patchBMA(namespace, name, address, credentialsName, bootMACAddress) {
+  async patchSecretOwnerRef(namespace, secretName, ownerName, ownerUID) {
+    const secretBody = {
+      body: [
+        {
+          op: 'replace',
+          path: '/metadata/ownerReferences',
+          value: [{
+            apiVersion: 'midas.io/v1alpha1',
+            kind: 'BareMetalAsset',
+            name: ownerName,
+            uid: ownerUID,
+          }],
+        },
+      ],
+    };
+    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
+  }
+
+  async patchBMA(oldSpec, namespace, name, address, credentialsName, bootMACAddress) {
+    const newSpec = Object.assign({}, oldSpec, {
+      bmc: {
+        address,
+        credentialsName,
+      },
+      bootMACAddress,
+    });
     const bmaBody = {
       body: [
         {
           op: 'replace',
           path: '/spec',
-          value: {
-            bmc: {
-              address,
-              credentialsName,
-            },
-            bootMACAddress,
-          },
+          value: newSpec,
         },
       ],
     };
@@ -147,20 +170,24 @@ export default class BareMetalAssetModel extends KubeModel {
       namespace, name, bmcAddress, username, password, bootMac,
     } = args;
     try {
-      const secretName = `${name}-bmc-secret`;
-      const secretResult = await this.createSecret(namespace, secretName, username, password);
+      const secretResult = await this.createSecret(namespace, `${name}-bmc-secret-`, username, password);
+      const secretName = _.get(secretResult, 'metadata.name', '');
       const bmaResult = await this.createBMA(namespace, name, bmcAddress, secretName, bootMac);
+      const patchedSecretResult = await this.patchSecretOwnerRef(namespace, secretName, name, _.get(bmaResult, 'metadata.uid'));
 
       let statusCode = 201;
-      if (secretResult.metadata.name !== secretName) {
+      if (!secretResult.metadata.name) {
         statusCode = secretResult.code;
       } else if (bmaResult.metadata.name !== name) {
         statusCode = bmaResult.code;
+      } else if (!patchedSecretResult.metadata.name) {
+        statusCode = patchedSecretResult.code;
       }
 
       return {
         statusCode,
         secretResult,
+        patchedSecretResult,
         bmaResult,
       };
     } catch (error) {
@@ -176,6 +203,7 @@ export default class BareMetalAssetModel extends KubeModel {
     const bareMetalAsset = await this.kubeConnector.get(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
     if (bareMetalAsset.metadata !== undefined) {
       let secretResult;
+      let patchedSecretResult;
       if (bareMetalAsset.spec.bmc && bareMetalAsset.spec.bmc.credentialsName) {
         secretResult = await this.patchSecret(
           namespace,
@@ -185,17 +213,20 @@ export default class BareMetalAssetModel extends KubeModel {
         );
       } else {
         // Secret does not exist, create one
-        secretResult = await this.createSecret(namespace, `${name}-bmc-secret`, username, password);
+        secretResult = await this.createSecret(namespace, `${name}-bmc-secret-`, username, password);
+        patchedSecretResult = await this.patchSecretOwnerRef(namespace, _.get(secretResult, 'metadata.name'), name, _.get(bareMetalAsset, 'metadata.uid'));
       }
       if (secretResult && (secretResult.code || secretResult.message)) {
         return {
           statusCode: secretResult.code || 500,
           secretResult,
+          patchedSecretResult,
           bmaResult: {},
         };
       }
 
       const bmaResult = await this.patchBMA(
+        bareMetalAsset.spec,
         namespace,
         name,
         bmcAddress,
@@ -206,6 +237,7 @@ export default class BareMetalAssetModel extends KubeModel {
         return {
           statusCode: bmaResult.code || 500,
           secretResult,
+          patchedSecretResult,
           bmaResult,
         };
       }
@@ -213,6 +245,7 @@ export default class BareMetalAssetModel extends KubeModel {
       return {
         statusCode: 200,
         secretResult,
+        patchedSecretResult,
         bmaResult,
       };
     }
@@ -222,6 +255,53 @@ export default class BareMetalAssetModel extends KubeModel {
       statusCode: 400,
       secretResult: {},
       bmaResult: {},
+      patchedSecretResult: {},
     };
+  }
+
+  async deleteBareMetalAssets(args) {
+    const { bmas = [] } = args;
+    try {
+      if (!_.isArray(bmas)) {
+        return {
+          statusCode: 500,
+          error: 'Array of bmas is expected',
+        };
+      }
+
+      const requests = bmas.map((bma) => {
+        const { namespace, name } = bma;
+        return `/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+      });
+
+      const errors = [];
+      const chunks = _.chunk(requests, MAX_PARALLEL_REQUESTS);
+      for (let i = 0; i < chunks.length; i += 1) {
+        const chunk = chunks[i];
+        // eslint-disable-next-line no-await-in-loop
+        const results = await Promise.all(chunk.map(url => this.kubeConnector.delete(url)));
+        results.forEach((result) => {
+          if (result.code) {
+            errors.push({ statusCode: result.code, message: result.message });
+          }
+        });
+      }
+      if (errors.length > 0) {
+        return {
+          statusCode: 500,
+          errors,
+          message: `Failed to delete ${errors.length} bare metal asset(s)`,
+        };
+      }
+
+      return {
+        statusCode: 200,
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        error,
+      };
+    }
   }
 }

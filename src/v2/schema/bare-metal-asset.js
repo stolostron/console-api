@@ -45,6 +45,8 @@ export const resolver = {
       bareMetalAssetModel.createBareMetalAsset(args),
     updateBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
       bareMetalAssetModel.updateBareMetalAsset(args),
+    deleteBareMetalAssets: (parent, args, { bareMetalAssetModel }) =>
+      bareMetalAssetModel.deleteBareMetalAssets(args),
   },
 
 };

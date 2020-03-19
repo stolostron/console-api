@@ -169,6 +169,7 @@ type Mutation {
   # BareMetalAssests
   createBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
   updateBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
+  deleteBareMetalAssets(bmas: [JSON]): JSON
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
