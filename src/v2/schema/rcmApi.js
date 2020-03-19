@@ -35,7 +35,6 @@ export const resolver = {
     // createCluster: (parent, args, { rcmApiModel }) => rcmApiModel.createCluster(args),
     // previewCluster: (parent, args, { rcmApiModel }) => rcmApiModel.previewCluster(args),
     // automatedImport: (parent, args, { rcmApiModel }) => rcmApiModel.automatedImport(args),
-    deleteCluster: (parent, args, { rcmApiModel }) => rcmApiModel.deleteCluster(args),
     // updateClusterResource: (parent, args, { rcmApiModel }) => rcmApiModel.updateClusterResource(args),
   },
 };
