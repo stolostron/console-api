@@ -106,6 +106,14 @@ function findMatchedStatus(clusters, clusterstatuses, rawClusterversions) {
   return [...resultMap.values()];
 }
 
+function getClusterDeploymentSecrets(clusterDeployment) {
+  return {
+    adminKubeconfigSecret: _.get(clusterDeployment, 'spec.clusterMetadata.adminKubeconfigSecretRef.name', ''),
+    adminPasswordSecret: _.get(clusterDeployment, 'spec.clusterMetadata.adminPasswordSecretRef.name', ''),
+    installConfigSecret: _.get(clusterDeployment, 'spec.provisioning.installConfigSecretRef.name', ''),
+  };
+}
+
 function findMatchedStatusForOverview(clusters, clusterstatuses) {
   const resultMap = new Map();
   const clusterstatusResultMap = mapClusters(clusterstatuses);
@@ -131,13 +139,16 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
 export default class ClusterModel extends KubeModel {
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
-    const [clusters, clusterstatuses, ...clusterversions] = await Promise.all([
+    const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
+      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
-    const results = findMatchedStatus([clusters], [clusterstatuses], clusterversions);
-    return results;
+    const [result] = findMatchedStatus([clusters], [clusterstatuses], clusterversions);
+    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployments);
+
+    return [{ ...result, ...clusterDeploymentSecrets }];
   }
 
   async getClusters(args = {}) {
