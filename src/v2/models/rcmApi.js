@@ -167,20 +167,22 @@ export default class RcmApiModel {
     return new Promise(poll);
   }
 
-  async updateClusterResource(args) {
-    let response;
-    const { namespace, name, body } = args;
+  // async updateClusterResource(args) {
+  //   let response;
+  //   const { namespace, name, body } = args;
 
-    if (!body || !namespace || !name) {
-      throw new Error('Body, namespace, and name are required for updateClusterResource');
-    } else {
-      response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
-    }
-    return response;
-  }
+  //   if (!body || !namespace || !name) {
+  //     throw new Error('Body, namespace, and name are required for updateClusterResource');
+  //   } else {
+  // eslint-disable-next-line max-len
+  //     response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
+  //   }
+  //   if (response && this.responseHasError(response)) {
+  // eslint-disable-next-line max-len
+  //     return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
+  //   }
+  //   return response;
+  // }
 
   // async automatedImport(args) {
   //   let response;
