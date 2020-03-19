@@ -30,8 +30,8 @@ const jestConfig = {
     global: {
       branches: 30,
       functions: 40,
-      lines: 46,
-      statements: 47,
+      lines: 45,
+      statements: 45,
     },
   },
   collectCoverageFrom: [
