@@ -5,6 +5,8 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
+const MAX_PARALLEL_REQUESTS = 5;
+
 function transform(bareMetalAsset, secret = {}) {
   const { spec } = bareMetalAsset;
   const username = secret.data ? secret.data.username : undefined;
@@ -255,5 +257,51 @@ export default class BareMetalAssetModel extends KubeModel {
       bmaResult: {},
       patchedSecretResult: {},
     };
+  }
+
+  async deleteBareMetalAssets(args) {
+    const { bmas = [] } = args;
+    try {
+      if (!_.isArray(bmas)) {
+        return {
+          statusCode: 500,
+          error: 'Array of bmas is expected',
+        };
+      }
+
+      const requests = bmas.map((bma) => {
+        const { namespace, name } = bma;
+        return `/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+      });
+
+      const errors = [];
+      const chunks = _.chunk(requests, MAX_PARALLEL_REQUESTS);
+      for (let i = 0; i < chunks.length; i += 1) {
+        const chunk = chunks[i];
+        // eslint-disable-next-line no-await-in-loop
+        const results = await Promise.all(chunk.map(url => this.kubeConnector.delete(url)));
+        results.forEach((result) => {
+          if (result.code) {
+            errors.push({ statusCode: result.code, message: result.message });
+          }
+        });
+      }
+      if (errors.length > 0) {
+        return {
+          statusCode: 500,
+          errors,
+          message: `Failed to delete ${errors.length} bare metal asset(s)`,
+        };
+      }
+
+      return {
+        statusCode: 200,
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        error,
+      };
+    }
   }
 }
