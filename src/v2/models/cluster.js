@@ -95,16 +95,16 @@ async function getClusterResources(kube) {
   return [clusters, clusterstatuses, clusterdeployments, clusterversions];
 }
 
-function getUniqueResourceName(cluster) {
-  const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
-  const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
-  return `${clusterName}_${clusterNamespace}`;
+function getUniqueResourceName(resource) {
+  const name = _.get(resource, 'metadata.name', 'noClusterName');
+  const namespace = _.get(resource, 'metadata.namespace', 'noClusterNamespace');
+  return `${name}_${namespace}`;
 }
 
-function mapResources(resource) {
+function mapResources(resource, kind = 'Cluster') {
   const resultMap = new Map();
   resource.forEach((r) => {
-    if (_.has(r, 'metadata')) {
+    if (r.metadata && (!r.kind || r.kind === kind)) {
       const key = getUniqueResourceName(r);
       resultMap.set(key, { metadata: r.metadata, raw: r });
     }
@@ -126,8 +126,8 @@ function mapClusterVersions(rawClusterversions) {
 function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClusterversions) {
   const resultMap = new Map();
   const clusterMap = mapResources(clusters);
-  const clusterStatusMap = mapResources(clusterstatuses);
-  const clusterDeploymentMap = mapResources(clusterdeployments);
+  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
+  const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
   const clusterVersionMap = mapClusterVersions(rawClusterversions);
 
   const uniqueClusterNames = new Set([...clusterMap.keys(), ...clusterDeploymentMap.keys()]);
@@ -139,10 +139,9 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       _.get(cluster, 'metadata') :
       _.pick(_.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
     const clusterversion = _.get(clusterVersionMap, metadata.name);
-    const serverAddress = _.get(
-      cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress',
-      _.get(clusterdeployment, 'raw.status.apiURL'),
-    );
+    const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
+    const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
+    const serverAddress = apiURL || (rawServerAddress ? `https://${rawServerAddress}` : null);
     const data = {
       metadata,
       nodes: _.get(clusterstatus, 'raw.spec.capacity.nodes'),
@@ -151,7 +150,7 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       rawStatus: _.get(clusterstatus, 'raw'),
       klusterletVersion: _.get(clusterstatus, 'raw.spec.klusterletVersion', '-'),
       k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
-      serverAddress: serverAddress.startsWith('https://') ? serverAddress : `https://${serverAddress}`,
+      serverAddress,
       isHive: !!clusterdeployment,
       isManaged: !!cluster,
     };
@@ -180,7 +179,7 @@ function getClusterDeploymentSecrets(clusterDeployment) {
 
 function findMatchedStatusForOverview(clusters, clusterstatuses) {
   const resultMap = new Map();
-  const clusterstatusResultMap = mapResources(clusterstatuses);
+  const clusterstatusResultMap = mapResources(clusterstatuses, 'ClusterStatus');
   clusters.forEach((cluster) => {
     const uniqueClusterName = getUniqueResourceName(cluster);
     const clusterstatus = clusterstatusResultMap.get(uniqueClusterName);
@@ -308,7 +307,6 @@ export default class ClusterModel extends KubeModel {
     return undefined;
   }
 
-
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
     const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
@@ -317,7 +315,8 @@ export default class ClusterModel extends KubeModel {
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
-    const [result] = findMatchedStatus([clusters], [clusterstatuses], [clusterdeployments], clusterversions);
+    const [result] =
+      findMatchedStatus([clusters], [clusterstatuses], [clusterdeployments], clusterversions);
     const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployments);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
