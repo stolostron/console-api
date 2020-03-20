@@ -26,6 +26,12 @@ function getStatus(cluster) {
   return status === '' ? 'offline' : status.toLowerCase();
 }
 
+function responseHasError(response) {
+  const code = response.statusCode || response.code;
+  return (code < 200 || code >= 300);
+}
+
+
 async function getClusterResources(kube) {
   // Try cluster scope query, falling back to per-namespace
   const allClusters = await kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
@@ -137,6 +143,114 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
 }
 
 export default class ClusterModel extends KubeModel {
+  async createCluster(args) {
+    let { cluster: resources } = args;
+
+    // get namespace and filter out any namespace resource
+    let namespace;
+    resources = resources.filter(({ kind, metadata = {} }) => {
+      switch (kind) {
+        case 'Namespace':
+          namespace = metadata.name;
+          return false;
+
+        case 'ClusterDeployment':
+          ({ namespace } = metadata);
+          break;
+
+        default:
+          break;
+      }
+      return true;
+    });
+
+    // if there's a namespace, try to create it
+    if (namespace) {
+      const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: namespace } });
+      if (responseHasError(namespaceResponse)) {
+        // if namespace already exists, only fail if there's no cluster in it
+        if (namespaceResponse.code === 409) {
+          const existingNamespaceClusters = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments`);
+          if (existingNamespaceClusters.items.length > 0) {
+            return {
+              errors: [{ message: `Create Cluster failed: Namespace "${namespace}" already contains a Cluster resource` }],
+            };
+          }
+        } else {
+          // failed to create the namespace at all
+          return {
+            errors: [{ message: namespaceResponse.message }],
+          };
+        }
+      }
+
+      // get resource end point for each resource
+      const k8sPaths = await this.kubeConnector.get('/');
+      const requestPaths = await Promise.all(resources.map(async resource =>
+        this.getResourceEndPoint(resource, k8sPaths)));
+      if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
+        if (requestPaths.length > 0) {
+          const resourceIndex = requestPaths.indexOf(undefined);
+          return {
+            errors: [{ message: `Cannot find resource type "${resources[resourceIndex].apiVersion}"` }],
+          };
+        }
+        return {
+          errors: [{ message: 'Cannot find resource path' }],
+        };
+      } else if (requestPaths.includes(null)) {
+        return {
+          errors: [{ message: 'Namespace not found in the template' }],
+        };
+      }
+
+      const result = await Promise.all(resources.map((resource, index) =>
+        this.kubeConnector.post(requestPaths[index], resource)
+          .catch(err => ({
+            status: 'Failure',
+            message: err.message,
+          }))));
+
+      const errors = [];
+      result.forEach((item) => {
+        if (item.code >= 400 || item.status === 'Failure' || item.message) {
+          errors.push({ message: item.message });
+        }
+      });
+      return {
+        errors,
+        result,
+      };
+    }
+    return {
+      errors: [{ message: 'Namespace not found in the template' }],
+    };
+  }
+
+  async getResourceEndPoint(resource, k8sPaths) {
+    // dynamically get resource endpoint from kebernetes API
+    // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
+    if (k8sPaths) {
+      const { apiVersion, kind } = resource;
+      const apiPath = k8sPaths.paths.find(path => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      if (apiPath) {
+        return (async () => {
+          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
+          const resourceType = k8sResourceList.resources.find(item => item.kind === kind);
+          const namespace = _.get(resource, 'metadata.namespace');
+          const { name, namespaced } = resourceType;
+          if (namespaced && !namespace) {
+            return null;
+          }
+          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
+          return requestPath;
+        })();
+      }
+    }
+    return undefined;
+  }
+
+
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
     const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
