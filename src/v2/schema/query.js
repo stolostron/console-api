@@ -25,7 +25,7 @@ type Query {
 
   # BareMetalAssests
   bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
-  bareMetalAssets: [BareMetalAsset]
+  bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]
   bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
 
   # Get Nodes and node info
