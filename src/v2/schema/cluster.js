@@ -29,6 +29,9 @@ type Cluster implements K8sObject {
   klusterletVersion: String
   k8sVersion: String
   upgradeFailed: Boolean
+  adminKubeconfigSecret: String
+  adminPasswordSecret: String
+  installConfigSecret: String
 }
 `;
 

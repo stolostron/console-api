@@ -62,6 +62,13 @@ export default class BareMetalAssetModel extends KubeModel {
     if (bareMetalAssets.items !== undefined) {
       return bareMetalAssets.items.map(bma => transform(bma, secrets.items));
     }
+    if (_.isArray(bareMetalAssets.paths)) {
+      // missing BMA CRD
+      // throw new Error('Missing BareMetalAsset CRD'); // will cause not-UX-friendly UI message
+      // eslint-disable-next-line no-console
+      console.log('Missing BareMetalAsset CRD (getAllBareMetalAssets)');
+    }
+
     return [];
   }
 
@@ -175,6 +182,16 @@ export default class BareMetalAssetModel extends KubeModel {
       const secretResult = await this.createSecret(namespace, `${name}-bmc-secret-`, username, password);
       const secretName = _.get(secretResult, 'metadata.name', '');
       const bmaResult = await this.createBMA(namespace, name, bmcAddress, secretName, bootMac);
+      if (bmaResult.paths) {
+        // missing BMA CRD
+        return {
+          statusCode: 500,
+          bmaResult: {
+            code: 500,
+            message: 'Missing BareMetalAsset CRD',
+          },
+        };
+      }
       const patchedSecretResult = await this.patchSecretOwnerRef(namespace, secretName, name, _.get(bmaResult, 'metadata.uid'));
 
       let statusCode = 201;
