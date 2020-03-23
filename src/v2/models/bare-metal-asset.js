@@ -7,10 +7,12 @@ import KubeModel from './kube';
 
 const MAX_PARALLEL_REQUESTS = 5;
 
-function transform(bareMetalAsset, secret = {}) {
-  const { spec } = bareMetalAsset;
-  const username = secret.data ? secret.data.username : undefined;
-  const password = secret.data ? secret.data.password : undefined;
+function transform(bareMetalAsset, secrets = []) {
+  const { metadata, spec } = bareMetalAsset;
+  const secret = secrets.find(s =>
+    s.metadata.name === spec.bmc.credentialsName && s.metadata.namespace === metadata.namespace);
+  const username = secret && secret.data ? secret.data.username : undefined;
+  const password = secret && secret.data ? secret.data.password : undefined;
 
   const bma = {
     metadata: bareMetalAsset.metadata,
@@ -37,7 +39,7 @@ export default class BareMetalAssetModel extends KubeModel {
         if (bareMetalAsset.spec.bmc && bareMetalAsset.spec.bmc.credentialsName) {
           secret = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${bareMetalAsset.spec.bmc.credentialsName}`);
         }
-        return [transform(bareMetalAsset, secret)];
+        return [transform(bareMetalAsset, [secret])];
       }
     }
     return [];
@@ -52,13 +54,13 @@ export default class BareMetalAssetModel extends KubeModel {
     return allBareMetalAssets;
   }
 
-  async getAllBareMetalAssets() {
-    const [bareMetalAssets] = await Promise.all([
+  async getAllBareMetalAssets({ fetchSecrets }) {
+    const [bareMetalAssets, secrets] = await Promise.all([
       this.kubeConnector.get('/apis/midas.io/v1alpha1/baremetalassets'),
-      // TODO: do we need secrets?
+      fetchSecrets ? this.kubeConnector.get('/api/v1/secrets') : Promise.resolve({ items: [] }),
     ]);
     if (bareMetalAssets.items !== undefined) {
-      return bareMetalAssets.items.map(bma => transform(bma));
+      return bareMetalAssets.items.map(bma => transform(bma, secrets.items));
     }
     if (_.isArray(bareMetalAssets.paths)) {
       // missing BMA CRD
