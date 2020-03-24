@@ -199,8 +199,15 @@ export default class ClusterModel extends KubeModel {
           errors: [{ message: 'Cannot find resource path' }],
         };
       } else if (requestPaths.includes(null)) {
+        const missingPaths = []
+        requestPaths.forEach((path, inx)=>{
+          if (path===null) {
+            const {apiVersion, kind} = resources[inx]
+            missingPaths.push(`version: ${apiVersion} kind:${kind}`)
+          }
+        })
         return {
-          errors: [{ message: 'Namespace not found in the template' }],
+          errors: [{ message: `Endpoint not found for these resources ${missingPaths.join(', ')}` }],
         };
       }
 
