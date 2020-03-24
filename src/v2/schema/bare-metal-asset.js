@@ -23,6 +23,7 @@ type BareMetalAsset implements K8sObject {
   clusterDeployment: BmcClusterDeploymentType
   hardwareProfile: String
   role: String
+  status: String
 }
 
 type BareMetalAssetSubresources {
