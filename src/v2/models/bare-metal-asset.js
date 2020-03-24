@@ -7,7 +7,7 @@ import KubeModel from './kube';
 
 const MAX_PARALLEL_REQUESTS = 5;
 
-function transform(bareMetalAsset, secrets = []) {
+export function transform(bareMetalAsset, secrets = []) {
   const { metadata, spec, status } = bareMetalAsset;
   const secret = secrets.find(s =>
     s.metadata.name === spec.bmc.credentialsName && s.metadata.namespace === metadata.namespace);
