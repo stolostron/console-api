@@ -88,10 +88,6 @@ export default function createMockHttp() {
           return state.connectionApi.createCloudConnection;
         case params.url.includes('/api/v1/namespaces/hive/secrets') && _.get(params.json, 'metadata.name') === 'google':
           return state.connectionApi.createCloudConnectionError;
-        case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.json, 'metadata.name') === 'aws':
-          return state.connectionApi.editCloudConnection;
-        case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.json, 'metadata.name') === 'google':
-          return state.connectionApi.editCloudConnectionError;
         case params.url.includes('/api/v1/namespaces') && _.get(params.json, 'metadata.name') === 'foo':
           return state.rcmApi.getNamespaceCreationResponse;
         case params.url.includes('/apis/multicloud.ibm.com/v1alpha1/namespaces/foo/endpointconfigs'):
@@ -103,6 +99,10 @@ export default function createMockHttp() {
       }
     }
     switch (true) {
+      case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.body, 'metadata.name') === 'aws':
+        return state.connectionApi.editCloudConnection;
+      case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.body, 'metadata.name') === 'google':
+        return state.connectionApi.editCloudConnectionError;
       case params.url.includes('applications/gbapp-gbapp'):
         return state.apps.mockSingleAppResponse;
       case params.url.includes('applications/testapp'):
