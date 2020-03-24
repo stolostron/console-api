@@ -82,7 +82,7 @@ export default class ConnectionModel extends KubeModel {
   async editConnection(args) {
     const { body, namespace, name } = args;
     const resource = generateSecret(body);
-    const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, {}, resource);
+    const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, resource);
     const statusCode = response.kind === 'Status' ? response.code : 200;
     return { ...response, statusCode };
   }
