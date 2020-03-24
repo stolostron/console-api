@@ -185,7 +185,7 @@ export default class ClusterModel extends KubeModel {
       }
 
       // get resource end point for each resource
-      const k8sPaths = await this.kubeConnector.get('/');
+      /*const k8sPaths = await this.kubeConnector.get('/');
       const requestPaths = await Promise.all(resources.map(async resource =>
         this.getResourceEndPoint(resource, k8sPaths)));
       if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
@@ -209,7 +209,7 @@ export default class ClusterModel extends KubeModel {
         return {
           errors: [{ message: `Endpoint not found for these resources ${missingPaths.join(', ')}` }],
         };
-      }
+      }*/
 
       const result = await Promise.all(resources.map((resource, index) =>
         this.kubeConnector.post(requestPaths[index], resource)
