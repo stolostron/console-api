@@ -8,7 +8,7 @@ import KubeModel from './kube';
 const MAX_PARALLEL_REQUESTS = 5;
 
 function transform(bareMetalAsset, secrets = []) {
-  const { metadata, spec } = bareMetalAsset;
+  const { metadata, spec, status } = bareMetalAsset;
   const secret = secrets.find(s =>
     s.metadata.name === spec.bmc.credentialsName && s.metadata.namespace === metadata.namespace);
   const username = secret && secret.data ? secret.data.username : undefined;
@@ -22,6 +22,24 @@ function transform(bareMetalAsset, secrets = []) {
   bma.bmc = bma.bmc || {};
   bma.bmc.username = username ? Buffer.from(username, 'base64').toString('ascii') : undefined;
   bma.bmc.password = password ? Buffer.from(password, 'base64').toString('ascii') : undefined;
+
+  // https://github.com/open-cluster-management/multicloud-operators-foundation/blob/16e92f7/pkg/apis/inventory/v1alpha1/baremetalasset_types.go#L81-L98
+  // https://github.com/open-cluster-management/multicluster-inventory/blob/master/pkg/controller/baremetalasset/baremetalasset_controller.go
+  const allConditions = _.get(status, 'conditions', []);
+  if (allConditions.length > 0) {
+    const failingConditions = allConditions.filter(c => c.status === 'False');
+    if (failingConditions.length > 0) {
+      // one or more conditions are not met, report the first one
+      bma.status = failingConditions[0].type;
+    } else {
+      // operator finished reconcilation, all conditions are truish
+      bma.status = 'Ready';
+    }
+  } else {
+    // waiting for the operator to set status
+    bma.status = ''; // Pending
+  }
+
   return bma;
 }
 
