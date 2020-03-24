@@ -36,7 +36,8 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
       clusterdeploymentStatus = 'creating';
     } else {
       const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-      clusterdeploymentStatus = conditions[_.findIndex(conditions, c => c.type === 'Available')].status === 'True' ?
+      const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
+      clusterdeploymentStatus = conditionIndex >= 0 && conditions[conditionIndex].status === 'True' ?
         'detached' : 'unknown';
     }
   }
