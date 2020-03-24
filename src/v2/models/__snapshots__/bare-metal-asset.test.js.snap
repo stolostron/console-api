@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Bare Metal Asset model BMA transform function 1`] = `
+Object {
+  "bmc": Object {
+    "address": "bmcAddr1",
+    "credentialsName": "my-secret-name",
+    "password": undefined,
+    "username": undefined,
+  },
+  "bootMACAddress": "addr1",
+  "clusterDeployment": "cluster",
+  "hardwareProfile": "my-profile",
+  "metadata": Object {
+    "name": "foo",
+    "namespace": "bar",
+  },
+  "role": "role",
+  "status": "",
+}
+`;
+
+exports[`Bare Metal Asset model BMA transform function 2`] = `
+Object {
+  "bmc": Object {
+    "address": "bmcAddr1",
+    "credentialsName": "my-secret-name",
+    "password": "mypwd1",
+    "username": "myuser1",
+  },
+  "bootMACAddress": "addr1",
+  "clusterDeployment": "cluster",
+  "hardwareProfile": "my-profile",
+  "metadata": Object {
+    "name": "foo",
+    "namespace": "bar",
+  },
+  "role": "role",
+  "status": "",
+}
+`;
+
+exports[`Bare Metal Asset model BMA transform function 3`] = `
+Object {
+  "bmc": Object {
+    "address": "bmcAddr1",
+    "credentialsName": "my-secret-name",
+    "password": "mypwd1",
+    "username": "myuser1",
+  },
+  "bootMACAddress": "addr1",
+  "clusterDeployment": "cluster",
+  "hardwareProfile": "my-profile",
+  "metadata": Object {
+    "name": "foo",
+    "namespace": "bar",
+  },
+  "role": "role",
+  "status": "condType1",
+}
+`;
+
+exports[`Bare Metal Asset model BMA transform function 4`] = `
+Object {
+  "bmc": Object {
+    "address": "bmcAddr1",
+    "credentialsName": "my-secret-name",
+    "password": "mypwd1",
+    "username": "myuser1",
+  },
+  "bootMACAddress": "addr1",
+  "clusterDeployment": "cluster",
+  "hardwareProfile": "my-profile",
+  "metadata": Object {
+    "name": "foo",
+    "namespace": "bar",
+  },
+  "role": "role",
+  "status": "Ready",
+}
+`;
+
+exports[`Bare Metal Asset model BMA transform function 5`] = `
+Object {
+  "bmc": Object {
+    "address": "bmcAddr1",
+    "credentialsName": "my-secret-name",
+    "password": "mypwd1",
+    "username": "myuser1",
+  },
+  "bootMACAddress": "addr1",
+  "clusterDeployment": "cluster",
+  "hardwareProfile": "my-profile",
+  "metadata": Object {
+    "name": "foo",
+    "namespace": "bar",
+  },
+  "role": "role",
+  "status": "",
+}
+`;
