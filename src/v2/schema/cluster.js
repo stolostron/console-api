@@ -16,6 +16,8 @@ type Cluster implements K8sObject {
   consoleURL: String
   desiredVersion: String
   distributionVersion: String
+  isHive: Boolean
+  isManaged: Boolean
   metadata: Metadata
   nodes: Int
   serverAddress: String
@@ -50,5 +52,6 @@ export const resolver = {
   },
   Mutation: {
     createCluster: (parent, args, { clusterModel }) => clusterModel.createCluster(args),
+    detachCluster: (parent, args, { clusterModel }) => clusterModel.detachCluster(args),
   },
 };

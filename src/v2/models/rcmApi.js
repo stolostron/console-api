@@ -251,21 +251,6 @@ export default class RcmApiModel {
   //   return response;
   // }
 
-  async deleteCluster(args) {
-    let response;
-    const { namespace, cluster } = args;
-
-    if (!cluster) {
-      throw new Error('cluster name is required for deleteCluster');
-    } else {
-      response = await this.rcmApiConnector.delete(`/clusters/${namespace}/${cluster}`);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`DELETE ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${cluster}`, response);
-    }
-    return response;
-  }
-
   async getImportYamlTemplate() {
     const response = await this.kubeConnector.get('/api/v1/configmaps?labelSelector=config=cluster-import-config');
     if (response && this.responseHasError(response)) {

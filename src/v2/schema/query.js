@@ -163,7 +163,7 @@ type Mutation {
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
 
-  deleteCluster(namespace: String, cluster: String): JSON
+  detachCluster(namespace: String!, cluster: String!, destroy: Boolean): JSON
   updateClusterResource(namespace: String, name: String, body: String): JSON
 
   # BareMetalAssests

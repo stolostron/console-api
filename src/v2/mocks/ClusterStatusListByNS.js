@@ -134,7 +134,7 @@ export default {
       {
         metadata: {
           name: 'managed-cluster',
-          namespace: 'mycluster',
+          namespace: 'default',
           selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/mycluster/clusterstatuses/mycluster',
           uid: 'a83b98b7-b03e-11e8-bd43-b69970856045',
           resourceVersion: '723',

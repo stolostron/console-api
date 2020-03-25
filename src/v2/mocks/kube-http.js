@@ -69,7 +69,6 @@ export default function createMockHttp() {
           return state.pvs.mockPVsClaimResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'clusterversions'):
           return state.clusterVersions.mockClusterVersionsResourceView;
-
         case _.includes(_.get(params.json, 'metadata.name'), 'test-acs-engine'):
           return state.relMutations;
         case params.url.includes('default/helmrepos'):
@@ -137,6 +136,12 @@ export default function createMockHttp() {
         return state.clusterstatusesByNamespace.kubeSystem;
       case params.url.includes('clusterstatuses'):
         return state.clusterStatus;
+      case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
+        return { body: state.clustersByNamespace.kubeSystem.body.items[0] };
+      case params.url.includes('namespaces/kube-system/clusters/new-cluster'):
+        return { body: state.clustersByNamespace.kubeSystem.body.items[1] };
+      case params.url.includes('namespaces/default/clusters/managed-cluster'):
+        return { body: state.clustersByNamespace.default.body.items[0] };
       case params.url.includes('namespaces/default/clusters'):
         return state.clustersByNamespace.default;
       case params.url.includes('namespaces/kube-system/clusters'):
