@@ -106,7 +106,20 @@ Object {
           },
         },
       ],
-      "compliances": Array [],
+      "compliances": Array [
+        Object {
+          "metadata": null,
+          "raw": Object {
+            "status": Object {},
+          },
+        },
+        Object {
+          "metadata": null,
+          "raw": Object {
+            "status": Object {},
+          },
+        },
+      ],
       "pods": Array [
         Object {
           "cluster": Object {
