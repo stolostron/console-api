@@ -7,6 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+// Copyright (c) 2020 Red Hat, Inc.
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { isInstance as isApolloErrorInstance, formatError as formatApolloError } from 'apollo-errors';
@@ -21,7 +22,6 @@ import _ from 'lodash';
 import logger from './lib/logger';
 
 import KubeConnector from './connectors/kube';
-import RcmApiConnector from './connectors/rcmApi';
 
 import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
@@ -34,7 +34,7 @@ import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
-import RcmApiModel from './models/rcmApi';
+import ClusterImportModel from './models/clusterImport';
 import ConnectionModel from './models/connection';
 
 import createMockKubeHTTP from './mocks/kube-http';
@@ -111,11 +111,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     namespaces,
   });
 
-  const rcmApiConnector = new RcmApiConnector({
-    token: _.get(req, "cookies['acm-access-token-cookie']") || config.get('acm-access-token-cookie'),
-    httpLib: kubeHTTP,
-  });
-
   const context = {
     req,
     applicationModel: new ApplicationModel({ kubeConnector }),
@@ -129,7 +124,7 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
-    rcmApiModel: new RcmApiModel({ rcmApiConnector, kubeConnector }),
+    clusterImportModel: new ClusterImportModel({ kubeConnector }),
     connectionModel: new ConnectionModel({ kubeConnector }),
     bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
   };

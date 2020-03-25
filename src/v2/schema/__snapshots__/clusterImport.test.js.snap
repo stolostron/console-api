@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import 1`] = `
+exports[`Cluster Import Resolver Create Kubernetes Cluster Resource for Import 1`] = `
 Object {
   "data": Object {
     "createClusterResource": Object {
@@ -10,7 +10,7 @@ Object {
 }
 `;
 
-exports[`RCM Api Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
+exports[`Cluster Import Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
 Object {
   "data": Object {
     "createClusterResource": null,
