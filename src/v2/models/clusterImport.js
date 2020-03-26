@@ -175,7 +175,8 @@ export default class ClusterImportModel {
   }
 
   clusterTemplate(config) {
-    const { clusterName, clusterNamespace, clusterLabels: { cloud, vendor } } = config;
+    console.log('config', config);
+    const { clusterName, clusterNamespace, clusterLabels } = config;
     return {
       apiVersion: 'clusterregistry.k8s.io/v1alpha1',
       kind: 'Cluster',
@@ -184,8 +185,7 @@ export default class ClusterImportModel {
         namespace: clusterNamespace,
         labels: {
           name: clusterName,
-          vendor,
-          cloud,
+          ...clusterLabels,
         },
       },
     };
