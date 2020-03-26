@@ -155,6 +155,7 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       isHive: !!clusterdeployment,
       isManaged: !!cluster,
     };
+
     if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
       data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
@@ -164,6 +165,8 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       data.distributionVersion = completedVersion ? completedVersion.version : null;
       const conditions = _.get(clusterversion, 'status.conditions', []);
       data.upgradeFailed = conditions ? conditions.filter(cond => cond.type === 'Failing')[0].status === 'True' : false;
+    } else {
+      data.distributionVersion = _.get(clusterstatus, 'raw.spec.version', '');
     }
     resultMap.set(c, data);
   });
