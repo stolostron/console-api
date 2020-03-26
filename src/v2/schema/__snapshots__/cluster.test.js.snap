@@ -304,7 +304,7 @@ Object {
         "availableVersions": null,
         "clusterip": "9.42.23.230",
         "desiredVersion": null,
-        "distributionVersion": null,
+        "distributionVersion": "",
         "metadata": Object {
           "creationTimestamp": "2018-08-13T16:56:41Z",
           "labels": Object {
@@ -363,7 +363,7 @@ Object {
         "availableVersions": null,
         "clusterip": "9.42.23.230",
         "desiredVersion": null,
-        "distributionVersion": null,
+        "distributionVersion": "",
         "metadata": Object {
           "creationTimestamp": "2018-08-13T16:56:41Z",
           "labels": Object {
