@@ -84,14 +84,14 @@ export default class ComplianceModel {
 
     if (!name) {
       // for getting policy list
-      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('complianceNamespace') || 'mcm'}/policies`);
+      const policyResponse = await this.kubeConnector.getResources(ns => `/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${ns}/policies`);
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       }
-      policies = policyResponse.items || [];
+      policies = policyResponse || [];
     } else {
       // get single policy with a specific name - walkaround of no type field
-      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace || config.get('policyNamespace') || 'mcm'}/policies/${name}`);
+      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       } else {

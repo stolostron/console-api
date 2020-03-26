@@ -43,7 +43,7 @@ export default function createMockHttp() {
     resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
-    rcmApi: require('./RcmApi'),
+    clusterImport: require('./ClusterImport'),
     connectionApi: require('./ConnectionApi'),
     bareMetalAssets: require('./BareMetalAssetList').default,
   };
@@ -69,7 +69,6 @@ export default function createMockHttp() {
           return state.pvs.mockPVsClaimResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'clusterversions'):
           return state.clusterVersions.mockClusterVersionsResourceView;
-
         case _.includes(_.get(params.json, 'metadata.name'), 'test-acs-engine'):
           return state.relMutations;
         case params.url.includes('default/helmrepos'):
@@ -82,18 +81,16 @@ export default function createMockHttp() {
           return state.apps.mockCreateAppResponse;
         case params.url.includes('default/work'):
           return state.genericResourceList.mockedUpdateWorkResponse;
-        case params.url.includes('/api/v1/clusters') && params.url.includes('/imports'):
-          return state.rcmApi.getAutomatedImportStatusResponse;
         case params.url.includes('/api/v1/namespaces/default/secrets') && _.get(params.json, 'metadata.name') === 'new-aws':
           return state.connectionApi.createCloudConnection;
         case params.url.includes('/api/v1/namespaces/hive/secrets') && _.get(params.json, 'metadata.name') === 'google':
           return state.connectionApi.createCloudConnectionError;
         case params.url.includes('/api/v1/namespaces') && _.get(params.json, 'metadata.name') === 'foo':
-          return state.rcmApi.getNamespaceCreationResponse;
+          return state.clusterImport.getNamespaceCreationResponse;
         case params.url.includes('/apis/multicloud.ibm.com/v1alpha1/namespaces/foo/endpointconfigs'):
-          return state.rcmApi.getEndpointConfigsResponse;
+          return state.clusterImport.getEndpointConfigsResponse;
         case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
-          return state.rcmApi.getClusterResponse;
+          return state.clusterImport.getClusterResponse;
         default:
           return state.pods;
       }
@@ -137,6 +134,12 @@ export default function createMockHttp() {
         return state.clusterstatusesByNamespace.kubeSystem;
       case params.url.includes('clusterstatuses'):
         return state.clusterStatus;
+      case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
+        return { body: state.clustersByNamespace.kubeSystem.body.items[0] };
+      case params.url.includes('namespaces/kube-system/clusters/new-cluster'):
+        return { body: state.clustersByNamespace.kubeSystem.body.items[1] };
+      case params.url.includes('namespaces/default/clusters/managed-cluster'):
+        return { body: state.clustersByNamespace.default.body.items[0] };
       case params.url.includes('namespaces/default/clusters'):
         return state.clustersByNamespace.default;
       case params.url.includes('namespaces/kube-system/clusters'):
@@ -189,12 +192,6 @@ export default function createMockHttp() {
         return state.genericResourceList.updateResourceLocalMock;
       case params.url.includes('test-path-to-update-work'):
         return state.genericResourceList.mockedUpdatePollResponse;
-      case params.url.includes('/api/v1/clusters'):
-        return state.rcmApi.createClusterResourceResponse;
-      case params.url.includes('api/v1/cloudproviders'):
-        return state.rcmApi.getCloudProvidersResponse;
-      case params.url.includes('api/v1/cloudconnections/iks/ericabrtest4/clusters'):
-        return state.rcmApi.getClusterCreationResponse;
       case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
         return state.connectionApi.getCloudConnectionSecrets;
       case params.url.includes('/api/v1/namespaces/ocm/secrets/microsoft'):
@@ -202,7 +199,7 @@ export default function createMockHttp() {
       case params.url.includes('v1alpha1/baremetalassets'):
         return state.bareMetalAssets;
       case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
-        return state.rcmApi.getImportYamlSecret;
+        return state.clusterImport.getImportYamlSecret;
       default:
         return state.apiList.mockResponse;
     }

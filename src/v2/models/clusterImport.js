@@ -12,12 +12,8 @@
 import _ from 'lodash';
 import logger from '../lib/logger';
 
-export default class RcmApiModel {
-  constructor({ rcmApiConnector, kubeConnector }) {
-    if (!rcmApiConnector) {
-      throw new Error('rcmApiConnector is a required parameter');
-    }
-    this.rcmApiConnector = rcmApiConnector;
+export default class ClusterImportModel {
+  constructor({ kubeConnector }) {
     this.kubeConnector = kubeConnector;
   }
 
@@ -38,7 +34,7 @@ export default class RcmApiModel {
 
   responseForError(errorTitle, response) {
     const code = response.statusCode || response.code;
-    logger.error(`RCM API ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+    logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
     return {
       error: {
         rawResponse: response,
@@ -47,45 +43,6 @@ export default class RcmApiModel {
       },
     };
   }
-  // async getOrchestrations() {
-  //   // eslint-disable-next-line arrow-body-style
-  //   const response = await this.rcmApiConnector.get('/cloudproviders');
-  //   if (response && (response.code || response.message)) {
-  //     logger.error(
-  //       `RCM API ERROR: POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudproviders - `
-  //       + `${this.getErrorMsg(response)}`);
-  //     return {
-  //       error: {
-  //         rawResponse: response,
-  //         statusCode: response.statusCode,
-  //       },
-  //     };
-  //   }
-  //   if (response.statusCode !== 200) {
-  //     const Items = [];
-  //     const item = { statusCode: response.statusCode };
-  //     Items.push(item);
-  //     return Items;
-  //   }
-  //   const Items = response && response.Items;
-  //   // eslint-disable-next-line arrow-body-style
-  //   const formattedItems = Items && Items.map((item) => {
-  //     return ({
-  //       name: item.name,
-  //       longname: item.longname,
-  //       categoryName: item.categoryName,
-  //       categoryLongname: item.categoryLongname,
-  //       type: item.type,
-  //       configMetadata: item.configMetadata,
-  //       configValues: item.configValues,
-  //       clusterMetadata: item.clusterMetadata,
-  //       clusterValues: item.clusterValues,
-  //       statusCode: response.statusCode,
-  //     });
-  //   });
-  //   return (formattedItems);
-  // }
-
 
   async createClusterResource(args) {
     const { body } = args;
@@ -167,105 +124,6 @@ export default class RcmApiModel {
     return new Promise(poll);
   }
 
-  // async updateClusterResource(args) {
-  //   let response;
-  //   const { namespace, name, body } = args;
-
-  //   if (!body || !namespace || !name) {
-  //     throw new Error('Body, namespace, and name are required for updateClusterResource');
-  //   } else {
-  // eslint-disable-next-line max-len
-  //     response = await this.rcmApiConnector.putWithString(`/clusters/${namespace}/${name}`, body);
-  //   }
-  //   if (response && this.responseHasError(response)) {
-  // eslint-disable-next-line max-len
-  //     return this.responseForError(`PUT ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}`, response);
-  //   }
-  //   return response;
-  // }
-
-  // async automatedImport(args) {
-  //   let response;
-  //   const { namespace, name, body } = args;
-
-  //   if (!body || !namespace || !name) {
-  //     throw new Error('Body, namespace, and name are required for automatedImport');
-  //   } else {
-  //     response = await this.rcmApiConnector.post(`/clusters/${namespace}/${name}/imports`, body);
-  //   }
-  //   if (response && this.responseHasError(response)) {
-  // eslint-disable-next-line max-len
-  //     return this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
-  //   }
-  //   return response;
-  // }
-
-  // async createCluster(args) {
-  //   let response;
-  //   const { namespace, cluster } = args;
-  //   if (!namespace || !cluster) {
-  //     throw new Error('Namespace and cluster are required for createCluster');
-  //   } else {
-  //     response = await
-  //       this.rcmApiConnector.post(`/cloudconnections/${namespace}/${cluster.name}/clusters`,
-  //       cluster);
-  //   }
-  //   if (response && this.responseHasError(response)) {
-  //     return this.
-  //       responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/` +
-  //       `cloudconnections/${namespace}/${cluster.name}/clusters`, response);
-  //   }
-  //   return response;
-  // }
-
-  // async previewCluster(args) {
-  //   let response;
-  //   const { namespace, cluster } = args;
-  //   if (!namespace || !cluster) {
-  //     throw new Error('Namespace and cluster are required for previewCluster');
-  //   } else {
-  //     response = await this.rcmApiConnector.post(`/cloudconnections/${namespace}/` +
-  //       `${cluster.name}/clusters/manifest`, cluster);
-  //   }
-  //   if (response && this.responseHasError(response)) {
-  //     return
-  //       this.responseForError(`POST ${this.rcmApiConnector.rcmApiEndpoint}/cloudconnections/` +
-  //         `${namespace}/${cluster.name}/clusters/manifest`, response);
-  //   }
-  //   return response;
-  // }
-
-  // async getAutomatedImportStatus(args) {
-  //   let response;
-  //   const { namespace, name } = args;
-
-  //   if (!namespace || !name) {
-  //     throw new Error('namespace and name are required for getAutomatedImportStatus');
-  //   } else {
-  //     response = await this.rcmApiConnector.get(`/clusters/${namespace}/${name}/imports`);
-  //   }
-  //   if (response && this.responseHasError(response)) {
-  // eslint-disable-next-line max-len
-  //     return this.responseForError(`GET ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${name}/imports`, response);
-  //   }
-  //   return response;
-  // }
-
-  async deleteCluster(args) {
-    let response;
-    const { namespace, cluster } = args;
-
-    if (!cluster) {
-      throw new Error('cluster name is required for deleteCluster');
-    } else {
-      response = await this.rcmApiConnector.delete(`/clusters/${namespace}/${cluster}`);
-    }
-    if (response && this.responseHasError(response)) {
-      return this.responseForError(`DELETE ${this.rcmApiConnector.rcmApiEndpoint}/clusters/${namespace}/${cluster}`, response);
-    }
-    return response;
-  }
-
   async getImportYamlTemplate() {
     const response = await this.kubeConnector.get('/api/v1/configmaps?labelSelector=config=cluster-import-config');
     if (response && this.responseHasError(response)) {
@@ -317,7 +175,7 @@ export default class RcmApiModel {
   }
 
   clusterTemplate(config) {
-    const { clusterName, clusterNamespace, clusterLabels: { cloud, vendor } } = config;
+    const { clusterName, clusterNamespace, clusterLabels } = config;
     return {
       apiVersion: 'clusterregistry.k8s.io/v1alpha1',
       kind: 'Cluster',
@@ -326,8 +184,7 @@ export default class RcmApiModel {
         namespace: clusterNamespace,
         labels: {
           name: clusterName,
-          vendor,
-          cloud,
+          ...clusterLabels,
         },
       },
     };

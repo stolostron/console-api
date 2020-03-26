@@ -302,7 +302,7 @@ Object {
     "clusters": Array [
       Object {
         "availableVersions": null,
-        "clusterip": null,
+        "clusterip": "9.42.23.230",
         "desiredVersion": null,
         "distributionVersion": null,
         "metadata": Object {
@@ -320,11 +320,11 @@ Object {
           "namespace": "default",
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
-        "nodes": null,
+        "nodes": 2,
         "status": "pending",
-        "totalCPU": "0",
-        "totalMemory": "0",
-        "totalStorage": "0",
+        "totalCPU": "36",
+        "totalMemory": "21",
+        "totalStorage": "60",
         "upgradeFailed": null,
       },
       Object {

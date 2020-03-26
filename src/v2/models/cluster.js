@@ -10,6 +10,14 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
+export const HIVE_DOMAIN = 'hive.openshift.io';
+export const UNINSTALL_LABEL = `${HIVE_DOMAIN}/uninstall`;
+export const INSTALL_LABEL = `${HIVE_DOMAIN}/install`;
+export const CLUSTER_LABEL = `${HIVE_DOMAIN}/cluster-deployment-name`;
+export const UNINSTALL_LABEL_SELECTOR = cluster => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
+export const INSTALL_LABEL_SELECTOR = cluster => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
+
+
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
   return (usage.substring(0, usage.length - 2) / capacity.substring(0, capacity.length - 2)) * 100;
@@ -19,11 +27,40 @@ function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
 }
 
-function getStatus(cluster) {
-  // Empty status indicates cluster has not been imported
-  // status with conditions[0].type === '' indicates cluster is offline
-  const status = _.get(cluster, 'status.conditions[0].type', 'pending');
-  return status === '' ? 'offline' : status.toLowerCase();
+function getStatus(cluster, clusterdeployment, uninstall, install) {
+  let clusterdeploymentStatus = '';
+  if (clusterdeployment && _.get(clusterdeployment, 'kind') === 'ClusterDeployment') {
+    if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active === 1)) {
+      clusterdeploymentStatus = 'destroying';
+    } else if (install && install.items && install.items.some(i => i.status.active === 1)) {
+      clusterdeploymentStatus = 'creating';
+    } else {
+      const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
+      const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
+      clusterdeploymentStatus = conditionIndex >= 0 && conditions[conditionIndex].status === 'True' ?
+        'detached' : 'unknown';
+    }
+  }
+
+  if (cluster && (!_.has(cluster, 'kind') || _.get(cluster, 'kind') === 'Cluster')) {
+    if (_.get(cluster, 'metadata.deletionTimestamp')) {
+      return 'detaching';
+    }
+    // Empty status indicates cluster has not been imported
+    // status with conditions[0].type === '' indicates cluster is offline
+    const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pending');
+    const status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
+
+    // If cluster is pending import because Hive is installing or uninstalling,
+    // show that status instead
+    if (status === 'pending' &&
+      clusterdeploymentStatus &&
+      clusterdeploymentStatus !== 'detached') {
+      return clusterdeploymentStatus;
+    }
+    return status;
+  }
+  return clusterdeploymentStatus;
 }
 
 function responseHasError(response) {
@@ -33,13 +70,21 @@ function responseHasError(response) {
 
 
 async function getClusterResources(kube) {
-  // Try cluster scope query, falling back to per-namespace
-  const allClusters = await kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters');
-  const clusters = allClusters.items ? allClusters.items : await kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`);
+  const [clusters, clusterdeployments] = await Promise.all([
+    // Try cluster scope queries, falling back to per-namespace
+    kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters')
+      .then(allClusters => (allClusters.items ?
+        allClusters.items
+        : kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`))),
+    kube.get('/apis/hive.openshift.io/v1/clusterdeployments')
+      .then(allClusterDeployments => (allClusterDeployments.items ?
+        allClusterDeployments.items
+        : kube.getResources(ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`))),
+  ]);
 
-  // For clusterstatuses, query only namespaces that have clusters
   // For clusterversions, query only clusters that are online
-  const names = Array.from(new Set(clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name)));
+  const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
+  // For clusterstatuses, query only namespaces that have clusters
   const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
   const [clusterstatuses, ...clusterversions] = await Promise.all([
     kube.getResources(
@@ -48,20 +93,22 @@ async function getClusterResources(kube) {
     ),
     ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
   ]);
-  return [clusters, clusterstatuses, clusterversions];
+  return [clusters, clusterstatuses, clusterdeployments, clusterversions];
 }
 
-function getUniqueClusterName(cluster) {
-  const clusterName = _.get(cluster, 'metadata.name', 'noClusterName');
-  const clusterNamespace = _.get(cluster, 'metadata.namespace', 'noClusterNamespace');
-  return `${clusterName}_${clusterNamespace}`;
+function getUniqueResourceName(resource) {
+  const name = _.get(resource, 'metadata.name', 'noClusterName');
+  const namespace = _.get(resource, 'metadata.namespace', 'noClusterNamespace');
+  return `${name}_${namespace}`;
 }
 
-function mapClusters(clusters) {
+function mapResources(resource, kind = 'Cluster') {
   const resultMap = new Map();
-  clusters.forEach((cluster) => {
-    const uniqueClusterName = getUniqueClusterName(cluster);
-    resultMap.set(uniqueClusterName, { metadata: cluster.metadata, raw: cluster });
+  resource.forEach((r) => {
+    if (r.metadata && (!r.kind || r.kind === kind)) {
+      const key = getUniqueResourceName(r);
+      resultMap.set(key, { metadata: r.metadata, raw: r });
+    }
   });
   return resultMap;
 }
@@ -77,37 +124,48 @@ function mapClusterVersions(rawClusterversions) {
   return clusterversions;
 }
 
-function findMatchedStatus(clusters, clusterstatuses, rawClusterversions) {
-  const resultMap = mapClusters(clusters);
-  const clusterversions = mapClusterVersions(rawClusterversions);
-  clusterstatuses.forEach((clusterstatus) => {
-    const uniqueClusterName = getUniqueClusterName(clusterstatus);
-    if (resultMap.has(uniqueClusterName)) {
-      const cluster = resultMap.get(uniqueClusterName);
-      const data = {
-        metadata: _.get(cluster, 'metadata'),
-        nodes: _.get(clusterstatus, 'spec.capacity.nodes'),
-        clusterip: _.get(clusterstatus, 'spec.masterAddresses[0].ip'),
-        consoleURL: _.get(clusterstatus, 'spec.consoleURL'),
-        rawStatus: clusterstatus,
-        klusterletVersion: _.get(clusterstatus, 'spec.klusterletVersion', '-'),
-        k8sVersion: _.get(clusterstatus, 'spec.version', '-'),
-        serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
-      };
-      const clusterName = _.get(clusterstatus, 'metadata.name', 'noClusterName');
-      if (_.has(clusterversions, clusterName)) {
-        const clusterversion = _.get(clusterversions, clusterName);
-        const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
-        data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
-        data.desiredVersion = _.get(clusterversion, 'status.desired.version');
-        const versionHistory = _.get(clusterversion, 'status.history', []);
-        const completedVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0] : null;
-        data.distributionVersion = completedVersion ? completedVersion.version : null;
-        const conditions = _.get(clusterversion, 'status.conditions', []);
-        data.upgradeFailed = conditions ? conditions.filter(c => c.type === 'Failing')[0].status === 'True' : false;
-      }
-      resultMap.set(uniqueClusterName, data);
+function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClusterversions) {
+  const resultMap = new Map();
+  const clusterMap = mapResources(clusters);
+  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
+  const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
+  const clusterVersionMap = mapClusterVersions(rawClusterversions);
+
+  const uniqueClusterNames = new Set([...clusterMap.keys(), ...clusterDeploymentMap.keys()]);
+  uniqueClusterNames.forEach((c) => {
+    const cluster = clusterMap.get(c);
+    const clusterstatus = clusterStatusMap.get(c);
+    const clusterdeployment = clusterDeploymentMap.get(c);
+    const metadata = _.has(cluster, 'metadata') ?
+      _.get(cluster, 'metadata') :
+      _.pick(_.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
+    const clusterversion = _.get(clusterVersionMap, metadata.name);
+    const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
+    const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
+    const serverAddress = apiURL || (rawServerAddress ? `https://${rawServerAddress}` : null);
+    const data = {
+      metadata,
+      nodes: _.get(clusterstatus, 'raw.spec.capacity.nodes'),
+      clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
+      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL', _.get(clusterdeployment, 'raw.status.webConsoleURL')),
+      rawStatus: _.get(clusterstatus, 'raw'),
+      klusterletVersion: _.get(clusterstatus, 'raw.spec.klusterletVersion', '-'),
+      k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
+      serverAddress,
+      isHive: !!clusterdeployment,
+      isManaged: !!cluster,
+    };
+    if (clusterversion) {
+      const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
+      data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
+      data.desiredVersion = _.get(clusterversion, 'status.desired.version');
+      const versionHistory = _.get(clusterversion, 'status.history', []);
+      const completedVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0] : null;
+      data.distributionVersion = completedVersion ? completedVersion.version : null;
+      const conditions = _.get(clusterversion, 'status.conditions', []);
+      data.upgradeFailed = conditions ? conditions.filter(cond => cond.type === 'Failing')[0].status === 'True' : false;
     }
+    resultMap.set(c, data);
   });
   return [...resultMap.values()];
 }
@@ -122,9 +180,9 @@ function getClusterDeploymentSecrets(clusterDeployment) {
 
 function findMatchedStatusForOverview(clusters, clusterstatuses) {
   const resultMap = new Map();
-  const clusterstatusResultMap = mapClusters(clusterstatuses);
+  const clusterstatusResultMap = mapResources(clusterstatuses, 'ClusterStatus');
   clusters.forEach((cluster) => {
-    const uniqueClusterName = getUniqueClusterName(cluster);
+    const uniqueClusterName = getUniqueResourceName(cluster);
     const clusterstatus = clusterstatusResultMap.get(uniqueClusterName);
     const data = {
       metadata: cluster.metadata,
@@ -257,7 +315,6 @@ export default class ClusterModel extends KubeModel {
     return undefined;
   }
 
-
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
     const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
@@ -266,16 +323,18 @@ export default class ClusterModel extends KubeModel {
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
-    const [result] = findMatchedStatus([clusters], [clusterstatuses], clusterversions);
+    const [result] =
+      findMatchedStatus([clusters], [clusterstatuses], [clusterdeployments], clusterversions);
     const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployments);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
   }
 
   async getClusters(args = {}) {
-    const [clusters, clusterstatuses, clusterversions] =
+    const [clusters, clusterstatuses, clusterdeployments, clusterversions] =
       await getClusterResources(this.kubeConnector);
-    const results = findMatchedStatus(clusters, clusterstatuses, clusterversions);
+    const results =
+      findMatchedStatus(clusters, clusterstatuses, clusterdeployments, clusterversions);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
@@ -303,17 +362,25 @@ export default class ClusterModel extends KubeModel {
     return parseInt(getPercentage(usage, capacity), 10);
   }
 
-  async getStatus(cluster) {
-    const clusters = await this.kubeConnector.getResources(
-      ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
-      { namespaces: [cluster.metadata.namespace] },
-    );
+  async getStatus(resource) {
+    const { metadata: { name, namespace } } = resource;
+    const [cluster, clusterdeployment] = await Promise.all([
+      this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
+      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
+    ]);
 
-    const resultMap = mapClusters(clusters);
-    const uniqueClusterName = getUniqueClusterName(cluster);
-    const { raw } = resultMap.get(uniqueClusterName);
+    let uninstall;
+    let install;
+    if (clusterdeployment && _.get(clusterdeployment, 'kind') === 'ClusterDeployment') {
+      const [destroys, creates] = await Promise.all([
+        this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
+        this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
+      ]);
+      uninstall = destroys;
+      install = creates;
+    }
 
-    return getStatus(raw);
+    return getStatus(cluster, clusterdeployment, uninstall, install);
   }
 
   async getClusterStatus() {
@@ -336,5 +403,27 @@ export default class ClusterModel extends KubeModel {
 
       return accum;
     }, []);
+  }
+
+  async detachCluster(args) {
+    const { namespace, cluster, destroy = false } = args;
+    const clusterRegistry = `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${cluster}`;
+    const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
+
+    if (clusterRegistry) {
+      const detachResponse = await this.kubeConnector.delete(clusterRegistry);
+      if (!destroy && detachResponse.kind === 'Status') {
+        return detachResponse.code;
+      }
+    }
+
+    if (destroy) {
+      const destroyResponse = await this.kubeConnector.delete(clusterDeployment);
+      if (destroyResponse.kind === 'Status') {
+        return destroyResponse.code;
+      }
+    }
+
+    return 204;
   }
 }
