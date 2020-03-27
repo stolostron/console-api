@@ -270,7 +270,7 @@ export default class ClusterModel extends KubeModel {
         return { errors };
       }
     } else {
-      errors.push({ message: 'Could find any endpoints' });
+      errors.push({ message: 'Cannot find any endpoints' });
       return { errors };
     }
 
