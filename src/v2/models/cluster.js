@@ -42,7 +42,7 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
     }
   }
 
-  if (cluster && _.get(cluster, 'kind') === 'Cluster') {
+  if (cluster && (!_.has(cluster, 'kind') || _.get(cluster, 'kind') === 'Cluster')) {
     if (_.get(cluster, 'metadata.deletionTimestamp')) {
       return 'detaching';
     }
