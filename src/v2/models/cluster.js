@@ -203,6 +203,9 @@ function findMatchedStatusForOverview(clusters, clusterstatuses) {
 export default class ClusterModel extends KubeModel {
   async createCluster(args) {
     let { cluster: resources } = args;
+    const created = [];
+    const updated = [];
+    const errors = [];
 
     // get namespace and filter out any namespace resource
     let namespace;
@@ -223,65 +226,143 @@ export default class ClusterModel extends KubeModel {
     });
 
     // if there's a namespace, try to create it
-    if (namespace) {
-      const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: namespace } });
-      if (responseHasError(namespaceResponse)) {
-        // if namespace already exists, only fail if there's no cluster in it
-        if (namespaceResponse.code === 409) {
-          const existingNamespaceClusters = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments`);
-          if (existingNamespaceClusters.items.length > 0) {
-            return {
-              errors: [{ message: `Create Cluster failed: Namespace "${namespace}" already contains a Cluster resource` }],
-            };
-          }
-        } else {
-          // failed to create the namespace at all
-          return {
-            errors: [{ message: namespaceResponse.message }],
-          };
+    if (!namespace) {
+      errors.push({ message: 'ClusterDeployment must specify a namespace' });
+      return { errors };
+    }
+    const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: namespace } });
+    if (responseHasError(namespaceResponse)) {
+      // if namespace already exists, only fail if there's no cluster in it
+      if (namespaceResponse.code === 409) {
+        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments`);
+        if (existingNamespaceClusters.items.length > 0) {
+          errors.push({ message: `Create Cluster failed: Namespace "${namespace}" already contains a Cluster resource` });
+          return { errors };
         }
+      } else {
+        // failed to create the namespace at all
+        errors.push({ message: namespaceResponse.message });
+        return { errors };
       }
+    }
 
-      // get resource end point for each resource
-      const k8sPaths = await this.kubeConnector.get('/');
-      const requestPaths = await Promise.all(resources.map(async resource =>
-        this.getResourceEndPoint(resource, k8sPaths)));
-      if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
-        if (requestPaths.length > 0) {
-          const resourceIndex = requestPaths.indexOf(undefined);
-          return {
-            errors: [{ message: `Cannot find resource type "${resources[resourceIndex].apiVersion}"` }],
-          };
+    // get resource end point for each resource
+    const k8sPaths = await this.kubeConnector.get('/');
+    const requestPaths = await Promise.all(resources.map(async resource =>
+      this.getResourceEndPoint(resource, k8sPaths)));
+    if (requestPaths.length > 0) {
+      const missingTypes = [];
+      const missingEndPoints = [];
+      requestPaths.forEach((path, index) => {
+        if (path === undefined) {
+          missingTypes.push(`${resources[index].apiVersion}`);
+        } else if (path === null) {
+          missingEndPoints.push(`${resources[index].kind}`);
         }
-        return {
-          errors: [{ message: 'Cannot find resource path' }],
-        };
-      } else if (requestPaths.includes(null)) {
-        return {
-          errors: [{ message: 'Namespace not found in the template' }],
-        };
+      });
+      if (missingTypes.length > 0) {
+        errors.push({ message: `Cannot find resource types: ${missingTypes.join(', ')}` });
       }
+      if (missingEndPoints.length > 0) {
+        errors.push({ message: `Cannot find endpoints: ${missingEndPoints.join(', ')}` });
+      }
+      if (errors.length > 0) {
+        return { errors };
+      }
+    } else {
+      errors.push({ message: 'Could find any endpoints' });
+      return { errors };
+    }
 
-      const result = await Promise.all(resources.map((resource, index) =>
-        this.kubeConnector.post(requestPaths[index], resource)
-          .catch(err => ({
-            status: 'Failure',
-            message: err.message,
-          }))));
+    // try to create all resouces EXCEPT ClusterDeployment
+    // we don't want to create ClusterDeployment until all the other resources successfully created
+    // because we check if the ClusterDeployment exists in this namespace
+    let clusterResource;
+    let clusterRequestPath;
+    resources = resources.filter((resource, index) => {
+      if (resource.kind === 'ClusterDeployment') {
+        clusterResource = resource;
+        ([clusterRequestPath] = requestPaths.splice(index, 1));
+        return false;
+      }
+      return true;
+    });
 
-      const errors = [];
-      result.forEach((item) => {
-        if (item.code >= 400 || item.status === 'Failure' || item.message) {
+    // try to create resources
+    const result = await Promise.all(resources.map((resource, index) =>
+      this.kubeConnector.post(requestPaths[index], resource)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }))));
+    const updates = [];
+    result.filter((item, index) => {
+      if (!responseHasError(item)) {
+        const { kind, metadata = {} } = item;
+        created.push({ name: metadata.name, kind });
+        return false;
+      } else if (item.code === 409) {
+        // filter out "already existing" errors
+        updates.push({
+          requestPath: requestPaths[index],
+          resource: resources[index],
+        });
+        return false;
+      }
+      return true;
+    }).forEach((item) => {
+      if (item.code >= 400 || item.status === 'Failure' || item.message) {
+        errors.push({ message: item.message });
+      }
+    });
+
+    // if the only errors were "already existing", patch those resources
+    if (errors.length === 0 && updates.length > 0) {
+      // get the selfLinks of the existing resources
+      const existing = await Promise.all(updates.map(({ requestPath, resource }) => {
+        const name = _.get(resource, 'metadata.name');
+        return this.kubeConnector.get(`${requestPath}/${name}`);
+      }));
+
+      // then update the resources
+      const replaced = await Promise.all(updates.map(({ resource }, index) => {
+        const selfLink = _.get(existing, `[${index}].metadata.selfLink`);
+        const resourceVersion = _.get(existing, `[${index}].metadata.resourceVersion`);
+        _.set(resource, 'metadata.resourceVersion', resourceVersion);
+        const requestBody = {
+          body: resource,
+        };
+        return this.kubeConnector.put(`${selfLink}`, requestBody);
+      }));
+
+      // report any errors
+      replaced.forEach((item) => {
+        if (!responseHasError(item)) {
+          const { kind, metadata = {} } = item;
+          updated.push({ name: metadata.name, kind });
+        } else if (item.code >= 400 || item.status === 'Failure' || item.message) {
           errors.push({ message: item.message });
         }
       });
-      return {
-        errors,
-        result,
-      };
     }
+
+    // last but not least, if everything else deployed, deploy ClusterDeployment
+    // if that fails--user can press create again and not get a "Already Exists" message
+    if (errors.length === 0) {
+      const deployment = await this.kubeConnector.post(clusterRequestPath, clusterResource)
+        .catch(err => ({
+          status: 'Failure',
+          message: err.message,
+        }));
+      if (deployment.code >= 400 || deployment.status === 'Failure' || deployment.message) {
+        errors.push({ message: deployment.message });
+      }
+    }
+
     return {
-      errors: [{ message: 'Namespace not found in the template' }],
+      errors,
+      updated,
+      created,
     };
   }
 
