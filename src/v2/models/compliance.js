@@ -78,8 +78,6 @@ export default class ComplianceModel {
   }
 
   async getCompliances(name, namespace) {
-    let compliancesAndPolicies = [];
-    const compliances = [];
     let policies = [];
 
     if (!name) {
@@ -98,8 +96,7 @@ export default class ComplianceModel {
         policies.push(policyResponse);
       }
     }
-    compliancesAndPolicies = compliances.concat(policies);
-    return compliancesAndPolicies.map(entry => ({
+    return policies.map(entry => ({
       ...entry,
       raw: entry,
       name: _.get(entry, 'metadata.name', ''),
