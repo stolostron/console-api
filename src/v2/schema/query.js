@@ -46,7 +46,7 @@ type Query {
 
   # List all cloud connections and orchestrations
   connections: [Connection]
-  connectionDetails: [ConnectionDetail]
+  connectionDetails(name: String, namespace: String): [ConnectionDetail]
   orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.

@@ -25,10 +25,10 @@ type ConnectionDetail {
 
 export const resolver = {
   Query: {
-    connections: (parent, args, { connectionModel, req }) =>
-      connectionModel.getConnections({ user: req.user }),
-    connectionDetails: (parent, args, { connectionModel, req }) =>
-      connectionModel.getConnectionDetails({ user: req.user }),
+    connections: (parent, args, { connectionModel }) =>
+      connectionModel.getConnections(),
+    connectionDetails: (parent, args, { connectionModel }) =>
+      connectionModel.getConnectionDetails(args),
   },
   Mutation: {
     createCloudConnection: (parent, args, { connectionModel }) =>
