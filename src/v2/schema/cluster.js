@@ -35,7 +35,15 @@ type Cluster implements K8sObject {
   adminPasswordSecret: String
   installConfigSecret: String
 }
+
+type ClusterImageSet {
+  name: String
+  releaseImage: String
+}
+
+
 `;
+
 
 export const resolver = {
   Query: {
@@ -43,6 +51,8 @@ export const resolver = {
       clusterModel.getSingleCluster({ ...args, user: req.user }),
     clusters: (parent, args, { clusterModel, req }) =>
       clusterModel.getClusters({ ...args, user: req.user }),
+    clusterImageSets: (parent, args, { clusterModel, req }) =>
+      clusterModel.getClusterImageSets({ ...args, user: req.user }),
   },
   Cluster: {
     status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
