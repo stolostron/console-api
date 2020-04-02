@@ -500,4 +500,18 @@ export default class ClusterModel extends KubeModel {
 
     return 204;
   }
+
+  async getClusterImageSets() {
+    const clusterImageSets = {};
+    // global--no namespace
+    const response = await this.kubeConnector.get('/apis/hive.openshift.io/v1/clusterimagesets');
+    response.items.forEach((imageSet) => {
+      const name = _.get(imageSet, 'metadata.name');
+      const releaseImage = _.get(imageSet, 'spec.releaseImage');
+      if (name && releaseImage) {
+        clusterImageSets[releaseImage] = name;
+      }
+    });
+    return Object.entries(clusterImageSets).map(([releaseImage, name]) => ({ releaseImage, name }));
+  }
 }
