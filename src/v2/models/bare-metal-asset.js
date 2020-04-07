@@ -51,7 +51,7 @@ export default class BareMetalAssetModel extends KubeModel {
   async getSingleBareMetalAsset(args = {}) {
     const { name, namespace } = args;
     if (name && namespace) {
-      const bareMetalAsset = await this.kubeConnector.get(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
+      const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
       let secret;
       if (bareMetalAsset.metadata !== undefined) {
         if (bareMetalAsset.spec.bmc && bareMetalAsset.spec.bmc.credentialsName) {
@@ -74,7 +74,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async getAllBareMetalAssets({ fetchSecrets }) {
     const [bareMetalAssets, secrets] = await Promise.all([
-      this.kubeConnector.get('/apis/midas.io/v1alpha1/baremetalassets'),
+      this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets'),
       fetchSecrets ? this.kubeConnector.get('/api/v1/secrets') : Promise.resolve({ items: [] }),
     ]);
     if (bareMetalAssets.items !== undefined) {
@@ -122,7 +122,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async createBMA(namespace, name, address, credentialsName, bootMACAddress) {
     const bma = {
-      apiVersion: 'midas.io/v1alpha1',
+      apiVersion: 'inventory.open-cluster-management.io/v1alpha1',
       kind: 'BareMetalAsset',
       metadata: {
         name,
@@ -135,7 +135,7 @@ export default class BareMetalAssetModel extends KubeModel {
         bootMACAddress,
       },
     };
-    return this.kubeConnector.post(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets`, bma);
+    return this.kubeConnector.post(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets`, bma);
   }
 
   async patchSecret(namespace, secretName, username, password) {
@@ -161,7 +161,7 @@ export default class BareMetalAssetModel extends KubeModel {
           op: 'replace',
           path: '/metadata/ownerReferences',
           value: [{
-            apiVersion: 'midas.io/v1alpha1',
+            apiVersion: 'inventory.open-cluster-management.io/v1alpha1',
             kind: 'BareMetalAsset',
             name: ownerName,
             uid: ownerUID,
@@ -189,7 +189,7 @@ export default class BareMetalAssetModel extends KubeModel {
         },
       ],
     };
-    return this.kubeConnector.patch(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+    return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
   }
 
   async createBareMetalAsset(args) {
@@ -237,7 +237,7 @@ export default class BareMetalAssetModel extends KubeModel {
       namespace, name, bmcAddress, username, password, bootMac,
     } = args;
 
-    const bareMetalAsset = await this.kubeConnector.get(`/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
+    const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
     if (bareMetalAsset.metadata !== undefined) {
       let secretResult;
       let patchedSecretResult;
@@ -308,7 +308,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
       const requests = bmas.map((bma) => {
         const { namespace, name } = bma;
-        return `/apis/midas.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+        return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
       });
 
       const errors = [];
