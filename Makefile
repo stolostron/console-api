@@ -42,7 +42,7 @@ endif
 
 .PHONY: copyright-check
 copyright-check:
-	#./copyright-check.sh
+	./copyright-check.sh $(TRAVIS_BRANCH)
 
 lint:
 	npm run lint
