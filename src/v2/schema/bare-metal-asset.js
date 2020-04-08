@@ -1,7 +1,7 @@
 
 /** *****************************************************************************
  * Licensed Materials - Property of Red Hat, Inc.
- * (c) Copyright Red Hat, Inc. All Rights Reserved.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 export const typeDef = `
 type BmcType {
