@@ -138,7 +138,7 @@ export default class ApplicationModel extends KubeModel {
           }));
       }
 
-      return this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${appKinds[resource.kind]}`, resource)
+      return this.kubeConnector.post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/${appKinds[resource.kind]}`, resource)
         .catch(err => ({
           status: 'Failure',
           message: err.message,
@@ -212,9 +212,9 @@ export default class ApplicationModel extends KubeModel {
       // get subscriptions to channels (pipelines)
       let arr = null;
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]') ||
-        _.get(app, 'metadata.annotations["apps.ibm.com/subscriptions"]');
+        _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]');
       let deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ||
-        _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]');
+        _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
         const allSubscriptions =
@@ -409,15 +409,15 @@ export default class ApplicationModel extends KubeModel {
     }
     return apps.filter(app => app.metadata)
       .map(async (app) => {
-        const deployableNames = _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/deployables"]').split(',') : [];
-        const placementBindingNames = _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/placementbindings"]').split(',') : [];
-        const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+        const deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]').split(',') : [];
+        const placementBindingNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]').split(',') : [];
+        const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
         const placementPolicyNames =
           placementPolicyItems.map(pp => pp.placementRef && pp.placementRef.name);
         return {
-          applicationRelationshipNames: _.get(app, 'metadata.annotations["apps.ibm.com/applicationrelationships"]') ? _.get(app, 'metadata.annotations["apps.ibm.com/applicationrelationships"]').split(',') : [],
+          applicationRelationshipNames: _.get(app, 'metadata.annotations["apps.open-cluster-management.io/applicationrelationships"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/applicationrelationships"]').split(',') : [],
           applicationWorkNames: app.metadata.name || '',
-          dashboard: _.get(app, 'metadata.annotations["apps.ibm.com/dashboard"]') || '',
+          dashboard: _.get(app, 'metadata.annotations["apps.open-cluster-management.io/dashboard"]') || '',
           deployableNames,
           placementBindingNames,
           placementPolicyNames: placementPolicyNames || [],
@@ -450,7 +450,7 @@ export default class ApplicationModel extends KubeModel {
     const { matchNames } = selector;
 
     const response = await this.kubeConnector.getResources(
-      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/deployables`,
+      ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
       { kind: 'Deployable' },
     );
     const deployables = matchNames ? filterByName(matchNames, response) : response;
