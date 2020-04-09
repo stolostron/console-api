@@ -33,7 +33,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
+      "pre-commit": "make copyright-check && lint-staged",
       "pre-push": "npm run test -- -o"
     }
   },
