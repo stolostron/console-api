@@ -100,4 +100,22 @@ export default class SubscriptionModel extends KubeModel {
       raw: subscription,
     }));
   }
+
+  async getSubscriptionsForCluster(clusterName) {
+    const chs = await this.kubeConnector.getResources(ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions`);
+    return chs.filter(subscription => clusterName in subscription.status.statuses)
+      .map(subscription => ({
+        metadata: subscription.metadata,
+        subscriptionWorkNames: subscription.metadata.name || '',
+        namespace: subscription.metadata.namespace,
+        sourceNamespace: subscription.spec.sourceNamespace,
+        source: subscription.spec.source,
+        channel: subscription.spec.channel,
+        package: subscription.spec.package,
+        packageFilter: subscription.spec.packageFilter,
+        packageOverrides: subscription.spec.packageOverrides,
+        placement: subscription.spec.placement,
+        raw: subscription,
+      }));
+  }
 }

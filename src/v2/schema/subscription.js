@@ -33,6 +33,7 @@ type Subscription implements K8sObject {
 export const resolver = {
   Query: {
     subscriptions: (root, args, { subscriptionModel }) => subscriptionModel.getSubscriptions(args.name, args.namespace),
+    subscriptionsForCluster: (root, args, { subscriptionModel }) => subscriptionModel.getSubscriptionsForCluster(args.clusterName),
   },
   Mutation: {
     createSubscription: (root, args, { subscriptionModel }) => subscriptionModel.createSubscription(args.resources),

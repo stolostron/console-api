@@ -361,7 +361,9 @@ export default class ComplianceModel {
       if (results) {
         const item = _.get(results, `${clusterName}`, {});
         if (item) {
-          return [{ ...item, cluster: clusterName, raw: item }];
+          const result = [];
+          item.items.forEach(policy => result.push({ ...policy, raw: policy }));
+          return result;
         }
       }
     }
@@ -486,26 +488,20 @@ export default class ComplianceModel {
   static resolvePolicyViolations(parent, cluster) {
     const violationArray = [];
     getTemplates(parent).forEach((res) => {
-      const templateCondition = _.get(res, 'status.conditions[0]');
-      if (_.get(res, 'templateType') === 'role-templates') {
-        violationArray.push({
-          name: _.get(res, 'metadata.name', '-'),
-          cluster: _.get(cluster, 'clustername', '-'),
-          status: this.resolvePolicyStatus(res),
-          message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
-          reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
-          selector: _.get(res, 'selector', ''),
-        });
-      } else if (_.get(res, 'templateType') === 'object-templates') {
-        violationArray.push({
-          name: _.get(res, 'objectDefinition.metadata.name', '-'),
-          cluster: _.get(cluster, 'clustername', '-'),
-          status: this.resolvePolicyStatus(res),
-          message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
-          reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
-          selector: _.get(res, 'selector', ''),
-        });
-      }
+      _.get(res, 'status.conditions').forEach((templateCondition) => {
+        if (_.get(templateCondition, 'type').toLowerCase() === 'violation') {
+          violationArray.push({
+            name: ['object-templates', 'policy-templates'].includes(_.get(res, 'templateType'))
+              ? _.get(res, 'objectDefinition.metadata.name', '-')
+              : _.get(res, 'metadata.name', '-'),
+            cluster: _.get(cluster, 'clustername', '-'),
+            status: this.resolvePolicyStatus(res),
+            message: (templateCondition && _.get(templateCondition, 'message', '-')) || '-',
+            reason: (templateCondition && _.get(templateCondition, 'reason', '-')) || '-',
+            selector: _.get(res, 'selector', ''),
+          });
+        }
+      });
     });
     return violationArray;
   }
