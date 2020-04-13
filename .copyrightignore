@@ -7,3 +7,5 @@
 operator-sdk/*
 build-harness/*
 build-harness-extensions/*
+node_modules/*
+test-output/*
