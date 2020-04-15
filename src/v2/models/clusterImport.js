@@ -86,7 +86,7 @@ export default class ClusterImportModel {
     }
 
     const endpointTemplate = this.endpointConfigTemplate(config);
-    const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
+    const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
     if (this.responseHasError(endpointConfigResponse)) {
       return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
     }
@@ -97,7 +97,7 @@ export default class ClusterImportModel {
       if (clusterResponse.code === 409) return clusterResponse;
 
       // Delete the endpointconfig so the user can try again
-      await this.kubeConnector.delete(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs/${clusterName}`);
+      await this.kubeConnector.delete(`/apis/multicloud.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/endpointconfigs/${clusterName}`);
       return this.responseForError('Create Cluster resource failed', clusterResponse);
     }
 
@@ -155,7 +155,7 @@ export default class ClusterImportModel {
     });
 
     return {
-      apiVersion: 'multicloud.ibm.com/v1alpha1',
+      apiVersion: 'multicloud.open-cluster-management.io/v1beta1',
       kind: 'EndpointConfig',
       metadata: {
         name: clusterName,

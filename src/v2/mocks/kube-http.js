@@ -88,7 +88,7 @@ export default function createMockHttp() {
           return state.connectionApi.createCloudConnectionError;
         case params.url.includes('/api/v1/namespaces') && _.get(params.json, 'metadata.name') === 'foo':
           return state.clusterImport.getNamespaceCreationResponse;
-        case params.url.includes('/apis/multicloud.ibm.com/v1alpha1/namespaces/foo/endpointconfigs'):
+        case params.url.includes('/apis/multicloud.open-cluster-management.io/v1beta1/namespaces/foo/endpointconfigs'):
           return state.clusterImport.getEndpointConfigsResponse;
         case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
           return state.clusterImport.getClusterResponse;
