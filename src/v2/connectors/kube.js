@@ -21,6 +21,13 @@ function selectNamespace(namespaces) {
   return namespaces.find(ns => ns === 'default') || namespaces[0];
 }
 
+function checkPath(path) {
+  if (!path.startsWith('/')) {
+    throw new Error('OCM ERROR: invalid path');
+  }
+  return path;
+}
+
 export default class KubeConnector {
   constructor({
     cache = lru(),
@@ -53,7 +60,7 @@ export default class KubeConnector {
    */
   get(path = '', opts = {}, noCache) {
     const options = _.merge({
-      url: `${this.kubeApiEndpoint}${path}`,
+      url: `${this.kubeApiEndpoint}${checkPath(path)}`,
       method: 'GET',
       headers: {
         Authorization: this.token,
@@ -125,7 +132,7 @@ export default class KubeConnector {
 
   post(path, jsonBody, opts = {}) {
     const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
+      url: `${this.kubeApiEndpoint}${checkPath(path)}`,
       method: 'POST',
       headers: {
         Authorization: this.token,
@@ -138,7 +145,7 @@ export default class KubeConnector {
 
   delete(path, jsonBody, opts = {}) {
     const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
+      url: `${this.kubeApiEndpoint}${checkPath(path)}`,
       method: 'DELETE',
       headers: {
         Authorization: this.token,
@@ -150,7 +157,7 @@ export default class KubeConnector {
 
   patch(path = '', opts = {}) {
     const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
+      url: `${this.kubeApiEndpoint}${checkPath(path)}`,
       method: 'PATCH',
       headers: {
         Authorization: this.token,
@@ -163,7 +170,7 @@ export default class KubeConnector {
 
   put(path = '', opts = {}) {
     const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
+      url: `${this.kubeApiEndpoint}${checkPath(path)}`,
       method: 'PUT',
       headers: {
         Authorization: this.token,
