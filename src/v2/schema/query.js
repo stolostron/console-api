@@ -37,7 +37,7 @@ type Query {
   node(namespace: String, name: String): [Node]
 
   # Get Compliance/Policy info
-  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
+  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from OCM. Use policies instead.")
 
   # Security findings
   occurrences: [Occurrence]

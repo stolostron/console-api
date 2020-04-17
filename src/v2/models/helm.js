@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import _ from 'lodash';
@@ -84,7 +85,7 @@ export default class HelmModel extends KubeModel {
 
       const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${workNamespace}/works`, jsonBody);
       if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
         return [{
           code: response.code,
           message: response.message,
@@ -103,7 +104,7 @@ export default class HelmModel extends KubeModel {
   async getCharts() {
     const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
     if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     const charts = [];
@@ -127,7 +128,7 @@ export default class HelmModel extends KubeModel {
   async getRepos() {
     const response = await this.kubeConnector.get('/apis/mcm.ibm.com/v1alpha1/helmrepos');
     if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     return response.items.map(cluster => ({
@@ -149,7 +150,7 @@ export default class HelmModel extends KubeModel {
     };
     const response = await this.kubeConnector.post('/apis/mcm.ibm.com/v1alpha1/namespaces/default/helmrepos', jsonBody);
     if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [];
     }
     return {

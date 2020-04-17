@@ -99,12 +99,12 @@ export default class KubeConnector {
       try {
         response = await this.get(urlTemplate(ns));
       } catch (err) {
-        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        logger.error(`OCM REQUEST ERROR - ${err.message}`);
         return [];
       }
 
       if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
 
@@ -117,7 +117,7 @@ export default class KubeConnector {
         }
       });
       if (strs.length > 0) {
-        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        logger.error(`OCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
         return [];
       }
 
@@ -312,12 +312,12 @@ export default class KubeConnector {
       try {
         response = await this.get(urlTemplate);
       } catch (err) {
-        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        logger.error(`OCM REQUEST ERROR - ${err.message}`);
         return [];
       }
 
       if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
 
@@ -330,7 +330,7 @@ export default class KubeConnector {
         }
       });
       if (strs.length > 0) {
-        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        logger.error(`OCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
         return [];
       }
 

@@ -155,7 +155,7 @@ export default class GenericModel extends KubeModel {
           resourceName = 'clusters';
           break;
         default:
-          throw new Error('MCM ERROR cannot find matched resource type');
+          throw new Error('OCM ERROR cannot find matched resource type');
       }
       response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1alpha1/namespaces/${namespace}/${resourceName}/${name}`, requestBody);
     } else {
@@ -204,7 +204,7 @@ export default class GenericModel extends KubeModel {
           resourceName = 'compliances';
           break;
         default:
-          throw new Error('MCM ERROR cannot find matched resource type');
+          throw new Error('OCM ERROR cannot find matched resource type');
       }
       response = await this.kubeConnector.put(`/apis/${endpointURL}/v1alpha1/namespaces/${namespace}/${resourceName}/${name}`, requestBody);
     } else {
@@ -354,7 +354,7 @@ export default class GenericModel extends KubeModel {
     };
     const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
     if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
         code: response.code,
         message: response.message,
@@ -388,7 +388,7 @@ export default class GenericModel extends KubeModel {
     if (childResources) {
       const errors = this.deleteChildResource(childResources);
       if (errors && errors.length > 0) {
-        throw new Error(`MCM ERROR: Unable to delete child resource(s) - ${JSON.stringify(errors)}`);
+        throw new Error(`OCM ERROR: Unable to delete child resource(s) - ${JSON.stringify(errors)}`);
       }
     }
 
@@ -436,7 +436,7 @@ export default class GenericModel extends KubeModel {
 
     const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
     if (response.code || response.message) {
-      logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+      logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
         code: response.code,
         message: response.message,
