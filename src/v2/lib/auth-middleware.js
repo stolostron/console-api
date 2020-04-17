@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import _ from 'lodash';
@@ -97,17 +98,6 @@ async function getNamespaces(usertoken) {
   }
   return request(options);
 }
-
-// async function getAccountData({ iamToken, user }) {
-//   const options = { iamToken };
-//   if (process.env.NODE_ENV === 'test') {
-//     options.httpLib = createMockIAMHTTP();
-//   }
-
-//   const idConnector = new IDConnector(options);
-
-//   return idConnector.get(`/identity/api/v1/users/${user}`);
-// }
 
 export default function createAuthMiddleWare({
   cache = lru({

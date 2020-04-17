@@ -42,9 +42,6 @@ type Query {
   # Security findings
   occurrences: [Occurrence]
 
-  # Get Cluster incidents.
-  incidents(accountId: String, cluster: String): [cemIncident]
-
   # List all cloud connections and orchestrations
   connections: [Connection]
   connectionDetails(name: String, namespace: String): [ConnectionDetail]
@@ -77,12 +74,6 @@ type Query {
 
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
-
-  # Get cloud event manager queries .
-  cemIncidents: [cemIncident]
-
-  # Get cloud event manager queries .
-  cemIncidentsForApplication(name: String!, namespace: String): [cemIncident]
 
   # Get cloud event manager queries .
   applicationNamespaces(namespace: String): [ApplicationNamespace]

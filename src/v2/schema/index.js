@@ -33,7 +33,6 @@ import * as releases from './helmrels';
 import * as repo from './helmrepo';
 import * as topology from './topology';
 import * as userAccess from './user-access';
-import * as cemIncident from './cem-incident';
 import * as clusterImport from './clusterImport';
 import * as connection from './connection';
 import * as bmAsset from './bare-metal-asset';
@@ -61,7 +60,6 @@ const modules = [
   repo,
   topology,
   userAccess,
-  cemIncident,
   clusterImport,
   connection,
   bmAsset,

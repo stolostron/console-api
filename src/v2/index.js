@@ -5,9 +5,8 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
-
-// Copyright (c) 2020 Red Hat, Inc.
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { isInstance as isApolloErrorInstance, formatError as formatApolloError } from 'apollo-errors';
@@ -29,7 +28,6 @@ import SubscriptionModel from './models/subscription';
 import PlacementRuleModel from './models/placementrule';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
-import CemModel from './models/cemincident';
 import ComplianceModel from './models/compliance';
 import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
@@ -119,7 +117,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     placementRuleModel: new PlacementRuleModel({ kubeConnector }),
     clusterModel: new ClusterModel({ kubeConnector }),
     genericModel: new GenericModel({ kubeConnector }),
-    cemModel: new CemModel({ kubeConnector, req }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
