@@ -3,21 +3,7 @@
 exports[`Occurrences Resolver Correctly Resolves Occurrences Query 1`] = `
 Object {
   "data": Object {
-    "occurrences": null,
+    "occurrences": Array [],
   },
-  "errors": Array [
-    Object {
-      "locations": Array [
-        Object {
-          "column": 11,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'errors' of undefined",
-      "path": Array [
-        "occurrences",
-      ],
-    },
-  ],
 }
 `;

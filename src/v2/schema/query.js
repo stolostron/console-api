@@ -37,13 +37,10 @@ type Query {
   node(namespace: String, name: String): [Node]
 
   # Get Compliance/Policy info
-  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
+  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from OCM. Use policies instead.")
 
   # Security findings
   occurrences: [Occurrence]
-
-  # Get Cluster incidents.
-  incidents(accountId: String, cluster: String): [cemIncident]
 
   # List all cloud connections and orchestrations
   connections: [Connection]
@@ -77,12 +74,6 @@ type Query {
 
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String): JSON
-
-  # Get cloud event manager queries .
-  cemIncidents: [cemIncident]
-
-  # Get cloud event manager queries .
-  cemIncidentsForApplication(name: String!, namespace: String): [cemIncident]
 
   # Get cloud event manager queries .
   applicationNamespaces(namespace: String): [ApplicationNamespace]

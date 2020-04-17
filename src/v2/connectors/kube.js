@@ -9,7 +9,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import lru from 'lru-cache';
 import uuid from 'uuid';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
@@ -23,7 +22,6 @@ function selectNamespace(namespaces) {
 
 export default class KubeConnector {
   constructor({
-    cache = lru(),
     token = 'Bearer localdev',
     httpLib = requestLib,
     kubeApiEndpoint = process.env.API_SERVER_URL || 'https://kubernetes.default.svc',
@@ -32,8 +30,6 @@ export default class KubeConnector {
     pollInterval = config.get('hcmPollInterval'),
     uid = uuid,
   } = {}) {
-    // Caches requests for a single query.
-    this.cache = cache;
     this.http = httpLib;
     this.kubeApiEndpoint = kubeApiEndpoint;
     this.namespaces = namespaces;
@@ -45,36 +41,79 @@ export default class KubeConnector {
   }
 
   /**
+   * Helper to check the request is against kubeApiEndpoint
+   *
+   * @param {*} url - Request url
+   */
+  checkUrl(url) {
+    if (!url.startsWith(`${this.kubeApiEndpoint}/`)) {
+      throw new Error(`OCM ERROR: invalid url: ${url}`);
+    }
+    return url;
+  }
+
+  /**
+   * Helper to construct defaults for API request
+   *
+   * @param {*} method - the HTTP method
+   * @param {*} path - the request path
+   * @param {*} extra - an object with extra properties to be included
+   * @param {*} headers - an object with additional headers
+   */
+  getDefaults(method, path, extra = {}, headers = {}) {
+    return {
+      url: `${this.kubeApiEndpoint}${path}`,
+      method,
+      headers: {
+        Authorization: this.token,
+        ...headers,
+      },
+      ...extra,
+    };
+  }
+
+  /**
+   * Execute Kube API HTTP requests.
+   *
+   * @param {*} defaults
+   * @param {*} opts
+   */
+  doRequest(defaults, opts) {
+    const options = _.merge(defaults, opts);
+    this.checkUrl(options.url);
+    return this.http(options).then(res => res.body);
+  }
+
+  /**
    * Excecute Kube API GET requests.
    *
    * @param {*} path - API path
    * @param {*} opts - HTTP request options
-   * @param {*} noCache - Don't use a previously cached request.
    */
-  get(path = '', opts = {}, noCache) {
-    const options = _.merge({
-      url: `${this.kubeApiEndpoint}${path}`,
-      method: 'GET',
-      headers: {
-        Authorization: this.token,
-      },
-    }, opts);
+  get(path = '', opts = {}) {
+    return this.doRequest(this.getDefaults('GET', path), opts);
+  }
 
-    const cacheKey = `${path}/${JSON.stringify(options.body)}`;
+  post(path, jsonBody, opts = {}) {
+    return this.doRequest(this.getDefaults('POST', path, { json: jsonBody }), opts);
+  }
 
-    const cachedRequest = this.cache.get(cacheKey);
-    if ((noCache === undefined || noCache === false) && cachedRequest) {
-      logger.debug('Kubeconnector: Using cached GET request.');
-      return cachedRequest;
-    }
+  delete(path, jsonBody, opts = {}) {
+    return this.doRequest(this.getDefaults('DELETE', path, { json: jsonBody }), opts);
+  }
 
-    const newRequest = this.http(options).then(res => res.body);
+  patch(path = '', opts = {}) {
+    const headers = {
+      'Content-Type': 'application/json-patch+json',
+    };
+    return this.doRequest(this.getDefaults('PATCH', path, {}, headers), opts);
+  }
 
-    if (noCache === undefined || noCache === false) {
-      this.cache.set(cacheKey, newRequest);
-    }
-
-    return newRequest;
+  put(path = '', opts = {}) {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    return this.doRequest(this.getDefaults('PUT', path, {}, headers), opts);
   }
 
   /**
@@ -92,12 +131,12 @@ export default class KubeConnector {
       try {
         response = await this.get(urlTemplate(ns));
       } catch (err) {
-        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        logger.error(`OCM REQUEST ERROR - ${err.message}`);
         return [];
       }
 
       if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
 
@@ -110,7 +149,7 @@ export default class KubeConnector {
         }
       });
       if (strs.length > 0) {
-        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        logger.error(`OCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
         return [];
       }
 
@@ -121,57 +160,6 @@ export default class KubeConnector {
     });
 
     return _.flatten(await Promise.all(requests));
-  }
-
-  post(path, jsonBody, opts = {}) {
-    const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
-      method: 'POST',
-      headers: {
-        Authorization: this.token,
-      },
-      json: jsonBody,
-    };
-
-    return this.http(_.merge(defaults, opts)).then(res => res.body);
-  }
-
-  delete(path, jsonBody, opts = {}) {
-    const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
-      method: 'DELETE',
-      headers: {
-        Authorization: this.token,
-      },
-      json: jsonBody,
-    };
-    return this.http(_.merge(defaults, opts)).then(res => res.body);
-  }
-
-  patch(path = '', opts = {}) {
-    const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
-      method: 'PATCH',
-      headers: {
-        Authorization: this.token,
-        'Content-Type': 'application/json-patch+json',
-      },
-    };
-    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
-    return newRequest;
-  }
-
-  put(path = '', opts = {}) {
-    const defaults = {
-      url: `${this.kubeApiEndpoint}${path}`,
-      method: 'PUT',
-      headers: {
-        Authorization: this.token,
-        'Content-Type': 'application/json',
-      },
-    };
-    const newRequest = this.http(_.merge(defaults, opts)).then(res => res.body);
-    return newRequest;
   }
 
   /* eslint-disable max-len */
@@ -305,12 +293,12 @@ export default class KubeConnector {
       try {
         response = await this.get(urlTemplate);
       } catch (err) {
-        logger.error(`MCM REQUEST ERROR - ${err.message}`);
+        logger.error(`OCM REQUEST ERROR - ${err.message}`);
         return [];
       }
 
       if (response.code || response.message) {
-        logger.error(`MCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
         return [];
       }
 
@@ -323,7 +311,7 @@ export default class KubeConnector {
         }
       });
       if (strs.length > 0) {
-        logger.error(`MCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        logger.error(`OCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
         return [];
       }
 

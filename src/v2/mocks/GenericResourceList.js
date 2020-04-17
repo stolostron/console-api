@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 
@@ -401,7 +402,7 @@ export const updateResourceLocalMock = {
 export const mockedUpdateWorkResponse = {
   body: {
     metadata: {
-      selfLink: 'test-path-to-update-work',
+      selfLink: '/path/to/resourceview/test-path-to-update-work',
     },
   },
 };
