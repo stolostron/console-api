@@ -212,9 +212,9 @@ export default class ApplicationModel extends KubeModel {
       // get subscriptions to channels (pipelines)
       let arr = null;
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]') ||
-        _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]');
+        _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]');
       let deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ||
-        _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]');
+        _.get(app, 'metadata.annotations["app.ibm.com/subscriptions/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
         const allSubscriptions =
@@ -409,9 +409,11 @@ export default class ApplicationModel extends KubeModel {
     }
     return apps.filter(app => app.metadata)
       .map(async (app) => {
-        const deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]').split(',') : [];
-        const placementBindingNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]').split(',') : [];
-        const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+        const deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ?
+          _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]').split(',') : [];
+        const placementBindingNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]') ?
+          _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]').split(',') : [];
+        const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
         const placementPolicyNames =
           placementPolicyItems.map(pp => pp.placementRef && pp.placementRef.name);
         return {

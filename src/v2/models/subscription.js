@@ -11,6 +11,21 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
+
+const mapSubscription = subscription => ({
+  metadata: subscription.metadata,
+  subscriptionWorkNames: subscription.metadata.name || '',
+  namespace: subscription.metadata.namespace,
+  sourceNamespace: subscription.spec.sourceNamespace,
+  source: subscription.spec.source,
+  channel: subscription.spec.channel,
+  package: subscription.spec.package,
+  packageFilter: subscription.spec.packageFilter,
+  packageOverrides: subscription.spec.packageOverrides,
+  placement: subscription.spec.placement,
+  raw: subscription,
+});
+
 export default class SubscriptionModel extends KubeModel {
   async createSubscription(resources) {
     const subscriptionKinds = {
@@ -86,19 +101,7 @@ export default class SubscriptionModel extends KubeModel {
     } else {
       chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
     }
-    return chs.map(async subscription => ({
-      metadata: subscription.metadata,
-      subscriptionWorkNames: subscription.metadata.name || '',
-      namespace: subscription.metadata.namespace,
-      sourceNamespace: subscription.spec.sourceNamespace,
-      source: subscription.spec.source,
-      channel: subscription.spec.channel,
-      package: subscription.spec.package,
-      packageFilter: subscription.spec.packageFilter,
-      packageOverrides: subscription.spec.packageOverrides,
-      placement: subscription.spec.placement,
-      raw: subscription,
-    }));
+    return chs.map(mapSubscription);
   }
 
   async getSubscriptionsForCluster(clusterName, clusterNamespace) {
@@ -114,18 +117,6 @@ export default class SubscriptionModel extends KubeModel {
           _.get(deployable, 'metadata.annotations["apps.open-cluster-management.io/managed-cluster"]') === `${clusterNamespace}/${clusterName}` &&
           _.get(deployable, 'spec.template.metadata.annotations["apps.open-cluster-management.io/hosting-subscription"]') ===
             `${subscription.metadata.namespace}/${subscription.metadata.name}`))
-      .map(subscription => ({
-        metadata: subscription.metadata,
-        subscriptionWorkNames: subscription.metadata.name || '',
-        namespace: subscription.metadata.namespace,
-        sourceNamespace: subscription.spec.sourceNamespace,
-        source: subscription.spec.source,
-        channel: subscription.spec.channel,
-        package: subscription.spec.package,
-        packageFilter: subscription.spec.packageFilter,
-        packageOverrides: subscription.spec.packageOverrides,
-        placement: subscription.spec.placement,
-        raw: subscription,
-      }));
+      .map(mapSubscription);
   }
 }
