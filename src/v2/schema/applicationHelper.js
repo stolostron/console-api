@@ -1,7 +1,7 @@
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
- * (c) Copyright IBM Corporation 2019. All Rights Reserved.
- *
+ * (c) Copyright IBM Corporation 2019, 2020. All Rights Reserved.
+ * Copyright (c) 2020 Red Hat, Inc.
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
@@ -145,7 +145,7 @@ function addSubscriptionDeployable(
   });
 
   // if deployment, show pod--unless deployable failed to deploy deployment
-  if (kind === 'deployment' && !failed) {
+  if ((kind === 'deployment' || kind === 'deploymentconfig' || kind === 'route')&& !failed) {
     const podId = `member--pod--${deployableId}--${k8Name}`;
     nodes.push({
       name: k8Name,
