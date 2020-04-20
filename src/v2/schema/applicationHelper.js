@@ -145,7 +145,7 @@ function addSubscriptionDeployable(
   });
 
   // if deployment, show pod--unless deployable failed to deploy deployment
-  if ((kind === 'deployment' || kind === 'deploymentconfig' || kind === 'route')&& !failed) {
+  if ((kind === 'deployment' || kind === 'deploymentconfig' || kind === 'route') && !failed) {
     const podId = `member--pod--${deployableId}--${k8Name}`;
     nodes.push({
       name: k8Name,
