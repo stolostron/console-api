@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const mockAppsResponse = {
@@ -34,10 +35,10 @@ export const mockAppsResponse = {
           annotations: {
             'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
             'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
-            'apps.ibm.com/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
-            'apps.ibm.com/dashboard': 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-            'apps.ibm.com/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
-            'apps.ibm.com/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
+            'apps.open-cluster-management.io/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+            'apps.open-cluster-management.io/dashboard': 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+            'apps.open-cluster-management.io/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+            'apps.open-cluster-management.io/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
           },
         },
         spec: {
@@ -91,10 +92,10 @@ export const mockSingleAppResponse = {
       annotations: {
         'mcm.ibm.com/user-group': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk',
         'mcm.ibm.com/user-identity': 'c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=',
-        'apps.ibm.com/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
-        'apps.ibm.com/dashboard': 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
-        'apps.ibm.com/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
-        'apps.ibm.com/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
+        'apps.open-cluster-management.io/applicationrelationships': 'gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave',
+        'apps.open-cluster-management.io/dashboard': 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
+        'apps.open-cluster-management.io/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
+        'apps.open-cluster-management.io/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
       },
     },
     spec: {
