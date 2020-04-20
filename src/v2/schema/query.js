@@ -69,7 +69,7 @@ type Query {
   subscriptions(name: String, namespace: String): [Subscription]
 
   # Get all subscriptions that apply to a given cluster
-  subscriptionsForCluster(clusterName: String!): [Subscription]
+  subscriptionsForCluster(clusterName: String!, clusterNamespace: String!): [Subscription]
 
   # Update any Kubernetes resources on both local and managed clusters.
   # FIXME: This must be moved to mutations, query operations should not change any data.

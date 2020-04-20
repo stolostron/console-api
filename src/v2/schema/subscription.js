@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const typeDef = `
@@ -33,7 +34,8 @@ type Subscription implements K8sObject {
 export const resolver = {
   Query: {
     subscriptions: (root, args, { subscriptionModel }) => subscriptionModel.getSubscriptions(args.name, args.namespace),
-    subscriptionsForCluster: (root, args, { subscriptionModel }) => subscriptionModel.getSubscriptionsForCluster(args.clusterName),
+    subscriptionsForCluster: (root, args, { subscriptionModel }) =>
+      subscriptionModel.getSubscriptionsForCluster(args.clusterName, args.clusterNamespace),
   },
   Mutation: {
     createSubscription: (root, args, { subscriptionModel }) => subscriptionModel.createSubscription(args.resources),

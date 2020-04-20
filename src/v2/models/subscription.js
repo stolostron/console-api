@@ -101,9 +101,19 @@ export default class SubscriptionModel extends KubeModel {
     }));
   }
 
-  async getSubscriptionsForCluster(clusterName) {
-    const chs = await this.kubeConnector.getResources(ns => `/apis/app.ibm.com/v1alpha1/namespaces/${ns}/subscriptions`);
-    return chs.filter(subscription => clusterName in subscription.status.statuses)
+  async getSubscriptionsForCluster(clusterName, clusterNamespace) {
+    const [chs, deployables] = await Promise.all([
+      this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`),
+      this.kubeConnector.getResources(
+        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
+        { namespaces: [clusterNamespace] },
+      ),
+    ]);
+    // Return only subscriptions that have a corresponding deployable in the cluster namespace
+    return chs.filter(subscription => !!deployables.find(deployable => _.get(deployable, 'spec.template.kind') === 'Subscription' &&
+          _.get(deployable, 'metadata.annotations["apps.open-cluster-management.io/managed-cluster"]') === `${clusterNamespace}/${clusterName}` &&
+          _.get(deployable, 'spec.template.metadata.annotations["apps.open-cluster-management.io/hosting-subscription"]') ===
+            `${subscription.metadata.namespace}/${subscription.metadata.name}`))
       .map(subscription => ({
         metadata: subscription.metadata,
         subscriptionWorkNames: subscription.metadata.name || '',
