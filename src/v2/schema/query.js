@@ -68,6 +68,9 @@ type Query {
   # Get all subscription resources. Optionally, specify name and namespace to filter results.
   subscriptions(name: String, namespace: String): [Subscription]
 
+  # Get all subscriptions that apply to a given cluster
+  subscriptionsForCluster(clusterName: String!, clusterNamespace: String!): [Subscription]
+
   # Update any Kubernetes resources on both local and managed clusters.
   # FIXME: This must be moved to mutations, query operations should not change any data.
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
