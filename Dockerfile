@@ -31,11 +31,13 @@ LABEL org.label-schema.vendor="$IMAGE_VENDOR" \
       io.k8s.description="$IMAGE_DESCRIPTION" \
       io.openshift.tags="$IMAGE_OPENSHIFT_TAGS"
 
-RUN mkdir -p /opt/app-root/console-api
-RUN mkdir -p /opt/app-root/licenses
+#RUN mkdir -p /opt/app-root/console-api
 WORKDIR /opt/app-root/console-api
 
-COPY . /opt/app-root/console-api
+COPY build /opt/app-root/console-api/build
+COPY config /opt/app-root/console-api/config
+COPY node_modules /opt/app-root/console-api/node_modules
+COPY sslcert /opt/app-root/console-api/sslcert
 
 EXPOSE 4000
 
