@@ -1,12 +1,14 @@
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
  * (c) Copyright IBM Corporation 2019. All Rights Reserved.
+ * Copyright (c) 2020 Red Hat, Inc.
  *
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import getApplicationElements from './applicationHelper';
 
 export const typeDef = `
@@ -79,9 +81,8 @@ export const resolver = {
     },
 
     // second pass--get topology details
-    topologyDetails: async (root, data, { resourceViewModel }) => {
-      //      resourceViewModel.fetchResource('pods', args.clusterName, args.name, args.namespace),
-      let pods = await resourceViewModel.fetchResources({ type: 'pods' });
+    topologyDetails: async (root, args, { resourceViewModel }) => {
+      let pods = await resourceViewModel.fetchResources({ type: 'pods' }, _.get(args, 'filter.clusterNames'));
       pods = pods.map((pod) => {
         const {
           metadata, cluster, containers: cntrs, status, hostIP, podIP, restarts, startedAt,

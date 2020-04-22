@@ -182,7 +182,13 @@ export default class KubeConnector {
       },
     };
 
-    if (clusterName) {
+    if (Array.isArray(clusterName)) {
+      body.spec.clusterSelector = {
+        matchExpressions: [
+          { key: 'name', operator: 'In', values: clusterName },
+        ],
+      };
+    } else if (clusterName) {
       body.spec.clusterSelector = {
         matchLabels: {
           name: clusterName,
