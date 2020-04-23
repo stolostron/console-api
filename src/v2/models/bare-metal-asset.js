@@ -92,7 +92,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async getBareMetalAssetSubresources(args = {}) {
     const [namespaces, bareMetalAsset] = await Promise.all([
-      this.kubeConnector.get('/api/v1/namespaces'),
+      this.kubeConnector.get('/apis/project.openshift.io/v1/projects'),
       this.getSingleBareMetalAsset(args),
     ]);
     return {
