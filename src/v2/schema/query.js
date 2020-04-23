@@ -96,8 +96,6 @@ type Query {
 
   getAutomatedImportStatus(namespace: String, name: String): JSON
 
-  getImportYamlTemplate: JSON
-
   # DEPRECATED QUERIES
   charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
   namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")

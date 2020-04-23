@@ -25,9 +25,6 @@ type Orchestration {
 `;
 
 export const resolver = {
-  Query: {
-    getImportYamlTemplate: (parent, args, { clusterImportModel }) => clusterImportModel.getImportYamlTemplate(),
-  },
   Mutation: {
     createClusterResource: (parent, args, { clusterImportModel }) => clusterImportModel.createClusterResource(args),
   },

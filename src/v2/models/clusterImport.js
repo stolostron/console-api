@@ -125,14 +125,6 @@ export default class ClusterImportModel {
     return new Promise(poll);
   }
 
-  async getImportYamlTemplate() {
-    const response = await this.kubeConnector.get('/api/v1/configmaps?labelSelector=config=cluster-import-config');
-    if (response && this.responseHasError(response)) {
-      return this.responseForError('GET cluster-import-config ConfigMap', response);
-    }
-    return _.get(response, 'items[0]', {});
-  }
-
   endpointConfigTemplate(config) {
     const {
       clusterName,
