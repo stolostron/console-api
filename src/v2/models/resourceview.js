@@ -59,7 +59,7 @@ const formatNode = (clusterName, node) => ({
   capacity: node.status.capacity,
   cluster: clusterName,
   metadata: node.metadata,
-  images: node.status.images.reduce((imageNames, curr) => {
+  images: node.status.images && node.status.images.reduce((imageNames, curr) => {
     imageNames.push(...curr.names);
     return imageNames;
   }, []),

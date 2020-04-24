@@ -9,7 +9,7 @@
 
 export const typeDef = `
 type NodeResources {
-  cpu: Int
+  cpu: String
   memory: String
 }
 
