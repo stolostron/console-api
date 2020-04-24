@@ -484,6 +484,7 @@ export default class ClusterModel extends KubeModel {
     const { namespace, cluster, destroy = false } = args;
     const clusterRegistry = `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${cluster}`;
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
+    const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
     if (clusterRegistry) {
       const detachResponse = await this.kubeConnector.delete(clusterRegistry);
@@ -493,9 +494,26 @@ export default class ClusterModel extends KubeModel {
     }
 
     if (destroy) {
-      const destroyResponse = await this.kubeConnector.delete(clusterDeployment);
-      if (destroyResponse.kind === 'Status') {
-        return destroyResponse.code;
+      // Find MachinePools to delete
+      const machinePoolsResponse = await this.kubeConnector.get(machinePools);
+      if (machinePoolsResponse.kind === 'Status') {
+        return machinePoolsResponse.code;
+      }
+      const machinePoolsToDelete = (machinePoolsResponse.items &&
+        machinePoolsResponse.items
+          .filter(item => _.get(item, 'spec.clusterDeploymentRef.name') === cluster)
+          .map(item => _.get(item, 'metadata.selfLink'))) || [];
+
+      // Create full list of resources to delete
+      const resourcesToDelete = [
+        clusterDeployment,
+        ...machinePoolsToDelete,
+      ];
+      const destroyResponses =
+        await Promise.all(resourcesToDelete.map(link => this.kubeConnector.delete(link)));
+      const failedResponse = destroyResponses.find(dr => dr.kind === 'Status');
+      if (failedResponse) {
+        return failedResponse.code;
       }
     }
 
