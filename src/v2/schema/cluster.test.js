@@ -45,6 +45,59 @@ describe('Cluster Resolver', () => {
         done();
       });
   });
+
+  test('Correctly Resolves Single Cluster Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          cluster(name: "hub-cluster", namespace: "kube-system") {
+            clusterip
+            metadata {
+              creationTimestamp
+              labels
+              name
+              namespace
+              uid
+            }
+            availableVersions
+            desiredVersion
+            distributionVersion
+            nodes
+            status
+            totalCPU
+            totalMemory
+            totalStorage
+            upgradeFailed
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves ClusterImageSet Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          clusterImageSets {
+            name
+            releaseImage
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });
 
 describe('Cluster Mutation', () => {

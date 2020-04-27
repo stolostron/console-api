@@ -24,6 +24,7 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
+    clusterImageSets: require('./ClusterImageSets').default,
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
@@ -201,6 +202,8 @@ export default function createMockHttp() {
         return state.bareMetalAssets;
       case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
         return state.clusterImport.getImportYamlSecret;
+      case params.url.includes('/apis/hive.openshift.io/v1/clusterimagesets'):
+        return state.clusterImageSets;
       default:
         return state.apiList.mockResponse;
     }
