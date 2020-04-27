@@ -45,6 +45,59 @@ describe('Cluster Resolver', () => {
         done();
       });
   });
+
+  test('Correctly Resolves Single Cluster Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          cluster(name: "hub-cluster", namespace: "kube-system") {
+            clusterip
+            metadata {
+              creationTimestamp
+              labels
+              name
+              namespace
+              uid
+            }
+            availableVersions
+            desiredVersion
+            distributionVersion
+            nodes
+            status
+            totalCPU
+            totalMemory
+            totalStorage
+            upgradeFailed
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves ClusterImageSet Query', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          clusterImageSets {
+            name
+            releaseImage
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });
 
 describe('Cluster Mutation', () => {
@@ -55,6 +108,70 @@ describe('Cluster Mutation', () => {
         query: `
         mutation {
           updateResourceLabels(resourceType:"HCMCompliance",namespace:"my-remote-cluster-1", name:"my-remote-cluster-1-xz", body:{cloud:"IBMs"}, selfLink:"/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/my-remote-cluster-1/compliances/compliance-xz", resourcePath:"/metadata/spec")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Detach Cluster', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"default", cluster:"managed-cluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Detach Cluster with Failure', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"kube-system", cluster:"hub-cluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Destroy Cluster', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"default", cluster:"managed-cluster", destroy: true)
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Destroy Cluster with Failure', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"kube-system", cluster:"new-cluster", destroy: true)
         }
       `,
       })

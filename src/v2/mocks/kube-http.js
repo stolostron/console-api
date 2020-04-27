@@ -24,6 +24,7 @@ export default function createMockHttp() {
       kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
     },
     clusters: require('./ClusterList').default,
+    clusterImageSets: require('./ClusterImageSets').default,
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
@@ -36,6 +37,10 @@ export default function createMockHttp() {
     relMutations: require('./RelMutationList').default,
     pods: require('./PodList'),
     pvs: require('./PVsList'),
+    machinePoolsByNamespace: {
+      default: require('./MachinePoolsByNS').default,
+      kubeSystem: require('./MachinePoolsByNS').kubeSystem,
+    },
     nodes: require('./NodeList'),
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
@@ -50,6 +55,16 @@ export default function createMockHttp() {
   };
 
   return async function MockLib(params) {
+    if (params.method === 'DELETE') {
+      switch (true) {
+        case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
+          return { body: { kind: 'Status', code: '401' } };
+        case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
+          return { body: { kind: 'Status', code: '406' } };
+        default:
+          return { body: '204' };
+      }
+    }
     if (params.json) {
       switch (true) {
         case _.includes(_.get(params.json, 'kind'), 'SelfSubjectAccessReview'):
@@ -195,12 +210,16 @@ export default function createMockHttp() {
         return state.genericResourceList.mockedUpdatePollResponse;
       case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
         return state.connectionApi.getCloudConnectionSecrets;
-      case params.url.includes('/api/v1/namespaces/ocm/secrets/microsoft'):
-        return state.connectionApi.deleteCloudConnection;
       case params.url.includes('v1alpha1/baremetalassets'):
         return state.bareMetalAssets;
       case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
         return state.clusterImport.getImportYamlSecret;
+      case params.url.includes('/apis/hive.openshift.io/v1/clusterimagesets'):
+        return state.clusterImageSets;
+      case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools'):
+        return state.machinePoolsByNamespace.default;
+      case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools'):
+        return state.machinePoolsByNamespace.kubeSystem;
       default:
         return state.apiList.mockResponse;
     }

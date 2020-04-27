@@ -97,7 +97,3 @@ export const editCloudConnectionError = {
     code: 409,
   },
 };
-
-export const deleteCloudConnection = {
-  body: '204',
-};
