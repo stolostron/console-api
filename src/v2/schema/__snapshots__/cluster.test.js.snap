@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Cluster Mutation Correctly Resolves Destroy Cluster 1`] = `
+Object {
+  "data": Object {
+    "detachCluster": 204,
+  },
+}
+`;
+
+exports[`Cluster Mutation Correctly Resolves Destroy Cluster with Failure 1`] = `
+Object {
+  "data": Object {
+    "detachCluster": "406",
+  },
+}
+`;
+
+exports[`Cluster Mutation Correctly Resolves Detach Cluster 1`] = `
+Object {
+  "data": Object {
+    "detachCluster": 204,
+  },
+}
+`;
+
+exports[`Cluster Mutation Correctly Resolves Detach Cluster with Failure 1`] = `
+Object {
+  "data": Object {
+    "detachCluster": "401",
+  },
+}
+`;
+
 exports[`Cluster Mutation Correctly Resolves Update Cluster Labels 1`] = `
 Object {
   "data": Object {

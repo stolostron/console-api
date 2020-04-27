@@ -116,5 +116,69 @@ describe('Cluster Mutation', () => {
         done();
       });
   });
+
+  test('Correctly Resolves Detach Cluster', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"default", cluster:"managed-cluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Detach Cluster with Failure', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"kube-system", cluster:"hub-cluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Destroy Cluster', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"default", cluster:"managed-cluster", destroy: true)
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Destroy Cluster with Failure', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          detachCluster(namespace:"kube-system", cluster:"new-cluster", destroy: true)
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
 });
 
