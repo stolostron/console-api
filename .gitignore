@@ -1,13 +1,19 @@
-node_modules
+# node_modules
 .vscode
-build
+/build
 config/config-development.json
 .idea
-coverage
+/coverage
 build-harness
 build-harness-extensions
 .build-harness
 .build-harness-bootstrap
 .history
 .project
-test-report.xml
+/test-report.xml
+/test-output
+
+# override build harness vendoring
+!vbh/.build-harness-bootstrap
+!vbh/build-harness
+!vbh/build-harness-extensions
