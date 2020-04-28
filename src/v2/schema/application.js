@@ -130,16 +130,16 @@ export const resolver = {
     // placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
   },
   Application: {
-    applicationRelationships: (parent, args, { applicationModel }) =>
-      applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
+    applicationRelationships: (/* parent, args, { applicationModel } */) =>
+      [], // applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
     applicationWorks: (parent, args, { applicationModel }) =>
       applicationModel.getApplicationWorks({ deployableNames: parent.deployableNames, placementBindingNames: parent.placementBindingNames }),
     deployables: (parent, args, { applicationModel }) =>
       applicationModel.getDeployables({ matchNames: parent.deployableNames }),
-    placementBindings: (parent, args, { applicationModel }) =>
-      applicationModel.getPlacementBindings({ matchNames: parent.placementBindingNames }),
-    placementPolicies: (parent, args, { applicationModel }) =>
-      applicationModel.getPlacementPolicies({ matchNames: parent.placementPolicyNames }),
+    placementBindings: (/* parent, args, { applicationModel } */) =>
+      [], // applicationModel.getPlacementBindings({ matchNames: parent.placementBindingNames }),
+    placementPolicies: (/* parent, args, { applicationModel } */) =>
+      [], // applicationModel.getPlacementPolicies({ matchNames: parent.placementPolicyNames }),
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args.resources),
