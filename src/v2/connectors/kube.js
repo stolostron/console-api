@@ -125,6 +125,7 @@ export default class KubeConnector {
    */
   async getResources(urlTemplate, { namespaces, kind } = {}) {
     const namespaceList = (namespaces || this.namespaces);
+    logger.error(`OCM REQUEST - namespace(s): ${namespaceList} kind: ${kind} `);
 
     const requests = namespaceList.map(async (ns) => {
       let response;
