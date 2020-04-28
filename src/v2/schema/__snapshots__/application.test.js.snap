@@ -5,20 +5,7 @@ Object {
   "data": Object {
     "applications": Array [
       Object {
-        "applicationRelationships": Array [
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-master",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-master",
-            },
-          },
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-slave",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-slave",
-            },
-          },
-        ],
+        "applicationRelationships": Array [],
         "applicationWorks": Array [
           Object {
             "metadata": Object {
@@ -73,26 +60,7 @@ Object {
           "namespace": "default",
           "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
         },
-        "placementPolicies": Array [
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/gbapp-gbapp",
-            },
-            "status": Object {
-              "decisions": Array [
-                Object {
-                  "clusterName": "cluster2",
-                  "clusterNamespace": "cluster2",
-                },
-                Object {
-                  "clusterName": "cluster1",
-                  "clusterNamespace": "cluster1",
-                },
-              ],
-            },
-          },
-        ],
+        "placementPolicies": Array [],
       },
     ],
   },
@@ -167,154 +135,7 @@ Object {
   "data": Object {
     "applications": Array [
       Object {
-        "applicationRelationships": Array [
-          Object {
-            "destination": Object {
-              "kind": "Deployable",
-              "name": "gbapp-gbapp-redismaster",
-            },
-            "metadata": Object {
-              "annotations": Object {
-                "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-              },
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "labels": Object {
-                "app": "gbapp",
-                "chart": "gbapp-0.1.0",
-                "destinationKind": "Deployable",
-                "destinationName": "gbapp-gbapp-redismaster",
-                "heritage": "Tiller",
-                "release": "gbapp",
-                "sourceKind": "Deployable",
-                "sourceName": "gbapp-gbapp",
-              },
-              "name": "gbapp-gbapp-master",
-              "namespace": "default",
-              "resourceVersion": "240",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-master",
-              "status": null,
-              "uid": "8303a19d-e6ab-11e8-b778-9e17a0ceb481",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "ApplicationRelationship",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "destinationKind": "Deployable",
-                  "destinationName": "gbapp-gbapp-redismaster",
-                  "heritage": "Tiller",
-                  "release": "gbapp",
-                  "sourceKind": "Deployable",
-                  "sourceName": "gbapp-gbapp",
-                },
-                "name": "gbapp-gbapp-master",
-                "namespace": "default",
-                "resourceVersion": "240",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-master",
-                "uid": "8303a19d-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "destination": Object {
-                  "kind": "Deployable",
-                  "name": "gbapp-gbapp-redismaster",
-                },
-                "livenessProbe": Object {},
-                "source": Object {
-                  "kind": "Deployable",
-                  "name": "gbapp-gbapp",
-                },
-                "type": "usesCreated",
-              },
-              "status": Object {},
-            },
-            "source": Object {
-              "kind": "Deployable",
-              "name": "gbapp-gbapp",
-            },
-            "type": "usesCreated",
-          },
-          Object {
-            "destination": Object {
-              "kind": "Deployable",
-              "name": "gbapp-gbapp-redisslave",
-            },
-            "metadata": Object {
-              "annotations": Object {
-                "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-              },
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "labels": Object {
-                "app": "gbapp",
-                "chart": "gbapp-0.1.0",
-                "destinationKind": "Deployable",
-                "destinationName": "gbapp-gbapp-redisslave",
-                "heritage": "Tiller",
-                "release": "gbapp",
-                "sourceKind": "Deployable",
-                "sourceName": "gbapp-gbapp",
-              },
-              "name": "gbapp-gbapp-slave",
-              "namespace": "default",
-              "resourceVersion": "244",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-slave",
-              "status": null,
-              "uid": "83058fb8-e6ab-11e8-b778-9e17a0ceb481",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "ApplicationRelationship",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "destinationKind": "Deployable",
-                  "destinationName": "gbapp-gbapp-redisslave",
-                  "heritage": "Tiller",
-                  "release": "gbapp",
-                  "sourceKind": "Deployable",
-                  "sourceName": "gbapp-gbapp",
-                },
-                "name": "gbapp-gbapp-slave",
-                "namespace": "default",
-                "resourceVersion": "244",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applicationrelationships/gbapp-gbapp-slave",
-                "uid": "83058fb8-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "destination": Object {
-                  "kind": "Deployable",
-                  "name": "gbapp-gbapp-redisslave",
-                },
-                "livenessProbe": Object {},
-                "source": Object {
-                  "kind": "Deployable",
-                  "name": "gbapp-gbapp",
-                },
-                "type": "usesCreated",
-              },
-              "status": Object {},
-            },
-            "source": Object {
-              "kind": "Deployable",
-              "name": "gbapp-gbapp",
-            },
-            "type": "usesCreated",
-          },
-        ],
+        "applicationRelationships": Array [],
         "applicationWorks": Array [
           Object {
             "cluster": "cluster1",
@@ -547,89 +368,7 @@ Object {
           "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
           "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
         },
-        "placementPolicies": Array [
-          Object {
-            "clusterLabels": Object {
-              "matchLabels": Object {
-                "environment": "Dev",
-              },
-            },
-            "clusterReplicas": 2,
-            "metadata": Object {
-              "annotations": Object {
-                "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-              },
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "name": "gbapp-gbapp",
-              "namespace": "default",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/gbapp-gbapp",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "PlacementPolicy",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "heritage": "Tiller",
-                  "name": "gbapp-gbapp",
-                  "release": "gbapp",
-                  "servicekind": "CacheService",
-                },
-                "name": "gbapp-gbapp",
-                "namespace": "default",
-                "resourceVersion": "278",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/placementpolicies/gbapp-gbapp",
-                "uid": "830b0e5f-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "clusterLabels": Object {
-                  "matchLabels": Object {
-                    "environment": "Dev",
-                  },
-                },
-                "clusterReplicas": 2,
-                "resourceHint": Object {
-                  "type": "cpu",
-                },
-                "resourceSelector": Object {},
-              },
-              "status": Object {
-                "decisions": Array [
-                  Object {
-                    "clusterName": "cluster2",
-                    "clusterNamespace": "cluster2",
-                  },
-                  Object {
-                    "clusterName": "cluster1",
-                    "clusterNamespace": "cluster1",
-                  },
-                ],
-              },
-            },
-            "resourceSelector": Object {
-              "type": "cpu",
-            },
-            "status": Object {
-              "decisions": Array [
-                Object {
-                  "clusterName": "cluster2",
-                  "clusterNamespace": "cluster2",
-                },
-                Object {
-                  "clusterName": "cluster1",
-                  "clusterNamespace": "cluster1",
-                },
-              ],
-            },
-          },
-        ],
+        "placementPolicies": Array [],
         "raw": Object {
           "apiVersion": "mcm.ibm.com/v1alpha1",
           "kind": "Application",
