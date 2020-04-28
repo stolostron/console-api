@@ -59,7 +59,7 @@ export default class ClusterImportModel {
 
     const { clusterName, clusterNamespace } = config;
 
-    const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: clusterNamespace } });
+    const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
 
     if (this.responseHasError(namespaceResponse)) {
       if (namespaceResponse.code === 409) {
