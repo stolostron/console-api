@@ -231,7 +231,7 @@ export default class ClusterModel extends KubeModel {
       errors.push({ message: 'ClusterDeployment must specify a namespace' });
       return { errors };
     }
-    const namespaceResponse = await this.kubeConnector.post('/api/v1/namespaces', { metadata: { name: namespace } });
+    const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } });
     if (responseHasError(namespaceResponse)) {
       // if namespace already exists, only fail if there's no cluster in it
       if (namespaceResponse.code === 409) {
