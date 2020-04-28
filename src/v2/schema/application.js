@@ -130,8 +130,8 @@ export const resolver = {
     // placementPolicies: (root, args, { applicationModel }) => applicationModel.getPlacementPolicies(args.selector),
   },
   Application: {
-    applicationRelationships: (parent, args, { applicationModel }) =>
-      applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
+    applicationRelationships: (/* parent, args, { applicationModel } */) =>
+      [], // applicationModel.getApplicationRelationships({ matchNames: parent.applicationRelationshipNames }),
     applicationWorks: (parent, args, { applicationModel }) =>
       applicationModel.getApplicationWorks({ deployableNames: parent.deployableNames, placementBindingNames: parent.placementBindingNames }),
     deployables: (parent, args, { applicationModel }) =>
