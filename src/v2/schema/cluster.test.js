@@ -117,6 +117,22 @@ describe('Cluster Mutation', () => {
       });
   });
 
+  test('Correctly Resolves Create Cluster', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          createCluster(cluster: [])
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
   test('Correctly Resolves Detach Cluster', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
