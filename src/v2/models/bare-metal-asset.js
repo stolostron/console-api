@@ -346,7 +346,6 @@ export default class BareMetalAssetModel extends KubeModel {
   async attachBMAs(hosts, clusterName, errors) {
     // get requests to fetch the bmas
     const requests = hosts.map(({ namespace, name }) => {
-      namespace = namespace || name;
       return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
     });
 
@@ -366,6 +365,7 @@ export default class BareMetalAssetModel extends KubeModel {
       });
 
       // assign bmas to hosts
+      // eslint-disable-next-line no-await-in-loop
       const results = await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
         const newSpec = Object.assign({}, spec, {
           role: hosts[inx].role,
