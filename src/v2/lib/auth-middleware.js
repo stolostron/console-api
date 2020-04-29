@@ -148,6 +148,14 @@ export default function createAuthMiddleWare({
       cache.set(`namespaces_${idToken}`, nsPromise);
     }
 
+    req.updateUserNamespaces = async (project) => {
+      const projectPromise = await cache.get(`namespaces_${idToken}`);
+      if (projectPromise) {
+        projectPromise.items.push(project);
+        cache.set(`namespaces_${idToken}`, projectPromise);
+      }
+    };
+
     // Get user's account data.
     // We cache the promise to prevent starting the same request multiple times.
     // let accountPromise = cache.get(`account_${iamToken}`);

@@ -14,8 +14,9 @@ import _ from 'lodash';
 import logger from '../lib/logger';
 
 export default class ClusterImportModel {
-  constructor({ kubeConnector }) {
+  constructor({ kubeConnector, updateUserNamespaces }) {
     this.kubeConnector = kubeConnector;
+    this.updateUserNamespaces = updateUserNamespaces;
   }
 
   getErrorMsg(response) {
@@ -68,6 +69,10 @@ export default class ClusterImportModel {
       } else {
         return namespaceResponse;
       }
+    }
+
+    if (namespaceResponse.code !== 409) {
+      this.updateUserNamespaces(namespaceResponse);
     }
 
     if (config.privateRegistryEnabled) {
