@@ -131,12 +131,12 @@ export default class KubeConnector {
       try {
         response = await this.get(urlTemplate(ns));
       } catch (err) {
-        logger.error(`OCM REQUEST ERROR - ${err.message}`);
+        logger.error(`OCM REQUEST ERROR  for ${urlTemplate(ns)} - ${err.message}`);
         return [];
       }
 
       if (response.code || response.message) {
-        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
+        logger.error(`OCM ERROR ${response.code} (${urlTemplate(ns)}) - ${response.message}`);
         return [];
       }
 
@@ -149,7 +149,7 @@ export default class KubeConnector {
         }
       });
       if (strs.length > 0) {
-        logger.error(`OCM RESPONSE ERROR, Expected Objects but Returned this: ${strs.join(', ')}`);
+        logger.error(`OCM RESPONSE ERROR for ${urlTemplate(ns)}: Expected Objects but Returned this: ${strs.join(', ')}`);
         return [];
       }
 
