@@ -511,7 +511,8 @@ export default class ClusterModel extends KubeModel {
       ];
       const destroyResponses =
         await Promise.all(resourcesToDelete.map(link => this.kubeConnector.delete(link)));
-      const failedResponse = destroyResponses.find(dr => dr.kind === 'Status');
+      // MachinePool deletion returns a Status with status==='Success'
+      const failedResponse = destroyResponses.find(dr => dr.kind === 'Status' && dr.status !== 'Success');
       if (failedResponse) {
         return failedResponse.code;
       }
