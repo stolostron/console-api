@@ -345,7 +345,8 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async attachBMAs(hosts, clusterName, errors) {
     // get requests to fetch the bmas
-    const requests = hosts.map(({ namespace, name }) => {
+    const requests = hosts.map((bma) => {
+      const { namespace, name } = bma;
       return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
     });
 
