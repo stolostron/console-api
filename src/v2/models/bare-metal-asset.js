@@ -366,7 +366,7 @@ export default class BareMetalAssetModel extends KubeModel {
       });
 
       // assign bmas to hosts
-      const results = await Promise.all(bmas.map(({ spec, metadata: {namespace, name} }, inx) => {
+      const results = await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
         const newSpec = Object.assign({}, spec, {
           role: hosts[inx].role,
           clusterDeployment: {
