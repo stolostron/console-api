@@ -150,7 +150,7 @@ export default function createAuthMiddleWare({
 
     req.updateUserNamespaces = async (project) => {
       const projectPromise = await cache.get(`namespaces_${idToken}`);
-      if (projectPromise) {
+      if (projectPromise && project) {
         projectPromise.items.push(project);
         cache.set(`namespaces_${idToken}`, projectPromise);
       }

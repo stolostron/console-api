@@ -71,6 +71,7 @@ export default class ClusterImportModel {
       }
     }
 
+    // Update the namespace cache, don't add existing namespace in case they are unauthorized
     if (namespaceResponse.code !== 409) {
       this.updateUserNamespaces(namespaceResponse);
     }
