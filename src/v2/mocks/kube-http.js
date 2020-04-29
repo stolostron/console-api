@@ -60,7 +60,9 @@ export default function createMockHttp() {
         case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
           return { body: { kind: 'Status', code: '401' } };
         case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
-          return { body: { kind: 'Status', code: '406' } };
+          return { body: { kind: 'Status', status: 'Not Acceptable', code: '406' } };
+        case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools/managed-cluster-worker'):
+          return { body: { kind: 'Status', status: 'Success' } };
         default:
           return { body: '204' };
       }
