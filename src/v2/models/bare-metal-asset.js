@@ -341,4 +341,56 @@ export default class BareMetalAssetModel extends KubeModel {
       };
     }
   }
+
+
+  async attachBMAs(hosts, clusterName, errors) {
+    // get requests to fetch the bmas
+    const requests = hosts.map((bma) => {
+      const { namespace, name } = bma;
+      return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+    });
+
+    const chunks = _.chunk(requests, MAX_PARALLEL_REQUESTS);
+    for (let i = 0; i < chunks.length; i += 1) {
+      const chunk = chunks[i];
+
+      // get the bmas
+      // eslint-disable-next-line no-await-in-loop
+      let bmas = await Promise.all(chunk.map(url => this.kubeConnector.get(url)));
+      bmas = bmas.filter((result) => {
+        if (result.code) {
+          errors.push({ statusCode: result.code, message: result.message });
+          return false;
+        }
+        return true;
+      });
+
+      // assign bmas to hosts
+      // eslint-disable-next-line no-await-in-loop
+      const results = await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
+        const newSpec = Object.assign({}, spec, {
+          role: hosts[inx].role,
+          clusterDeployment: {
+            name: clusterName,
+            namespace: clusterName,
+          },
+        });
+        const bmaBody = {
+          body: [
+            {
+              op: 'replace',
+              path: '/spec',
+              value: newSpec,
+            },
+          ],
+        };
+        return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+      }));
+      results.forEach((result) => {
+        if (result.code) {
+          errors.push({ statusCode: result.code, message: result.message });
+        }
+      });
+    }
+  }
 }
