@@ -63,7 +63,23 @@ export const resolver = {
     totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
   Mutation: {
-    createCluster: (parent, args, { clusterModel }) => clusterModel.createCluster(args),
+    createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
+      const results = await clusterModel.createCluster(args);
+
+      // if this was a successful bare metal deployment,
+      // update the bma's with what cluster grabbed them
+      const { errors } = results;
+      if (errors.length === 0) {
+        const map = _.keyBy(args.cluster, 'kind');
+        const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
+        if (hosts) {
+          const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
+          // reserve these bmsa for this cluster
+          await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
+        }
+      }
+      return results;
+    },
     detachCluster: (parent, args, { clusterModel }) => clusterModel.detachCluster(args),
   },
 };
