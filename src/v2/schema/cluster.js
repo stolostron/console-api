@@ -74,7 +74,7 @@ export const resolver = {
         const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
         if (hosts) {
           const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
-          //reserve these bmsa for this cluster
+          // reserve these bmsa for this cluster
           await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
         }
       }
