@@ -8,6 +8,7 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import ClusterModel from '../models/cluster';
 
 export const typeDef = `
