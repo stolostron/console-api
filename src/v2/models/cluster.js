@@ -157,14 +157,18 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       isManaged: !!cluster,
     };
     if (clusterversion) {
-      const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
-      data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
-      data.desiredVersion = _.get(clusterversion, 'status.desired.version');
       const versionHistory = _.get(clusterversion, 'status.history', []);
-      const completedVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0] : null;
-      data.distributionVersion = completedVersion ? completedVersion.version : null;
+      const completedVersion = versionHistory && versionHistory.find(h => h.state === 'Completed');
+      data.distributionVersion = _.get(completedVersion, 'version');
+      const isROKS = _.get(completedVersion, 'image', '').startsWith('registry.ng.bluemix.net/');
+
+      const availableUpdates = isROKS ? [] : _.get(clusterversion, 'status.availableUpdates', []);
+      data.availableVersions = availableUpdates && availableUpdates.map(u => u.version);
+      data.desiredVersion = _.get(clusterversion, 'status.desired.version');
+
       const conditions = _.get(clusterversion, 'status.conditions', []);
-      data.upgradeFailed = conditions ? conditions.filter(cond => cond.type === 'Failing')[0].status === 'True' : false;
+      const failingCondition = conditions.find(cond => cond.type === 'Failing');
+      data.upgradeFailed = failingCondition && failingCondition.status === 'True';
     }
     resultMap.set(c, data);
   });
