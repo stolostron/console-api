@@ -160,7 +160,7 @@ function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClu
       const versionHistory = _.get(clusterversion, 'status.history', []);
       const completedVersion = versionHistory && versionHistory.find(h => h.state === 'Completed');
       data.distributionVersion = _.get(completedVersion, 'version');
-      const isROKS = _.get(completedVersion, 'image', '').startsWith('registry.ng.bluemix.net/');
+      const isROKS = (_.get(completedVersion, 'image') || '').startsWith('registry.ng.bluemix.net/');
 
       const availableUpdates = isROKS ? [] : _.get(clusterversion, 'status.availableUpdates', []);
       data.availableVersions = availableUpdates && availableUpdates.map(u => u.version);
