@@ -80,7 +80,7 @@ export default class BareMetalAssetModel extends KubeModel {
         ? this.kubeConnector.get('/api/v1/secrets').then(allSecrets => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources(ns => `/api/v1/namespaces/${ns}/secrets`)))
         : Promise.resolve({ items: [] }),
     ]);
-    console.log('BMA', bareMetalAssets);
+
     const BMAs = bareMetalAssets.items || bareMetalAssets;
     const k8sSecrets = secrets.items || secrets;
     if (BMAs.length > 0) {
