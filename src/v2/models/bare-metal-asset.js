@@ -74,11 +74,17 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async getAllBareMetalAssets({ fetchSecrets }) {
     const [bareMetalAssets, secrets] = await Promise.all([
-      this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets'),
-      fetchSecrets ? this.kubeConnector.get('/api/v1/secrets') : Promise.resolve({ items: [] }),
+      this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets')
+        .then(allBMAs => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources(ns => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))),
+      fetchSecrets
+        ? this.kubeConnector.get('/api/v1/secrets').then(allSecrets => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources(ns => `/api/v1/namespaces/${ns}/secrets`)))
+        : Promise.resolve({ items: [] }),
     ]);
-    if (bareMetalAssets.items !== undefined) {
-      return bareMetalAssets.items.map(bma => transform(bma, secrets.items));
+
+    const BMAs = bareMetalAssets.items || bareMetalAssets || [];
+    const k8sSecrets = secrets.items || secrets || [];
+    if (BMAs.length > 0) {
+      return BMAs.map(bma => transform(bma, k8sSecrets));
     }
     if (_.isArray(bareMetalAssets.paths)) {
       // missing BMA CRD
