@@ -54,12 +54,13 @@ export default class GenericModel extends KubeModel {
     const { resources, clusterInfo } = args;
     if (clusterInfo) {
       const responseArr = await Promise.all(resources.map(async (resource) => {
-        const now = new Date();
+        let workName = `create-resource-${this.kubeConnector.uid()}`;
+        workName = workName.substring(0, 63);
         const jsonBody = {
           apiVersion: 'mcm.ibm.com/v1alpha1',
           kind: 'Work',
           metadata: {
-            name: `${resource.metadata.name}-${now.valueOf()}`,
+            name: workName,
             namespace: clusterInfo.clusterNameSpace,
           },
           spec: {
@@ -218,7 +219,8 @@ export default class GenericModel extends KubeModel {
   }
 
   async resourceAction(resourceType, actionType, resourceName, resourceNamespace, clusterName) {
-    const name = `${resourceType}-workset-${this.kubeConnector.uid()}`;
+    let name = `workset-${resourceType}-${this.kubeConnector.uid()}`;
+    name = name.substring(0, 63);
     const body = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'WorkSet',
@@ -325,8 +327,8 @@ export default class GenericModel extends KubeModel {
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
-    const modName = (name.length >= 30) ? name.substring(name.length - 30) : name;
-    const workName = `${modName}-update-work-${this.kubeConnector.uid()}`;
+    let workName = `update-resource-${this.kubeConnector.uid()}`;
+    workName = workName.substring(0, 63);
     const jsonBody = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'Work',
@@ -407,8 +409,8 @@ export default class GenericModel extends KubeModel {
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
-    const modName = (name.length >= 30) ? name.substring(name.length - 30) : name;
-    const workName = `${modName}-delete-work-${this.kubeConnector.uid()}`;
+    let workName = `delete-resource-${this.kubeConnector.uid()}`;
+    workName = workName.substring(0, 63);
     const jsonBody = {
       apiVersion: 'mcm.ibm.com/v1alpha1',
       kind: 'Work',
