@@ -1,7 +1,7 @@
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
  * (c) Copyright IBM Corporation 2019. All Rights Reserved.
- *
+ * Copyright (c) 2020 Red Hat, Inc.
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
@@ -96,31 +96,13 @@ function addSubscriptionDeployable(
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
-  nodes.push({
-    name,
-    namespace,
-    type: 'deployable',
-    id: deployableId,
-    uid: deployableId,
-    specs: { isDesign: true, raw: deployable, isDivider: true },
-  });
-  links.push({
-    from: { uid: parentId },
-    to: { uid: deployableId },
-    type: '',
-    specs: { isDesign: true },
-  });
 
   // installs these K8 objects
-  let failed = false;
   const deployStatuses = [];
   names.forEach((cname) => {
     const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
     if (status) {
       deployStatuses.push(status);
-      if (status.phase === 'Failed') {
-        failed = true;
-      }
     }
   });
 
@@ -139,28 +121,10 @@ function addSubscriptionDeployable(
     specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
   });
   links.push({
-    from: { uid: deployableId },
+    from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
-
-  // if deployment, show pod--unless deployable failed to deploy deployment
-  if (kind === 'deployment' && !failed) {
-    const podId = `member--pod--${deployableId}--${k8Name}`;
-    nodes.push({
-      name: k8Name,
-      namespace: '',
-      type: 'pod',
-      id: podId,
-      uid: podId,
-      specs: { raw: template },
-    });
-    links.push({
-      from: { uid: memberId },
-      to: { uid: podId },
-      type: '',
-    });
-  }
 }
 
 function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links) {

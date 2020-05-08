@@ -92,7 +92,6 @@ type Query {
 
   # Gets data for the topology diagram.
   topology(filter: TopologyFilter): Topology
-  topologyDetails(filter: TopologyDetailsFilter): TopologyDetails
 
   getAutomatedImportStatus(namespace: String, name: String): JSON
 
