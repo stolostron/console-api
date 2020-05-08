@@ -81,8 +81,8 @@ export default class BareMetalAssetModel extends KubeModel {
         : Promise.resolve({ items: [] }),
     ]);
 
-    const BMAs = bareMetalAssets.items || bareMetalAssets;
-    const k8sSecrets = secrets.items || secrets;
+    const BMAs = bareMetalAssets.items || bareMetalAssets || [];
+    const k8sSecrets = secrets.items || secrets || [];
     if (BMAs.length > 0) {
       return BMAs.map(bma => transform(bma, k8sSecrets));
     }
