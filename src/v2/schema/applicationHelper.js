@@ -91,7 +91,7 @@ function addClusters(
 
 function addSubscriptionDeployable(
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names,
+  subscriptionStatusMap, names, appNamespace,
 ) {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
@@ -114,7 +114,7 @@ function addSubscriptionDeployable(
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
   nodes.push({
     name: k8Name,
-    namespace: '',
+    namespace: appNamespace,
     type: kind,
     id: memberId,
     uid: memberId,
@@ -127,7 +127,7 @@ function addSubscriptionDeployable(
   });
 }
 
-function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links) {
+function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links, appNamespace) {
   Object.values(subscriptionStatusMap).forEach((value) => {
     if (value) {
       const [packageName] = Object.keys(value);
@@ -139,7 +139,7 @@ function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links) {
       }
       nodes.push({
         name: packageName,
-        namespace: '',
+        namespace: appNamespace,
         type: 'package',
         id: memberId,
         uid: memberId,
@@ -252,19 +252,19 @@ async function getApplicationElements(application, clusterModel) {
             subscription.deployables.forEach((deployable) => {
               addSubscriptionDeployable(
                 clusterId, deployable, links, nodes,
-                subscriptionStatusMap, names,
+                subscriptionStatusMap, names, namespace,
               );
             });
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
-            addSubscriptionCharts(clusterId, subscriptionStatusMap, nodes, links);
+            addSubscriptionCharts(clusterId, subscriptionStatusMap, nodes, links, namespace);
           }
         });
       }
 
       // no deployables was placed on a clutser but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
-        addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links);
+        addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links, namespace);
       }
       delete subscription.deployables;
     });
