@@ -14,7 +14,7 @@ nvm use v10.20.1
 
 3. The following environment variables must be set.
 ```
-API_SERVER_URL
+API_SERVER_URL - The cluster’s kube api server address. Can easily find it using "oc cluster-info" command.
 SERVICEACCT_TOKEN - the token that you can get from the top right corner of the console page - configure client - the value of kubectl config set-credentials admin --token, it's a long string, starts with "ey...". Please note that this value is updated every 24 hrs.
 ```
 
