@@ -108,7 +108,7 @@ export default function createMockHttp() {
         case params.url.includes('/apis/project.openshift.io/v1/projectrequests') && _.get(params.json, 'metadata.name') === 'foo':
           return state.clusterImport.getNamespaceCreationResponse;
         case params.url.includes('/apis/agent.open-cluster-management.io/v1beta1/namespaces/foo/klusterletconfigs'):
-          return state.clusterImport.getEndpointConfigsResponse;
+          return state.clusterImport.getKlusterletConfigsResponse;
         case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
           return state.clusterImport.getClusterResponse;
         default:
@@ -208,7 +208,7 @@ export default function createMockHttp() {
         return state.apiList.apiPath;
       case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):
         return state.genericResourceList.getResourceMock;
-      case params.url.includes('/api/v1/namespaces/multicluster-endpoint'):
+      case params.url.includes('/api/v1/namespaces/klusterlet'):
         return state.genericResourceList.updateResourceLocalMock;
       case params.url.includes('test-path-to-update-work'):
         return state.genericResourceList.mockedUpdatePollResponse;

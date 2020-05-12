@@ -91,10 +91,10 @@ export default class ClusterImportModel {
       }
     }
 
-    const endpointTemplate = this.endpointConfigTemplate(config);
-    const endpointConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, endpointTemplate);
-    if (this.responseHasError(endpointConfigResponse)) {
-      return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
+    const klusterletTemplate = this.klusterletConfigTemplate(config);
+    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+    if (this.responseHasError(klusterletConfigResponse)) {
+      return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
 
     const clusterTemplate = this.clusterTemplate(config);
@@ -102,7 +102,7 @@ export default class ClusterImportModel {
     if (this.responseHasError(clusterResponse)) {
       if (clusterResponse.code === 409) return clusterResponse;
 
-      // Delete the endpointconfig so the user can try again
+      // Delete the klusterletconfig so the user can try again
       await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
       return this.responseForError('Create Cluster resource failed', clusterResponse);
     }
@@ -131,7 +131,7 @@ export default class ClusterImportModel {
     return new Promise(poll);
   }
 
-  endpointConfigTemplate(config) {
+  klusterletConfigTemplate(config) {
     const {
       clusterName,
       clusterNamespace,

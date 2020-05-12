@@ -33,7 +33,7 @@ describe('Generic Resources', () => {
       .send({
         query: `
         {
-          updateResource(selfLink: "/api/v1/namespaces/multicluster-endpoint", namespace: "", kind: "namespace", name: "multicluster-endpoint", cluster: "local-cluster", body: {kind: "Namespace", apiVersion: "v1", metadata: {name: "multicluster-endpoint", selfLink: "/api/v1/namespaces/multicluster-endpoint", uid: "34ddc94d-70dc-11e9-865a-00000a15079c", resourceVersion: "2120711", creationTimestamp: "2019-05-07T15:24:29Z", labels: {icp: "system", test: "test"}}, spec: {finalizers: ["kubernetes"]}, status: {phase: "Active"}})
+          updateResource(selfLink: "/api/v1/namespaces/klusterlet", namespace: "", kind: "namespace", name: "klusterlet", cluster: "local-cluster", body: {kind: "Namespace", apiVersion: "v1", metadata: {name: "klusterlet", selfLink: "/api/v1/namespaces/klusterlet", uid: "34ddc94d-70dc-11e9-865a-00000a15079c", resourceVersion: "2120711", creationTimestamp: "2019-05-07T15:24:29Z", labels: {icp: "system", test: "test"}}, spec: {finalizers: ["kubernetes"]}, status: {phase: "Active"}})
         }
         `,
       })
