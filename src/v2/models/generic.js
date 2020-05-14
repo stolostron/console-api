@@ -58,8 +58,8 @@ export default class GenericModel extends KubeModel {
         let workName = `create-resource-${this.kubeConnector.uid()}`;
         workName = workName.substring(0, 63);
         const jsonBody = {
-          apiVersion: 'mcm.ibm.com/v1alpha1',
-          kind: 'Work',
+          apiVersion: 'action.open-cluster-management.io/v1beta1',
+          kind: 'ClusterAction',
           metadata: {
             name: workName,
             namespace: clusterInfo.clusterNameSpace,
@@ -77,7 +77,7 @@ export default class GenericModel extends KubeModel {
             },
           },
         };
-        const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterInfo.clusterNameSpace}/works`, jsonBody);
+        const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterInfo.clusterNameSpace}/clusteractions`, jsonBody);
         return response;
       }));
       return responseArr;
@@ -363,8 +363,8 @@ export default class GenericModel extends KubeModel {
     let workName = `update-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'Work',
+      apiVersion: 'action.open-cluster-management.io/v1beta1',
+      kind: 'ClusterAction',
       metadata: {
         name: workName,
         namespace: clusterNamespace,
@@ -387,7 +387,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
+    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -445,8 +445,8 @@ export default class GenericModel extends KubeModel {
     let workName = `delete-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'Work',
+      apiVersion: 'action.open-cluster-management.io/v1beta1',
+      kind: 'ClusterAction',
       metadata: {
         name: workName,
         namespace: clusterNamespace,
@@ -469,7 +469,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
+    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -482,7 +482,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
+        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
