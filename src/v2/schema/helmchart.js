@@ -47,7 +47,5 @@ export const resolver = {
   Query: {
     charts: async (root, args, { helmModel }) => helmModel.getCharts(args),
   },
-  Mutation: {
-    installHelmChart: async (root, { input }, { helmModel }) => helmModel.installHelmChart(input),
-  },
+  Mutation: {},
 };
