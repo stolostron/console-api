@@ -9,8 +9,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import yaml from 'js-yaml';
-import { unflatten } from 'flat';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -49,56 +47,6 @@ export default class HelmModel extends KubeModel {
 
       return accum;
     }, []);
-  }
-
-  async installHelmChart({
-    chartURL, destinationClusters, namespace, releaseName, values,
-  }) {
-    const vals = JSON.parse(values.replace(/'/g, '"'));
-    const valuesUnflat = unflatten(vals);
-    const valuesYaml = yaml.safeDump(valuesUnflat);
-    const valuesEncoded = Buffer.from(valuesYaml).toString('base64');
-    const name = `${releaseName}-helm-install-${this.kubeConnector.uid()}`;
-
-    return destinationClusters.map(async ({ name: clusterName, namespace: workNamespace }) => {
-      const jsonBody = {
-        apiVersion: 'mcm.ibm.com/v1alpha1',
-        kind: 'Work',
-        metadata: {
-          name,
-          namespace: workNamespace,
-        },
-        spec: {
-          cluster: {
-            name: clusterName,
-          },
-          type: 'Action',
-          actionType: 'Create',
-          helm: {
-            releaseName,
-            chartURL,
-            namespace,
-            values: valuesEncoded,
-          },
-        },
-      };
-
-      const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${workNamespace}/works`, jsonBody);
-      if (response.code || response.message) {
-        logger.error(`OCM ERROR ${response.code} - ${response.message}`);
-        return [{
-          code: response.code,
-          message: response.message,
-        }];
-      }
-
-      return {
-        name: response.metadata.name,
-        namespace: response.spec.helm.namespace,
-        status: response.status.type,
-        cluster: response.spec.cluster.name,
-      };
-    });
   }
 
   async getCharts() {
