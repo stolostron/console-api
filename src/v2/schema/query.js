@@ -96,7 +96,6 @@ type Query {
   getAutomatedImportStatus(namespace: String, name: String): JSON
 
   # DEPRECATED QUERIES
-  charts: [HelmChart] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
   namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pod(name: String, namespace: String, clusterName: String): [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
@@ -168,7 +167,6 @@ type Mutation {
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
-  installHelmChart(input: InstallHelmChartInput): [HelmChartResponse] @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
   setHelmRepo(input: HelmRepoInput): HelmRepo @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
 }
 

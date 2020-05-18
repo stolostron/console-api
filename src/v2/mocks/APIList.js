@@ -329,33 +329,6 @@ export const apiPath = {
         ],
       },
       {
-        name: 'helmrepos',
-        singularName: '',
-        namespaced: true,
-        kind: 'HelmRepo',
-        verbs: [
-          'create',
-          'delete',
-          'deletecollection',
-          'get',
-          'list',
-          'patch',
-          'update',
-          'watch',
-        ],
-      },
-      {
-        name: 'helmrepos/status',
-        singularName: '',
-        namespaced: true,
-        kind: 'HelmRepo',
-        verbs: [
-          'get',
-          'patch',
-          'update',
-        ],
-      },
-      {
         name: 'placementbindings',
         singularName: '',
         namespaced: true,
