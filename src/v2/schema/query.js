@@ -101,10 +101,6 @@ type Query {
   pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
   pvsClaims: [PVsClaims] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  releases: [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  release(name: String, namespace: String, clusterName: String): [HelmRel] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  releasesFromSearch: [HelmRel] @deprecated(reason: "Moved to search-api service in 4.1")
-  repos: [HelmRepo] @deprecated(reason: "No longer in use. Will remove this query in 4.1")
 }
 
 # Multicloud Manager Mutations
@@ -167,7 +163,6 @@ type Mutation {
 
   # DEPRECATED MUTATIONS
   createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
-  setHelmRepo(input: HelmRepoInput): HelmRepo @deprecated(reason: "No longer in use. Will remove this mutation in 4.1")
 }
 
 # Common fields for all Kubernetes objects
