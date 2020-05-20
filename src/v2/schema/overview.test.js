@@ -55,18 +55,6 @@ describe('Overview Resolver', () => {
             }
             raw
           }
-          pods {
-            metadata {
-              name
-              namespace
-            }
-            cluster {
-              metadata {
-                name
-              }
-            }
-            status
-          }
         }
         }
       `,
