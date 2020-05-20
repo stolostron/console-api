@@ -212,7 +212,7 @@ export default class KubeConnector {
       setTimeout(reject, this.pollTimeout, new Error('Manager request timed out')));
   }
 
-  pollView(resourceViewLink) {
+  pollView(viewLink) {
     let cancel;
 
     const promise = new Promise(async (resolve, reject) => {
@@ -223,9 +223,9 @@ export default class KubeConnector {
           if (!pendingRequest) {
             pendingRequest = true;
             try {
-              const links = resourceViewLink.split('/');
-              const resourceViewName = links.pop();
-              const link = `${links.join('/')}?fieldSelector=metadata.name=${resourceViewName}`;
+              const links = viewLink.split('/');
+              const viewName = links.pop();
+              const link = `${links.join('/')}?fieldSelector=metadata.name=${viewName}`;
 
               logger.debug('start polling: ', new Date(), link);
               const response = await this.get(link, {}, true);
@@ -234,12 +234,12 @@ export default class KubeConnector {
                 clearInterval(intervalID);
                 return reject(response);
               }
-              const isComplete = _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
-
-              if (isComplete === 'Completed') {
+              // We are looking for the type to be Processing for SpokeView resources
+              const isComplete = _.get(response, 'items[0].status.conditions[0].type') || _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
+              if (isComplete === 'Processing' || isComplete === 'Completed') {
                 clearInterval(intervalID);
-                logger.debug('start to get resource: ', new Date(), resourceViewLink);
-                const result = await this.get(resourceViewLink, {}, true);
+                logger.debug('start to get resource: ', new Date(), viewLink);
+                const result = await this.get(viewLink, {}, true);
                 if (result.code || result.message) {
                   return reject(result);
                 }
@@ -325,5 +325,57 @@ export default class KubeConnector {
     });
 
     return _.flatten(await Promise.all(requests));
+  }
+
+  // eslint-disable-next-line max-len
+  async spokeViewQuery(spokeClusterNamespace, resource, resourceName, resourceNamespace, updateInterval, deleteAfterUse) {
+    // name cannot be long than 63 chars in length
+    const name = `${spokeClusterNamespace}-${resourceName}-${resource}`.substr(0, 63);
+
+    // scope.name is required, and either GKV (scope.apiGroup+kind+version) or scope.resource
+    const body = {
+      apiVersion: 'view.open-cluster-management.io/v1beta1',
+      kind: 'SpokeView',
+      metadata: {
+        labels: {
+          name,
+        },
+        name,
+        namespace: spokeClusterNamespace,
+      },
+      spec: {
+        scope: {
+          resource,
+          name: resourceName,
+          namespace: resourceNamespace,
+        },
+      },
+    };
+    if (updateInterval) {
+      body.spec.scope.updateIntervalSeconds = updateInterval; // default is 30 secs
+    }
+    // Create spoke view
+    const spokeViewResponse = await this.post(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${spokeClusterNamespace}/spokeviews`, body);
+    if (_.get(spokeViewResponse, 'status.conditions[0].status') === 'False' || spokeViewResponse.code >= 400) {
+      throw new Error(`Create Spoke View Failed [${spokeViewResponse.code}] - ${spokeViewResponse.message}`);
+    }
+    // Poll SpokeView until success or failure
+    const { cancel, promise: pollPromise } = this.pollView(_.get(spokeViewResponse, 'metadata.selfLink'));
+    try {
+      const result = await Promise.race([pollPromise, this.timeout()]);
+      if (result && deleteAfterUse) {
+        this.deleteSpokeView(spokeClusterNamespace, spokeViewResponse.metadata.name);
+      }
+      return result;
+    } catch (e) {
+      logger.error(`Resource View Query Error for ${resource}`, e.message);
+      cancel();
+      throw e;
+    }
+  }
+
+  async deleteSpokeView(spokeClusterNamespace, spokeViewName) {
+    this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${spokeClusterNamespace}/spokeviews/${spokeViewName}`)
+      .catch(e => logger.error(`Error deleting spoke view ${spokeViewName}`, e.message));
   }
 }

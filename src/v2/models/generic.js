@@ -309,6 +309,43 @@ export default class GenericModel extends KubeModel {
     return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
   }
 
+  // Generic query to get local and remote resource data
+  // Remote resources are queried using SpokeView
+  async getSpokeViewResource(selfLink, namespace, kind, name, cluster = '', updateInterval, deleteAfterUse) {
+    if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
+      return this.kubeConnector.get(selfLink);
+    }
+
+    // Check if the SpokeView already exists if not create it
+    const spokeViewName = `${cluster}-${name}-${kind}`.substr(0, 63);
+    const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/spokeviews/${spokeViewName}`);
+    if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
+      // If not local cluster -> create a SpokeView to retrieve requested resource
+      const response = await this.kubeConnector.spokeViewQuery(
+        cluster,
+        kind,
+        name,
+        namespace,
+        updateInterval,
+        deleteAfterUse,
+      ).catch(() => null);
+
+      const resourceResult = _.get(response, 'status.result');
+      if (resourceResult) {
+        return resourceResult;
+      }
+
+      return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
+    }
+    return _.get(resourceResponse, 'status.result');
+  }
+
+  // Delete a SpokeView resource
+  async deleteSpokeView(spokeClusterNamespace, spokeViewName) {
+    await this.kubeConnector.deleteSpokeView(spokeClusterNamespace, spokeViewName)
+      .catch(() => null);
+  }
+
   async updateResource(args) {
     const {
       selfLink, namespace, kind, name, body, cluster,

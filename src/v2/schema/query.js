@@ -50,6 +50,9 @@ type Query {
   # Get any kubernetes resource from any managed cluster.
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
 
+  # Get any kubernetes resource from any managed cluster.
+  getSpokeViewResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String, updateInterval: Int, deleteAfterUse: Boolean): JSON
+
   # Retrieves logs for the given container.
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
 
@@ -150,6 +153,9 @@ type Mutation {
 
   # Delete any Kubernetes resource via selfLink
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
+
+  # Delete a SpokeView resource
+  deleteSpokeView(spokeClusterNamespace: String, spokeViewName: String): JSON
 
   # Create remote cluster
   createCluster(cluster: JSON!) : JSON
