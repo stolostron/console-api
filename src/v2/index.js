@@ -29,7 +29,6 @@ import PlacementRuleModel from './models/placementrule';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
-import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
 import ClusterImportModel from './models/clusterImport';
@@ -120,7 +119,6 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     clusterModel: new ClusterModel({ kubeConnector, updateUserNamespaces }),
     genericModel: new GenericModel({ kubeConnector }),
     complianceModel: new ComplianceModel({ kubeConnector }),
-    helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
     clusterImportModel: new ClusterImportModel({ kubeConnector, updateUserNamespaces }),

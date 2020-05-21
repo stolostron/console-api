@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const mockResponse = {
@@ -322,33 +323,6 @@ export const apiPath = {
         singularName: '',
         namespaced: true,
         kind: 'Deployable',
-        verbs: [
-          'get',
-          'patch',
-          'update',
-        ],
-      },
-      {
-        name: 'helmrepos',
-        singularName: '',
-        namespaced: true,
-        kind: 'HelmRepo',
-        verbs: [
-          'create',
-          'delete',
-          'deletecollection',
-          'get',
-          'list',
-          'patch',
-          'update',
-          'watch',
-        ],
-      },
-      {
-        name: 'helmrepos/status',
-        singularName: '',
-        namespaced: true,
-        kind: 'HelmRepo',
         verbs: [
           'get',
           'patch',
