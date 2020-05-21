@@ -12,7 +12,6 @@ export const typeDef = `
 type Overview {
   clusters: [ClusterOverview]
   applications: [ApplicationOverview]
-  pods: [PodOverview]
   compliances: [ComplianceOverview]
   timestamp: String
 }
@@ -49,22 +48,12 @@ type ComplianceOverview implements K8sObject {
   metadata: Metadata
   raw: JSON
 }
-
-type PodOverview implements K8sObject {
-  metadata: Metadata
-  cluster: Cluster
-  hostIP: String
-  podIP: String
-  restarts: Int
-  startedAt: String
-  status: String
-}
 `;
 
 export const resolver = {
   Query: {
     overview: async (root, args, {
-      clusterModel, applicationModel, complianceModel, resourceViewModel,
+      clusterModel, applicationModel, complianceModel,
     }) => {
       let clusters = await clusterModel.getAllClusters();
       clusters = clusters.map(({
@@ -97,20 +86,6 @@ export const resolver = {
         },
       }));
 
-      // number, what cluster and status
-      let pods = await resourceViewModel.fetchResources({ type: 'pods' });
-      pods = pods.map(({ metadata, cluster, status }) => {
-        const { name, namespace } = metadata;
-        return {
-          metadata: {
-            name,
-            namespace,
-          },
-          status,
-          cluster,
-        };
-      });
-
       // policy compliances
       let compliances = await complianceModel.getCompliances();
       compliances = compliances.map(({ raw: { status: { status } } }) => ({
@@ -126,7 +101,7 @@ export const resolver = {
       const timestamp = new Date().toString();
 
       return {
-        clusters, applications, compliances, pods, timestamp,
+        clusters, applications, compliances, timestamp,
       };
     },
   },
