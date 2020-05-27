@@ -48,10 +48,7 @@ type Query {
   orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.
-  getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String): JSON
-
-  # Get any kubernetes resource from any managed cluster.
-  getSpokeViewResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String, updateInterval: Int, deleteAfterUse: Boolean): JSON
+  getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String, updateInterval: Int, deleteAfterUse: Boolean): JSON
 
   # Retrieves logs for the given container.
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String

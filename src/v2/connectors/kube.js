@@ -10,6 +10,7 @@
 
 import _ from 'lodash';
 import uuid from 'uuid';
+import crypto from 'crypto';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
 import config from '../../../config';
@@ -235,6 +236,7 @@ export default class KubeConnector {
                 return reject(response);
               }
               // We are looking for the type to be Processing for SpokeView resources
+              // TODO remove the 'Completed' logic when resource view is removed
               const isComplete = _.get(response, 'items[0].status.conditions[0].type') || _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
               if (isComplete === 'Processing' || isComplete === 'Completed') {
                 clearInterval(intervalID);
@@ -328,9 +330,9 @@ export default class KubeConnector {
   }
 
   // eslint-disable-next-line max-len
-  async spokeViewQuery(spokeClusterNamespace, resource, resourceName, resourceNamespace, updateInterval, deleteAfterUse) {
+  async spokeViewQuery(spokeClusterNamespace, apiGroup, kind, resourceName, namespace, updateInterval, deleteAfterUse) {
     // name cannot be long than 63 chars in length
-    const name = `${spokeClusterNamespace}-${resourceName}-${resource}`.substr(0, 63);
+    const name = crypto.createHash('sha1').update(`${spokeClusterNamespace}-${resourceName}-${kind}`).digest('hex').substr(0, 63);
 
     // scope.name is required, and either GKV (scope.apiGroup+kind+version) or scope.resource
     const body = {
@@ -345,9 +347,9 @@ export default class KubeConnector {
       },
       spec: {
         scope: {
-          resource,
           name: resourceName,
-          namespace: resourceNamespace,
+          namespace,
+          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
         },
       },
     };
@@ -368,7 +370,7 @@ export default class KubeConnector {
       }
       return result;
     } catch (e) {
-      logger.error(`Resource View Query Error for ${resource}`, e.message);
+      logger.error(`Resource View Query Error for ${kind}`, e.message);
       cancel();
       throw e;
     }

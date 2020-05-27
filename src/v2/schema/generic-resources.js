@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const typeDef = `
@@ -13,17 +14,7 @@ export const typeDef = `
 export const resolver = {
   Query: {
     getResource: (parent, args, { genericModel }) =>
-      genericModel.getResource(args.selfLink, args.namespace, args.kind, args.name, args.cluster),
-    getSpokeViewResource: (parent, args, { genericModel }) =>
-      genericModel.getSpokeViewResource(
-        args.selfLink,
-        args.namespace,
-        args.kind,
-        args.name,
-        args.cluster,
-        args.updateInterval,
-        args.deleteAfterUse,
-      ),
+      genericModel.getResource(args),
     updateResource: (parent, args, { genericModel }) => genericModel.updateResource(args),
   },
   Mutation: {

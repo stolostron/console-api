@@ -9,6 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -293,36 +294,31 @@ export default class GenericModel extends KubeModel {
     throw new Error(`Unable to find the cluster called ${clusterName}`);
   }
 
-  // Generic query to get raw data for any resource local || remote
-  async getResource(selfLink, namespace, kind, name, cluster = '') {
-    if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
-      return this.kubeConnector.get(selfLink);
-    }
-    // if not local cluster -> need to create a resource query to get remote resource
-    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
-
-    // eslint-disable-next-line
-    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup).catch(() => null);
-    if (response && response.status.results) {
-      return response.status.results[cluster];
-    }
-    return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
-  }
-
   // Generic query to get local and remote resource data
   // Remote resources are queried using SpokeView
-  async getSpokeViewResource(selfLink, namespace, kind, name, cluster = '', updateInterval, deleteAfterUse) {
+  async getResource(args) {
+    const {
+      selfLink,
+      cluster = '',
+      kind,
+      name,
+      namespace = '',
+      updateInterval,
+      deleteAfterUse = false,
+    } = args;
     if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
       return this.kubeConnector.get(selfLink);
     }
 
     // Check if the SpokeView already exists if not create it
-    const spokeViewName = `${cluster}-${name}-${kind}`.substr(0, 63);
+    const spokeViewName = crypto.createHash('sha1').update(`${cluster}-${name}-${kind}`).digest('hex').substr(0, 63);
+
     const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/spokeviews/${spokeViewName}`);
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
-      // If not local cluster -> create a SpokeView to retrieve requested resource
+      const apiGroup = getApiGroupFromSelfLink(selfLink);
       const response = await this.kubeConnector.spokeViewQuery(
         cluster,
+        apiGroup,
         kind,
         name,
         namespace,
