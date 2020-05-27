@@ -71,16 +71,22 @@ function responseHasError(response) {
 
 
 async function getClusterResources(kube) {
-  const [clusters, clusterdeployments] = await Promise.all([
+  const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
     // Try cluster scope queries, falling back to per-namespace
     kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters')
       .then(allClusters => (allClusters.items ?
         allClusters.items
         : kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`))),
+    kube.get('/apis/cluster.open-cluster-management.io/v1/managedclusters')
+      .then(allManagedClusters => allManagedClusters.items),
     kube.get('/apis/hive.openshift.io/v1/clusterdeployments')
       .then(allClusterDeployments => (allClusterDeployments.items ?
         allClusterDeployments.items
         : kube.getResources(ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`))),
+    kube.get('/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos')
+      .then(allManagedClusterInfos => (allManagedClusterInfos.items ?
+        allManagedClusterInfos.items
+        : kube.getResources(ns => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`))),
   ]);
 
   // For clusterversions, query only clusters that are online
@@ -94,7 +100,14 @@ async function getClusterResources(kube) {
     ),
     ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
   ]);
-  return [clusters, clusterstatuses, clusterdeployments, clusterversions];
+  return {
+    clusters,
+    managedclusters,
+    clusterstatuses,
+    clusterdeployments,
+    managedclusterinfos,
+    clusterversions,
+  };
 }
 
 function getUniqueResourceName(resource) {
@@ -125,12 +138,14 @@ function mapClusterVersions(rawClusterversions) {
   return clusterversions;
 }
 
-function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClusterversions) {
+function findMatchedStatus({
+  clusters, clusterstatuses, clusterdeployments, clusterversions,
+}) {
   const resultMap = new Map();
   const clusterMap = mapResources(clusters);
   const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
   const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
-  const clusterVersionMap = mapClusterVersions(rawClusterversions);
+  const clusterVersionMap = mapClusterVersions(clusterversions);
 
   const uniqueClusterNames = new Set([...clusterMap.keys(), ...clusterDeploymentMap.keys()]);
   uniqueClusterNames.forEach((c) => {
@@ -179,7 +194,7 @@ function getClusterDeploymentSecrets(clusterDeployment) {
   };
 }
 
-function findMatchedStatusForOverview(clusters, clusterstatuses) {
+function findMatchedStatusForOverview({ clusters, clusterstatuses }) {
   const resultMap = new Map();
   const clusterstatusResultMap = mapResources(clusterstatuses, 'ClusterStatus');
   clusters.forEach((cluster) => {
@@ -397,24 +412,39 @@ export default class ClusterModel extends KubeModel {
 
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
-    const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
+    const [
+      cluster,
+      managedcluster,
+      clusterstatus,
+      clusterdeployment,
+      managedclusterinfo,
+      ...clusterversions
+    ] =
+    await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
+      this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
+      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${namespace}/managedclusterinfos/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
     const [result] =
-      findMatchedStatus([clusters], [clusterstatuses], [clusterdeployments], clusterversions);
-    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployments);
+      findMatchedStatus({
+        clusters: [cluster],
+        managedclusters: [managedcluster],
+        clusterstatuses: [clusterstatus],
+        clusterdeployments: [clusterdeployment],
+        managedclusterinfos: [managedclusterinfo],
+        clusterversions,
+      });
+    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployment);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
   }
 
   async getClusters(args = {}) {
-    const [clusters, clusterstatuses, clusterdeployments, clusterversions] =
-      await getClusterResources(this.kubeConnector);
-    const results =
-      findMatchedStatus(clusters, clusterstatuses, clusterdeployments, clusterversions);
+    const resources = await getClusterResources(this.kubeConnector);
+    const results = findMatchedStatus(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
@@ -422,8 +452,8 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getAllClusters(args = {}) {
-    const [clusters, clusterstatuses] = await getClusterResources(this.kubeConnector);
-    const results = findMatchedStatusForOverview(clusters, clusterstatuses);
+    const resources = await getClusterResources(this.kubeConnector);
+    const results = findMatchedStatusForOverview(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
