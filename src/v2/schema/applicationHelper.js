@@ -145,53 +145,55 @@ function addSubscriptionCharts(
   }
 
   Object.values(subscriptionStatusMap).forEach((packageItem) => {
-    Object.keys(packageItem).forEach((packageItemKey) => {
-      if (packageItemKey.startsWith(channelName)) {
-        const objectInfo = packageItemKey.substring(channelName.length + 1);
-        let objectType;
-        let objectName;
-        // now find the type-name
-        const splitIndex = _.indexOf(objectInfo, '-');
-        if (splitIndex !== -1) {
-          objectName = objectInfo.substring(splitIndex + 1);
-          objectType = objectInfo.substring(0, splitIndex);
+    if (packageItem) {
+      Object.keys(packageItem).forEach((packageItemKey) => {
+        if (packageItemKey.startsWith(channelName)) {
+          const objectInfo = packageItemKey.substring(channelName.length + 1);
+          let objectType;
+          let objectName;
+          // now find the type-name
+          const splitIndex = _.indexOf(objectInfo, '-');
+          if (splitIndex !== -1) {
+            objectName = objectInfo.substring(splitIndex + 1);
+            objectType = objectInfo.substring(0, splitIndex);
 
-          const keyStr = `${objectName}-${objectType}`;
+            const keyStr = `${objectName}-${objectType}`;
 
-          if (!packagedObjects[keyStr]) {
-            const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
+            if (!packagedObjects[keyStr]) {
+              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
 
-            const chartObject = {
-              id: objId,
-              uid: objId,
-              name: objectName,
-              namespace: appNamespace,
-              type: objectType.toLowerCase(),
-              specs: {
-                isDesign: true,
-                raw: {
-                  kind: objectType,
-                  metadata: {
-                    name: objectName,
-                    namespace: appNamespace,
+              const chartObject = {
+                id: objId,
+                uid: objId,
+                name: objectName,
+                namespace: appNamespace,
+                type: objectType.toLowerCase(),
+                specs: {
+                  isDesign: true,
+                  raw: {
+                    kind: objectType,
+                    metadata: {
+                      name: objectName,
+                      namespace: appNamespace,
+                    },
+                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
                   },
-                  spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
                 },
-              },
 
-            };
+              };
 
-            nodes.push(chartObject);
-            links.push({
-              from: { uid: parentId },
-              to: { uid: objId },
-              type: 'package',
-            });
-            packagedObjects[keyStr] = chartObject;
+              nodes.push(chartObject);
+              links.push({
+                from: { uid: parentId },
+                to: { uid: objId },
+                type: 'package',
+              });
+              packagedObjects[keyStr] = chartObject;
+            }
           }
         }
-      }
-    });
+      });
+    }
   });
 }
 
