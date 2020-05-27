@@ -211,7 +211,6 @@ function addSubscriptionCharts(
                 },
 
               };
-
               nodes.push(chartObject);
               links.push({
                 from: { uid: parentId },
