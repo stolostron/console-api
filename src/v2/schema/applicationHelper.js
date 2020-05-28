@@ -127,9 +127,37 @@ function addSubscriptionDeployable(
   });
 }
 
+function createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName) {
+  const packageName = `HelmChart-${subscriptionName}`;
+  const memberId = `member--package--${packageName}`;
+
+  nodes.push({
+    name: packageName,
+    namespace: appNamespace,
+    type: 'package',
+    id: memberId,
+    uid: memberId,
+    specs: {
+      raw: {
+        kind: 'Package',
+        metadata: {
+          name: packageName,
+          namespace: appNamespace,
+        },
+        isDesign: false,
+      },
+    },
+  });
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+}
+
 function addSubscriptionCharts(
   parentId, subscriptionStatusMap,
-  nodes, links, appNamespace, channelInfo,
+  nodes, links, appNamespace, channelInfo, subscriptionName,
 ) {
   let channelName = null;
   if (channelInfo) {
@@ -141,9 +169,11 @@ function addSubscriptionCharts(
   const packagedObjects = {};
 
   if (!channelName) {
+    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
     return; // could not find the subscription channel name, abort
   }
 
+  let foundDeployables = false;
   Object.values(subscriptionStatusMap).forEach((packageItem) => {
     if (packageItem) {
       Object.keys(packageItem).forEach((packageItemKey) => {
@@ -181,7 +211,6 @@ function addSubscriptionCharts(
                 },
 
               };
-
               nodes.push(chartObject);
               links.push({
                 from: { uid: parentId },
@@ -189,12 +218,16 @@ function addSubscriptionCharts(
                 type: 'package',
               });
               packagedObjects[keyStr] = chartObject;
+              foundDeployables = true;
             }
           }
         }
       });
     }
   });
+  if (!foundDeployables) {
+    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+  }
 }
 
 async function getApplicationElements(application, clusterModel) {
@@ -242,6 +275,7 @@ async function getApplicationElements(application, clusterModel) {
     const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
       const subscriptionChannel = _.get(subscription, 'spec.channel');
+      const subscriptionName = _.get(subscription, 'metadata.name', '');
       // get cluster placement if any
       const ruleDecisionMap = {};
       if (subscription.rules) {
@@ -303,7 +337,7 @@ async function getApplicationElements(application, clusterModel) {
           // else add charts which does deployment
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes
-              , links, namespace, subscriptionChannel,
+              , links, namespace, subscriptionChannel, subscriptionName,
             );
           }
         });
@@ -313,7 +347,7 @@ async function getApplicationElements(application, clusterModel) {
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
           parentId, subscriptionStatusMap, nodes
-          , links, namespace, subscriptionChannel,
+          , links, namespace, subscriptionChannel, subscriptionName,
         );
       }
       delete subscription.deployables;
