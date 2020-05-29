@@ -400,7 +400,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
+        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
