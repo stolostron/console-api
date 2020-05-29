@@ -86,16 +86,19 @@ export default class ChannelModel extends KubeModel {
     } else {
       chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
     }
-    return chs.map(async channel => ({
-      metadata: channel.metadata,
-      channelWorkNames: channel.metadata.name || '',
-      namespace: channel.metadata.namespace,
-      type: channel.spec.type, // HelmRepo or ObjectBucket
-      objectPath: channel.spec.pathname,
-      secret: channel.spec.secretRef ? channel.spec.secretRef.name : '',
-      raw: channel,
-      gates: channel.spec.gates || {},
-      sourceNamespaces: channel.spec.sourceNamespaces || {},
-    }));
+    return chs.map(async (channel) => {
+      const { spec } = channel;
+      return {
+        metadata: channel.metadata,
+        channelWorkNames: channel.metadata.name || '',
+        namespace: channel.metadata.namespace,
+        type: (spec && spec.type) || '', // HelmRepo or ObjectBucket
+        objectPath: (spec && spec.pathname) || '',
+        secret: (spec && spec.secretRef && spec.secretRef.name) || '',
+        raw: channel,
+        gates: (spec && spec.gates) || {},
+        sourceNamespaces: (spec && spec.sourceNamespaces) || {},
+      };
+    });
   }
 }

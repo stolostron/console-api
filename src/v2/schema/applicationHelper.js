@@ -127,31 +127,107 @@ function addSubscriptionDeployable(
   });
 }
 
-function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links, appNamespace) {
-  Object.values(subscriptionStatusMap).forEach((value) => {
-    if (value) {
-      const [packageName] = Object.keys(value);
-      const memberId = `member--package--${packageName}`;
-      const status = value[packageName];
-      const deployStatuses = [];
-      if (status) {
-        deployStatuses.push(status);
-      }
-      nodes.push({
-        name: packageName,
-        namespace: appNamespace,
-        type: 'package',
-        id: memberId,
-        uid: memberId,
-        specs: { raw: value, deployStatuses, isDesign: false },
-      });
-      links.push({
-        from: { uid: parentId },
-        to: { uid: memberId },
-        type: '',
+function createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName) {
+  const packageName = `HelmChart-${subscriptionName}`;
+  const memberId = `member--package--${packageName}`;
+
+  nodes.push({
+    name: packageName,
+    namespace: appNamespace,
+    type: 'package',
+    id: memberId,
+    uid: memberId,
+    specs: {
+      raw: {
+        kind: 'Package',
+        metadata: {
+          name: packageName,
+          namespace: appNamespace,
+        },
+        isDesign: false,
+      },
+    },
+  });
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+}
+
+function addSubscriptionCharts(
+  parentId, subscriptionStatusMap,
+  nodes, links, appNamespace, channelInfo, subscriptionName,
+) {
+  let channelName = null;
+  if (channelInfo) {
+    const splitIndex = _.indexOf(channelInfo, '/');
+    if (splitIndex !== -1) {
+      channelName = channelInfo.substring(splitIndex + 1);
+    }
+  }
+  const packagedObjects = {};
+
+  if (!channelName) {
+    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+    return; // could not find the subscription channel name, abort
+  }
+
+  let foundDeployables = false;
+  Object.values(subscriptionStatusMap).forEach((packageItem) => {
+    if (packageItem) {
+      Object.keys(packageItem).forEach((packageItemKey) => {
+        if (packageItemKey.startsWith(channelName)) {
+          const objectInfo = packageItemKey.substring(channelName.length + 1);
+          let objectType;
+          let objectName;
+          // now find the type-name
+          const splitIndex = _.indexOf(objectInfo, '-');
+          if (splitIndex !== -1) {
+            objectName = objectInfo.substring(splitIndex + 1);
+            objectType = objectInfo.substring(0, splitIndex);
+
+            const keyStr = `${objectName}-${objectType}`;
+
+            if (!packagedObjects[keyStr]) {
+              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
+
+              const chartObject = {
+                id: objId,
+                uid: objId,
+                name: objectName,
+                namespace: appNamespace,
+                type: objectType.toLowerCase(),
+                specs: {
+                  isDesign: true,
+                  raw: {
+                    kind: objectType,
+                    metadata: {
+                      name: objectName,
+                      namespace: appNamespace,
+                    },
+                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
+                  },
+                },
+
+              };
+              nodes.push(chartObject);
+              links.push({
+                from: { uid: parentId },
+                to: { uid: objId },
+                type: 'package',
+              });
+              packagedObjects[keyStr] = chartObject;
+              foundDeployables = true;
+            }
+          }
+        }
       });
     }
   });
+  if (!foundDeployables) {
+    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+  }
 }
 
 async function getApplicationElements(application, clusterModel) {
@@ -198,6 +274,8 @@ async function getApplicationElements(application, clusterModel) {
   if (application.subscriptions) {
     const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
+      const subscriptionChannel = _.get(subscription, 'spec.channel');
+      const subscriptionName = _.get(subscription, 'metadata.name', '');
       // get cluster placement if any
       const ruleDecisionMap = {};
       if (subscription.rules) {
@@ -257,14 +335,20 @@ async function getApplicationElements(application, clusterModel) {
             });
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
-            addSubscriptionCharts(clusterId, subscriptionStatusMap, nodes, links, namespace);
+            addSubscriptionCharts(
+              clusterId, subscriptionStatusMap, nodes
+              , links, namespace, subscriptionChannel, subscriptionName,
+            );
           }
         });
       }
 
       // no deployables was placed on a clutser but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
-        addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links, namespace);
+        addSubscriptionCharts(
+          parentId, subscriptionStatusMap, nodes
+          , links, namespace, subscriptionChannel, subscriptionName,
+        );
       }
       delete subscription.deployables;
     });
