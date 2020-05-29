@@ -349,7 +349,7 @@ export default class KubeConnector {
         scope: {
           name: resourceName,
           namespace,
-          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
+          resource: `${kind}${apiGroup && `.${apiGroup}`}`,
         },
       },
     };

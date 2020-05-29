@@ -16,7 +16,7 @@ const asyncReturn = (value, waitTime = 500) =>
 const mockSpokeView = {
   body: {
     metadata: {
-      selfLink: '/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/test-set',
+      selfLink: '/apis/view.open-cluster-management.io/v1beta1/namespaces/cluster-test/spokeviews/spoke-test',
     },
   },
 };
@@ -237,7 +237,7 @@ describe('KubeConnector', () => {
         kubeApiEndpoint: 'kubernetes',
         httpLib: mockHttp,
         uid: () => '1234',
-        namespaces: ['default'],
+        namespaces: ['open-cluster-management'],
       });
 
       const result = await connector.spokeViewQuery(

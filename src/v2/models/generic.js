@@ -304,7 +304,7 @@ export default class GenericModel extends KubeModel {
       name,
       namespace = '',
       updateInterval,
-      deleteAfterUse = false,
+      deleteAfterUse = true,
     } = args;
     if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
       return this.kubeConnector.get(selfLink);
