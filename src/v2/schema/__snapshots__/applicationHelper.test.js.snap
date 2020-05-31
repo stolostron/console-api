@@ -3,5 +3,3 @@
 exports[`applicationHelper should match snapshot with subscription 1`] = `Promise {}`;
 
 exports[`applicationHelper should match snapshot without subscription 1`] = `Promise {}`;
-
-exports[`createReplicaChild should match snapshot with subscription 1`] = `undefined`;
