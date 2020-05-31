@@ -43,7 +43,7 @@ describe('applicationHelper', () => {
 });
 
 describe('createReplicaChild', () => {
-  it('should match snapshot with subscription', () => {
+  it('createReplicaChild', () => {
     const parentObject = {
       id: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--deployment--redis-slave',
       uid: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--deployment--redis-slave',
@@ -83,7 +83,7 @@ describe('createReplicaChild', () => {
 });
 
 describe('createGenericPackageObject', () => {
-  it('should match snapshot with subscription', () => {
+  it('createGenericPackageObject', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'obj-sub-ns';
     const subscriptionName = 'obj-sub';
@@ -142,7 +142,7 @@ describe('addClusters', () => {
 
 
 describe('addSubscriptionDeployable', () => {
-  it('should match snapshot with subscription', () => {
+  it('addSubscriptionDeployable', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -221,7 +221,7 @@ describe('addSubscriptionDeployable', () => {
 });
 
 describe('addSubscriptionCharts', () => {
-  it('should match snapshot with subscription', () => {
+  it('addSubscriptionCharts', () => {
     const parentId = 'member--clusters--possiblereptile, braveman, sharingpenguin, relievedox';
     const appNamespace = 'open-cluster-management';
     const channelInfo = 'gb-app-latest-ns/guestbook-app-latest';
