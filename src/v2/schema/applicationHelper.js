@@ -54,10 +54,10 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
-function addClusters(
+export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
-) {
+) => {
   // create element if not already created
   const cns = clusterNames.join(', ');
   const clusterId = `member--clusters--${cns}`;
@@ -87,7 +87,7 @@ function addClusters(
     specs: { isDesign: true },
   });
   return clusterId;
-}
+};
 
 const getClusterName = (nodeId) => {
   const startPos = nodeId.indexOf('--clusters--') + 12;
@@ -97,14 +97,14 @@ const getClusterName = (nodeId) => {
 };
 
 
-function createReplicaChild(parentObject, template, links, nodes) {
+export const createReplicaChild = (parentObject, template, links, nodes) => {
   if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
-    return; // no replica
+    return null; // no replica
   }
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
     // create only for deploymentconfig and deployment types
-    return;
+    return null;
   }
 
   const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
@@ -139,11 +139,14 @@ function createReplicaChild(parentObject, template, links, nodes) {
     to: { uid: memberId },
     type: '',
   });
-}
-function addSubscriptionDeployable(
+
+  return deployableObj;
+};
+
+export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
   subscriptionStatusMap, names, appNamespace,
-) {
+) => {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -183,13 +186,18 @@ function addSubscriptionDeployable(
 
   // create subobject replica subobject, if this object defines a replicas
   createReplicaChild(topoObject, template, links, nodes);
-}
 
-function createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName) {
+  return topoObject;
+};
+
+export const createGenericPackageObject = (
+  parentId, appNamespace
+  , nodes, links, subscriptionName,
+) => {
   const packageName = `HelmChart-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
 
-  nodes.push({
+  const packageObj = {
     name: packageName,
     namespace: appNamespace,
     type: 'package',
@@ -205,18 +213,22 @@ function createGenericPackageObject(parentId, appNamespace, nodes, links, subscr
         isDesign: false,
       },
     },
-  });
+  };
+
+  nodes.push(packageObj);
   links.push({
     from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
-}
 
-function addSubscriptionCharts(
+  return packageObj;
+};
+
+export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
   nodes, links, appNamespace, channelInfo, subscriptionName,
-) {
+) => {
   let channelName = null;
   if (channelInfo) {
     const splitIndex = _.indexOf(channelInfo, '/');
@@ -228,72 +240,72 @@ function addSubscriptionCharts(
 
   if (!channelName) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
-    return; // could not find the subscription channel name, abort
+    return null; // could not find the subscription channel name, abort
   }
 
   let foundDeployables = false;
   Object.values(subscriptionStatusMap).forEach((packageItem) => {
-    if (!packageItem) {
-      return;
-    }
+    if (packageItem) {
+      Object.keys(packageItem).forEach((packageItemKey) => {
+        if (packageItemKey.startsWith(channelName)) {
+          const objectInfo = packageItemKey.substring(channelName.length + 1);
+          let objectType;
+          let objectName;
+          // now find the type-name
+          const splitIndex = _.indexOf(objectInfo, '-');
+          if (splitIndex !== -1) {
+            objectName = objectInfo.substring(splitIndex + 1);
+            objectType = objectInfo.substring(0, splitIndex);
 
-    Object.keys(packageItem).forEach((packageItemKey) => {
-      if (packageItemKey.startsWith(channelName)) {
-        const objectInfo = packageItemKey.substring(channelName.length + 1);
-        let objectType;
-        let objectName;
-        // now find the type-name
-        const splitIndex = _.indexOf(objectInfo, '-');
-        if (splitIndex !== -1) {
-          objectName = objectInfo.substring(splitIndex + 1);
-          objectType = objectInfo.substring(0, splitIndex);
+            const keyStr = `${objectName}-${objectType}`;
 
-          const keyStr = `${objectName}-${objectType}`;
+            if (!packagedObjects[keyStr]) {
+              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
 
-          if (!packagedObjects[keyStr]) {
-            const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
-
-            const chartObject = {
-              id: objId,
-              uid: objId,
-              name: objectName,
-              namespace: appNamespace,
-              type: objectType.toLowerCase(),
-              specs: {
-                isDesign: true,
-                raw: {
-                  kind: objectType,
-                  metadata: {
-                    name: objectName,
-                    namespace: appNamespace,
+              const chartObject = {
+                id: objId,
+                uid: objId,
+                name: objectName,
+                namespace: appNamespace,
+                type: objectType.toLowerCase(),
+                specs: {
+                  isDesign: true,
+                  raw: {
+                    kind: objectType,
+                    metadata: {
+                      name: objectName,
+                      namespace: appNamespace,
+                    },
+                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
                   },
-                  spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
                 },
-              },
 
-            };
-            nodes.push(chartObject);
-            links.push({
-              from: { uid: parentId },
-              to: { uid: objId },
-              type: 'package',
-            });
-            // create subobject replica subobject, if this object defines a replicas
-            createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
+              };
+              nodes.push(chartObject);
+              links.push({
+                from: { uid: parentId },
+                to: { uid: objId },
+                type: 'package',
+              });
+              // create subobject replica subobject, if this object defines a replicas
+              createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
 
-            packagedObjects[keyStr] = chartObject;
-            foundDeployables = true;
+              packagedObjects[keyStr] = chartObject;
+              foundDeployables = true;
+            }
           }
         }
-      }
-    });
+      });
+    }
   });
   if (!foundDeployables) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
   }
-}
 
-async function getApplicationElements(application, clusterModel) {
+  return nodes;
+};
+
+export async function getApplicationElements(application, clusterModel) {
   const links = [];
   const nodes = [];
 
