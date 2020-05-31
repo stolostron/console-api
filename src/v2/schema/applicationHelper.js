@@ -305,7 +305,7 @@ export const addSubscriptionCharts = (
   return nodes;
 };
 
-export async function getApplicationElements(application, clusterModel) {
+async function getApplicationElements(application, clusterModel) {
   const links = [];
   const nodes = [];
 
