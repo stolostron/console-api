@@ -8,15 +8,14 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-
-import {
-  getApplicationElements
-  , createReplicaChild
+import getApplicationElements, {
+  createReplicaChild
   , createGenericPackageObject
   , addSubscriptionCharts
   , addSubscriptionDeployable
   , addClusters,
 } from './applicationHelper';
+
 
 describe('applicationHelper', () => {
   it('should match snapshot with subscription', () => {
