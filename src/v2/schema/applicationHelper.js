@@ -98,6 +98,9 @@ const getClusterName = (nodeId) => {
 
 
 function createReplicaChild(parentObject, template, links, nodes) {
+  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
+    return; // no replica
+  }
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
     // create only for deploymentconfig and deployment types
@@ -178,9 +181,8 @@ function addSubscriptionDeployable(
     type: '',
   });
 
-  if (_.get(template, 'spec.replicas')) { // create subobject replicaset
-    createReplicaChild(topoObject, template, links, nodes);
-  }
+  // create subobject replica subobject, if this object defines a replicas
+  createReplicaChild(topoObject, template, links, nodes);
 }
 
 function createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName) {
@@ -231,59 +233,60 @@ function addSubscriptionCharts(
 
   let foundDeployables = false;
   Object.values(subscriptionStatusMap).forEach((packageItem) => {
-    if (packageItem) {
-      Object.keys(packageItem).forEach((packageItemKey) => {
-        if (packageItemKey.startsWith(channelName)) {
-          const objectInfo = packageItemKey.substring(channelName.length + 1);
-          let objectType;
-          let objectName;
-          // now find the type-name
-          const splitIndex = _.indexOf(objectInfo, '-');
-          if (splitIndex !== -1) {
-            objectName = objectInfo.substring(splitIndex + 1);
-            objectType = objectInfo.substring(0, splitIndex);
+    if (!packageItem) {
+      return;
+    }
 
-            const keyStr = `${objectName}-${objectType}`;
+    Object.keys(packageItem).forEach((packageItemKey) => {
+      if (packageItemKey.startsWith(channelName)) {
+        const objectInfo = packageItemKey.substring(channelName.length + 1);
+        let objectType;
+        let objectName;
+        // now find the type-name
+        const splitIndex = _.indexOf(objectInfo, '-');
+        if (splitIndex !== -1) {
+          objectName = objectInfo.substring(splitIndex + 1);
+          objectType = objectInfo.substring(0, splitIndex);
 
-            if (!packagedObjects[keyStr]) {
-              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
+          const keyStr = `${objectName}-${objectType}`;
 
-              const chartObject = {
-                id: objId,
-                uid: objId,
-                name: objectName,
-                namespace: appNamespace,
-                type: objectType.toLowerCase(),
-                specs: {
-                  isDesign: true,
-                  raw: {
-                    kind: objectType,
-                    metadata: {
-                      name: objectName,
-                      namespace: appNamespace,
-                    },
-                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
+          if (!packagedObjects[keyStr]) {
+            const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
+
+            const chartObject = {
+              id: objId,
+              uid: objId,
+              name: objectName,
+              namespace: appNamespace,
+              type: objectType.toLowerCase(),
+              specs: {
+                isDesign: true,
+                raw: {
+                  kind: objectType,
+                  metadata: {
+                    name: objectName,
+                    namespace: appNamespace,
                   },
+                  spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
                 },
+              },
 
-              };
-              nodes.push(chartObject);
-              links.push({
-                from: { uid: parentId },
-                to: { uid: objId },
-                type: 'package',
-              });
-              if (_.get(chartObject, 'specs.raw.spec.replicas')) {
-                createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
-              }
+            };
+            nodes.push(chartObject);
+            links.push({
+              from: { uid: parentId },
+              to: { uid: objId },
+              type: 'package',
+            });
+            // create subobject replica subobject, if this object defines a replicas
+            createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
 
-              packagedObjects[keyStr] = chartObject;
-              foundDeployables = true;
-            }
+            packagedObjects[keyStr] = chartObject;
+            foundDeployables = true;
           }
         }
-      });
-    }
+      }
+    });
   });
   if (!foundDeployables) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
