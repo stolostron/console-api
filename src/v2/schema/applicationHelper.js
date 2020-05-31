@@ -89,6 +89,54 @@ function addClusters(
   return clusterId;
 }
 
+const getClusterName = (nodeId) => {
+  const startPos = nodeId.indexOf('--clusters--') + 12;
+  const endPos = nodeId.indexOf('--', startPos);
+
+  return nodeId.slice(startPos, endPos);
+};
+
+
+function createReplicaChild(parentObject, template, links, nodes) {
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
+    // create only for deploymentconfig and deployment types
+    return;
+  }
+
+  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
+  const { name, namespace } = parentObject;
+
+  const parentId = parentObject.id;
+  const memberId = `member--member--deployable--member--clusters--${getClusterName(parentId)}--${type}--${name}`;
+
+  const rawData = {
+    kind: type,
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      desired: _.get(template, 'spec.replicas', 0),
+      template: Object.assign({}, _.get(template, 'spec.template', {})),
+    },
+  };
+  const deployableObj = {
+    name,
+    namespace,
+    type,
+    id: memberId,
+    uid: memberId,
+    specs: { isDesign: true, raw: rawData },
+  };
+
+  nodes.push(deployableObj);
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+}
 function addSubscriptionDeployable(
   parentId, deployable, links, nodes,
   subscriptionStatusMap, names, appNamespace,
@@ -112,22 +160,30 @@ function addSubscriptionDeployable(
   const { metadata: { name: k8Name } } = template;
   kind = kind.toLowerCase();
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
-  nodes.push({
+
+  const topoObject =
+  {
     name: k8Name,
     namespace: appNamespace,
     type: kind,
     id: memberId,
     uid: memberId,
     specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
-  });
+  };
+
+  nodes.push(topoObject);
   links.push({
     from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
+
+  if (_.get(template, 'spec.replicas')) { // create subobject replicaset
+    createReplicaChild(topoObject, template, links, nodes);
+  }
 }
 
-function createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName) {
+function createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName) {
   const packageName = `HelmChart-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
 
@@ -169,7 +225,7 @@ function addSubscriptionCharts(
   const packagedObjects = {};
 
   if (!channelName) {
-    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
     return; // could not find the subscription channel name, abort
   }
 
@@ -217,6 +273,10 @@ function addSubscriptionCharts(
                 to: { uid: objId },
                 type: 'package',
               });
+              if (_.get(chartObject, 'specs.raw.spec.replicas')) {
+                createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
+              }
+
               packagedObjects[keyStr] = chartObject;
               foundDeployables = true;
             }
@@ -226,7 +286,7 @@ function addSubscriptionCharts(
     }
   });
   if (!foundDeployables) {
-    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
   }
 }
 
