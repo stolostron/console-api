@@ -8,7 +8,6 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-import _ from 'lodash';
 import getApplicationElements from './applicationHelper';
 
 export const typeDef = `
@@ -56,13 +55,6 @@ input TopologyFilter {
   type: [String]
 }
 
-type TopologyDetails {
-  pods: [JSON]
-}
-
-input TopologyDetailsFilter {
-  clusterNames: [String]
-}
 `;
 
 export const resolver = {
@@ -79,36 +71,6 @@ export const resolver = {
       }
       return { resources, relationships };
     },
-
-    // second pass--get topology details
-    topologyDetails: async (root, args, { resourceViewModel }) => {
-      let pods = await resourceViewModel.fetchResources({ type: 'pods' }, _.get(args, 'filter.clusterNames'));
-      pods = pods.map((pod) => {
-        const {
-          metadata, cluster, containers: cntrs, status, hostIP, podIP, restarts, startedAt,
-        } = pod;
-        const {
-          name, namespace, creationTimestamp, labels,
-        } = metadata;
-        const containers = cntrs.map(({ name: n, image }) => ({
-          name: n,
-          image,
-        }));
-        return {
-          name,
-          namespace,
-          status,
-          cluster,
-          containers,
-          creationTimestamp,
-          labels,
-          hostIP,
-          podIP,
-          restarts,
-          startedAt,
-        };
-      });
-      return { pods };
-    },
   },
+
 };

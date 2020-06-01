@@ -247,6 +247,11 @@ export default class ClusterModel extends KubeModel {
       }
     }
 
+    // Update the namespace cache, don't add existing namespace in case they are unauthorized
+    if (namespaceResponse.code !== 409) {
+      this.updateUserNamespaces(namespaceResponse);
+    }
+
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/');
     const requestPaths = await Promise.all(resources.map(async resource =>

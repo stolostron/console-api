@@ -5,13 +5,15 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import { isRequired } from '../lib/utils';
 
 // Abstract class for models that communicate with the kubernetes api
 export default class Kube {
-  constructor({ kubeConnector = isRequired('kubeConnector') }) {
+  constructor({ kubeConnector = isRequired('kubeConnector'), updateUserNamespaces }) {
     this.kubeConnector = kubeConnector;
+    this.updateUserNamespaces = updateUserNamespaces;
   }
 }

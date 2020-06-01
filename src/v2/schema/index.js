@@ -14,7 +14,6 @@ import { makeExecutableSchema } from 'graphql-tools';
 import * as applications from './application';
 import * as channels from './channel';
 import * as subscriptions from './subscription';
-import * as charts from './helmchart';
 import * as cluster from './cluster';
 import * as compliance from './compliance';
 import * as placementrules from './placementrule';
@@ -29,8 +28,6 @@ import * as policy from './policy';
 import * as pvs from './pvs';
 import * as genericResources from './generic-resources';
 import * as query from './query';
-import * as releases from './helmrels';
-import * as repo from './helmrepo';
 import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as clusterImport from './clusterImport';
@@ -42,7 +39,6 @@ const modules = [
   channels,
   subscriptions,
   placementrules,
-  charts,
   cluster,
   compliance,
   filter,
@@ -56,8 +52,6 @@ const modules = [
   pvs,
   query,
   genericResources,
-  releases,
-  repo,
   topology,
   userAccess,
   clusterImport,

@@ -1,7 +1,7 @@
 /** *****************************************************************************
  * Licensed Materials - Property of IBM
  * (c) Copyright IBM Corporation 2019. All Rights Reserved.
- *
+ * Copyright (c) 2020 Red Hat, Inc.
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
@@ -54,10 +54,10 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
-function addClusters(
+export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
-) {
+) => {
   // create element if not already created
   const cns = clusterNames.join(', ');
   const clusterId = `member--clusters--${cns}`;
@@ -87,40 +87,76 @@ function addClusters(
     specs: { isDesign: true },
   });
   return clusterId;
-}
+};
 
-function addSubscriptionDeployable(
+const getClusterName = (nodeId) => {
+  const startPos = nodeId.indexOf('--clusters--') + 12;
+  const endPos = nodeId.indexOf('--', startPos);
+
+  return nodeId.slice(startPos, endPos);
+};
+
+
+export const createReplicaChild = (parentObject, template, links, nodes) => {
+  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
+    return null; // no replica
+  }
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
+    // create only for deploymentconfig and deployment types
+    return null;
+  }
+
+  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
+  const { name, namespace } = parentObject;
+
+  const parentId = parentObject.id;
+  const memberId = `member--member--deployable--member--clusters--${getClusterName(parentId)}--${type}--${name}`;
+
+  const rawData = {
+    kind: type,
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      desired: _.get(template, 'spec.replicas', 0),
+      template: Object.assign({}, _.get(template, 'spec.template', {})),
+    },
+  };
+  const deployableObj = {
+    name,
+    namespace,
+    type,
+    id: memberId,
+    uid: memberId,
+    specs: { isDesign: true, raw: rawData },
+  };
+
+  nodes.push(deployableObj);
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+
+  return deployableObj;
+};
+
+export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names,
-) {
+  subscriptionStatusMap, names, appNamespace,
+) => {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
-  nodes.push({
-    name,
-    namespace,
-    type: 'deployable',
-    id: deployableId,
-    uid: deployableId,
-    specs: { isDesign: true, raw: deployable, isDivider: true },
-  });
-  links.push({
-    from: { uid: parentId },
-    to: { uid: deployableId },
-    type: '',
-    specs: { isDesign: true },
-  });
 
   // installs these K8 objects
-  let failed = false;
   const deployStatuses = [];
   names.forEach((cname) => {
     const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
     if (status) {
       deployStatuses.push(status);
-      if (status.phase === 'Failed') {
-        failed = true;
-      }
     }
   });
 
@@ -130,65 +166,144 @@ function addSubscriptionDeployable(
   const { metadata: { name: k8Name } } = template;
   kind = kind.toLowerCase();
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
-  nodes.push({
+
+  const topoObject =
+  {
     name: k8Name,
-    namespace: '',
+    namespace: appNamespace,
     type: kind,
     id: memberId,
     uid: memberId,
     specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
-  });
+  };
+
+  nodes.push(topoObject);
   links.push({
-    from: { uid: deployableId },
+    from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
 
-  // if deployment, show pod--unless deployable failed to deploy deployment
-  if (kind === 'deployment' && !failed) {
-    const podId = `member--pod--${deployableId}--${k8Name}`;
-    nodes.push({
-      name: k8Name,
-      namespace: '',
-      type: 'pod',
-      id: podId,
-      uid: podId,
-      specs: { raw: template },
-    });
-    links.push({
-      from: { uid: memberId },
-      to: { uid: podId },
-      type: '',
-    });
-  }
-}
+  // create subobject replica subobject, if this object defines a replicas
+  createReplicaChild(topoObject, template, links, nodes);
 
-function addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links) {
-  Object.values(subscriptionStatusMap).forEach((value) => {
-    if (value) {
-      const [packageName] = Object.keys(value);
-      const memberId = `member--package--${packageName}`;
-      const status = value[packageName];
-      const deployStatuses = [];
-      if (status) {
-        deployStatuses.push(status);
-      }
-      nodes.push({
-        name: packageName,
-        namespace: '',
-        type: 'package',
-        id: memberId,
-        uid: memberId,
-        specs: { raw: value, deployStatuses, isDesign: false },
-      });
-      links.push({
-        from: { uid: parentId },
-        to: { uid: memberId },
-        type: '',
+  return topoObject;
+};
+
+export const createGenericPackageObject = (
+  parentId, appNamespace
+  , nodes, links, subscriptionName,
+) => {
+  const packageName = `HelmChart-${subscriptionName}`;
+  const memberId = `member--package--${packageName}`;
+
+  const packageObj = {
+    name: packageName,
+    namespace: appNamespace,
+    type: 'package',
+    id: memberId,
+    uid: memberId,
+    specs: {
+      raw: {
+        kind: 'Package',
+        metadata: {
+          name: packageName,
+          namespace: appNamespace,
+        },
+        isDesign: false,
+      },
+    },
+  };
+
+  nodes.push(packageObj);
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+
+  return packageObj;
+};
+
+export const addSubscriptionCharts = (
+  parentId, subscriptionStatusMap,
+  nodes, links, appNamespace, channelInfo, subscriptionName,
+) => {
+  let channelName = null;
+  if (channelInfo) {
+    const splitIndex = _.indexOf(channelInfo, '/');
+    if (splitIndex !== -1) {
+      channelName = channelInfo.substring(splitIndex + 1);
+    }
+  }
+  const packagedObjects = {};
+
+  if (!channelName) {
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
+    return null; // could not find the subscription channel name, abort
+  }
+
+  let foundDeployables = false;
+  Object.values(subscriptionStatusMap).forEach((packageItem) => {
+    if (packageItem) {
+      Object.keys(packageItem).forEach((packageItemKey) => {
+        if (packageItemKey.startsWith(channelName)) {
+          const objectInfo = packageItemKey.substring(channelName.length + 1);
+          let objectType;
+          let objectName;
+          // now find the type-name
+          const splitIndex = _.indexOf(objectInfo, '-');
+          if (splitIndex !== -1) {
+            objectName = objectInfo.substring(splitIndex + 1);
+            objectType = objectInfo.substring(0, splitIndex);
+
+            const keyStr = `${objectName}-${objectType}`;
+
+            if (!packagedObjects[keyStr]) {
+              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
+
+              const chartObject = {
+                id: objId,
+                uid: objId,
+                name: objectName,
+                namespace: appNamespace,
+                type: objectType.toLowerCase(),
+                specs: {
+                  isDesign: true,
+                  raw: {
+                    kind: objectType,
+                    metadata: {
+                      name: objectName,
+                      namespace: appNamespace,
+                    },
+                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
+                  },
+                },
+
+              };
+              nodes.push(chartObject);
+              links.push({
+                from: { uid: parentId },
+                to: { uid: objId },
+                type: 'package',
+              });
+              // create subobject replica subobject, if this object defines a replicas
+              createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
+
+              packagedObjects[keyStr] = chartObject;
+              foundDeployables = true;
+            }
+          }
+        }
       });
     }
   });
-}
+  if (!foundDeployables) {
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
+  }
+
+  return nodes;
+};
 
 async function getApplicationElements(application, clusterModel) {
   const links = [];
@@ -234,6 +349,8 @@ async function getApplicationElements(application, clusterModel) {
   if (application.subscriptions) {
     const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
+      const subscriptionChannel = _.get(subscription, 'spec.channel');
+      const subscriptionName = _.get(subscription, 'metadata.name', '');
       // get cluster placement if any
       const ruleDecisionMap = {};
       if (subscription.rules) {
@@ -288,19 +405,25 @@ async function getApplicationElements(application, clusterModel) {
             subscription.deployables.forEach((deployable) => {
               addSubscriptionDeployable(
                 clusterId, deployable, links, nodes,
-                subscriptionStatusMap, names,
+                subscriptionStatusMap, names, namespace,
               );
             });
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
-            addSubscriptionCharts(clusterId, subscriptionStatusMap, nodes, links);
+            addSubscriptionCharts(
+              clusterId, subscriptionStatusMap, nodes
+              , links, namespace, subscriptionChannel, subscriptionName,
+            );
           }
         });
       }
 
       // no deployables was placed on a clutser but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
-        addSubscriptionCharts(parentId, subscriptionStatusMap, nodes, links);
+        addSubscriptionCharts(
+          parentId, subscriptionStatusMap, nodes
+          , links, namespace, subscriptionChannel, subscriptionName,
+        );
       }
       delete subscription.deployables;
     });
