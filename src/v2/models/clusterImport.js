@@ -46,17 +46,11 @@ export default class ClusterImportModel {
   }
 
   async createClusterResource(args) {
-    const { body } = args;
+    const { cluster } = args;
+    const [clusterTemplate, endpointTemplate] = cluster;
+    if (!endpointTemplate) throw new Error('EndpointConfig is required for createClusterResource');
 
-    if (!body) throw new Error('Body is required for createClusterResource');
-
-    let config = {};
-    try {
-      config = JSON.parse(body);
-    } catch (e) {
-      throw new Error(e);
-    }
-
+    const config = endpointTemplate.spec;
     const { clusterName, clusterNamespace } = config;
 
     const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
@@ -85,13 +79,12 @@ export default class ClusterImportModel {
       }
     }
 
-    const endpointTemplate = this.endpointConfigTemplate(config);
+    endpointTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
     const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
     if (this.responseHasError(endpointConfigResponse)) {
       return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
     }
 
-    const clusterTemplate = this.clusterTemplate(config);
     const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
     if (this.responseHasError(clusterResponse)) {
       if (clusterResponse.code === 409) return clusterResponse;
@@ -123,63 +116,5 @@ export default class ClusterImportModel {
     };
 
     return new Promise(poll);
-  }
-
-  endpointConfigTemplate(config) {
-    const {
-      clusterName,
-      clusterNamespace,
-      imageRegistry,
-      imageNamePostfix,
-      imageTagPostfix,
-      version,
-      clusterLabels: { cloud, vendor },
-      privateRegistryEnabled,
-    } = config;
-
-    const imagePullSecret = privateRegistryEnabled ? clusterName : undefined;
-
-    const componentConfig = {};
-    Object.keys(config).forEach((key) => {
-      if (_.has(config[key], 'enabled')) {
-        componentConfig[key] = config[key];
-      }
-    });
-
-    return {
-      apiVersion: 'multicloud.ibm.com/v1alpha1',
-      kind: 'EndpointConfig',
-      metadata: {
-        name: clusterName,
-        namespace: clusterNamespace,
-      },
-      spec: {
-        clusterName,
-        clusterNamespace,
-        clusterLabels: { cloud, vendor },
-        imageRegistry,
-        imagePullSecret,
-        imageNamePostfix,
-        imageTagPostfix,
-        version,
-        ...componentConfig,
-      },
-    };
-  }
-
-  clusterTemplate(config) {
-    const { clusterName, clusterNamespace, clusterLabels } = config;
-    return {
-      apiVersion: 'clusterregistry.k8s.io/v1alpha1',
-      kind: 'Cluster',
-      metadata: {
-        name: clusterName,
-        namespace: clusterNamespace,
-        labels: {
-          name: clusterName,
-          ...clusterLabels,
-        },
-      },
-    };
   }
 }
