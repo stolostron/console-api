@@ -2,20 +2,16 @@
 
 exports[`Cluster Import Resolver Create Kubernetes Cluster Resource for Import 1`] = `
 Object {
-  "data": Object {
-    "createClusterResource": Object {
-      "kind": "Secret",
-    },
-  },
-}
-`;
-
-exports[`Cluster Import Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
-Object {
-  "data": Object {
-    "createClusterResource": null,
-  },
   "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 35,
+          "line": 3,
+        },
+      ],
+      "message": "Unknown argument \\"body\\" on field \\"createClusterResource\\" of type \\"Mutation\\".",
+    },
     Object {
       "locations": Array [
         Object {
@@ -23,10 +19,32 @@ Object {
           "line": 3,
         },
       ],
-      "message": "Body is required for createClusterResource",
-      "path": Array [
-        "createClusterResource",
+      "message": "Field \\"createClusterResource\\" argument \\"cluster\\" of type \\"JSON!\\" is required but not provided.",
+    },
+  ],
+}
+`;
+
+exports[`Cluster Import Resolver Create Kubernetes Cluster Resource for Import should return error msg 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 35,
+          "line": 3,
+        },
       ],
+      "message": "Unknown argument \\"body\\" on field \\"createClusterResource\\" of type \\"Mutation\\".",
+    },
+    Object {
+      "locations": Array [
+        Object {
+          "column": 13,
+          "line": 3,
+        },
+      ],
+      "message": "Field \\"createClusterResource\\" argument \\"cluster\\" of type \\"JSON!\\" is required but not provided.",
     },
   ],
 }
