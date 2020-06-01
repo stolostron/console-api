@@ -10,7 +10,6 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
-import _ from 'lodash';
 import logger from '../lib/logger';
 
 export default class ClusterImportModel {
