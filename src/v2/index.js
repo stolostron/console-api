@@ -29,7 +29,6 @@ import PlacementRuleModel from './models/placementrule';
 import ClusterModel from './models/cluster';
 import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
-import HelmModel from './models/helm';
 import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
 import ClusterImportModel from './models/clusterImport';
@@ -103,6 +102,8 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
   let namespaces = _.get(req, 'user.namespaces', []);
   namespaces = Array.isArray(namespaces.items) ? namespaces.items.map(ns => ns.metadata.name) : [];
 
+  const { updateUserNamespaces } = req;
+
   const kubeConnector = new KubeConnector({
     token: req.kubeToken,
     httpLib: kubeHTTP,
@@ -115,13 +116,12 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     channelModel: new ChannelModel({ kubeConnector }),
     subscriptionModel: new SubscriptionModel({ kubeConnector }),
     placementRuleModel: new PlacementRuleModel({ kubeConnector }),
-    clusterModel: new ClusterModel({ kubeConnector }),
+    clusterModel: new ClusterModel({ kubeConnector, updateUserNamespaces }),
     genericModel: new GenericModel({ kubeConnector }),
     complianceModel: new ComplianceModel({ kubeConnector }),
-    helmModel: new HelmModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
-    clusterImportModel: new ClusterImportModel({ kubeConnector }),
+    clusterImportModel: new ClusterImportModel({ kubeConnector, updateUserNamespaces }),
     connectionModel: new ConnectionModel({ kubeConnector }),
     bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
   };

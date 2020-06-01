@@ -34,7 +34,6 @@ export default function createMockHttp() {
     clusterVersions: require('./ClusterVersionsList'),
     repos: require('./ReposList').default,
     repoMutations: require('./RepoMutationsList').default,
-    relMutations: require('./RelMutationList').default,
     pods: require('./PodList'),
     pvs: require('./PVsList'),
     machinePoolsByNamespace: {
@@ -87,10 +86,6 @@ export default function createMockHttp() {
           return state.pvs.mockPVsClaimResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'clusterversions'):
           return state.clusterVersions.mockClusterVersionsResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'test-acs-engine'):
-          return state.relMutations;
-        case params.url.includes('default/helmrepos'):
-          return state.repoMutations;
         case params.url.includes('policies'):
           return state.policies.mockCreatePolicy;
         case params.url.includes('compliances'):
@@ -168,10 +163,6 @@ export default function createMockHttp() {
         return { body: { items: [] } };
       case params.url.includes('deployables'):
         return state.apps.mockDeployablesResponse;
-      case params.url.includes('default/helmrepos'):
-        return state.repoMutations;
-      case params.url.includes('helmrepos'):
-        return state.repos;
       case params.url.includes('resourceviews/pods'):
         return state.pods.mockResponse;
       case params.url.includes('resourceviews/persistentvolumes'):
