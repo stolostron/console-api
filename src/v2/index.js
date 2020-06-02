@@ -13,6 +13,7 @@ import { isInstance as isApolloErrorInstance, formatError as formatApolloError }
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import noCache from 'nocache';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import inspect from 'security-middleware';
@@ -67,8 +68,7 @@ graphQLServer.use('*', helmet({
   frameguard: false,
   noSniff: false,
   xssFilter: false,
-  noCache: true,
-}), requestLogger, cookieParser());
+}), noCache(), requestLogger, cookieParser());
 
 graphQLServer.get('/livenessProbe', (req, res) => {
   res.send(`Testing livenessProbe --> ${new Date().toLocaleString()}`);
