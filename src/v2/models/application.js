@@ -14,10 +14,10 @@ import KubeModel from './kube';
 
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 
-const filterByName = (names, items) =>
+export const filterByName = (names, items) =>
   items.filter(item => names.find(name => name === item.metadata.name));
 
-const filterByNameNamespace = (names, items) =>
+export const filterByNameNamespace = (names, items) =>
   items.filter(({ metadata }) => names.find((name) => {
     const path = name.split('/');
     return path[1] === metadata.name && path[0] === metadata.namespace;
@@ -80,7 +80,7 @@ const longestCommonSubstring = (str1, str2) => {
 
 
 // if channel has sub channels, get subchannel name
-const getSubChannelName = (paths, isChucked) => {
+export const getSubChannelName = (paths, isChucked) => {
   if (isChucked) {
     const getName = (rname) => {
       let [, name] = rname.split('/');
@@ -104,10 +104,101 @@ const getSubChannelName = (paths, isChucked) => {
   return '';
 };
 
-const getChannelName = (subscription) => {
+export const getChannelName = (subscription) => {
   const { metadata: { name: nm, namespace: ns }, deployablePaths: paths, isChucked } = subscription;
   const chn = _.get(subscription, 'spec.channel');
   return `${ns}/${nm}//${chn}${getSubChannelName(paths, isChucked)}`;
+};
+
+// get deployables from the subscription annotation
+export const getSubscriptionsDeployables = (allSubscriptions) => {
+  // if a subscription has lots and lots of deployables, break into smaller subscriptions
+  let allowAllChannel = true;
+  const subscriptions = [];
+  allSubscriptions.forEach((subscription) => {
+    const deployablePaths = _.get(subscription, 'metadata.annotations["apps.open-cluster-management.io/deployables"]', '').split(',').sort();
+
+    if (deployablePaths.length > 30) {
+      const chunks = _.chunk(deployablePaths, 25);
+      // if last chunk is just one, append to 2nd to last chunk
+      const len = chunks.length - 1;
+      if (chunks[len].length === 1) {
+        chunks[len - 1].push(chunks[len][0]);
+        chunks.pop();
+      }
+      chunks.forEach((chuck) => {
+        subscriptions.push({ ...subscription, deployablePaths: chuck, isChucked: true });
+      });
+      allowAllChannel = false;
+    } else {
+      subscriptions.push({ ...subscription, deployablePaths });
+    }
+  });
+
+  return { subscriptions, allowAllChannel };
+};
+
+export const getAllChannels = (subscriptions, channels, selectedChannel, allowAllChannel) => {
+  let selectedSubscription = null;
+  subscriptions.forEach((subscription) => {
+    if (_.get(subscription, 'spec.channel')) {
+      const subscriptionChannel = getChannelName(subscription);
+      channels.push(subscriptionChannel);
+      if (selectedChannel === subscriptionChannel) {
+        selectedSubscription = [subscription];
+      }
+    }
+  });
+  // add an ALL channel?
+  if (allowAllChannel) {
+    if (channels.length > 1) {
+      channels.unshift(EVERYTHING_CHANNEL);
+    }
+  } else if (!selectedSubscription) {
+    selectedSubscription = [subscriptions[0]];
+  }
+  return selectedSubscription;
+};
+
+export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
+  const rulesMap = {};
+  const deployableMap = {};
+  let arr = null;
+
+  subscriptions.forEach((subscription) => {
+    modelSubscriptions.push(subscription);
+    // build up map of what deployables to get for a bulk fetch
+    subscription.deployablePaths.forEach((deployablePath) => {
+      if (deployablePath && deployablePath.split('/').length > 0) {
+        const [deployableNamespace, deployableName] = deployablePath.split('/');
+        arr = deployableMap[deployableNamespace];
+        if (!arr) {
+          deployableMap[deployableNamespace] = [];
+          arr = deployableMap[deployableNamespace];
+        }
+        arr.push({ deployableName, subscription });
+        subscription.deployables = [];
+      }
+    });
+    delete subscription.deployablePaths;
+
+    // ditto for rules
+    const ruleNamespace = _.get(subscription, 'metadata.namespace');
+    _.get(subscription, 'spec.placement.placementRef.name', '')
+      .split(',').forEach((ruleName) => {
+        if (ruleName) {
+          arr = rulesMap[ruleNamespace];
+          if (!arr) {
+            rulesMap[ruleNamespace] = [];
+            arr = rulesMap[ruleNamespace];
+          }
+          arr.push({ ruleName, subscription });
+          subscription.rules = [];
+        }
+      });
+  });
+
+  return { deployableMap, rulesMap };
 };
 
 export default class ApplicationModel extends KubeModel {
@@ -210,7 +301,6 @@ export default class ApplicationModel extends KubeModel {
       model = { name, namespace, app };
 
       // get subscriptions to channels (pipelines)
-      let arr = null;
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]') ||
         _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]');
       let deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ||
@@ -220,95 +310,26 @@ export default class ApplicationModel extends KubeModel {
         const allSubscriptions =
           await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
 
-        // if a subscription has lots and lots of deployables, break into smaller subscriptions
-        let allowAllChannel = true;
-        const subscriptions = [];
-        allSubscriptions.forEach((subscription) => {
-          const deployablePaths = _.get(subscription, 'metadata.annotations["apps.open-cluster-management.io/deployables"]', '').split(',').sort();
-          if (deployablePaths.length > 10) {
-            const chunks = _.chunk(deployablePaths, 6);
-            // if last chunk is just one, append to 2nd to last chunk
-            const len = chunks.length - 1;
-            if (chunks[len].length === 1) {
-              chunks[len - 1].push(chunks[len][0]);
-              chunks.pop();
-            }
-            chunks.forEach((chuck) => {
-              subscriptions.push({ ...subscription, deployablePaths: chuck, isChucked: true });
-            });
-            allowAllChannel = false;
-          } else {
-            subscriptions.push({ ...subscription, deployablePaths });
-          }
-        });
-
+        // get deployables from the subscription annotation
+        const { subscriptions, allowAllChannel } = getSubscriptionsDeployables(allSubscriptions);
         // pick subscription based on channel requested by ui
         model.activeChannel = selectedChannel;
 
         // what subscriptions does user want to see
         model.channels = [];
         model.subscriptions = [];
-        const rulesMap = {};
-        const deployableMap = {};
 
-        // get all the channels
-        let selectedSubscription;
-        subscriptions.forEach((subscription) => {
-          if (_.get(subscription, 'spec.channel')) {
-            const subscriptionChannel = getChannelName(subscription);
-            model.channels.push(subscriptionChannel);
-            if (selectedChannel === subscriptionChannel) {
-              selectedSubscription = [subscription];
-            }
-          }
-        });
-
-        // add an ALL channel?
-        if (allowAllChannel) {
-          if (model.channels.length > 1) {
-            model.channels.unshift(EVERYTHING_CHANNEL);
-          }
-        } else if (!selectedSubscription) {
-          selectedSubscription = [subscriptions[0]];
-        }
-
+        // get all the channels ad find selected subscription from selected channel
+        const subscr = getAllChannels(
+          subscriptions, model.channels
+          , selectedChannel, allowAllChannel,
+        );
         // get all requested subscriptions
-        (selectedSubscription || subscriptions).forEach((subscription) => {
-          model.subscriptions.push(subscription);
-
-          // build up map of what deployables to get for a bulk fetch
-          subscription.deployablePaths.forEach((deployablePath) => {
-            if (deployablePath && deployablePath.split('/').length > 0) {
-              const [deployableNamespace, deployableName] = deployablePath.split('/');
-              arr = deployableMap[deployableNamespace];
-              if (!arr) {
-                deployableMap[deployableNamespace] = [];
-                arr = deployableMap[deployableNamespace];
-              }
-              arr.push({ deployableName, subscription });
-              subscription.deployables = [];
-            }
-          });
-          delete subscription.deployablePaths;
-
-          // ditto for rules
-          const ruleNamespace = _.get(subscription, 'metadata.namespace');
-          _.get(subscription, 'spec.placement.placementRef.name', '')
-            .split(',').forEach((ruleName) => {
-              if (ruleName) {
-                arr = rulesMap[ruleNamespace];
-                if (!arr) {
-                  rulesMap[ruleNamespace] = [];
-                  arr = rulesMap[ruleNamespace];
-                }
-                arr.push({ ruleName, subscription });
-                subscription.rules = [];
-              }
-            });
-        });
-
+        const selectedSubscription = subscr;
+        const { deployableMap, rulesMap } =
+          buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
         // now fetch them
-        await this.getAppDeployables(deployableMap);
+        await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
         await this.getAppRules(rulesMap);
       } else if (deployableNames && deployableNames.length > 0) {
         deployableNames = deployableNames.split(',');
