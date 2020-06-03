@@ -13,6 +13,8 @@ import KubeModel from './kube';
 
 
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
+const DEPLOYABLES = 'metadata.annotations["apps.open-cluster-management.io/deployables"]';
+const NAMESPACE = 'metadata.namespace';
 
 export const filterByName = (names, items) =>
   items.filter(item => names.find(name => name === item.metadata.name));
@@ -116,7 +118,7 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
   let allowAllChannel = true;
   const subscriptions = [];
   allSubscriptions.forEach((subscription) => {
-    const deployablePaths = _.get(subscription, 'metadata.annotations["apps.open-cluster-management.io/deployables"]', '').split(',').sort();
+    const deployablePaths = _.get(subscription, DEPLOYABLES, '').split(',').sort();
 
     if (deployablePaths.length > 30) {
       const chunks = _.chunk(deployablePaths, 25);
@@ -183,7 +185,7 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
     delete subscription.deployablePaths;
 
     // ditto for rules
-    const ruleNamespace = _.get(subscription, 'metadata.namespace');
+    const ruleNamespace = _.get(subscription, NAMESPACE);
     _.get(subscription, 'spec.placement.placementRef.name', '')
       .split(',').forEach((ruleName) => {
         if (ruleName) {
@@ -214,7 +216,7 @@ export default class ApplicationModel extends KubeModel {
     };
 
     const result = await Promise.all(resources.map((resource) => {
-      const namespace = _.get(resource, 'metadata.namespace', 'default');
+      const namespace = _.get(resource, NAMESPACE, 'default');
       if (appKinds[resource.kind] === 'undefined') {
         return Promise.resolve({
           status: 'Failure',
@@ -303,7 +305,7 @@ export default class ApplicationModel extends KubeModel {
       // get subscriptions to channels (pipelines)
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]') ||
         _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]');
-      let deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ||
+      let deployableNames = _.get(app, DEPLOYABLES) ||
         _.get(app, 'metadata.annotations["app.ibm.com/subscriptions/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
@@ -397,7 +399,7 @@ export default class ApplicationModel extends KubeModel {
       // if this one has a placement rule reference get that
       const name = _.get(resource, 'spec.placement.placementRef.name');
       if (name) {
-        const namespace = _.get(resource, 'metadata.namespace');
+        const namespace = _.get(resource, NAMESPACE);
         const response = await this.kubeConnector.getResources(
           ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
           { kind: 'PlacementRule', namespaces: [namespace] },
@@ -430,8 +432,8 @@ export default class ApplicationModel extends KubeModel {
     }
     return apps.filter(app => app.metadata)
       .map(async (app) => {
-        const deployableNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]') ?
-          _.get(app, 'metadata.annotations["apps.open-cluster-management.io/deployables"]').split(',') : [];
+        const deployableNames = _.get(app, DEPLOYABLES) ?
+          _.get(app, DEPLOYABLES).split(',') : [];
         const placementBindingNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]') ?
           _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]').split(',') : [];
         const placementPolicyItems = await Promise.all(placementBindingNames.map(pbName => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
