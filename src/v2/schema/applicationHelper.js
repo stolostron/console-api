@@ -391,7 +391,7 @@ async function getApplicationElements(application, clusterModel) {
       // add cluster(s) if any
       if (isRulePlaced) {
         // add cluster(s) if any or if too many
-        const clusterShapes = ruleClusterNames.length > 3 ?
+        const clusterShapes = ruleClusterNames.length > 1 ?
           [ruleClusterNames] : ruleClusterNames.map(cn => [cn]);
         clusterShapes.forEach((names) => {
           // add cluster element
