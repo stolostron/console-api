@@ -47,6 +47,10 @@ export default class ClusterImportModel {
 
   async createClusterResource(args) {
     const { cluster } = args;
+    if (!cluster || !Array.isArray(cluster)) {
+      throw new Error('cluster argument is required for createClusterResource');
+    }
+
     const [clusterTemplate, endpointTemplate] = cluster;
     if (!endpointTemplate) {
       throw new Error('EndpointConfig is required for createClusterResource');

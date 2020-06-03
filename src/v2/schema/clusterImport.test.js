@@ -19,7 +19,7 @@ describe('Cluster Import Resolver', () => {
       .send({
         query: `
         mutation {
-            createClusterResource(body: "")
+            createClusterResource(cluster: [])
           }
       `,
       })
@@ -37,11 +37,20 @@ describe('Cluster Import Resolver', () => {
       .send({
         query: `
         mutation {
-            createClusterResource(body: "{\\"clusterName\\":\\"foo\\", \\"clusterNamespace\\":\\"foo\\", \\"clusterLabels\\": {}}")
+            createClusterResource(
+              cluster: [
+                {},
+                {spec: {
+                  clusterName: "foo",
+                  clusterNamespace: "foo"
+                }
+              }]
+            )
           }
       `,
       })
       .end((err, res) => {
+        expect(JSON.parse(res.error)).toBeFalsy();
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
