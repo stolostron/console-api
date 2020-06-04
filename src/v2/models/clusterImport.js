@@ -51,12 +51,12 @@ export default class ClusterImportModel {
       throw new Error('cluster argument is required for createClusterResource');
     }
 
-    const [clusterTemplate, endpointTemplate] = cluster;
-    if (!endpointTemplate) {
-      throw new Error('EndpointConfig is required for createClusterResource');
+    const [clusterTemplate, klusterletTemplate] = cluster;
+    if (!klusterletTemplate) {
+      throw new Error('KlusterletConfig is required for createClusterResource');
     }
 
-    const config = endpointTemplate.spec;
+    const config = klusterletTemplate.spec;
     const { clusterName, clusterNamespace } = config;
 
     const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
@@ -90,18 +90,19 @@ export default class ClusterImportModel {
       }
     }
 
-    endpointTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
-    const endpointConfigResponse = await this.kubeConnector.post(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs`, endpointTemplate);
-    if (this.responseHasError(endpointConfigResponse)) {
-      return this.responseForError('Create EndpointConfig resource failed', endpointConfigResponse);
+    klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
+    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+
+    if (this.responseHasError(klusterletConfigResponse)) {
+      return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
 
     const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
     if (this.responseHasError(clusterResponse)) {
       if (clusterResponse.code === 409) return clusterResponse;
 
-      // Delete the endpointconfig so the user can try again
-      await this.kubeConnector.delete(`/apis/multicloud.ibm.com/v1alpha1/namespaces/${clusterNamespace}/endpointconfigs/${clusterName}`);
+      // Delete the klusterletconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
       return this.responseForError('Create Cluster resource failed', clusterResponse);
     }
 

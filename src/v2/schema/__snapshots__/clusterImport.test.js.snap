@@ -23,7 +23,7 @@ Object {
           "line": 3,
         },
       ],
-      "message": "EndpointConfig is required for createClusterResource",
+      "message": "KlusterletConfig is required for createClusterResource",
       "path": Array [
         "createClusterResource",
       ],
