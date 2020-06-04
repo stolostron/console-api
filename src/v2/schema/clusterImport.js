@@ -26,7 +26,7 @@ type Orchestration {
 
 export const resolver = {
   Mutation: {
-    createClusterResource: (parent, args, { clusterImportModel }) => clusterImportModel.createClusterResource(args),
+    createClusterResource: (parent, args, { clusterModel }) => clusterModel.createClusterResource(args),
   },
 };
 

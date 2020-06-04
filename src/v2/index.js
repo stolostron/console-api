@@ -27,12 +27,11 @@ import ApplicationModel from './models/application';
 import ChannelModel from './models/channel';
 import SubscriptionModel from './models/subscription';
 import PlacementRuleModel from './models/placementrule';
-import ClusterModel from './models/cluster';
+import ClusterModel, { CLUSTER_NAMESPACE_LABEL } from './models/cluster';
 import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
 import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
-import ClusterImportModel from './models/clusterImport';
 import ConnectionModel from './models/connection';
 
 import createMockKubeHTTP from './mocks/kube-http';
@@ -99,8 +98,11 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     kubeHTTP = createMockKubeHTTP();
   }
 
-  let namespaces = _.get(req, 'user.namespaces', []);
-  namespaces = Array.isArray(namespaces.items) ? namespaces.items.map(ns => ns.metadata.name) : [];
+  const namespaceList = _.get(req, 'user.namespaces', []);
+  const rawNamespaces = Array.isArray(namespaceList.items) ? namespaceList.items : [];
+  const namespaces = rawNamespaces.map(ns => ns.metadata.name);
+  const clusterNamespaces = rawNamespaces.filter(ns => _.has(ns, `metadata.labels["${CLUSTER_NAMESPACE_LABEL}"]`))
+    .map(ns => ns.metadata.name);
 
   const { updateUserNamespaces } = req;
 
@@ -116,12 +118,11 @@ graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) =>
     channelModel: new ChannelModel({ kubeConnector }),
     subscriptionModel: new SubscriptionModel({ kubeConnector }),
     placementRuleModel: new PlacementRuleModel({ kubeConnector }),
-    clusterModel: new ClusterModel({ kubeConnector, updateUserNamespaces }),
+    clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
     genericModel: new GenericModel({ kubeConnector }),
     complianceModel: new ComplianceModel({ kubeConnector }),
     resourceViewModel: new ResourceViewModel({ kubeConnector }),
     sfModel: new SFModel({ kubeConnector, req }),
-    clusterImportModel: new ClusterImportModel({ kubeConnector, updateUserNamespaces }),
     connectionModel: new ConnectionModel({ kubeConnector }),
     bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
   };
