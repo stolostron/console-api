@@ -91,7 +91,8 @@ export default class ClusterImportModel {
     }
 
     klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
-    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1alpha1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+
     if (this.responseHasError(klusterletConfigResponse)) {
       return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
