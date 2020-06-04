@@ -23,7 +23,7 @@ Object {
           "line": 3,
         },
       ],
-      "message": "Body is required for createClusterResource",
+      "message": "EndpointConfig is required for createClusterResource",
       "path": Array [
         "createClusterResource",
       ],
