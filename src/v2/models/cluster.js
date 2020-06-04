@@ -9,6 +9,8 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import logger from '../lib/logger';
+import { responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
@@ -18,6 +20,8 @@ export const CLUSTER_LABEL = `${HIVE_DOMAIN}/cluster-deployment-name`;
 export const UNINSTALL_LABEL_SELECTOR = cluster => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 export const INSTALL_LABEL_SELECTOR = cluster => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 
+export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
+export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -63,12 +67,6 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
   }
   return clusterdeploymentStatus;
 }
-
-function responseHasError(response) {
-  const code = response.statusCode || response.code;
-  return (code < 200 || code >= 300);
-}
-
 
 async function getClusterResources(kube) {
   const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
@@ -217,6 +215,79 @@ function findMatchedStatusForOverview({ clusters, clusterstatuses }) {
 }
 
 export default class ClusterModel extends KubeModel {
+  constructor(args) {
+    super(args);
+    const { clusterNamespaces } = args;
+    this.clusterNamespaces = clusterNamespaces;
+  }
+
+  async createClusterNamespace(clusterNamespace, checkForDeployment = false) {
+    let projectResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
+
+    if (responseHasError(projectResponse)) {
+      if (projectResponse.code === 409) {
+        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
+        if (existingNamespaceClusters.items.length > 0) {
+          throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
+        }
+        if (checkForDeployment) {
+          const existingNamespaceClusterDeployments = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${clusterNamespace}/clusterdeployments`);
+          if (existingNamespaceClusterDeployments.items.length > 0) {
+            throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a ClusterDeployment resource`);
+          }
+        }
+      } else {
+        return projectResponse;
+      }
+    }
+
+    // Mark namespace as a cluster namespace
+    // First try adding a label
+    let labelNamespaceResponse = await this.kubeConnector.patch(
+      `/api/v1/namespaces/${clusterNamespace}`,
+      {
+        body: [
+          {
+            op: 'add',
+            path: `/metadata/labels/${CLUSTER_NAMESPACE_LABEL.replace('/', '~1')}`,
+            value: '',
+          },
+        ],
+      },
+    );
+    if (responseHasError(labelNamespaceResponse)) {
+      // Otherwise, try labels object
+      labelNamespaceResponse = await this.kubeConnector.patch(
+        `/api/v1/namespaces/${clusterNamespace}`,
+        {
+          body: [
+            {
+              op: 'add',
+              path: '/metadata/labels',
+              value:
+              {
+                [CLUSTER_NAMESPACE_LABEL]: '',
+              },
+            },
+          ],
+        },
+      );
+    }
+
+    // If we created this namespace but could not label it, we have a problem
+    if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
+      return labelNamespaceResponse;
+    }
+
+    // Get updated project and update namespace cache as long as we were able to label it
+    if (!responseHasError(labelNamespaceResponse)) {
+      projectResponse = this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`);
+      this.updateUserNamespaces(labelNamespaceResponse);
+    }
+
+    return projectResponse;
+  }
+
   async createCluster(args) {
     let { cluster: resources } = args;
     const created = [];
@@ -246,26 +317,20 @@ export default class ClusterModel extends KubeModel {
       errors.push({ message: 'ClusterDeployment must specify a namespace' });
       return { errors };
     }
-    const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } });
+
+    let namespaceResponse;
+    try {
+      namespaceResponse = this.createClusterNamespace(namespace, true);
+    } catch (error) {
+      errors.push({ message: error.message });
+      return { errors };
+    }
     if (responseHasError(namespaceResponse)) {
-      // if namespace already exists, only fail if there's no cluster in it
-      if (namespaceResponse.code === 409) {
-        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments`);
-        if (existingNamespaceClusters.items.length > 0) {
-          errors.push({ message: `Create Cluster failed: Namespace "${namespace}" already contains a Cluster resource` });
-          return { errors };
-        }
-      } else {
-        // failed to create the namespace at all
-        errors.push({ message: namespaceResponse.message });
-        return { errors };
-      }
+      // failed to create the namespace at all
+      errors.push({ message: namespaceResponse.message });
+      return { errors };
     }
 
-    // Update the namespace cache, don't add existing namespace in case they are unauthorized
-    if (namespaceResponse.code !== 409) {
-      this.updateUserNamespaces(namespaceResponse);
-    }
 
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/');
@@ -568,5 +633,102 @@ export default class ClusterModel extends KubeModel {
       }
     });
     return Object.entries(clusterImageSets).map(([releaseImage, name]) => ({ releaseImage, name }));
+  }
+
+  static getErrorMsg(response) {
+    let errorMsg = '';
+    const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
+    errorMsgKeys.forEach((key, i) => {
+      if (response[key]) {
+        (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
+      }
+    });
+    return errorMsg;
+  }
+
+  responseForError(errorTitle, response) {
+    const code = response.statusCode || response.code;
+    logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+    return {
+      error: {
+        rawResponse: response,
+        statusCode: code,
+        statusMsg: response.message || response.description || response.statusMessage,
+      },
+    };
+  }
+
+  async createClusterResource(args) {
+    const { cluster } = args;
+    if (!cluster || !Array.isArray(cluster)) {
+      throw new Error('cluster argument is required for createClusterResource');
+    }
+
+    const [clusterTemplate, klusterletTemplate] = cluster;
+    if (!klusterletTemplate) {
+      throw new Error('KlusterletConfig is required for createClusterResource');
+    }
+
+    const config = klusterletTemplate.spec;
+    const { clusterName, clusterNamespace } = config;
+
+    const clusterNamespaceResponse = this.createClusterNamespace(clusterNamespace);
+    if (responseHasError(clusterNamespaceResponse)) {
+      return clusterNamespaceResponse;
+    }
+
+    if (config.privateRegistryEnabled) {
+      const { imageRegistry, registryUsername, registryPassword } = config;
+      const auth = Buffer.from(`${registryUsername}:${registryPassword}`).toString('base64');
+      const dockerConfigJson = Buffer.from(JSON.stringify({ auths: { [`${imageRegistry}`]: { auth } } })).toString('base64');
+      const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
+
+      const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
+      if (responseHasError(registrySecretResponse)) {
+        // skip error for existing secret
+        if (registrySecretResponse.code !== 409) {
+          return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
+        }
+      }
+    }
+
+    klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
+    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+
+    if (responseHasError(klusterletConfigResponse)) {
+      return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
+    }
+
+    const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
+    if (responseHasError(clusterResponse)) {
+      if (clusterResponse.code === 409) return clusterResponse;
+
+      // Delete the klusterletconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
+      return this.responseForError('Create Cluster resource failed', clusterResponse);
+    }
+
+    // fetch and return the generated secret
+    const importYamlSecret = await this.pollImportYamlSecret(clusterNamespace, clusterName);
+    return importYamlSecret;
+  }
+
+  async pollImportYamlSecret(clusterNamespace, clusterName) {
+    let count = 0;
+    let importYamlSecret;
+
+    const poll = async (resolve, reject) => {
+      const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
+      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true);
+
+      if (importYamlSecret.code === 404 && count < 5) {
+        count += 1;
+        setTimeout(poll, 2000, resolve, reject);
+      } else {
+        resolve(importYamlSecret);
+      }
+    };
+
+    return new Promise(poll);
   }
 }
