@@ -194,7 +194,7 @@ export const createGenericPackageObject = (
   parentId, appNamespace
   , nodes, links, subscriptionName,
 ) => {
-  const packageName = `HelmChart-${subscriptionName}`;
+  const packageName = `Package-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
 
   const packageObj = {
