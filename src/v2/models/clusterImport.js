@@ -10,7 +10,6 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
-import _ from 'lodash';
 import logger from '../lib/logger';
 
 export default class ClusterImportModel {
@@ -47,17 +46,17 @@ export default class ClusterImportModel {
   }
 
   async createClusterResource(args) {
-    const { body } = args;
-
-    if (!body) throw new Error('Body is required for createClusterResource');
-
-    let config = {};
-    try {
-      config = JSON.parse(body);
-    } catch (e) {
-      throw new Error(e);
+    const { cluster } = args;
+    if (!cluster || !Array.isArray(cluster)) {
+      throw new Error('cluster argument is required for createClusterResource');
     }
 
+    const [clusterTemplate, klusterletTemplate] = cluster;
+    if (!klusterletTemplate) {
+      throw new Error('KlusterletConfig is required for createClusterResource');
+    }
+
+    const config = klusterletTemplate.spec;
     const { clusterName, clusterNamespace } = config;
 
     const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
@@ -91,13 +90,12 @@ export default class ClusterImportModel {
       }
     }
 
-    const klusterletTemplate = this.klusterletConfigTemplate(config);
-    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+    klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
+    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1alpha1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
     if (this.responseHasError(klusterletConfigResponse)) {
       return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
 
-    const clusterTemplate = this.clusterTemplate(config);
     const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
     if (this.responseHasError(clusterResponse)) {
       if (clusterResponse.code === 409) return clusterResponse;
@@ -129,63 +127,5 @@ export default class ClusterImportModel {
     };
 
     return new Promise(poll);
-  }
-
-  klusterletConfigTemplate(config) {
-    const {
-      clusterName,
-      clusterNamespace,
-      imageRegistry,
-      imageNamePostfix,
-      imageTagPostfix,
-      version,
-      clusterLabels: { cloud, vendor },
-      privateRegistryEnabled,
-    } = config;
-
-    const imagePullSecret = privateRegistryEnabled ? clusterName : undefined;
-
-    const componentConfig = {};
-    Object.keys(config).forEach((key) => {
-      if (_.has(config[key], 'enabled')) {
-        componentConfig[key] = config[key];
-      }
-    });
-
-    return {
-      apiVersion: 'agent.open-cluster-management.io/v1beta1',
-      kind: 'KlusterletConfig',
-      metadata: {
-        name: clusterName,
-        namespace: clusterNamespace,
-      },
-      spec: {
-        clusterName,
-        clusterNamespace,
-        clusterLabels: { cloud, vendor },
-        imageRegistry,
-        imagePullSecret,
-        imageNamePostfix,
-        imageTagPostfix,
-        version,
-        ...componentConfig,
-      },
-    };
-  }
-
-  clusterTemplate(config) {
-    const { clusterName, clusterNamespace, clusterLabels } = config;
-    return {
-      apiVersion: 'clusterregistry.k8s.io/v1alpha1',
-      kind: 'Cluster',
-      metadata: {
-        name: clusterName,
-        namespace: clusterNamespace,
-        labels: {
-          name: clusterName,
-          ...clusterLabels,
-        },
-      },
-    };
   }
 }
