@@ -89,7 +89,7 @@ describe('createGenericPackageObject', () => {
     const subscriptionName = 'obj-sub';
 
     const result = {
-      id: 'member--package--HelmChart-obj-sub', name: 'HelmChart-obj-sub', namespace: 'obj-sub-ns', specs: { raw: { isDesign: false, kind: 'Package', metadata: { name: 'HelmChart-obj-sub', namespace: 'obj-sub-ns' } } }, type: 'package', uid: 'member--package--HelmChart-obj-sub',
+      id: 'member--package--Package-obj-sub', name: 'Package-obj-sub', namespace: 'obj-sub-ns', specs: { raw: { isDesign: false, kind: 'Package', metadata: { name: 'Package-obj-sub', namespace: 'obj-sub-ns' } } }, type: 'package', uid: 'member--package--Package-obj-sub',
     };
 
     expect(createGenericPackageObject(
