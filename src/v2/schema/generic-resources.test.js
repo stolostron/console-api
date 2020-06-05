@@ -185,7 +185,7 @@ describe('Generic Resources', () => {
               },
               runtimeRules: [
                 {
-                  apiVersion: "policy.mcm.ibm.com/v1alpha1",
+                  apiVersion: "policy.open-cluster-management.io/v1",
                   kind: "Policy",
                   metadata: {
                     name: "test-policy-1",
