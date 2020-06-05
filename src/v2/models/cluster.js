@@ -68,46 +68,6 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
   return clusterdeploymentStatus;
 }
 
-async function getClusterResources(kube) {
-  const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
-    // Try cluster scope queries, falling back to per-namespace
-    kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters')
-      .then(allClusters => (allClusters.items ?
-        allClusters.items
-        : kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`))),
-    kube.get('/apis/cluster.open-cluster-management.io/v1/managedclusters')
-      .then(allManagedClusters => allManagedClusters.items),
-    kube.get('/apis/hive.openshift.io/v1/clusterdeployments')
-      .then(allClusterDeployments => (allClusterDeployments.items ?
-        allClusterDeployments.items
-        : kube.getResources(ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`))),
-    kube.get('/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos')
-      .then(allManagedClusterInfos => (allManagedClusterInfos.items ?
-        allManagedClusterInfos.items
-        : kube.getResources(ns => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`))),
-  ]);
-
-  // For clusterversions, query only clusters that are online
-  const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
-  // For clusterstatuses, query only namespaces that have clusters
-  const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
-  const [clusterstatuses, ...clusterversions] = await Promise.all([
-    kube.getResources(
-      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
-      { namespaces },
-    ),
-    ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
-  ]);
-  return {
-    clusters,
-    managedclusters,
-    clusterstatuses,
-    clusterdeployments,
-    managedclusterinfos,
-    clusterversions,
-  };
-}
-
 function getUniqueResourceName(resource) {
   const name = _.get(resource, 'metadata.name', 'noClusterName');
   const namespace = _.get(resource, 'metadata.namespace', 'noClusterNamespace');
@@ -475,6 +435,57 @@ export default class ClusterModel extends KubeModel {
     return undefined;
   }
 
+  async getClusterResources() {
+    // Try cluster scope queries, falling back to per-cluster-namespace
+    const rbacFallbackQuery = (clusterQuery, namespaceQueryFunction) => (
+      this.kubeConnector.get(clusterQuery).then(allItems => (allItems.items
+        ? allItems.items
+        : this.kubeConnector.getResources(
+          namespaceQueryFunction,
+          { namespaces: this.clusterNamespaces },
+        )))
+    );
+
+    const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
+      rbacFallbackQuery(
+        '/apis/clusterregistry.k8s.io/v1alpha1/clusters',
+        ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
+      ),
+      rbacFallbackQuery(
+        '/apis/cluster.open-cluster-management.io/v1/managedclusters',
+        ns => `/apis/cluster.open-cluster-management.io/v1/managedclusters/${ns}`,
+      ),
+      rbacFallbackQuery(
+        '/apis/hive.openshift.io/v1/clusterdeployments',
+        ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
+      ),
+      rbacFallbackQuery(
+        '/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos',
+        ns => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`,
+      ),
+    ]);
+
+    // For clusterversions, query only clusters that are online
+    const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
+    // For clusterstatuses, query only namespaces that have clusters
+    const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
+    const [clusterstatuses, ...clusterversions] = await Promise.all([
+      this.kubeConnector.getResources(
+        ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
+        { namespaces },
+      ),
+      ...names.map(n => this.kubeConnector.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
+    ]);
+    return {
+      clusters,
+      managedclusters,
+      clusterstatuses,
+      clusterdeployments,
+      managedclusterinfos,
+      clusterversions,
+    };
+  }
+
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
     const [
@@ -508,7 +519,7 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getClusters(args = {}) {
-    const resources = await getClusterResources(this.kubeConnector);
+    const resources = await this.getClusterResources();
     const results = findMatchedStatus(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
@@ -517,7 +528,7 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getAllClusters(args = {}) {
-    const resources = await getClusterResources(this.kubeConnector);
+    const resources = await this.getClusterResources();
     const results = findMatchedStatusForOverview(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
