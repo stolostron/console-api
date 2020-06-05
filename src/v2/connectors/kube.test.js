@@ -13,15 +13,15 @@ import KubeConnector from './kube';
 const asyncReturn = (value, waitTime = 500) =>
   new Promise(res => setTimeout(res, waitTime, value));
 
-const mockSpokeView = {
+const mockManagedClusterView = {
   body: {
     metadata: {
-      selfLink: '/apis/view.open-cluster-management.io/v1beta1/namespaces/cluster-test/spokeviews/spoke-test',
+      selfLink: '/apis/view.open-cluster-management.io/v1beta1/namespaces/cluster-test/managedclusterviews/spoke-test',
     },
   },
 };
 
-const mockSpokeViewPollIncomplete = {
+const mockManagedClusterViewPollIncomplete = {
   body: {
     items: [
       {
@@ -33,7 +33,7 @@ const mockSpokeViewPollIncomplete = {
   },
 };
 
-const mockSpokeViewPollComplete = {
+const mockManagedClusterViewPollComplete = {
   body: {
     items: [
       {
@@ -47,7 +47,7 @@ const mockSpokeViewPollComplete = {
   },
 };
 
-const mockSpokeViewResults = {
+const mockManagedClusterViewResults = {
   body: {
     status: {
       conditions: [
@@ -221,16 +221,16 @@ describe('KubeConnector', () => {
     });
   });
 
-  describe('CreateSpokeView', () => {
-    test('creates and polls SpokeView api', async () => {
+  describe('CreateManagedClusterView', () => {
+    test('creates and polls ManagedClusterView api', async () => {
       const mockCache = { get: jest.fn().mockReturnValue(null), set: jest.fn() };
       const mockHttp = jest.fn()
-        .mockImplementationOnce(() => asyncReturn(mockSpokeView))
-        .mockImplementationOnce(() => asyncReturn(mockSpokeViewPollIncomplete))
-        .mockImplementationOnce(() => asyncReturn(mockSpokeViewPollIncomplete))
-        .mockImplementationOnce(() => asyncReturn(mockSpokeViewPollIncomplete))
-        .mockImplementationOnce(() => asyncReturn(mockSpokeViewPollComplete))
-        .mockImplementation(() => asyncReturn(mockSpokeViewResults));
+        .mockImplementationOnce(() => asyncReturn(mockManagedClusterView))
+        .mockImplementationOnce(() => asyncReturn(mockManagedClusterViewPollIncomplete))
+        .mockImplementationOnce(() => asyncReturn(mockManagedClusterViewPollIncomplete))
+        .mockImplementationOnce(() => asyncReturn(mockManagedClusterViewPollIncomplete))
+        .mockImplementationOnce(() => asyncReturn(mockManagedClusterViewPollComplete))
+        .mockImplementation(() => asyncReturn(mockManagedClusterViewResults));
 
       const connector = new KubeConnector({
         cache: mockCache,
@@ -240,7 +240,7 @@ describe('KubeConnector', () => {
         namespaces: ['open-cluster-management'],
       });
 
-      const result = await connector.spokeViewQuery(
+      const result = await connector.managedClusterViewQuery(
         'cluster-test',
         '',
         'Pod',

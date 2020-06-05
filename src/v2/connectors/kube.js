@@ -235,7 +235,7 @@ export default class KubeConnector {
                 clearInterval(intervalID);
                 return reject(response);
               }
-              // We are looking for the type to be Processing for SpokeView resources
+              // We are looking for the type to be Processing for ManagedClusterView resources
               // TODO remove the 'Completed' logic when resource view is removed
               const isComplete = _.get(response, 'items[0].status.conditions[0].type') || _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
               if (isComplete === 'Processing' || isComplete === 'Completed') {
@@ -330,20 +330,20 @@ export default class KubeConnector {
   }
 
   // eslint-disable-next-line max-len
-  async spokeViewQuery(spokeClusterNamespace, apiGroup, kind, resourceName, namespace, updateInterval, deleteAfterUse) {
+  async managedClusterViewQuery(managedClusterNamespace, apiGroup, kind, resourceName, namespace, updateInterval, deleteAfterUse) {
     // name cannot be long than 63 chars in length
-    const name = crypto.createHash('sha1').update(`${spokeClusterNamespace}-${resourceName}-${kind}`).digest('hex').substr(0, 63);
+    const name = crypto.createHash('sha1').update(`${managedClusterNamespace}-${resourceName}-${kind}`).digest('hex').substr(0, 63);
 
     // scope.name is required, and either GKV (scope.apiGroup+kind+version) or scope.resource
     const body = {
       apiVersion: 'view.open-cluster-management.io/v1beta1',
-      kind: 'SpokeView',
+      kind: 'ManagedClusterView',
       metadata: {
         labels: {
           name,
         },
         name,
-        namespace: spokeClusterNamespace,
+        namespace: managedClusterNamespace,
       },
       spec: {
         scope: {
@@ -356,28 +356,28 @@ export default class KubeConnector {
     if (updateInterval) {
       body.spec.scope.updateIntervalSeconds = updateInterval; // default is 30 secs
     }
-    // Create spoke view
-    const spokeViewResponse = await this.post(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${spokeClusterNamespace}/spokeviews`, body);
-    if (_.get(spokeViewResponse, 'status.conditions[0].status') === 'False' || spokeViewResponse.code >= 400) {
-      throw new Error(`Create Spoke View Failed [${spokeViewResponse.code}] - ${spokeViewResponse.message}`);
+    // Create ManagedClusterView
+    const managedClusterViewResponse = await this.post(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews`, body);
+    if (_.get(managedClusterViewResponse, 'status.conditions[0].status') === 'False' || managedClusterViewResponse.code >= 400) {
+      throw new Error(`Create ManagedClusterView Failed [${managedClusterViewResponse.code}] - ${managedClusterViewResponse.message}`);
     }
-    // Poll SpokeView until success or failure
-    const { cancel, promise: pollPromise } = this.pollView(_.get(spokeViewResponse, 'metadata.selfLink'));
+    // Poll ManagedClusterView until success or failure
+    const { cancel, promise: pollPromise } = this.pollView(_.get(managedClusterViewResponse, 'metadata.selfLink'));
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
       if (result && deleteAfterUse) {
-        this.deleteSpokeView(spokeClusterNamespace, spokeViewResponse.metadata.name);
+        this.deleteManagedClusterView(managedClusterNamespace, managedClusterViewResponse.metadata.name);
       }
       return result;
     } catch (e) {
-      logger.error(`Resource View Query Error for ${kind}`, e.message);
+      logger.error(`ManagedClusterView Query Error for ${kind}`, e.message);
       cancel();
       throw e;
     }
   }
 
-  async deleteSpokeView(spokeClusterNamespace, spokeViewName) {
-    this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${spokeClusterNamespace}/spokeviews/${spokeViewName}`)
-      .catch(e => logger.error(`Error deleting spoke view ${spokeViewName}`, e.message));
+  async deleteManagedClusterView(managedClusterNamespace, managedClusterViewName) {
+    this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews/${managedClusterViewName}`)
+      .catch(e => logger.error(`Error deleting managed cluster view ${managedClusterViewName}`, e.message));
   }
 }

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`KubeConnector CreateSpokeView creates and polls SpokeView api 1`] = `
+exports[`KubeConnector CreateManagedClusterView creates and polls ManagedClusterView api 1`] = `
 Object {
   "status": Object {
     "conditions": Array [

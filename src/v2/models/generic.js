@@ -295,7 +295,7 @@ export default class GenericModel extends KubeModel {
   }
 
   // Generic query to get local and remote resource data
-  // Remote resources are queried using SpokeView
+  // Remote resources are queried using ManagedClusterView
   async getResource(args) {
     const {
       selfLink,
@@ -310,13 +310,13 @@ export default class GenericModel extends KubeModel {
       return this.kubeConnector.get(selfLink);
     }
 
-    // Check if the SpokeView already exists if not create it
-    const spokeViewName = crypto.createHash('sha1').update(`${cluster}-${name}-${kind}`).digest('hex').substr(0, 63);
+    // Check if the ManagedClusterView already exists if not create it
+    const managedClusterViewName = crypto.createHash('sha1').update(`${cluster}-${name}-${kind}`).digest('hex').substr(0, 63);
 
-    const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/spokeviews/${spokeViewName}`);
+    const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/managedclusterviews/${managedClusterViewName}`);
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
       const apiGroup = getApiGroupFromSelfLink(selfLink);
-      const response = await this.kubeConnector.spokeViewQuery(
+      const response = await this.kubeConnector.managedClusterViewQuery(
         cluster,
         apiGroup,
         kind,
@@ -336,10 +336,12 @@ export default class GenericModel extends KubeModel {
     return _.get(resourceResponse, 'status.result');
   }
 
-  // Delete a SpokeView resource
-  async deleteSpokeView(spokeClusterNamespace, spokeViewName) {
-    await this.kubeConnector.deleteSpokeView(spokeClusterNamespace, spokeViewName)
-      .catch(() => null);
+  // Delete a ManagedClusterView resource
+  async deleteManagedClusterView(managedClusterNamespace, managedClusterViewName) {
+    await this.kubeConnector.deleteManagedClusterView(
+      managedClusterNamespace,
+      managedClusterViewName,
+    ).catch(() => null);
   }
 
   async updateResource(args) {

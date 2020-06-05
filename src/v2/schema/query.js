@@ -146,8 +146,8 @@ type Mutation {
   # Delete any Kubernetes resource via selfLink
   deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
 
-  # Delete a SpokeView resource
-  deleteSpokeView(spokeClusterNamespace: String, spokeViewName: String): JSON
+  # Delete a ManagedClusterView resource
+  deleteManagedClusterView(managedClusterNamespace: String, managedClusterViewName: String): JSON
 
   # Create remote cluster
   createCluster(cluster: JSON!) : JSON

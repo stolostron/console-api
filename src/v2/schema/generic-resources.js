@@ -30,7 +30,10 @@ export const resolver = {
     createResources: (parent, args, { genericModel }) => genericModel.createResources(args),
     deleteResource: (root, args, { genericModel }) =>
       genericModel.deleteResource(args),
-    deleteSpokeView: (root, args, { genericModel }) =>
-      genericModel.deleteSpokeView(args.spokeClusterNamespace, args.spokeViewName),
+    deleteManagedClusterView: (root, args, { genericModel }) =>
+      genericModel.deleteManagedClusterView(
+        args.managedClusterNamespace,
+        args.managedClusterViewName,
+      ),
   },
 };
