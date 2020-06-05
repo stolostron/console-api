@@ -70,18 +70,20 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
 
 function getUniqueResourceName(resource) {
   const name = _.get(resource, 'metadata.name', 'noClusterName');
-  const namespace = _.get(resource, 'metadata.namespace', 'noClusterNamespace');
+  const namespace = _.get(resource, 'metadata.namespace', name);
   return `${name}_${namespace}`;
 }
 
 function mapResources(resource, kind = 'Cluster') {
   const resultMap = new Map();
-  resource.forEach((r) => {
-    if (r.metadata && (!r.kind || r.kind === kind)) {
-      const key = getUniqueResourceName(r);
-      resultMap.set(key, { metadata: r.metadata, raw: r });
-    }
-  });
+  if (resource) {
+    resource.forEach((r) => {
+      if (r.metadata && (!r.kind || r.kind === kind)) {
+        const key = getUniqueResourceName(r);
+        resultMap.set(key, { metadata: r.metadata, raw: r });
+      }
+    });
+  }
   return resultMap;
 }
 
@@ -97,37 +99,59 @@ function mapClusterVersions(rawClusterversions) {
 }
 
 function findMatchedStatus({
-  clusters, clusterstatuses, clusterdeployments, clusterversions,
+  clusters, clusterstatuses, clusterversions,
+  managedclusters, managedclusterinfos, clusterdeployments,
 }) {
   const resultMap = new Map();
   const clusterMap = mapResources(clusters);
+  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
   const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
   const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
+  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
   const clusterVersionMap = mapClusterVersions(clusterversions);
 
-  const uniqueClusterNames = new Set([...clusterMap.keys(), ...clusterDeploymentMap.keys()]);
+  const uniqueClusterNames = new Set([
+    ...clusterMap.keys(),
+    ...managedClusterMap.keys(),
+    ...clusterDeploymentMap.keys(),
+  ]);
   uniqueClusterNames.forEach((c) => {
     const cluster = clusterMap.get(c);
+    const managedcluster = managedClusterMap.get(c);
     const clusterstatus = clusterStatusMap.get(c);
     const clusterdeployment = clusterDeploymentMap.get(c);
-    const metadata = _.has(cluster, 'metadata') ?
-      _.get(cluster, 'metadata') :
-      _.pick(_.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
+    const managedclusterinfo = managedClusterInfoMap.get(c);
+    const metadata =
+      _.get(managedcluster, 'metadata') ||
+      _.get(cluster, 'metadata') ||
+      _.pick(_.get(managedclusterinfo, 'metadata') || _.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
     const clusterversion = _.get(clusterVersionMap, metadata.name);
     const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
+    const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
     const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
-    const serverAddress = apiURL || (rawServerAddress ? `https://${rawServerAddress}` : null);
+    const serverAddress = apiURL || (masterEndpoint || rawServerAddress ? `https://${masterEndpoint || rawServerAddress}` : null);
     const data = {
       metadata,
       nodes: _.get(clusterstatus, 'raw.spec.capacity.nodes'),
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL', _.get(clusterdeployment, 'raw.status.webConsoleURL')),
+      consoleURL: _.get(
+        managedclusterinfo,
+        'raw.status.consoleURL',
+        _.get(
+          clusterstatus,
+          'raw.spec.consoleURL',
+          _.get(
+            clusterdeployment,
+            'raw.status.webConsoleURL',
+          ),
+        ),
+      ),
       rawStatus: _.get(clusterstatus, 'raw'),
       klusterletVersion: _.get(clusterstatus, 'raw.spec.klusterletVersion', '-'),
       k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
       serverAddress,
       isHive: !!clusterdeployment,
-      isManaged: !!cluster,
+      isManaged: managedcluster || cluster,
     };
     if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
@@ -152,24 +176,36 @@ function getClusterDeploymentSecrets(clusterDeployment) {
   };
 }
 
-function findMatchedStatusForOverview({ clusters, clusterstatuses }) {
+function findMatchedStatusForOverview({
+  clusters, managedclusters, clusterstatuses, managedclusterinfos,
+}) {
   const resultMap = new Map();
-  const clusterstatusResultMap = mapResources(clusterstatuses, 'ClusterStatus');
-  clusters.forEach((cluster) => {
-    const uniqueClusterName = getUniqueResourceName(cluster);
-    const clusterstatus = clusterstatusResultMap.get(uniqueClusterName);
+  const clusterMap = mapResources(clusters);
+  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
+  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
+  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
+
+  const uniqueClusterNames = new Set([
+    ...clusterMap.keys(),
+    ...managedClusterMap.keys(),
+  ]);
+  uniqueClusterNames.forEach((c) => {
+    const cluster = clusterMap.get(c);
+    const managedcluster = managedClusterMap.get(c);
+    const clusterstatus = clusterStatusMap.get(c);
+    const managedclusterinfo = managedClusterInfoMap.get(c);
     const data = {
-      metadata: cluster.metadata,
-      status: getStatus(cluster),
+      metadata: _.get(managedcluster, 'metadata', _.get(cluster, 'metadata')),
+      status: getStatus(_.get(cluster, 'raw')),
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL'),
+      consoleURL: _.get(managedclusterinfo, 'raw.status.consoleURL', _.get(clusterstatus, 'raw.spec.consoleURL')),
       capacity: _.get(clusterstatus, 'raw.spec.capacity'),
       usage: _.get(clusterstatus, 'raw.spec.usage'),
-      rawCluster: cluster,
+      rawCluster: _.get(managedcluster, 'raw', _.get(cluster, 'raw')),
       rawStatus: _.get(clusterstatus, 'raw'),
       serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
     };
-    resultMap.set(uniqueClusterName, data);
+    resultMap.set(c, data);
   });
   return [...resultMap.values()];
 }
@@ -695,16 +731,17 @@ export default class ClusterModel extends KubeModel {
       const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
 
       const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
-      if (responseHasError(registrySecretResponse)) {
-        // skip error for existing secret
-        if (registrySecretResponse.code !== 409) {
-          return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
-        }
+      // skip error for existing secret
+      if (responseHasError(registrySecretResponse) && registrySecretResponse.code !== 409) {
+        return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
       }
     }
 
     klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
-    const klusterletConfigResponse = await this.kubeConnector.post(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`, klusterletTemplate);
+    const klusterletConfigResponse = await this.kubeConnector.post(
+      `/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`,
+      klusterletTemplate,
+    );
 
     if (responseHasError(klusterletConfigResponse)) {
       return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
@@ -712,7 +749,9 @@ export default class ClusterModel extends KubeModel {
 
     const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
     if (responseHasError(clusterResponse)) {
-      if (clusterResponse.code === 409) return clusterResponse;
+      if (clusterResponse.code === 409) {
+        return clusterResponse;
+      }
 
       // Delete the klusterletconfig so the user can try again
       await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
@@ -720,8 +759,7 @@ export default class ClusterModel extends KubeModel {
     }
 
     // fetch and return the generated secret
-    const importYamlSecret = await this.pollImportYamlSecret(clusterNamespace, clusterName);
-    return importYamlSecret;
+    return this.pollImportYamlSecret(clusterNamespace, clusterName);
   }
 
   async pollImportYamlSecret(clusterNamespace, clusterName) {
