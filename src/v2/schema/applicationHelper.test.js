@@ -13,7 +13,10 @@ import getApplicationElements, {
   , createGenericPackageObject
   , addSubscriptionCharts
   , addSubscriptionDeployable
-  , addClusters,
+  , addClusters
+  , processRouteIngress
+  , processServices,
+
 } from './applicationHelper';
 
 
@@ -217,6 +220,178 @@ describe('addSubscriptionDeployable', () => {
       parentId, deployable, [], [],
       subscriptionStatusMap, names, appNamespace,
     )).toEqual(result);
+  });
+});
+
+describe('processRouteIngress for Route', () => {
+  it('processRouteIngress for Route', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [{
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Route',
+            metadata: {},
+            spec: {
+              to: {
+                name: 'service1',
+              },
+            },
+          },
+      },
+    }];
+
+    const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--route--undefined' };
+
+    expect(processRouteIngress(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace,
+    )).toEqual(result);
+  });
+});
+
+describe('processRouteIngress for Ingress', () => {
+  it('processRouteIngress for Ingress', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [{
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Ingress',
+            metadata: {},
+            spec: {
+              rules: [
+                {
+                  http: {
+                    paths: [{
+                      backend: {
+                        serviceName: 'service1',
+                      },
+                    },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+      },
+    }];
+
+    const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
+    expect(processRouteIngress(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace,
+    )).toEqual(result);
+  });
+});
+
+describe('processServices', () => {
+  it('processServices', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [{
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Ingress',
+            metadata: {},
+            spec: {
+              rules: [
+                {
+                  http: {
+                    paths: [{
+                      backend: {
+                        serviceName: 'service1',
+                      },
+                    },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+      },
+    }];
+    const servicesMap = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
+
+    expect(processServices(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace, servicesMap,
+    )).toEqual(undefined);
   });
 });
 
