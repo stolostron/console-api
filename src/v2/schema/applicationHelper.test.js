@@ -15,7 +15,8 @@ import getApplicationElements, {
   , addSubscriptionDeployable
   , addClusters
   , processRouteIngress
-  , processServices,
+  , processServices
+  , processDeployables,
 
 } from './applicationHelper';
 
@@ -264,7 +265,29 @@ describe('processRouteIngress for Route', () => {
             },
           },
       },
-    }];
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Route',
+            metadata: {},
+            spec: {
+            },
+          },
+      },
+    },
+    ];
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--route--undefined' };
 
@@ -325,7 +348,31 @@ describe('processRouteIngress for Ingress', () => {
             },
           },
       },
-    }];
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Ingress',
+            metadata: {},
+            spec: {
+              rules: [
+              ],
+            },
+          },
+      },
+    },
+    ];
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
     expect(processRouteIngress(
@@ -337,6 +384,77 @@ describe('processRouteIngress for Ingress', () => {
 
 describe('processServices', () => {
   it('processServices', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-service1',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+        spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Service',
+            metadata: {
+              name: 'service1',
+            },
+          },
+      },
+      },
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-service2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+        spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Service',
+            metadata: {
+              name: 'service2',
+            },
+          },
+      },
+      },
+    ];
+    const servicesMap = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
+
+    expect(processServices(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace, servicesMap,
+    )).toEqual(undefined);
+  });
+});
+
+describe('processDeployables', () => {
+  it('processDeployables', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -386,11 +504,10 @@ describe('processServices', () => {
           },
       },
     }];
-    const servicesMap = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
 
-    expect(processServices(
-      parentId, deployables, [], [],
-      subscriptionStatusMap, names, appNamespace, servicesMap,
+    expect(processDeployables(
+      deployables, parentId, [], [],
+      subscriptionStatusMap, names, appNamespace,
     )).toEqual(undefined);
   });
 });

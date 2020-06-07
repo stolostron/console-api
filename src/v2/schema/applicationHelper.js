@@ -9,6 +9,8 @@
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 
+const templateKind = 'spec.template.kind';
+
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
@@ -202,7 +204,7 @@ export const processRouteIngress = (
     );
 
     // get service info and map it to the object id
-    const kind = _.get(deployable, 'spec.template.kind', '');
+    const kind = _.get(deployable, templateKind, '');
 
     if (kind === 'Route') {
       const service = _.get(deployable, 'spec.template.spec.to.name');
@@ -251,7 +253,7 @@ export const processDeployables = (
   , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
 ) => {
   const routes = _.filter(deployables, (obj) => {
-    const kind = _.get(obj, 'spec.template.kind', '');
+    const kind = _.get(obj, templateKind, '');
     return _.includes(['Route', 'Ingress'], kind);
   });
 
@@ -262,7 +264,7 @@ export const processDeployables = (
   );
 
   const services = _.filter(deployables, (obj) => {
-    const kind = _.get(obj, 'spec.template.kind', '');
+    const kind = _.get(obj, templateKind, '');
     return _.includes(['Service'], kind);
   });
 
@@ -274,7 +276,7 @@ export const processDeployables = (
 
   // then the rest
   const other = _.remove(deployables, (obj) => {
-    const kind = _.get(obj, 'spec.template.kind', '');
+    const kind = _.get(obj, templateKind, '');
     return !_.includes(['Route', 'Ingress', 'Service'], kind);
   });
 
