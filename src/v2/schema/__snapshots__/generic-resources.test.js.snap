@@ -737,9 +737,9 @@ Object {
               "icp": "system",
               "test": "test",
             },
-            "name": "multicluster-endpoint",
+            "name": "klusterlet",
             "resourceVersion": "2120711",
-            "selfLink": "/api/v1/namespaces/multicluster-endpoint",
+            "selfLink": "/api/v1/namespaces/klusterlet",
             "uid": "34ddc94d-70dc-11e9-865a-00000a15079c",
           },
           "spec": Object {
