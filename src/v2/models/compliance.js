@@ -41,7 +41,7 @@ export default class ComplianceModel {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', (config.get('complianceNamespace') || 'mcm'));
-      return this.kubeConnector.post(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies`, resource)
+      return this.kubeConnector.post(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies`, resource)
         .catch(err => Error(err));
     }));
     result.forEach((item) => {
@@ -83,14 +83,14 @@ export default class ComplianceModel {
 
     if (!name) {
       // for getting policy list
-      const policyResponse = await this.kubeConnector.getResources(ns => `/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${ns}/policies`);
+      const policyResponse = await this.kubeConnector.getResources(ns => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`);
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       }
       policies = policyResponse || [];
     } else {
       // get single policy with a specific name - walkaround of no type field
-      const policyResponse = await this.kubeConnector.get(`/apis/policy.mcm.ibm.com/v1alpha1/namespaces/${namespace}/policies/${name}`);
+      const policyResponse = await this.kubeConnector.get(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies/${name}`);
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       } else {

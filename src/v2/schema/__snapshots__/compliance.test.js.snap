@@ -54,7 +54,7 @@ Object {
             ],
             "results": Object {
               "cluster2": Object {
-                "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+                "apiVersion": "policy.open-cluster-management.io/v1",
                 "kind": "Policy",
                 "metadata": Object {
                   "annotations": Object {
@@ -82,7 +82,7 @@ Object {
                     },
                   ],
                   "resourceVersion": "5543743",
-                  "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mcm-cluster2/policies/policy-all",
+                  "selfLink": "/apis/policy.open-cluster-management.io/v1/namespaces/mcm-cluster2/policies/policy-all",
                   "uid": "c8af7ef9-0f74-11e9-9723-0e8b333ab57e",
                 },
                 "spec": Object {
@@ -421,7 +421,7 @@ Object {
             ],
             "results": Object {
               "cluster2": Object {
-                "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+                "apiVersion": "policy.open-cluster-management.io/v1",
                 "kind": "Policy",
                 "metadata": Object {
                   "annotations": Object {
@@ -449,7 +449,7 @@ Object {
                     },
                   ],
                   "resourceVersion": "5543743",
-                  "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mcm-cluster2/policies/policy-all",
+                  "selfLink": "/apis/policy.open-cluster-management.io/v1/namespaces/mcm-cluster2/policies/policy-all",
                   "uid": "c8af7ef9-0f74-11e9-9723-0e8b333ab57e",
                 },
                 "spec": Object {
@@ -762,7 +762,7 @@ Object {
         "spec": Object {
           "runtime-rules": Array [
             Object {
-              "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+              "apiVersion": "policy.open-cluster-management.io/v1",
               "kind": "Policy",
               "metadata": Object {
                 "description": "Instance descriptor for policy resource",
@@ -819,7 +819,7 @@ Object {
               },
             },
             Object {
-              "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+              "apiVersion": "policy.open-cluster-management.io/v1",
               "kind": "Policy",
               "metadata": Object {
                 "description": "Instance descriptor for policy resource",
@@ -975,7 +975,7 @@ Object {
             ],
             "results": Object {
               "cluster2": Object {
-                "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+                "apiVersion": "policy.open-cluster-management.io/v1",
                 "kind": "Policy",
                 "metadata": Object {
                   "annotations": Object {
@@ -1003,7 +1003,7 @@ Object {
                     },
                   ],
                   "resourceVersion": "5543743",
-                  "selfLink": "/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mcm-cluster2/policies/policy-all",
+                  "selfLink": "/apis/policy.open-cluster-management.io/v1/namespaces/mcm-cluster2/policies/policy-all",
                   "uid": "c8af7ef9-0f74-11e9-9723-0e8b333ab57e",
                 },
                 "spec": Object {
