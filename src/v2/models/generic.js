@@ -478,16 +478,16 @@ export default class GenericModel extends KubeModel {
       }];
     }
     const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
-
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
         this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
-      const reason = _.get(result, 'status.reason');
+      const reason = _.get(result, 'status.conditions[0].reason');
       if (reason) {
-        throw new Error(`Failed to Update ${name}: ${reason}`);
+        const message = _.get(result, 'status.conditions[0].message');
+        throw new Error(`Failed to Update ${name}. ${reason}. ${message}.`);
       } else {
         return _.get(result, 'metadata.name');
       }

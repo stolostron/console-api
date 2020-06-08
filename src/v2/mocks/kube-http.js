@@ -93,7 +93,7 @@ export default function createMockHttp() {
           return state.compliances.mockCreateCompliance;
         case params.url.includes('applications'):
           return state.apps.mockCreateAppResponse;
-        case params.url.includes('default/managedClusterAction'):
+        case params.url.includes('default/managedclusteractions'):
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/namespaces/default/secrets') && _.get(params.json, 'metadata.name') === 'new-aws':
           return state.connectionApi.createCloudConnection;
