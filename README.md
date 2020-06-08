@@ -16,11 +16,11 @@
       echo "echo \"NodeJS Version: \`node -v\`   NPM Version: \`npm -v\`\"" >> ~/.zshrc
       ```
 
-      Restart your shell.
-
       This will run nvm on shell startup which will look for a .nvmrc and use the node version specified.
 
-  2. Install and use NodeJS version 10 if NVM does not detect the installed version
+  2. Restart your shell.
+
+  3. If nvm does not find the version, install it.
 
       ```
       nvm install
