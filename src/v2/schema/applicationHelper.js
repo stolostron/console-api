@@ -9,6 +9,8 @@
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 
+const templateKind = 'spec.template.kind';
+
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
@@ -188,6 +190,102 @@ export const addSubscriptionDeployable = (
   createReplicaChild(topoObject, template, links, nodes);
 
   return topoObject;
+};
+
+export const processRouteIngress = (
+  clusterId, routes, links, nodes,
+  subscriptionStatusMap, names, namespace,
+) => {
+  const servicesMap = {};
+  routes.forEach((deployable) => {
+    const topoObject = addSubscriptionDeployable(
+      clusterId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+
+    // get service info and map it to the object id
+    const kind = _.get(deployable, templateKind, '');
+
+    if (kind === 'Route') {
+      const service = _.get(deployable, 'spec.template.spec.to.name');
+      if (service) {
+        servicesMap[service] = topoObject.id;
+      }
+    } else {
+      // ingress
+      const rules = _.get(deployable, 'spec.template.spec.rules', []);
+
+      rules.forEach((rule) => {
+        const rulePaths = _.get(rule, 'http.paths', []);
+        rulePaths.forEach((path) => {
+          const service = _.get(path, 'backend.serviceName');
+          if (service) {
+            servicesMap[service] = topoObject.id;
+          }
+        });
+      });
+    }
+  });
+  // return a map of services that must be linked to these router
+  return servicesMap;
+};
+
+export const processServices = (
+  clusterId, services, links, nodes,
+  subscriptionStatusMap, names, namespace, servicesMap,
+) => {
+  services.forEach((deployable) => {
+    const serviceName = _.get(deployable, 'spec.template.metadata.name', '');
+    let parentId = servicesMap[serviceName];
+    if (!parentId) {
+      parentId = clusterId;
+    }
+
+    addSubscriptionDeployable(
+      parentId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+  });
+};
+
+export const processDeployables = (
+  deployables
+  , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+) => {
+  const routes = _.filter(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return _.includes(['Route', 'Ingress'], kind);
+  });
+
+  // process route and ingress first
+  const serviceMap = processRouteIngress(
+    clusterId, routes, links, nodes,
+    subscriptionStatusMap, names, namespace,
+  );
+
+  const services = _.filter(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return _.includes(['Service'], kind);
+  });
+
+  // then service
+  processServices(
+    clusterId, services, links, nodes,
+    subscriptionStatusMap, names, namespace, serviceMap,
+  );
+
+  // then the rest
+  const other = _.remove(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return !_.includes(['Route', 'Ingress', 'Service'], kind);
+  });
+
+  other.forEach((deployable) => {
+    addSubscriptionDeployable(
+      clusterId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+  });
 };
 
 export const createGenericPackageObject = (
@@ -402,12 +500,10 @@ async function getApplicationElements(application, clusterModel) {
 
           // add deployables if any
           if (subscription.deployables) {
-            subscription.deployables.forEach((deployable) => {
-              addSubscriptionDeployable(
-                clusterId, deployable, links, nodes,
-                subscriptionStatusMap, names, namespace,
-              );
-            });
+            processDeployables(
+              subscription.deployables
+              , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+            );
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
             addSubscriptionCharts(
