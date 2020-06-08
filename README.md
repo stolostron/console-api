@@ -49,14 +49,14 @@
 
 4. Setup environment variables
 
-   | Variable            | Description                   |
-   | ------------------- | ----------------------------- |
-   | `API_SERVER_URL`    | Cluster API server URL        |
-   | `SERVICEACCT_TOKEN` | Cluster service account token |
+   | Variable          | Description                   |
+   | ----------------- | ----------------------------- |
+   | API_SERVER_URL    | Cluster API server URL        |
+   | SERVICEACCT_TOKEN | Cluster service account token |
 
     ```zsh
     oc login --token=${CLUSTER_TOKEN} --server=${CLUSTER_SERVER}
-    export API_SERVER_URL=`oc get infrastructure cluster -o jsonpath={.status.apiServerURI}`
+    export API_SERVER_URL=`oc get infrastructure cluster -o jsonpath={.status.apiServerURL}`
     export SERVICEACCT_TOKEN=`oc whoami -t`
     ```
 
