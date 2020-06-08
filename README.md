@@ -7,6 +7,9 @@
 ## Prerequisites
 
 - [NodeJS](https://nodejs.org/)
+
+  The build requires node.js version 10 as specified in the [.nvmrc](.nvmrc) file by the reference to [lts/dubnium](https://nodejs.org/en/about/releases/).
+  
   1. Setup [nvm](https://github.com/nvm-sh/nvm) - a version manager for node.js, designed to be installed per-user, and invoked per-shell.
 
       ```
@@ -55,7 +58,6 @@
    | SERVICEACCT_TOKEN | Cluster service account token |
 
     ```zsh
-    oc login --token=${CLUSTER_TOKEN} --server=${CLUSTER_SERVER}
     export API_SERVER_URL=`oc get infrastructure cluster -o jsonpath={.status.apiServerURL}`
     export SERVICEACCT_TOKEN=`oc whoami -t`
     ```
