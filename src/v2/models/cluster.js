@@ -9,6 +9,8 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import logger from '../lib/logger';
+import { responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
@@ -18,6 +20,8 @@ export const CLUSTER_LABEL = `${HIVE_DOMAIN}/cluster-deployment-name`;
 export const UNINSTALL_LABEL_SELECTOR = cluster => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 export const INSTALL_LABEL_SELECTOR = cluster => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 
+export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
+export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -64,53 +68,22 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
   return clusterdeploymentStatus;
 }
 
-function responseHasError(response) {
-  const code = response.statusCode || response.code;
-  return (code < 200 || code >= 300);
-}
-
-
-async function getClusterResources(kube) {
-  const [clusters, clusterdeployments] = await Promise.all([
-    // Try cluster scope queries, falling back to per-namespace
-    kube.get('/apis/clusterregistry.k8s.io/v1alpha1/clusters')
-      .then(allClusters => (allClusters.items ?
-        allClusters.items
-        : kube.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`))),
-    kube.get('/apis/hive.openshift.io/v1/clusterdeployments')
-      .then(allClusterDeployments => (allClusterDeployments.items ?
-        allClusterDeployments.items
-        : kube.getResources(ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`))),
-  ]);
-
-  // For clusterversions, query only clusters that are online
-  const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
-  // For clusterstatuses, query only namespaces that have clusters
-  const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
-  const [clusterstatuses, ...clusterversions] = await Promise.all([
-    kube.getResources(
-      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
-      { namespaces },
-    ),
-    ...names.map(n => kube.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
-  ]);
-  return [clusters, clusterstatuses, clusterdeployments, clusterversions];
-}
-
 function getUniqueResourceName(resource) {
   const name = _.get(resource, 'metadata.name', 'noClusterName');
-  const namespace = _.get(resource, 'metadata.namespace', 'noClusterNamespace');
+  const namespace = _.get(resource, 'metadata.namespace', name);
   return `${name}_${namespace}`;
 }
 
 function mapResources(resource, kind = 'Cluster') {
   const resultMap = new Map();
-  resource.forEach((r) => {
-    if (r.metadata && (!r.kind || r.kind === kind)) {
-      const key = getUniqueResourceName(r);
-      resultMap.set(key, { metadata: r.metadata, raw: r });
-    }
-  });
+  if (resource) {
+    resource.forEach((r) => {
+      if (r.metadata && (!r.kind || r.kind === kind)) {
+        const key = getUniqueResourceName(r);
+        resultMap.set(key, { metadata: r.metadata, raw: r });
+      }
+    });
+  }
   return resultMap;
 }
 
@@ -125,36 +98,60 @@ function mapClusterVersions(rawClusterversions) {
   return clusterversions;
 }
 
-function findMatchedStatus(clusters, clusterstatuses, clusterdeployments, rawClusterversions) {
+function findMatchedStatus({
+  clusters, clusterstatuses, clusterversions,
+  managedclusters, managedclusterinfos, clusterdeployments,
+}) {
   const resultMap = new Map();
   const clusterMap = mapResources(clusters);
+  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
   const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
   const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
-  const clusterVersionMap = mapClusterVersions(rawClusterversions);
+  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
+  const clusterVersionMap = mapClusterVersions(clusterversions);
 
-  const uniqueClusterNames = new Set([...clusterMap.keys(), ...clusterDeploymentMap.keys()]);
+  const uniqueClusterNames = new Set([
+    ...clusterMap.keys(),
+    ...managedClusterMap.keys(),
+    ...clusterDeploymentMap.keys(),
+  ]);
   uniqueClusterNames.forEach((c) => {
     const cluster = clusterMap.get(c);
+    const managedcluster = managedClusterMap.get(c);
     const clusterstatus = clusterStatusMap.get(c);
     const clusterdeployment = clusterDeploymentMap.get(c);
-    const metadata = _.has(cluster, 'metadata') ?
-      _.get(cluster, 'metadata') :
-      _.pick(_.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
+    const managedclusterinfo = managedClusterInfoMap.get(c);
+    const metadata =
+      _.get(managedcluster, 'metadata') ||
+      _.get(cluster, 'metadata') ||
+      _.pick(_.get(managedclusterinfo, 'metadata') || _.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
     const clusterversion = _.get(clusterVersionMap, metadata.name);
     const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
+    const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
     const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
-    const serverAddress = apiURL || (rawServerAddress ? `https://${rawServerAddress}` : null);
+    const serverAddress = apiURL || (masterEndpoint || rawServerAddress ? `https://${masterEndpoint || rawServerAddress}` : null);
     const data = {
       metadata,
       nodes: _.get(clusterstatus, 'raw.spec.capacity.nodes'),
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL', _.get(clusterdeployment, 'raw.status.webConsoleURL')),
+      consoleURL: _.get(
+        managedclusterinfo,
+        'raw.status.consoleURL',
+        _.get(
+          clusterstatus,
+          'raw.spec.consoleURL',
+          _.get(
+            clusterdeployment,
+            'raw.status.webConsoleURL',
+          ),
+        ),
+      ),
       rawStatus: _.get(clusterstatus, 'raw'),
       klusterletVersion: _.get(clusterstatus, 'raw.spec.klusterletVersion', '-'),
       k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
       serverAddress,
       isHive: !!clusterdeployment,
-      isManaged: !!cluster,
+      isManaged: managedcluster || cluster,
     };
     if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
@@ -179,29 +176,114 @@ function getClusterDeploymentSecrets(clusterDeployment) {
   };
 }
 
-function findMatchedStatusForOverview(clusters, clusterstatuses) {
+function findMatchedStatusForOverview({
+  clusters, managedclusters, clusterstatuses, managedclusterinfos,
+}) {
   const resultMap = new Map();
-  const clusterstatusResultMap = mapResources(clusterstatuses, 'ClusterStatus');
-  clusters.forEach((cluster) => {
-    const uniqueClusterName = getUniqueResourceName(cluster);
-    const clusterstatus = clusterstatusResultMap.get(uniqueClusterName);
+  const clusterMap = mapResources(clusters);
+  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
+  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
+  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
+
+  const uniqueClusterNames = new Set([
+    ...clusterMap.keys(),
+    ...managedClusterMap.keys(),
+  ]);
+  uniqueClusterNames.forEach((c) => {
+    const cluster = clusterMap.get(c);
+    const managedcluster = managedClusterMap.get(c);
+    const clusterstatus = clusterStatusMap.get(c);
+    const managedclusterinfo = managedClusterInfoMap.get(c);
     const data = {
-      metadata: cluster.metadata,
-      status: getStatus(cluster),
+      metadata: _.get(managedcluster, 'metadata', _.get(cluster, 'metadata')),
+      status: getStatus(_.get(cluster, 'raw')),
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(clusterstatus, 'raw.spec.consoleURL'),
+      consoleURL: _.get(managedclusterinfo, 'raw.status.consoleURL', _.get(clusterstatus, 'raw.spec.consoleURL')),
       capacity: _.get(clusterstatus, 'raw.spec.capacity'),
       usage: _.get(clusterstatus, 'raw.spec.usage'),
-      rawCluster: cluster,
+      rawCluster: _.get(managedcluster, 'raw', _.get(cluster, 'raw')),
       rawStatus: _.get(clusterstatus, 'raw'),
       serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
     };
-    resultMap.set(uniqueClusterName, data);
+    resultMap.set(c, data);
   });
   return [...resultMap.values()];
 }
 
 export default class ClusterModel extends KubeModel {
+  constructor(args) {
+    super(args);
+    const { clusterNamespaces } = args;
+    this.clusterNamespaces = clusterNamespaces;
+  }
+
+  async createClusterNamespace(clusterNamespace, checkForDeployment = false) {
+    let projectResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
+
+    if (responseHasError(projectResponse)) {
+      if (projectResponse.code === 409) {
+        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
+        if (existingNamespaceClusters.items.length > 0) {
+          throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
+        }
+        if (checkForDeployment) {
+          const existingNamespaceClusterDeployments = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${clusterNamespace}/clusterdeployments`);
+          if (existingNamespaceClusterDeployments.items.length > 0) {
+            throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a ClusterDeployment resource`);
+          }
+        }
+      } else {
+        return projectResponse;
+      }
+    }
+
+    // Mark namespace as a cluster namespace
+    // First try adding a label
+    let labelNamespaceResponse = await this.kubeConnector.patch(
+      `/api/v1/namespaces/${clusterNamespace}`,
+      {
+        body: [
+          {
+            op: 'add',
+            path: `/metadata/labels/${CLUSTER_NAMESPACE_LABEL.replace('/', '~1')}`,
+            value: '',
+          },
+        ],
+      },
+    );
+    if (responseHasError(labelNamespaceResponse)) {
+      // Otherwise, try labels object
+      labelNamespaceResponse = await this.kubeConnector.patch(
+        `/api/v1/namespaces/${clusterNamespace}`,
+        {
+          body: [
+            {
+              op: 'add',
+              path: '/metadata/labels',
+              value:
+              {
+                [CLUSTER_NAMESPACE_LABEL]: '',
+              },
+            },
+          ],
+        },
+      );
+    }
+
+    // If we created this namespace but could not label it, we have a problem
+    if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
+      return labelNamespaceResponse;
+    }
+
+    // Get updated project and update namespace cache as long as we were able to label it
+    if (!responseHasError(labelNamespaceResponse)) {
+      projectResponse = this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`);
+      this.updateUserNamespaces(labelNamespaceResponse);
+    }
+
+    return projectResponse;
+  }
+
   async createCluster(args) {
     let { cluster: resources } = args;
     const created = [];
@@ -231,26 +313,20 @@ export default class ClusterModel extends KubeModel {
       errors.push({ message: 'ClusterDeployment must specify a namespace' });
       return { errors };
     }
-    const namespaceResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } });
+
+    let namespaceResponse;
+    try {
+      namespaceResponse = this.createClusterNamespace(namespace, true);
+    } catch (error) {
+      errors.push({ message: error.message });
+      return { errors };
+    }
     if (responseHasError(namespaceResponse)) {
-      // if namespace already exists, only fail if there's no cluster in it
-      if (namespaceResponse.code === 409) {
-        const existingNamespaceClusters = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments`);
-        if (existingNamespaceClusters.items.length > 0) {
-          errors.push({ message: `Create Cluster failed: Namespace "${namespace}" already contains a Cluster resource` });
-          return { errors };
-        }
-      } else {
-        // failed to create the namespace at all
-        errors.push({ message: namespaceResponse.message });
-        return { errors };
-      }
+      // failed to create the namespace at all
+      errors.push({ message: namespaceResponse.message });
+      return { errors };
     }
 
-    // Update the namespace cache, don't add existing namespace in case they are unauthorized
-    if (namespaceResponse.code !== 409) {
-      this.updateUserNamespaces(namespaceResponse);
-    }
 
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/');
@@ -395,26 +471,92 @@ export default class ClusterModel extends KubeModel {
     return undefined;
   }
 
+  async getClusterResources() {
+    // Try cluster scope queries, falling back to per-cluster-namespace
+    const rbacFallbackQuery = (clusterQuery, namespaceQueryFunction) => (
+      this.kubeConnector.get(clusterQuery).then(allItems => (allItems.items
+        ? allItems.items
+        : this.kubeConnector.getResources(
+          namespaceQueryFunction,
+          { namespaces: this.clusterNamespaces },
+        )))
+    );
+
+    const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
+      rbacFallbackQuery(
+        '/apis/clusterregistry.k8s.io/v1alpha1/clusters',
+        ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
+      ),
+      rbacFallbackQuery(
+        '/apis/cluster.open-cluster-management.io/v1/managedclusters',
+        ns => `/apis/cluster.open-cluster-management.io/v1/managedclusters/${ns}`,
+      ),
+      rbacFallbackQuery(
+        '/apis/hive.openshift.io/v1/clusterdeployments',
+        ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
+      ),
+      rbacFallbackQuery(
+        '/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos',
+        ns => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`,
+      ),
+    ]);
+
+    // For clusterversions, query only clusters that are online
+    const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
+    // For clusterstatuses, query only namespaces that have clusters
+    const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
+    const [clusterstatuses, ...clusterversions] = await Promise.all([
+      this.kubeConnector.getResources(
+        ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
+        { namespaces },
+      ),
+      ...names.map(n => this.kubeConnector.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
+    ]);
+    return {
+      clusters,
+      managedclusters,
+      clusterstatuses,
+      clusterdeployments,
+      managedclusterinfos,
+      clusterversions,
+    };
+  }
+
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
-    const [clusters, clusterstatuses, clusterdeployments, ...clusterversions] = await Promise.all([
+    const [
+      cluster,
+      managedcluster,
+      clusterstatus,
+      clusterdeployment,
+      managedclusterinfo,
+      ...clusterversions
+    ] =
+    await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
+      this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
+      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${namespace}/managedclusterinfos/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
     const [result] =
-      findMatchedStatus([clusters], [clusterstatuses], [clusterdeployments], clusterversions);
-    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployments);
+      findMatchedStatus({
+        clusters: [cluster],
+        managedclusters: [managedcluster],
+        clusterstatuses: [clusterstatus],
+        clusterdeployments: [clusterdeployment],
+        managedclusterinfos: [managedclusterinfo],
+        clusterversions,
+      });
+    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployment);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
   }
 
   async getClusters(args = {}) {
-    const [clusters, clusterstatuses, clusterdeployments, clusterversions] =
-      await getClusterResources(this.kubeConnector);
-    const results =
-      findMatchedStatus(clusters, clusterstatuses, clusterdeployments, clusterversions);
+    const resources = await this.getClusterResources();
+    const results = findMatchedStatus(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
@@ -422,8 +564,8 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getAllClusters(args = {}) {
-    const [clusters, clusterstatuses] = await getClusterResources(this.kubeConnector);
-    const results = findMatchedStatusForOverview(clusters, clusterstatuses);
+    const resources = await this.getClusterResources();
+    const results = findMatchedStatusForOverview(resources);
     if (args.name) {
       return results.filter(c => c.metadata.name === args.name)[0];
     }
@@ -538,5 +680,104 @@ export default class ClusterModel extends KubeModel {
       }
     });
     return Object.entries(clusterImageSets).map(([releaseImage, name]) => ({ releaseImage, name }));
+  }
+
+  static getErrorMsg(response) {
+    let errorMsg = '';
+    const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
+    errorMsgKeys.forEach((key, i) => {
+      if (response[key]) {
+        (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
+      }
+    });
+    return errorMsg;
+  }
+
+  responseForError(errorTitle, response) {
+    const code = response.statusCode || response.code;
+    logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
+    return {
+      error: {
+        rawResponse: response,
+        statusCode: code,
+        statusMsg: response.message || response.description || response.statusMessage,
+      },
+    };
+  }
+
+  async createClusterResource(args) {
+    const { cluster } = args;
+    if (!cluster || !Array.isArray(cluster)) {
+      throw new Error('cluster argument is required for createClusterResource');
+    }
+
+    const [clusterTemplate, klusterletTemplate] = cluster;
+    if (!klusterletTemplate) {
+      throw new Error('KlusterletConfig is required for createClusterResource');
+    }
+
+    const config = klusterletTemplate.spec;
+    const { clusterName, clusterNamespace } = config;
+
+    const clusterNamespaceResponse = this.createClusterNamespace(clusterNamespace);
+    if (responseHasError(clusterNamespaceResponse)) {
+      return clusterNamespaceResponse;
+    }
+
+    if (config.privateRegistryEnabled) {
+      const { imageRegistry, registryUsername, registryPassword } = config;
+      const auth = Buffer.from(`${registryUsername}:${registryPassword}`).toString('base64');
+      const dockerConfigJson = Buffer.from(JSON.stringify({ auths: { [`${imageRegistry}`]: { auth } } })).toString('base64');
+      const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
+
+      const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
+      // skip error for existing secret
+      if (responseHasError(registrySecretResponse) && registrySecretResponse.code !== 409) {
+        return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
+      }
+    }
+
+    klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
+    const klusterletConfigResponse = await this.kubeConnector.post(
+      `/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`,
+      klusterletTemplate,
+    );
+
+    if (responseHasError(klusterletConfigResponse)) {
+      return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
+    }
+
+    const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
+    if (responseHasError(clusterResponse)) {
+      if (clusterResponse.code === 409) {
+        return clusterResponse;
+      }
+
+      // Delete the klusterletconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
+      return this.responseForError('Create Cluster resource failed', clusterResponse);
+    }
+
+    // fetch and return the generated secret
+    return this.pollImportYamlSecret(clusterNamespace, clusterName);
+  }
+
+  async pollImportYamlSecret(clusterNamespace, clusterName) {
+    let count = 0;
+    let importYamlSecret;
+
+    const poll = async (resolve, reject) => {
+      const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
+      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true);
+
+      if (importYamlSecret.code === 404 && count < 5) {
+        count += 1;
+        setTimeout(poll, 2000, resolve, reject);
+      } else {
+        resolve(importYamlSecret);
+      }
+    };
+
+    return new Promise(poll);
   }
 }

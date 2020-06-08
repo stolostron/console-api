@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import supertest from 'supertest';
@@ -127,7 +128,7 @@ describe('Policy Resolver', () => {
         query: `
         mutation {
           createPolicy(resources:[{
-            apiVersion: "policy.mcm.ibm.com/v1alpha1",
+            apiVersion: "policy.open-cluster-management.io/v1",
             kind: "Policy",
             metadata: {
               name: "test-policy",
