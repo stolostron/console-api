@@ -59,7 +59,7 @@ export default class GenericModel extends KubeModel {
         workName = workName.substring(0, 63);
         const jsonBody = {
           apiVersion: 'action.open-cluster-management.io/v1beta1',
-          kind: 'ClusterAction',
+          kind: 'ManagedClusterAction',
           metadata: {
             name: workName,
             namespace: clusterInfo.clusterNameSpace,
@@ -77,7 +77,7 @@ export default class GenericModel extends KubeModel {
             },
           },
         };
-        const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterInfo.clusterNameSpace}/clusteractions`, jsonBody);
+        const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
         return response;
       }));
       return responseArr;
@@ -364,7 +364,7 @@ export default class GenericModel extends KubeModel {
     workName = workName.substring(0, 63);
     const jsonBody = {
       apiVersion: 'action.open-cluster-management.io/v1beta1',
-      kind: 'ClusterAction',
+      kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
         namespace: clusterNamespace,
@@ -387,7 +387,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -400,7 +400,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
@@ -446,7 +446,7 @@ export default class GenericModel extends KubeModel {
     workName = workName.substring(0, 63);
     const jsonBody = {
       apiVersion: 'action.open-cluster-management.io/v1beta1',
-      kind: 'ClusterAction',
+      kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
         namespace: clusterNamespace,
@@ -469,7 +469,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -482,7 +482,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
