@@ -214,6 +214,29 @@ function findMatchedStatusForOverview({
   return [...resultMap.values()];
 }
 
+function getErrorMsg(response) {
+  let errorMsg = '';
+  const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
+  errorMsgKeys.forEach((key, i) => {
+    if (response[key]) {
+      (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
+    }
+  });
+  return errorMsg;
+}
+
+function responseForError(errorTitle, response) {
+  const code = response.statusCode || response.code;
+  logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${getErrorMsg(response)}`);
+  return {
+    error: {
+      rawResponse: response,
+      statusCode: code,
+      statusMsg: response.message || response.description || response.statusMessage,
+    },
+  };
+}
+
 export default class ClusterModel extends KubeModel {
   constructor(args) {
     super(args);
@@ -699,29 +722,6 @@ export default class ClusterModel extends KubeModel {
     return Object.entries(clusterImageSets).map(([releaseImage, name]) => ({ releaseImage, name }));
   }
 
-  static getErrorMsg(response) {
-    let errorMsg = '';
-    const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
-    errorMsgKeys.forEach((key, i) => {
-      if (response[key]) {
-        (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
-      }
-    });
-    return errorMsg;
-  }
-
-  responseForError(errorTitle, response) {
-    const code = response.statusCode || response.code;
-    logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${this.getErrorMsg(response)}`);
-    return {
-      error: {
-        rawResponse: response,
-        statusCode: code,
-        statusMsg: response.message || response.description || response.statusMessage,
-      },
-    };
-  }
-
   async createClusterResource(args) {
     const { cluster } = args;
     if (!cluster || !Array.isArray(cluster)) {
@@ -750,7 +750,7 @@ export default class ClusterModel extends KubeModel {
       const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
       // skip error for existing secret
       if (responseHasError(registrySecretResponse) && registrySecretResponse.code !== 409) {
-        return this.responseForError('Create private docker registry secret failed', registrySecretResponse);
+        return responseForError('Create private docker registry secret failed', registrySecretResponse);
       }
     }
 
@@ -761,7 +761,7 @@ export default class ClusterModel extends KubeModel {
     );
 
     if (responseHasError(klusterletConfigResponse)) {
-      return this.responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
+      return responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
 
     const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
@@ -772,7 +772,7 @@ export default class ClusterModel extends KubeModel {
 
       // Delete the klusterletconfig so the user can try again
       await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
-      return this.responseForError('Create Cluster resource failed', clusterResponse);
+      return responseForError('Create Cluster resource failed', clusterResponse);
     }
 
     // fetch and return the generated secret
