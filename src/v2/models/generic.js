@@ -487,7 +487,7 @@ export default class GenericModel extends KubeModel {
       const reason = _.get(result, 'status.conditions[0].reason');
       if (reason) {
         const message = _.get(result, 'status.conditions[0].message');
-        throw new Error(`Failed to Update ${name}. ${reason}. ${message}.`);
+        throw new Error(`Failed to Delete ${name}. ${reason}. ${message}.`);
       } else {
         return _.get(result, 'metadata.name');
       }
