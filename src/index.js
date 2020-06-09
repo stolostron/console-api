@@ -52,7 +52,7 @@ server.listen(GRAPHQL_PORT, () => {
 });
 
 function shutdown() {
-  if (server) {
+  if (server !== null) {
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
       setTimeout(() => {
@@ -62,7 +62,7 @@ function shutdown() {
     }
 
     server.close();
-    server = undefined;
+    server = null;
   }
 }
 
