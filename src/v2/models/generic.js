@@ -81,8 +81,7 @@ export default class GenericModel extends KubeModel {
           },
         };
         try {
-          const response = await this.kubeConnector.post(`${routePrefix}/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
-          return response;
+          return this.kubeConnector.post(`${routePrefix}/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
         } catch (e) {
           return e;
         }
