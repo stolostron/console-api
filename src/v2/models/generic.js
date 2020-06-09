@@ -13,6 +13,9 @@ import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
+const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
+const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
+
 function getApiGroupFromSelfLink(selfLink, kind) {
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
@@ -58,7 +61,7 @@ export default class GenericModel extends KubeModel {
         let workName = `create-resource-${this.kubeConnector.uid()}`;
         workName = workName.substring(0, 63);
         const jsonBody = {
-          apiVersion: 'action.open-cluster-management.io/v1beta1',
+          apiVersion: clusterActionApiVersion,
           kind: 'ManagedClusterAction',
           metadata: {
             name: workName,
@@ -77,7 +80,7 @@ export default class GenericModel extends KubeModel {
             },
           },
         };
-        const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
+        const response = await this.kubeConnector.post(`${routePrefix}/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
         return response;
       }));
       return responseArr;
@@ -363,7 +366,7 @@ export default class GenericModel extends KubeModel {
     let workName = `update-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'action.open-cluster-management.io/v1beta1',
+      apiVersion: clusterActionApiVersion,
       kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
@@ -387,7 +390,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${clusterNamespace}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -400,7 +403,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
@@ -445,7 +448,7 @@ export default class GenericModel extends KubeModel {
     let workName = `delete-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'action.open-cluster-management.io/v1beta1',
+      apiVersion: clusterActionApiVersion,
       kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
@@ -469,7 +472,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${clusterNamespace}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -481,7 +484,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/action.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.conditions[0].reason');
