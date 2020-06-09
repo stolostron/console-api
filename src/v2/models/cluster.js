@@ -764,7 +764,7 @@ export default class ClusterModel extends KubeModel {
       return responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
     }
 
-    const clusterResponse = await this.kubeConnector.post(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`, clusterTemplate);
+    const clusterResponse = await this.kubeConnector.post('/apis/cluster.open-cluster-management.io/v1/managedclusters', clusterTemplate);
     if (responseHasError(clusterResponse)) {
       if (clusterResponse.code === 409) {
         return clusterResponse;
