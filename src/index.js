@@ -26,7 +26,21 @@ const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/consoleap
 const certificate = fs.readFileSync(process.env.serverCert || './sslcert/consoleapi.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
-const server = https.createServer(credentials, graphQLServer);
+if (process.env.NODE_ENV === 'development') {
+  if (!process.env.API_SERVER_URL) {
+    throw new Error('environment variable API_SERVER_URL is required');
+  }
+
+  if (!process.env.SERVICEACCT_TOKEN) {
+    throw new Error('environment variable SERVICEACCT_TOKEN is required');
+  }
+
+  if (!process.env.localKubeToken) {
+    throw new Error('environment variable localKubeToken is required');
+  }
+}
+
+let server = https.createServer(credentials, graphQLServer);
 
 server.listen(GRAPHQL_PORT, () => {
   logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] [version V2] started.`);
@@ -35,3 +49,21 @@ server.listen(GRAPHQL_PORT, () => {
     logger.info(`GraphiQL is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphiql`);
   }
 });
+
+function shutdown() {
+  if (server) {
+    /* istanbul ignore next */
+    if (process.env.NODE_ENV === 'development') {
+      setTimeout(() => {
+        logger.error('shutdown timeout');
+        throw new Error('shutdown timeout');
+      }, 30 * 1000).unref();
+    }
+
+    server.close();
+    server = undefined;
+  }
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
