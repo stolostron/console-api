@@ -57,6 +57,7 @@ export default function createMockHttp() {
     if (params.method === 'DELETE') {
       switch (true) {
         case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
+        case params.url.includes('managedclusters/hub-cluster'):
           return { body: { kind: 'Status', code: '401' } };
         case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
           return { body: { kind: 'Status', status: 'Not Acceptable', code: '406' } };
@@ -105,6 +106,7 @@ export default function createMockHttp() {
         case params.url.includes('/apis/agent.open-cluster-management.io/v1beta1/namespaces/foo/klusterletconfigs'):
           return state.clusterImport.getKlusterletConfigsResponse;
         case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
+        case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
           return state.clusterImport.getClusterResponse;
         default:
           return state.pods;

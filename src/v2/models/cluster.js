@@ -671,14 +671,15 @@ export default class ClusterModel extends KubeModel {
   async detachCluster(args) {
     const { namespace, cluster, destroy = false } = args;
     const clusterRegistry = `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${cluster}`;
+    const managedCluster = `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`;
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
     const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
-    if (clusterRegistry) {
-      const detachResponse = await this.kubeConnector.delete(clusterRegistry);
-      if (!destroy && detachResponse.kind === 'Status') {
-        return detachResponse.code;
-      }
+    const detachClusterResponse = await this.kubeConnector.delete(clusterRegistry);
+    const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
+
+    if (!destroy && detachClusterResponse.kind === 'Status' && detachManagedClusterResponse.status !== 'Success') {
+      return detachClusterResponse.code;
     }
 
     if (destroy) {
