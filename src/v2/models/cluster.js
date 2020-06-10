@@ -34,16 +34,19 @@ function getCPUPercentage(usage, capacity) {
 
 function getStatus(cluster, clusterdeployment, uninstall, install) {
   let clusterdeploymentStatus = '';
-  if (clusterdeployment && _.get(clusterdeployment, 'kind') === 'ClusterDeployment') {
+  if (clusterdeployment) {
+    const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
+    const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
     if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active === 1)) {
       clusterdeploymentStatus = 'destroying';
     } else if (install && install.items && install.items.some(i => i.status.active === 1)) {
       clusterdeploymentStatus = 'creating';
+    } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
+      clusterdeploymentStatus = 'detached';
+    } else if ((install && install.items) || (uninstall && uninstall.items)) {
+      clusterdeploymentStatus = 'provisionfailed';
     } else {
-      const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-      const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
-      clusterdeploymentStatus = conditionIndex >= 0 && conditions[conditionIndex].status === 'True' ?
-        'detached' : 'unknown';
+      clusterdeploymentStatus = 'unknown';
     }
   }
 
