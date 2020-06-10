@@ -132,7 +132,15 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     type,
     id: memberId,
     uid: memberId,
-    specs: { isDesign: true, raw: rawData },
+    specs: {
+      isDesign: false,
+      raw: rawData,
+      parent: {
+        parentId,
+        parentName: name,
+        parentType,
+      },
+    },
   };
 
   nodes.push(deployableObj);
@@ -162,6 +170,13 @@ export const addSubscriptionDeployable = (
     }
   });
 
+  const parentNode = nodes.find(n => n.id === parentId);
+  const parentObject = parentNode ?
+    {
+      parentId,
+      parentName: parentNode.name,
+      parentType: parentNode.type,
+    } : undefined;
 
   const template = _.get(deployable, 'spec.template', { metadata: {} });
   let { kind = 'container' } = template;
@@ -176,7 +191,12 @@ export const addSubscriptionDeployable = (
     type: kind,
     id: memberId,
     uid: memberId,
-    specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
+    specs: {
+      raw: template,
+      deployStatuses,
+      isDesign: false,
+      parent: parentObject,
+    },
   };
 
   nodes.push(topoObject);

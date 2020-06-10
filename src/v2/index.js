@@ -79,7 +79,7 @@ const apolloServer = new ApolloServer({
       namespaces,
     });
 
-    const connectors = {
+    return {
       req,
       applicationModel: new ApplicationModel({ kubeConnector }),
       channelModel: new ChannelModel({ kubeConnector }),
@@ -93,8 +93,6 @@ const apolloServer = new ApolloServer({
       connectionModel: new ConnectionModel({ kubeConnector }),
       bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
     };
-
-    return { ...connectors };
   },
 });
 
