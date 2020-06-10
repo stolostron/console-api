@@ -7,7 +7,9 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-export const typeDef = `
+import { gql } from 'apollo-server-express';
+
+export const typeDef = gql`
 
 #Channel
 type Channel implements K8sObject {

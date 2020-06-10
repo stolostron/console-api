@@ -7,9 +7,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import { gql } from 'apollo-server-express';
 import ComplianceModel from '../models/compliance';
 
-export const typeDef = `
+export const typeDef = gql`
 type Policy implements K8sObject {
   detail: PolicyDetail
   # Possible values are: enforce, inform
