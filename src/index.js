@@ -35,10 +35,6 @@ if (process.env.NODE_ENV === 'development') {
   if (!process.env.SERVICEACCT_TOKEN) {
     throw new Error('environment variable SERVICEACCT_TOKEN is required');
   }
-
-  if (!process.env.localKubeToken) {
-    throw new Error('environment variable localKubeToken is required');
-  }
 }
 
 let server = https.createServer(credentials, graphQLServer);
