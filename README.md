@@ -56,8 +56,8 @@
       npm run start:production
       ```
 
-6. Open [GraphiQL](https://localhost:4000/hcmuiapi/graphiql) UI
+6. Open [GraphQL Playground](https://localhost:4000/hcmuiapi/graphql) UI
 
    ```
-   open https://localhost:4000/hcmuiapi/graphiql
+   open https://localhost:4000/hcmuiapi/graphql
    ```

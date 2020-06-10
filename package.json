@@ -54,6 +54,7 @@
     "express": "^4.17.1",
     "flat": "^4.1.0",
     "graphql": "^15.1.0",
+    "graphql-tools": "^6.0.9",
     "graphql-type-json": "^0.2.1",
     "helmet": "^3.22.0",
     "js-yaml": "^3.14.0",

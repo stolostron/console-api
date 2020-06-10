@@ -13,7 +13,6 @@ import server, { GRAPHQL_PATH } from '../index';
 
 describe('Cluster Import Resolver', () => {
   test('Create Kubernetes Cluster Resource for Import should return error msg', (done) => {
-    console.log('MYSERVER', server, GRAPHQL_PATH);
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -24,8 +23,6 @@ describe('Cluster Import Resolver', () => {
       `,
       })
       .end((err, res) => {
-        console.log('COFFEE', err);
-        console.log('BLAH', res.text);
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
