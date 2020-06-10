@@ -247,6 +247,97 @@ describe('addSubscriptionDeployable', () => {
   });
 });
 
+describe('addSubscriptionDeployable with parent node', () => {
+  it('should addSubscriptionDeployable with parent info', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployable = {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        annotations:
+          {
+            'apps.open-cluster-management.io/channel': 'mortgagedc-channel',
+            'apps.open-cluster-management.io/deployable-version': 'apps.openshift.io/v1',
+            'apps.open-cluster-management.io/external-source': 'mortgagedc',
+            'apps.open-cluster-management.io/is-local-deployable': 'false',
+          },
+        creationTimestamp: '2020-05-27T14:22:28Z',
+        generation: 1,
+        labels:
+          {
+            'apps.open-cluster-management.io/channel': 'mortgagedc-channel',
+            'apps.open-cluster-management.io/channel-type': 'GitHub',
+            'apps.open-cluster-management.io/subscription': 'default-mortgagedc-subscription',
+          },
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-deploymentconfig',
+        namespace: 'default',
+        ownerReferences: [{}],
+        resourceVersion: '51745834',
+        selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/deployables/mortgagedc-subscription-mortgagedc-mortgagedc-deploy-deploymentconfig',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'DeploymentConfig',
+            metadata: {},
+            spec: {},
+          },
+      },
+    };
+
+    const nodes = [
+      {
+        id: parentId,
+        name: 'braveman',
+        type: 'cluster',
+      },
+    ];
+    const result = {
+      id: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-deploymentconfig--deploymentconfig--undefined',
+      name: undefined,
+      namespace: 'default',
+      specs: {
+        deployStatuses: [],
+        isDesign: false,
+        parent: {
+          parentId: 'member--clusters--braveman',
+          parentName: 'braveman',
+          parentType: 'cluster',
+        },
+        raw: {
+          apiVersion: 'apps.openshift.io/v1', kind: 'DeploymentConfig', metadata: {}, spec: {},
+        },
+      },
+      type: 'deploymentconfig',
+      uid: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-deploymentconfig--deploymentconfig--undefined',
+    };
+
+    expect(addSubscriptionDeployable(
+      parentId, deployable, [], nodes,
+      subscriptionStatusMap, names, appNamespace,
+    )).toEqual(result);
+  });
+});
+
 describe('processRouteIngress for Route', () => {
   it('processRouteIngress for Route', () => {
     const parentId = 'member--clusters--braveman';
