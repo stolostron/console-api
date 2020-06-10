@@ -10,7 +10,6 @@
 
 import _ from 'lodash';
 import lru from 'lru-cache';
-import config from '../../../config';
 import createMockIAMHTTP from '../mocks/iam-http';
 import request from './request';
 
@@ -28,7 +27,7 @@ async function getKubeToken({
   if ((_.isEmpty(authorization) && shouldLocalAuth) || process.env.MOCK === 'true') {
     // special case for graphiql to work locally
     // do not exchange for idtoken since authorization header is empty
-    idToken = config.get('localKubeToken') || 'localdev';
+    idToken = `Bearer ${process.env.SERVICEACCT_TOKEN}`;
   } else {
     idToken = authorization;
     if (!idToken) {

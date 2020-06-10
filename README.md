@@ -35,12 +35,10 @@
    | ----------------- | ----------------------------- |
    | API_SERVER_URL    | Cluster API server URL        |
    | SERVICEACCT_TOKEN | Cluster service account token |
-   | localKubeToken    | Needed for GraphiQL           |
 
     ```zsh
     export API_SERVER_URL=`oc get infrastructure cluster -o jsonpath={.status.apiServerURL}`
     export SERVICEACCT_TOKEN=`oc whoami -t`
-    export localKubeToken="Bearer $SERVICEACCT_TOKEN"
     ```
 
 5. Start the server
