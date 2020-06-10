@@ -50,7 +50,7 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
     }
   }
 
-  if (cluster && (!_.has(cluster, 'kind') || _.get(cluster, 'kind') === 'Cluster')) {
+  if (cluster) {
     if (_.get(cluster, 'metadata.deletionTimestamp')) {
       return 'detaching';
     }
@@ -125,9 +125,11 @@ function findMatchedStatus({
     const clusterdeployment = clusterDeploymentMap.get(c);
     const managedclusterinfo = managedClusterInfoMap.get(c);
     const metadata =
-      _.get(managedcluster, 'metadata') ||
-      _.get(cluster, 'metadata') ||
-      _.pick(_.get(managedclusterinfo, 'metadata') || _.get(clusterdeployment, 'metadata'), ['name', 'namespace']);
+      _.get(managedcluster || cluster, 'metadata') ||
+      _.pick(_.get(managedclusterinfo || clusterdeployment, 'metadata'), ['name', 'namespace']);
+    if (!metadata.namespace) {
+      metadata.namespace = _.get(managedclusterinfo || clusterdeployment, 'metadata.namespace');
+    }
     const clusterversion = _.get(clusterVersionMap, metadata.name);
     const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
     const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
@@ -199,7 +201,7 @@ function findMatchedStatusForOverview({
     const managedclusterinfo = managedClusterInfoMap.get(c);
     const data = {
       metadata: _.get(managedcluster, 'metadata', _.get(cluster, 'metadata')),
-      status: getStatus(_.get(cluster, 'raw')),
+      status: getStatus(_.get(managedcluster || cluster, 'raw')),
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
       consoleURL: _.get(managedclusterinfo, 'raw.status.consoleURL', _.get(clusterstatus, 'raw.spec.consoleURL')),
       capacity: _.get(clusterstatus, 'raw.spec.capacity'),
@@ -505,9 +507,10 @@ export default class ClusterModel extends KubeModel {
     ]);
 
     // For clusterversions, query only clusters that are online
-    const names = clusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
+    const allClusters = [...clusters, ...managedclusters];
+    const names = allClusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
     // For clusterstatuses, query only namespaces that have clusters
-    const namespaces = Array.from(new Set(clusters.map(c => c.metadata.namespace)));
+    const namespaces = Array.from(new Set(allClusters.map(c => c.metadata.namespace)));
     const [clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.getResources(
         ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
@@ -589,14 +592,27 @@ export default class ClusterModel extends KubeModel {
 
   async getStatus(resource) {
     const { metadata: { name, namespace } } = resource;
-    const [cluster, clusterdeployment] = await Promise.all([
-      this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
-      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
+    const nullIfNotFound = (query, kind) => (
+      query.then(response => (_.get(response, 'kind') === kind ? response : null))
+    );
+    const [managedcluster, cluster, clusterdeployment] = await Promise.all([
+      nullIfNotFound(
+        this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
+        'ManagedCluster',
+      ),
+      nullIfNotFound(
+        this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
+        'Cluster',
+      ),
+      nullIfNotFound(
+        this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace || name}/clusterdeployments/${name}`),
+        'ClusterDeployment',
+      ),
     ]);
 
     let uninstall;
     let install;
-    if (clusterdeployment && _.get(clusterdeployment, 'kind') === 'ClusterDeployment') {
+    if (clusterdeployment) {
       const [destroys, creates] = await Promise.all([
         this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
         this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
@@ -605,7 +621,7 @@ export default class ClusterModel extends KubeModel {
       install = creates;
     }
 
-    return getStatus(cluster, clusterdeployment, uninstall, install);
+    return getStatus(managedcluster || cluster, clusterdeployment, uninstall, install);
   }
 
   async getClusterStatus() {
