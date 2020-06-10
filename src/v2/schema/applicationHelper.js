@@ -133,7 +133,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     id: memberId,
     uid: memberId,
     specs: {
-      isDesign: true,
+      isDesign: false,
       raw: rawData,
       parent: {
         parentId,
@@ -194,7 +194,7 @@ export const addSubscriptionDeployable = (
     specs: {
       raw: template,
       deployStatuses,
-      isDesign: kind === 'deployable' || kind === 'subscription',
+      isDesign: false,
       parent: parentObject,
     },
   };
