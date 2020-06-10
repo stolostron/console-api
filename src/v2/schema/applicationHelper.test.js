@@ -80,7 +80,30 @@ describe('createReplicaChild', () => {
     };
 
     const result = {
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--redis-slave', name: 'redis-slave', namespace: 'open-cluster-management', specs: { isDesign: true, raw: { kind: 'replicaset', metadata: { name: 'redis-slave', namespace: 'open-cluster-management' }, spec: { desired: 2, template: {} } } }, type: 'replicaset', uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--redis-slave',
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--redis-slave',
+      name: 'redis-slave',
+      namespace: 'open-cluster-management',
+      specs: {
+        isDesign: true,
+        parent: {
+          parentId: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--deployment--redis-slave',
+          parentName: 'redis-slave',
+          parentType: 'deployment',
+        },
+        raw: {
+          kind: 'replicaset',
+          metadata: {
+            name: 'redis-slave',
+            namespace: 'open-cluster-management',
+          },
+          spec: {
+            desired: 2,
+            template: {},
+          },
+        },
+      },
+      type: 'replicaset',
+      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--redis-slave',
     };
     expect(createReplicaChild(parentObject, template, [], [])).toEqual(result);
   });
