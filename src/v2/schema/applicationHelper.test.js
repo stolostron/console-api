@@ -56,7 +56,7 @@ describe('createReplicaChild', () => {
       type: 'deployment',
       specs:
       {
-        isDesign: true,
+        isDesign: false,
         raw: {
           kind: 'Deployment',
           metadata: {
@@ -84,7 +84,7 @@ describe('createReplicaChild', () => {
       name: 'redis-slave',
       namespace: 'open-cluster-management',
       specs: {
-        isDesign: true,
+        isDesign: false,
         parent: {
           parentId: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--deployment--redis-slave',
           parentName: 'redis-slave',
