@@ -583,6 +583,11 @@ export default class ClusterModel extends KubeModel {
     const defaultCapacity = kind === 'cpu' ? '1' : '1Mi';
     const usage = _.get(clusterstatus, `spec.usage.${kind}`, defaultUsage);
     const capacity = _.get(clusterstatus, `spec.capacity.${kind}`, defaultCapacity);
+
+    if (capacity === '0' || capacity === 0) {
+      return '0';
+    }
+
     if (kind === 'cpu') {
       return parseInt(getCPUPercentage(usage, capacity), 10);
     }
