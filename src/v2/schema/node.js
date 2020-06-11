@@ -8,7 +8,9 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
-export const typeDef = `
+import { gql } from 'apollo-server-express';
+
+export const typeDef = gql`
 type NodeResources {
   cpu: String
   memory: String

@@ -8,8 +8,10 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
+import { gql } from 'apollo-server-express';
+
 // eslint-disable-next-line
-export const typeDef = `
+export const typeDef = gql`
 # Multicloud Manager Queries
 type Query {
   # Get application resources.

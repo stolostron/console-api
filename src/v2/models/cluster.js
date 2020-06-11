@@ -156,7 +156,7 @@ function findMatchedStatus({
       k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
       serverAddress,
       isHive: !!clusterdeployment,
-      isManaged: managedcluster || cluster,
+      isManaged: managedcluster || !!cluster,
     };
     if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);

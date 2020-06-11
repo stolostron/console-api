@@ -9,9 +9,10 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import { gql } from 'apollo-server-express';
 import ClusterModel from '../models/cluster';
 
-export const typeDef = `
+export const typeDef = gql`
 type Cluster implements K8sObject {
   availableVersions: [String]
   clusterip: String
@@ -42,8 +43,6 @@ type ClusterImageSet {
   name: String
   releaseImage: String
 }
-
-
 `;
 
 

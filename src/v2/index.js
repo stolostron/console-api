@@ -8,9 +8,8 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 import express from 'express';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { isInstance as isApolloErrorInstance, formatError as formatApolloError } from 'apollo-errors';
-import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import noCache from 'nocache';
@@ -54,6 +53,49 @@ const formatError = (error) => {
   return formatApolloError(error);
 };
 
+const apolloServer = new ApolloServer({
+  ...schema,
+  formatError,
+  playground: {
+    endpoint: GRAPHQL_PATH,
+  },
+  context: ({ req }) => {
+    let kubeHTTP;
+    if (isTest) {
+      kubeHTTP = createMockKubeHTTP();
+    }
+
+    const namespaceList = _.get(req, 'user.namespaces', []);
+    const rawNamespaces = Array.isArray(namespaceList.items) ? namespaceList.items : [];
+    const namespaces = rawNamespaces.map(ns => ns.metadata.name);
+    const clusterNamespaces = rawNamespaces.filter(ns => _.has(ns, `metadata.labels["${CLUSTER_NAMESPACE_LABEL}"]`))
+      .map(ns => ns.metadata.name);
+
+    const { updateUserNamespaces } = req;
+
+    const kubeConnector = new KubeConnector({
+      token: req.kubeToken,
+      httpLib: kubeHTTP,
+      namespaces,
+    });
+
+    return {
+      req,
+      applicationModel: new ApplicationModel({ kubeConnector }),
+      channelModel: new ChannelModel({ kubeConnector }),
+      subscriptionModel: new SubscriptionModel({ kubeConnector }),
+      placementRuleModel: new PlacementRuleModel({ kubeConnector }),
+      clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
+      genericModel: new GenericModel({ kubeConnector }),
+      complianceModel: new ComplianceModel({ kubeConnector }),
+      resourceViewModel: new ResourceViewModel({ kubeConnector }),
+      sfModel: new SFModel({ kubeConnector, req }),
+      connectionModel: new ConnectionModel({ kubeConnector }),
+      bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
+    };
+  },
+});
+
 const graphQLServer = express();
 graphQLServer.use(compression());
 
@@ -84,7 +126,6 @@ if (isProd) {
   auth.push(inspect.app, authMiddleware());
 } else {
   auth.push(authMiddleware({ shouldLocalAuth: true }));
-  graphQLServer.use(GRAPHIQL_PATH, graphiqlExpress({ endpointURL: GRAPHQL_PATH }));
 }
 
 if (isTest) {
@@ -92,42 +133,7 @@ if (isTest) {
 }
 
 graphQLServer.use(...auth);
-graphQLServer.use(GRAPHQL_PATH, bodyParser.json(), graphqlExpress(async (req) => {
-  let kubeHTTP;
-  if (isTest) {
-    kubeHTTP = createMockKubeHTTP();
-  }
 
-  const namespaceList = _.get(req, 'user.namespaces', []);
-  const rawNamespaces = Array.isArray(namespaceList.items) ? namespaceList.items : [];
-  const namespaces = rawNamespaces.map(ns => ns.metadata.name);
-  const clusterNamespaces = rawNamespaces.filter(ns => _.has(ns, `metadata.labels["${CLUSTER_NAMESPACE_LABEL}"]`))
-    .map(ns => ns.metadata.name);
-
-  const { updateUserNamespaces } = req;
-
-  const kubeConnector = new KubeConnector({
-    token: req.kubeToken,
-    httpLib: kubeHTTP,
-    namespaces,
-  });
-
-  const context = {
-    req,
-    applicationModel: new ApplicationModel({ kubeConnector }),
-    channelModel: new ChannelModel({ kubeConnector }),
-    subscriptionModel: new SubscriptionModel({ kubeConnector }),
-    placementRuleModel: new PlacementRuleModel({ kubeConnector }),
-    clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
-    genericModel: new GenericModel({ kubeConnector }),
-    complianceModel: new ComplianceModel({ kubeConnector }),
-    resourceViewModel: new ResourceViewModel({ kubeConnector }),
-    sfModel: new SFModel({ kubeConnector, req }),
-    connectionModel: new ConnectionModel({ kubeConnector }),
-    bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
-  };
-
-  return { formatError, schema, context };
-}));
+apolloServer.applyMiddleware({ app: graphQLServer, path: GRAPHQL_PATH });
 
 export default graphQLServer;

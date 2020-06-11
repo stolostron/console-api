@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { makeExecutableSchema } from 'graphql-tools';
+import { gql } from 'apollo-server-express';
 
 import * as applications from './application';
 import * as channels from './channel';
@@ -59,16 +59,14 @@ const modules = [
   bmAsset,
 ];
 
-const mainDefs = [`
+const mainDefs = [gql`
 schema {
   query: Query,
   mutation: Mutation,
 }
 `];
 
-export const typeDefs = mainDefs.concat(modules.map(m => m.typeDef));
+export const typeDefs = mainDefs.concat(modules.filter(m => m.typeDef).map(m => m.typeDef));
 export const resolvers = _.merge(...modules.map(m => m.resolver));
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-export default schema;
+export default { typeDefs, resolvers };

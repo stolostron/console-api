@@ -31,8 +31,7 @@ branches:
 
 stages:
   - build
-  - unit-test
-  - test-e2e
+  - test
   - publish
 
 jobs:
@@ -52,7 +51,7 @@ jobs:
             export COMPONENT_TAG_EXTENSION="";
             make component/push;
           fi;
-    - stage: unit-test
+    - stage: test
       name: "Run unit tests"
       script:
         # Set the image tag differently for PRs
@@ -63,7 +62,7 @@ jobs:
         - make sonar/js/jest-init
         - make component/test/unit
         - make sonar/js
-    - stage: test-e2e
+    - stage: test
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request
       script:
