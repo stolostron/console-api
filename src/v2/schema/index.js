@@ -66,7 +66,7 @@ schema {
 }
 `];
 
-export const typeDefs = mainDefs.concat(modules.filter(m => m.typeDef !== '\n').map(m => m.typeDef));
+export const typeDefs = mainDefs.concat(modules.filter(m => m.typeDef).map(m => m.typeDef));
 export const resolvers = _.merge(...modules.map(m => m.resolver));
 
 export default { typeDefs, resolvers };

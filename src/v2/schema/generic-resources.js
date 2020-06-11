@@ -7,8 +7,7 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
-export const typeDef = `
-`;
+export const typeDef = '';
 
 export const resolver = {
   Query: {

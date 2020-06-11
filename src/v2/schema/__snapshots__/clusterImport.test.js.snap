@@ -17,6 +17,9 @@ Object {
   },
   "errors": Array [
     Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+      },
       "locations": Array [
         Object {
           "column": 13,
