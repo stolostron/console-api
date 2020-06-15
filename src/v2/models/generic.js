@@ -289,7 +289,7 @@ export default class GenericModel extends KubeModel {
     const cluster = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${clusterName}`);
     if (cluster && cluster.length === 1) {
       const clusterNamespace = cluster[0].metadata.namespace;
-      return this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
+      return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
     }
     throw new Error(`Unable to find the cluster called ${clusterName}`);
   }

@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import supertest from 'supertest';
@@ -52,7 +53,7 @@ describe('Pods Resolver', () => {
       .send({
         query: `
         {
-          logs(containerName: "hcm-ui", podName:"mcm-ibm-mcm-prod-mcmui-67f7f87d9d-5zr2b", podNamespace:"kube-system", clusterName:"cluster1")
+          logs(containerName: "search-api", podName:"search-prod-28a0e-search-api-66cf776db5-7bzfh", podNamespace:"open-cluster-management", clusterName:"cluster1")
         }
       `,
       })

@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const mockClusterResponse = {
@@ -63,5 +64,5 @@ export const mockClusterResponse = {
 };
 
 export const mockLogsResponse = {
-  body: 'here is the logs',
+  body: '[2020-05-13T20:24:23.321] [INFO] [search-api] [server] Built from git commit:  0.0.0-sha.f31e583\n[2020-05-13T20:24:23.674] [INFO] [search-api] [server] Initializing new Redis client.\n[2020-05-13T20:24:23.674] [INFO] [search-api] [server] Starting Redis client using SSL endpoint:  search-prod-28a0e-search-redisgraph:6380\n[2020-05-13T20:24:23.725] [INFO] [search-api] [server] Authentication enabled\n[2020-05-13T20:24:23.725] [INFO] [search-api] [server] Using RedisGraph search connector.\n[2020-05-13T20:24:23.740] [INFO] [search-api] [server] [pid 1] [env production] [version V2] started.\n[2020-05-13T20:24:23.740] [INFO] [search-api] [server] Search API is now running on https://localhost:4010/searchapi/graphql\n[2020-05-13T20:24:23.740] [INFO] [search-api] [server] RedisGraph address: "172.30.110.50" family: IPv4',
 };
