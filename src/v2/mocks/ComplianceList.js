@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const mockComplianceListResponse = {
@@ -29,7 +30,7 @@ export const mockComplianceListResponse = {
         },
         spec: {
           'runtime-rules': [{
-            apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+            apiVersion: 'policy.open-cluster-management.io/v1',
             kind: 'Policy',
             metadata: {
               creationTimestamp: null,
@@ -275,7 +276,7 @@ export const mockCreateCompliance = {
     spec: {
       'runtime-rules': [
         {
-          apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+          apiVersion: 'policy.open-cluster-management.io/v1',
           kind: 'Policy',
           metadata: {
             description: 'Instance descriptor for policy resource',
@@ -332,7 +333,7 @@ export const mockCreateCompliance = {
           },
         },
         {
-          apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+          apiVersion: 'policy.open-cluster-management.io/v1',
           kind: 'Policy',
           metadata: {
             description: 'Instance descriptor for policy resource',
@@ -445,7 +446,7 @@ export const mockDeleteResponse = {
     },
     spec: {
       'runtime-rules': [{
-        apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+        apiVersion: 'policy.open-cluster-management.io/v1',
         kind: 'Policy',
         metadata: {
           creationTimestamp: null,

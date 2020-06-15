@@ -13,19 +13,16 @@ import server, { GRAPHQL_PATH } from '../index';
 
 describe('Cluster Import Resolver', () => {
   test('Create Kubernetes Cluster Resource for Import should return error msg', (done) => {
-    console.log('MYSERVER', server, GRAPHQL_PATH);
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         mutation {
-            createClusterResource(body: "")
+            createClusterResource(cluster: [])
           }
       `,
       })
       .end((err, res) => {
-        console.log('COFFEE', err);
-        console.log('BLAH', res.text);
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
@@ -37,11 +34,20 @@ describe('Cluster Import Resolver', () => {
       .send({
         query: `
         mutation {
-            createClusterResource(body: "{\\"clusterName\\":\\"foo\\", \\"clusterNamespace\\":\\"foo\\", \\"clusterLabels\\": {}}")
+            createClusterResource(
+              cluster: [
+                {},
+                {spec: {
+                  clusterName: "foo",
+                  clusterNamespace: "foo"
+                }
+              }]
+            )
           }
       `,
       })
       .end((err, res) => {
+        expect(JSON.parse(res.error)).toBeFalsy();
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });

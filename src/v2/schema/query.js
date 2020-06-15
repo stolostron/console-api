@@ -8,8 +8,10 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
+import { gql } from 'apollo-server-express';
+
 // eslint-disable-next-line
-export const typeDef = `
+export const typeDef = gql`
 # Multicloud Manager Queries
 type Query {
   # Get application resources.
@@ -152,7 +154,7 @@ type Mutation {
   # Create remote cluster
   createCluster(cluster: JSON!) : JSON
   previewCluster(namespace: String!, cluster: JSON!) : JSON
-  createClusterResource(body: String): JSON
+  createClusterResource(cluster: JSON!): JSON
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
 

@@ -70,7 +70,7 @@ Object {
       "spec": Object {
         "runtime-rules": Array [
           Object {
-            "apiVersion": "policy.mcm.ibm.com/v1alpha1",
+            "apiVersion": "policy.open-cluster-management.io/v1",
             "kind": "Policy",
             "metadata": Object {
               "creationTimestamp": null,

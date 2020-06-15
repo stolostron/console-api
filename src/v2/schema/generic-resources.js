@@ -8,8 +8,7 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
-export const typeDef = `
-`;
+export const typeDef = '';
 
 export const resolver = {
   Query: {

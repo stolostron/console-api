@@ -9,6 +9,8 @@
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 
+const templateKind = 'spec.template.kind';
+
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
@@ -54,10 +56,10 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
-function addClusters(
+export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
-) {
+) => {
   // create element if not already created
   const cns = clusterNames.join(', ');
   const clusterId = `member--clusters--${cns}`;
@@ -87,12 +89,74 @@ function addClusters(
     specs: { isDesign: true },
   });
   return clusterId;
-}
+};
 
-function addSubscriptionDeployable(
+const getClusterName = (nodeId) => {
+  const startPos = nodeId.indexOf('--clusters--') + 12;
+  const endPos = nodeId.indexOf('--', startPos);
+
+  return nodeId.slice(startPos, endPos);
+};
+
+
+export const createReplicaChild = (parentObject, template, links, nodes) => {
+  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
+    return null; // no replica
+  }
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
+    // create only for deploymentconfig and deployment types
+    return null;
+  }
+
+  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
+  const { name, namespace } = parentObject;
+
+  const parentId = parentObject.id;
+  const memberId = `member--member--deployable--member--clusters--${getClusterName(parentId)}--${type}--${name}`;
+
+  const rawData = {
+    kind: type,
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      desired: _.get(template, 'spec.replicas', 0),
+      template: Object.assign({}, _.get(template, 'spec.template', {})),
+    },
+  };
+  const deployableObj = {
+    name,
+    namespace,
+    type,
+    id: memberId,
+    uid: memberId,
+    specs: {
+      isDesign: false,
+      raw: rawData,
+      parent: {
+        parentId,
+        parentName: name,
+        parentType,
+      },
+    },
+  };
+
+  nodes.push(deployableObj);
+  links.push({
+    from: { uid: parentId },
+    to: { uid: memberId },
+    type: '',
+  });
+
+  return deployableObj;
+};
+
+export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
   subscriptionStatusMap, names, appNamespace,
-) {
+) => {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -106,32 +170,152 @@ function addSubscriptionDeployable(
     }
   });
 
+  const parentNode = nodes.find(n => n.id === parentId);
+  const parentObject = parentNode ?
+    {
+      parentId,
+      parentName: parentNode.name,
+      parentType: parentNode.type,
+    } : undefined;
 
   const template = _.get(deployable, 'spec.template', { metadata: {} });
   let { kind = 'container' } = template;
   const { metadata: { name: k8Name } } = template;
   kind = kind.toLowerCase();
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
-  nodes.push({
+
+  const topoObject =
+  {
     name: k8Name,
     namespace: appNamespace,
     type: kind,
     id: memberId,
     uid: memberId,
-    specs: { raw: template, deployStatuses, isDesign: kind === 'deployable' || kind === 'subscription' },
-  });
+    specs: {
+      raw: template,
+      deployStatuses,
+      isDesign: false,
+      parent: parentObject,
+    },
+  };
+
+  nodes.push(topoObject);
   links.push({
     from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
-}
 
-function createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName) {
-  const packageName = `HelmChart-${subscriptionName}`;
+  // create subobject replica subobject, if this object defines a replicas
+  createReplicaChild(topoObject, template, links, nodes);
+
+  return topoObject;
+};
+
+export const processRouteIngress = (
+  clusterId, routes, links, nodes,
+  subscriptionStatusMap, names, namespace,
+) => {
+  const servicesMap = {};
+  routes.forEach((deployable) => {
+    const topoObject = addSubscriptionDeployable(
+      clusterId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+
+    // get service info and map it to the object id
+    const kind = _.get(deployable, templateKind, '');
+
+    if (kind === 'Route') {
+      const service = _.get(deployable, 'spec.template.spec.to.name');
+      if (service) {
+        servicesMap[service] = topoObject.id;
+      }
+    } else {
+      // ingress
+      const rules = _.get(deployable, 'spec.template.spec.rules', []);
+
+      rules.forEach((rule) => {
+        const rulePaths = _.get(rule, 'http.paths', []);
+        rulePaths.forEach((path) => {
+          const service = _.get(path, 'backend.serviceName');
+          if (service) {
+            servicesMap[service] = topoObject.id;
+          }
+        });
+      });
+    }
+  });
+  // return a map of services that must be linked to these router
+  return servicesMap;
+};
+
+export const processServices = (
+  clusterId, services, links, nodes,
+  subscriptionStatusMap, names, namespace, servicesMap,
+) => {
+  services.forEach((deployable) => {
+    const serviceName = _.get(deployable, 'spec.template.metadata.name', '');
+    let parentId = servicesMap[serviceName];
+    if (!parentId) {
+      parentId = clusterId;
+    }
+
+    addSubscriptionDeployable(
+      parentId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+  });
+};
+
+export const processDeployables = (
+  deployables
+  , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+) => {
+  const routes = _.filter(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return _.includes(['Route', 'Ingress'], kind);
+  });
+
+  // process route and ingress first
+  const serviceMap = processRouteIngress(
+    clusterId, routes, links, nodes,
+    subscriptionStatusMap, names, namespace,
+  );
+
+  const services = _.filter(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return _.includes(['Service'], kind);
+  });
+
+  // then service
+  processServices(
+    clusterId, services, links, nodes,
+    subscriptionStatusMap, names, namespace, serviceMap,
+  );
+
+  // then the rest
+  const other = _.remove(deployables, (obj) => {
+    const kind = _.get(obj, templateKind, '');
+    return !_.includes(['Route', 'Ingress', 'Service'], kind);
+  });
+
+  other.forEach((deployable) => {
+    addSubscriptionDeployable(
+      clusterId, deployable, links, nodes,
+      subscriptionStatusMap, names, namespace,
+    );
+  });
+};
+
+export const createGenericPackageObject = (
+  parentId, appNamespace
+  , nodes, links, subscriptionName,
+) => {
+  const packageName = `Package-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
 
-  nodes.push({
+  const packageObj = {
     name: packageName,
     namespace: appNamespace,
     type: 'package',
@@ -147,18 +331,22 @@ function createGenericHelmChartObject(parentId, appNamespace, nodes, links, subs
         isDesign: false,
       },
     },
-  });
+  };
+
+  nodes.push(packageObj);
   links.push({
     from: { uid: parentId },
     to: { uid: memberId },
     type: '',
   });
-}
 
-function addSubscriptionCharts(
+  return packageObj;
+};
+
+export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
   nodes, links, appNamespace, channelInfo, subscriptionName,
-) {
+) => {
   let channelName = null;
   if (channelInfo) {
     const splitIndex = _.indexOf(channelInfo, '/');
@@ -169,8 +357,8 @@ function addSubscriptionCharts(
   const packagedObjects = {};
 
   if (!channelName) {
-    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
-    return; // could not find the subscription channel name, abort
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
+    return null; // could not find the subscription channel name, abort
   }
 
   let foundDeployables = false;
@@ -217,6 +405,9 @@ function addSubscriptionCharts(
                 to: { uid: objId },
                 type: 'package',
               });
+              // create subobject replica subobject, if this object defines a replicas
+              createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
+
               packagedObjects[keyStr] = chartObject;
               foundDeployables = true;
             }
@@ -226,9 +417,11 @@ function addSubscriptionCharts(
     }
   });
   if (!foundDeployables) {
-    createGenericHelmChartObject(parentId, appNamespace, nodes, links, subscriptionName);
+    createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
   }
-}
+
+  return nodes;
+};
 
 async function getApplicationElements(application, clusterModel) {
   const links = [];
@@ -316,7 +509,7 @@ async function getApplicationElements(application, clusterModel) {
       // add cluster(s) if any
       if (isRulePlaced) {
         // add cluster(s) if any or if too many
-        const clusterShapes = ruleClusterNames.length > 3 ?
+        const clusterShapes = ruleClusterNames.length > 1 ?
           [ruleClusterNames] : ruleClusterNames.map(cn => [cn]);
         clusterShapes.forEach((names) => {
           // add cluster element
@@ -327,12 +520,10 @@ async function getApplicationElements(application, clusterModel) {
 
           // add deployables if any
           if (subscription.deployables) {
-            subscription.deployables.forEach((deployable) => {
-              addSubscriptionDeployable(
-                clusterId, deployable, links, nodes,
-                subscriptionStatusMap, names, namespace,
-              );
-            });
+            processDeployables(
+              subscription.deployables
+              , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+            );
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
             addSubscriptionCharts(

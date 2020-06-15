@@ -9,7 +9,9 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
-export const typeDef = `
+import { gql } from 'apollo-server-express';
+
+export const typeDef = gql`
 type Orchestration {
   name: String
   longname: String
@@ -26,7 +28,7 @@ type Orchestration {
 
 export const resolver = {
   Mutation: {
-    createClusterResource: (parent, args, { clusterImportModel }) => clusterImportModel.createClusterResource(args),
+    createClusterResource: (parent, args, { clusterModel }) => clusterModel.createClusterResource(args),
   },
 };
 
