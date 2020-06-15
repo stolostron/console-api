@@ -9,6 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -293,20 +294,54 @@ export default class GenericModel extends KubeModel {
     throw new Error(`Unable to find the cluster called ${clusterName}`);
   }
 
-  // Generic query to get raw data for any resource local || remote
-  async getResource(selfLink, namespace, kind, name, cluster = '') {
+  // Generic query to get local and remote resource data
+  // Remote resources are queried using ManagedClusterView
+  async getResource(args) {
+    const {
+      selfLink,
+      cluster = '',
+      kind,
+      name,
+      namespace = '',
+      updateInterval,
+      deleteAfterUse = true,
+    } = args;
     if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
       return this.kubeConnector.get(selfLink);
     }
-    // if not local cluster -> need to create a resource query to get remote resource
-    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
-    // eslint-disable-next-line
-    const response = await this.kubeConnector.resourceViewQuery(kind, cluster, name, namespace, apiGroup).catch(() => null);
-    if (response && response.status.results) {
-      return response.status.results[cluster];
+    // Check if the ManagedClusterView already exists if not create it
+    const managedClusterViewName = crypto.createHash('sha1').update(`${cluster}-${name}-${kind}`).digest('hex').substr(0, 63);
+
+    const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/managedclusterviews/${managedClusterViewName}`);
+    if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
+      const apiGroup = getApiGroupFromSelfLink(selfLink);
+      const response = await this.kubeConnector.managedClusterViewQuery(
+        cluster,
+        apiGroup,
+        kind,
+        name,
+        namespace,
+        updateInterval,
+        deleteAfterUse,
+      ).catch(() => null);
+
+      const resourceResult = _.get(response, 'status.result');
+      if (resourceResult) {
+        return resourceResult;
+      }
+
+      return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
     }
-    return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
+    return _.get(resourceResponse, 'status.result');
+  }
+
+  // Delete a ManagedClusterView resource
+  async deleteManagedClusterView(managedClusterNamespace, managedClusterViewName) {
+    await this.kubeConnector.deleteManagedClusterView(
+      managedClusterNamespace,
+      managedClusterViewName,
+    ).catch(() => null);
   }
 
   async updateResource(args) {

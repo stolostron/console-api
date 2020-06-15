@@ -13,7 +13,7 @@ export const typeDef = '';
 export const resolver = {
   Query: {
     getResource: (parent, args, { genericModel }) =>
-      genericModel.getResource(args.selfLink, args.namespace, args.kind, args.name, args.cluster),
+      genericModel.getResource(args),
     updateResource: (parent, args, { genericModel }) => genericModel.updateResource(args),
   },
   Mutation: {
@@ -29,5 +29,10 @@ export const resolver = {
     createResources: (parent, args, { genericModel }) => genericModel.createResources(args),
     deleteResource: (root, args, { genericModel }) =>
       genericModel.deleteResource(args),
+    deleteManagedClusterView: (root, args, { genericModel }) =>
+      genericModel.deleteManagedClusterView(
+        args.managedClusterNamespace,
+        args.managedClusterViewName,
+      ),
   },
 };
