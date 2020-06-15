@@ -8,9 +8,10 @@
  * Contract with IBM Corp.
  ****************************************************************************** */
 
+import { gql } from 'apollo-server-express';
 import getApplicationElements from './applicationHelper';
 
-export const typeDef = `
+export const typeDef = gql`
 type Resource {
   cluster: String
   clusterName: String

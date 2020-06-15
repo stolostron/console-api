@@ -3,7 +3,10 @@
  * Licensed Materials - Property of Red Hat, Inc.
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
-export const typeDef = `
+
+import { gql } from 'apollo-server-express';
+
+export const typeDef = gql`
 type BmcType {
   address: String
   credentialsName: String

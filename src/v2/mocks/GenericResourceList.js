@@ -376,8 +376,8 @@ export const updateResourceLocalMock = {
         kind: 'Namespace',
         apiVersion: 'v1',
         metadata: {
-          name: 'multicluster-endpoint',
-          selfLink: '/api/v1/namespaces/multicluster-endpoint',
+          name: 'klusterlet',
+          selfLink: '/api/v1/namespaces/klusterlet',
           uid: '34ddc94d-70dc-11e9-865a-00000a15079c',
           resourceVersion: '2120711',
           creationTimestamp: '2019-05-07T15:24:29Z',

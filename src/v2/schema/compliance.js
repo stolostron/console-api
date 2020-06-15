@@ -8,9 +8,10 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
+import { gql } from 'apollo-server-express';
 import ComplianceModel from '../models/compliance';
 
-export const typeDef = `
+export const typeDef = gql`
 type Compliance implements K8sObject {
   clusterCompliant: String
   compliancePolicies: [CompliancePolicies]

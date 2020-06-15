@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 export const mockPolicyListResponse = {
@@ -46,7 +47,7 @@ export const mockPolicyListResponse = {
         }],
         results: {
           cluster2: {
-            apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+            apiVersion: 'policy.open-cluster-management.io/v1',
             kind: 'Policy',
             metadata: {
               annotations: {
@@ -72,7 +73,7 @@ export const mockPolicyListResponse = {
                 uid: 'c8ad7adb-0f74-11e9-9723-0e8b333ab57e',
               }],
               resourceVersion: '5543743',
-              selfLink: '/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mcm-cluster2/policies/policy-all',
+              selfLink: '/apis/policy.open-cluster-management.io/v1/namespaces/mcm-cluster2/policies/policy-all',
               uid: 'c8af7ef9-0f74-11e9-9723-0e8b333ab57e',
             },
             spec: {
@@ -335,7 +336,7 @@ export const mockPolicyListResponse = {
 
 export const mockSinglePolicyResponse = {
   body: {
-    apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+    apiVersion: 'policy.open-cluster-management.io/v1',
     kind: 'Policy',
     metadata: {
       creationTimestamp: '2018-09-04T16:13:50Z',
@@ -359,7 +360,7 @@ export const mockSinglePolicyResponse = {
         },
       ],
       resourceVersion: '4349995',
-      selfLink: '/apis/policy.mcm.ibm.com/v1alpha1/namespaces/mycluster/policies/policy-xz-1',
+      selfLink: '/apis/policy.open-cluster-management.io/v1/namespaces/mycluster/policies/policy-xz-1',
       uid: '82e00acc-b05d-11e8-9a12-005056a0d11b',
     },
     spec: {
@@ -436,7 +437,7 @@ export const mockSinglePolicyResponse = {
 
 export const mockCreatePolicy = {
   body: {
-    apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+    apiVersion: 'policy.open-cluster-management.io/v1',
     kind: 'Policy',
     metadata: {
       creationTimestamp: '2018-09-06T17:12:34Z',
@@ -444,7 +445,7 @@ export const mockCreatePolicy = {
       name: 'test-policy',
       namespace: 'default',
       resourceVersion: '4385854',
-      selfLink: '/apis/policy.mcm.ibm.com/v1alpha1/namespaces/default/policies/test-policy',
+      selfLink: '/apis/policy.open-cluster-management.io/v1/namespaces/default/policies/test-policy',
       uid: '0c388331-b1f8-11e8-9a12-005056a0d11b',
     },
     spec: {
@@ -624,7 +625,7 @@ export const mockPlacementBindingResponse = {
 
 export const mockDeleteResponse = {
   body: {
-    apiVersion: 'policy.mcm.ibm.com/v1alpha1',
+    apiVersion: 'policy.open-cluster-management.io/v1',
     kind: 'Policy',
     metadata: {
       creationTimestamp: '2018-09-06T15:06:23Z',
@@ -637,7 +638,7 @@ export const mockDeleteResponse = {
       name: 'test-policy',
       namespace: 'default',
       resourceVersion: '4348453',
-      selfLink: '/apis/policy.mcm.ibm.com/v1alpha1/namespaces/default/policies/test-policy',
+      selfLink: '/apis/policy.open-cluster-management.io/v1/namespaces/default/policies/test-policy',
       uid: '6b4cc90c-b1e6-11e8-9a12-005056a0d11b',
     },
     spec: {
