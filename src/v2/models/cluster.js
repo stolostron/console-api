@@ -144,9 +144,11 @@ function findMatchedStatus({
     const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
     const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
     const serverAddress = apiURL || (masterEndpoint || rawServerAddress ? `https://${masterEndpoint || rawServerAddress}` : null);
+    const nodeCount = _.get(clusterstatus, 'raw.spec.capacity.nodes') ||
+    (_.get(managedclusterinfo, 'raw.status.nodeList') || []).length;
     const data = {
       metadata,
-      nodes: _.get(clusterstatus, 'raw.spec.capacity.nodes'),
+      nodes: nodeCount > 0 ? nodeCount : null,
       clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
       consoleURL: _.get(
         managedclusterinfo,
