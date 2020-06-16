@@ -16,8 +16,6 @@ jobs:
       with:
         node-version: 10.x
 
-    - run: git config --global user.name "${GITHUB_ACTOR}"
-    - run: git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
     - run: rm -rf package-lock.json node_modules
     - run: npx npm-check-updates -u
     - run: npm install
@@ -25,12 +23,14 @@ jobs:
     - run: npm test
     - run: npm run lint
     - run: npm run build
+    - run: git config user.name "${GITHUB_ACTOR}"
+    - run: git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
     - run: git add -u :/
     - run: |
         set +e
         git commit -m "update dependencies"
         EXIT=$?
         echo "::set-env name=EXIT::${EXIT}"
-    - if: env.EXIT != 1
+    - if: env.EXIT != '1'
       run: git push
       
