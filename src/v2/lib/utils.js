@@ -15,23 +15,32 @@ export function isRequired(paramName) {
 export function getType(item) {
   if (item.spec.hostPath) {
     return 'Hostpath';
-  } if (item.spec.gcePersistentDisk) {
+  }
+  if (item.spec.gcePersistentDisk) {
     return 'GCEPersistentDisk';
-  } if (item.spec.awsElasticBlockStore) {
+  }
+  if (item.spec.awsElasticBlockStore) {
     return 'AWSElasticBlockStore';
-  } if (item.spec.nfs) {
+  }
+  if (item.spec.nfs) {
     return 'NFS';
-  } if (item.spec.iscsi) {
+  }
+  if (item.spec.iscsi) {
     return 'iSCSI';
-  } if (item.spec.glusterfs) {
+  }
+  if (item.spec.glusterfs) {
     return 'Glusterfs';
-  } if (item.spec.rbd) {
+  }
+  if (item.spec.rbd) {
     return 'RBD';
-  } if (item.spec.secret) {
+  }
+  if (item.spec.secret) {
     return 'Secret';
-  } if (item.spec.local) {
+  }
+  if (item.spec.local) {
     return 'LocalVolume';
-  } if (item.spec.vsphereVolume) {
+  }
+  if (item.spec.vsphereVolume) {
     return 'vSphere';
   }
 
@@ -40,7 +49,7 @@ export function getType(item) {
 
 export function responseHasError(response) {
   const code = response.statusCode || response.code;
-  return (code < 200 || code >= 300);
+  return code < 200 || code >= 300;
 }
 
 export default {};
