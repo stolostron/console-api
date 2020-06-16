@@ -386,7 +386,7 @@ export const addSubscriptionCharts = (
                 namespace: appNamespace,
                 type: objectType.toLowerCase(),
                 specs: {
-                  isDesign: true,
+                  isDesign: false,
                   raw: {
                     kind: objectType,
                     metadata: {

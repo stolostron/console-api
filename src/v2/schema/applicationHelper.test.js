@@ -811,7 +811,7 @@ describe('addSubscriptionCharts', () => {
         name: 'frontend',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -835,7 +835,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-master',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -859,7 +859,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-slave',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -883,7 +883,7 @@ describe('addSubscriptionCharts', () => {
         name: 'frontend',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
@@ -907,7 +907,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-master',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
@@ -931,7 +931,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-slave',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
