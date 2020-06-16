@@ -6,7 +6,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('BareMetalAsset Resolver', () => {
-  test('Correctly Resolves BareMetalAsset Query', (done) => {
+  test('Correctly Resolves BareMetalAsset Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -43,5 +43,5 @@ describe('BareMetalAsset Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

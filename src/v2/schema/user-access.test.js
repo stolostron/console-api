@@ -11,7 +11,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('User Access Resolver', () => {
-  test('Correctly Resolves User Access Query', (done) => {
+  test('Correctly Resolves User Access Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -25,5 +25,5 @@ describe('User Access Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

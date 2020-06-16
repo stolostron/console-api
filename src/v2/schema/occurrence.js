@@ -26,7 +26,6 @@ type Occurrence {
 
 export const resolver = {
   Query: {
-    occurrences: (/* root, args, { sfModel, req } */) =>
-      [], // sfModel.getOccurrences({ ...args, req }),
+    occurrences: (/* root, args, { sfModel, req } */) => [], // sfModel.getOccurrences({ ...args, req }),
   },
 };

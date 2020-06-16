@@ -1,4 +1,3 @@
-
 /** *****************************************************************************
  * Licensed Materials - Property of Red Hat, Inc.
  * Copyright (c) 2020 Red Hat, Inc.
@@ -37,20 +36,14 @@ type BareMetalAssetSubresources {
 
 export const resolver = {
   Query: {
-    bareMetalAssets: (root, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.getBareMetalAssets({ ...args }),
-    bareMetalAsset: (root, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.getSingleBareMetalAsset({ ...args }),
-    bareMetalAssetSubresources: (root, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.getBareMetalAssetSubresources({ ...args }),
+    bareMetalAssets: (root, args, { bareMetalAssetModel }) => bareMetalAssetModel.getBareMetalAssets({ ...args }),
+    bareMetalAsset: (root, args, { bareMetalAssetModel }) => bareMetalAssetModel.getSingleBareMetalAsset({ ...args }),
+    bareMetalAssetSubresources: (root, args, { bareMetalAssetModel }) => bareMetalAssetModel.getBareMetalAssetSubresources({ ...args }),
   },
   Mutation: {
-    createBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.createBareMetalAsset(args),
-    updateBareMetalAsset: (parent, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.updateBareMetalAsset(args),
-    deleteBareMetalAssets: (parent, args, { bareMetalAssetModel }) =>
-      bareMetalAssetModel.deleteBareMetalAssets(args),
+    createBareMetalAsset: (parent, args, { bareMetalAssetModel }) => bareMetalAssetModel.createBareMetalAsset(args),
+    updateBareMetalAsset: (parent, args, { bareMetalAssetModel }) => bareMetalAssetModel.updateBareMetalAsset(args),
+    deleteBareMetalAssets: (parent, args, { bareMetalAssetModel }) => bareMetalAssetModel.deleteBareMetalAssets(args),
   },
 
 };

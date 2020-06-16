@@ -11,7 +11,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Topology Resolver', () => {
-  test('Correctly Resolves Topology Query', (done) => {
+  test('Correctly Resolves Topology Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -51,6 +51,5 @@ describe('Topology Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
-

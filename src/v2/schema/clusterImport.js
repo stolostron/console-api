@@ -31,4 +31,3 @@ export const resolver = {
     createClusterResource: (parent, args, { clusterModel }) => clusterModel.createClusterResource(args),
   },
 };
-

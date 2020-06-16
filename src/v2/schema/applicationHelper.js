@@ -98,7 +98,6 @@ const getClusterName = (nodeId) => {
   return nodeId.slice(startPos, endPos);
 };
 
-
 export const createReplicaChild = (parentObject, template, links, nodes) => {
   if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
     return null; // no replica
@@ -123,7 +122,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     },
     spec: {
       desired: _.get(template, 'spec.replicas', 0),
-      template: Object.assign({}, _.get(template, 'spec.template', {})),
+      template: { ..._.get(template, 'spec.template', {}) },
     },
   };
   const deployableObj = {
@@ -170,9 +169,9 @@ export const addSubscriptionDeployable = (
     }
   });
 
-  const parentNode = nodes.find(n => n.id === parentId);
-  const parentObject = parentNode ?
-    {
+  const parentNode = nodes.find((n) => n.id === parentId);
+  const parentObject = parentNode
+    ? {
       parentId,
       parentName: parentNode.name,
       parentType: parentNode.type,
@@ -184,8 +183,7 @@ export const addSubscriptionDeployable = (
   kind = kind.toLowerCase();
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
 
-  const topoObject =
-  {
+  const topoObject = {
     name: k8Name,
     namespace: appNamespace,
     type: kind,
@@ -269,8 +267,8 @@ export const processServices = (
 };
 
 export const processDeployables = (
-  deployables
-  , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+  deployables,
+  clusterId, links, nodes, subscriptionStatusMap, names, namespace,
 ) => {
   const routes = _.filter(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
@@ -309,8 +307,8 @@ export const processDeployables = (
 };
 
 export const createGenericPackageObject = (
-  parentId, appNamespace
-  , nodes, links, subscriptionName,
+  parentId, appNamespace,
+  nodes, links, subscriptionName,
 ) => {
   const packageName = `Package-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
@@ -446,7 +444,6 @@ async function getApplicationElements(application, clusterModel) {
     },
   });
 
-
   // get clusters labels
   const labelMap = [];
   const clusters = await clusterModel.getAllClusters();
@@ -458,7 +455,6 @@ async function getApplicationElements(application, clusterModel) {
       labelMap[`${key}: "${value}"`] = { key, value };
     });
   });
-
 
   // if application has subscriptions
   let memberId;
@@ -509,8 +505,8 @@ async function getApplicationElements(application, clusterModel) {
       // add cluster(s) if any
       if (isRulePlaced) {
         // add cluster(s) if any or if too many
-        const clusterShapes = ruleClusterNames.length > 1 ?
-          [ruleClusterNames] : ruleClusterNames.map(cn => [cn]);
+        const clusterShapes = ruleClusterNames.length > 1
+          ? [ruleClusterNames] : ruleClusterNames.map((cn) => [cn]);
         clusterShapes.forEach((names) => {
           // add cluster element
           clusterId = addClusters(
@@ -521,14 +517,14 @@ async function getApplicationElements(application, clusterModel) {
           // add deployables if any
           if (subscription.deployables) {
             processDeployables(
-              subscription.deployables
-              , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+              subscription.deployables,
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace,
             );
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
             addSubscriptionCharts(
-              clusterId, subscriptionStatusMap, nodes
-              , links, namespace, subscriptionChannel, subscriptionName,
+              clusterId, subscriptionStatusMap, nodes,
+              links, namespace, subscriptionChannel, subscriptionName,
             );
           }
         });
@@ -537,8 +533,8 @@ async function getApplicationElements(application, clusterModel) {
       // no deployables was placed on a clutser but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
-          parentId, subscriptionStatusMap, nodes
-          , links, namespace, subscriptionChannel, subscriptionName,
+          parentId, subscriptionStatusMap, nodes,
+          links, namespace, subscriptionChannel, subscriptionName,
         );
       }
       delete subscription.deployables;

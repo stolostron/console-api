@@ -11,7 +11,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Application Resolver', () => {
-  test('Correctly Resolves Applications Query', (done) => {
+  test('Correctly Resolves Applications Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -59,9 +59,9 @@ describe('Application Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Single Applications Query', (done) => {
+  test('Correctly Resolves Single Applications Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -158,9 +158,9 @@ describe('Application Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-
+  // eslint-disable-next-line jest/no-commented-out-tests
   // test('Correctly Resolves Deployables Query - MatchNames', (done) => {
   //   supertest(server)
   //     .post(GRAPHQL_PATH)
@@ -201,6 +201,7 @@ describe('Application Resolver', () => {
   //     });
   // });
 
+  // eslint-disable-next-line jest/no-commented-out-tests
   // test('Correctly Resolves Placement Policies Query', (done) => {
   //   supertest(server)
   //     .post(GRAPHQL_PATH)
@@ -234,7 +235,7 @@ describe('Application Resolver', () => {
   //     });
   // });
 
-  test('Correctly Resolves Create Application Mutation', (done) => {
+  test('Correctly Resolves Create Application Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -275,6 +276,5 @@ describe('Application Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
-

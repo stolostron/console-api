@@ -14,7 +14,7 @@ import createMockIAMHTTP from '../mocks/iam-http';
 import request from './request';
 
 // Async middleware error handler
-const asyncMiddleware = fn => (req, res, next) => {
+const asyncMiddleware = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next))
     .catch(next);
 };

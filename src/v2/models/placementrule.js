@@ -29,7 +29,7 @@ export default class PlacementRuleModel extends KubeModel {
       if (placementruleKinds[resource.kind] === 'placementrules') {
         return this.kubeConnector
           .post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/placementrules`, resource)
-          .catch(err => ({
+          .catch((err) => ({
             status: 'Failure',
             message: err.message,
           }));
@@ -40,7 +40,7 @@ export default class PlacementRuleModel extends KubeModel {
           `/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${placementruleKinds[resource.kind]}`,
           resource,
         )
-        .catch(err => ({
+        .catch((err) => ({
           status: 'Failure',
           message: err.message,
         }));
@@ -63,14 +63,14 @@ export default class PlacementRuleModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`);
     }
     chs = await Promise.all(chs);
-    return chs.map(placementrule => ({
+    return chs.map((placementrule) => ({
       metadata: placementrule.metadata,
       placementruleWorkNames: placementrule.name,
     }));
@@ -80,13 +80,13 @@ export default class PlacementRuleModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`);
     }
-    return chs.map(async placementrule => ({
+    return chs.map(async (placementrule) => ({
       metadata: placementrule.metadata,
       placementruleWorkNames: placementrule.metadata.name || '',
       namespace: placementrule.metadata.namespace,

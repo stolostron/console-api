@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Overview Resolver', () => {
-  test('Correctly Resolves Overview Query', (done) => {
+  test('Correctly Resolves Overview Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -64,5 +64,5 @@ describe('Overview Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

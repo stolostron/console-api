@@ -67,19 +67,18 @@ type Violations {
 
 export const resolver = {
   Query: {
-    policies: (root, args, { complianceModel }) =>
-      complianceModel.getPolicies(args.name, args.namespace, args.clusterName),
+    policies: (root, args, { complianceModel }) => complianceModel.getPolicies(args.name, args.namespace, args.clusterName),
   },
   Policy: {
-    detail: parent => ComplianceModel.resolvePolicyDetails(parent),
-    enforcement: parent => ComplianceModel.resolvePolicyEnforcement(parent),
-    roleTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'role-templates'),
-    roleBindingTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'roleBinding-templates'),
-    objectTemplates: parent => ComplianceModel.resolvePolicyTemplates(parent, 'object-templates'),
-    rules: parent => ComplianceModel.resolvePolicyRules(parent),
-    status: parent => ComplianceModel.resolvePolicyStatus(parent),
-    violations: parent => ComplianceModel.resolvePolicyViolations(parent),
-    message: parent => ComplianceModel.resolvePolicyMessage(parent),
+    detail: (parent) => ComplianceModel.resolvePolicyDetails(parent),
+    enforcement: (parent) => ComplianceModel.resolvePolicyEnforcement(parent),
+    roleTemplates: (parent) => ComplianceModel.resolvePolicyTemplates(parent, 'role-templates'),
+    roleBindingTemplates: (parent) => ComplianceModel.resolvePolicyTemplates(parent, 'roleBinding-templates'),
+    objectTemplates: (parent) => ComplianceModel.resolvePolicyTemplates(parent, 'object-templates'),
+    rules: (parent) => ComplianceModel.resolvePolicyRules(parent),
+    status: (parent) => ComplianceModel.resolvePolicyStatus(parent),
+    violations: (parent) => ComplianceModel.resolvePolicyViolations(parent),
+    message: (parent) => ComplianceModel.resolvePolicyMessage(parent),
   },
   Mutation: {
     createPolicy: (root, args, { complianceModel }) => complianceModel.createPolicy(args.resources),

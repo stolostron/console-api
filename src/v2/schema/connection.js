@@ -28,18 +28,12 @@ type ConnectionDetail {
 
 export const resolver = {
   Query: {
-    connections: (parent, args, { connectionModel }) =>
-      connectionModel.getConnections(),
-    connectionDetails: (parent, args, { connectionModel }) =>
-      connectionModel.getConnectionDetails(args),
+    connections: (parent, args, { connectionModel }) => connectionModel.getConnections(),
+    connectionDetails: (parent, args, { connectionModel }) => connectionModel.getConnectionDetails(args),
   },
   Mutation: {
-    createCloudConnection: (parent, args, { connectionModel }) =>
-      connectionModel.createConnection(args),
-    deleteCloudConnection: (parent, args, { connectionModel }) =>
-      connectionModel.deleteConnection(args),
-    editCloudConnection: (parent, args, { connectionModel }) =>
-      connectionModel.editConnection(args),
+    createCloudConnection: (parent, args, { connectionModel }) => connectionModel.createConnection(args),
+    deleteCloudConnection: (parent, args, { connectionModel }) => connectionModel.deleteConnection(args),
+    editCloudConnection: (parent, args, { connectionModel }) => connectionModel.editConnection(args),
   },
 };
-

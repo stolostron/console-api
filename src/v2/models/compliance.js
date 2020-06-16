@@ -18,12 +18,11 @@ function getTemplates(policy = {}) {
   const templates = [];
   Object.entries(policy.spec || []).forEach(([key, value]) => {
     if (key.endsWith('-templates')) {
-      value.forEach(item => templates.push({ ...item, templateType: key }));
+      value.forEach((item) => templates.push({ ...item, templateType: key }));
     }
   });
   return templates;
 }
-
 
 export default class ComplianceModel {
   constructor({ kubeConnector }) {
@@ -34,7 +33,6 @@ export default class ComplianceModel {
     this.kubeConnector = kubeConnector;
   }
 
-
   async createPolicy(resources) {
     // TODO: revist this, do something like application,
     // combine policy and compliance into one mutation
@@ -42,7 +40,7 @@ export default class ComplianceModel {
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', (config.get('complianceNamespace') || 'mcm'));
       return this.kubeConnector.post(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies`, resource)
-        .catch(err => Error(err));
+        .catch((err) => Error(err));
     }));
     result.forEach((item) => {
       if (item.code >= 400 || item.status === POLICY_FAILURE_STATUS) {
@@ -57,13 +55,12 @@ export default class ComplianceModel {
     }
   }
 
-
   async createCompliance(resources) {
     let errorMessage = '';
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, 'metadata.namespace', (config.get('complianceNamespace') || 'mcm'));
       return this.kubeConnector.post(`/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/${namespace}/compliances`, resource)
-        .catch(err => Error(err));
+        .catch((err) => Error(err));
     }));
     result.forEach((item) => {
       if (item.code >= 400 || item.status === POLICY_FAILURE_STATUS) {
@@ -83,7 +80,7 @@ export default class ComplianceModel {
 
     if (!name) {
       // for getting policy list
-      const policyResponse = await this.kubeConnector.getResources(ns => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`);
+      const policyResponse = await this.kubeConnector.getResources((ns) => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`);
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       }
@@ -97,7 +94,7 @@ export default class ComplianceModel {
         policies.push(policyResponse);
       }
     }
-    return policies.map(entry => ({
+    return policies.map((entry) => ({
       ...entry,
       raw: entry,
       name: _.get(entry, 'metadata.name', ''),
@@ -107,7 +104,6 @@ export default class ComplianceModel {
       apiVersion: _.get(entry, 'apiVersion', ''),
     }));
   }
-
 
   static resolveCompliancePolicies(parent) {
     const aggregatedStatus = _.get(parent, 'status.status');
@@ -143,7 +139,7 @@ export default class ComplianceModel {
     if (aggregatedStatus) {
       Object.values(aggregatedStatus).forEach((cluster) => {
         Object.entries(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach(([key, value]) => {
-          const policy = parent.spec['runtime-rules'].find(p => p.metadata.name === key);
+          const policy = parent.spec['runtime-rules'].find((p) => p.metadata.name === key);
 
           const policyObject = {
             compliant: this.resolveStatus(value),
@@ -169,7 +165,7 @@ export default class ComplianceModel {
     const compliancePolicies = [];
     Object.values(aggregatedStatus).forEach((cluster) => {
       Object.entries(_.get(cluster, 'aggregatePoliciesStatus', {})).forEach(([key, value]) => {
-        const policy = parent.spec['runtime-rules'].find(p => p.metadata.name === key);
+        const policy = parent.spec['runtime-rules'].find((p) => p.metadata.name === key);
 
         const policyObject = {
           cluster: _.get(cluster, 'clustername', parent.metadata.namespace),
@@ -219,7 +215,6 @@ export default class ComplianceModel {
     });
     return Object.values(tempResult);
   }
-
 
   static resolvePolicyFromSpec(parent) {
     const compliancePolicies = [];
@@ -274,7 +269,6 @@ export default class ComplianceModel {
     return complianceStatus;
   }
 
-
   static resolvePolicyCompliant({ status = {} }) {
     let totalPolicies = 0;
     let compliantPolicies = 0;
@@ -289,11 +283,10 @@ export default class ComplianceModel {
     return `${compliantPolicies}/${totalPolicies}`;
   }
 
-
   static resolveClusterCompliant({ status = {} }) {
     if (status && status.status) {
       const totalClusters = Object.keys(status.status).length;
-      const compliantClusters = Object.values(status.status || []).filter(cluster => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
+      const compliantClusters = Object.values(status.status || []).filter((cluster) => (_.get(cluster, 'compliant', '').toLowerCase() === 'compliant'));
       return `${compliantClusters.length}/${totalClusters}`;
     }
     return '0/0';
@@ -302,12 +295,12 @@ export default class ComplianceModel {
   async getPlacementPolicies(parent = {}) {
     const policies = _.get(parent, 'status.placementPolicies', []);
     const response = await this.kubeConnector.getResources(
-      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
+      (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
       { kind: 'PlacementPolicy' },
     );
     const map = new Map();
     if (response) {
-      response.forEach(item => map.set(item.metadata.name, item));
+      response.forEach((item) => map.set(item.metadata.name, item));
     }
     const placementPolicies = [];
     policies.forEach((policy) => {
@@ -330,12 +323,12 @@ export default class ComplianceModel {
   async getPlacementBindings(parent = {}) {
     const bindings = _.get(parent, 'status.placementBindings', []);
     const response = await this.kubeConnector.getResources(
-      ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
+      (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
       { kind: 'PlacementBinding' },
     );
     const map = new Map();
     if (response) {
-      response.forEach(item => map.set(item.metadata.name, item));
+      response.forEach((item) => map.set(item.metadata.name, item));
     }
     const placementBindings = [];
 
@@ -362,14 +355,13 @@ export default class ComplianceModel {
         const item = _.get(results, `${clusterName}`, {});
         if (item) {
           const result = [];
-          item.items.forEach(policy => result.push({ ...policy, raw: policy }));
+          item.items.forEach((policy) => result.push({ ...policy, raw: policy }));
           return result;
         }
       }
     }
     return [];
   }
-
 
   static resolvePolicyDetails(parent) {
     return {

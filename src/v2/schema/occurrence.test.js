@@ -12,7 +12,6 @@ import nock from 'nock';
 import server, { GRAPHQL_PATH } from '../index';
 import { mockOccurrences } from '../mocks/OccurrenceList';
 
-
 describe('Occurrences Resolver', () => {
   beforeAll(() => {
     // specify the url to be intercepted
@@ -23,7 +22,7 @@ describe('Occurrences Resolver', () => {
       .reply(200, mockOccurrences);
   });
 
-  test('Correctly Resolves Occurrences Query', (done) => {
+  test('Correctly Resolves Occurrences Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -48,5 +47,5 @@ describe('Occurrences Resolver', () => {
         expect(textMessage).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
