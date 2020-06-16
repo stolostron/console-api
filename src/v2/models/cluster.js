@@ -36,15 +36,16 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
   let clusterdeploymentStatus = '';
   if (clusterdeployment) {
     const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-    const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
-    if (uninstall && uninstall.items && uninstall.items.some((i) => i.status.active === 1)) {
-      clusterdeploymentStatus = 'destroying';
-    } else if (install && install.items && install.items.some((i) => i.status.active === 1)) {
-      clusterdeploymentStatus = 'creating';
-    } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
+    const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
+    if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
       clusterdeploymentStatus = 'detached';
-    } else if ((install && install.items) || (uninstall && uninstall.items)) {
+    } else if ((install && install.items && install.items.some(i => i.status.failed > 0))
+    || (uninstall && uninstall.items && install.items.some(i => i.status.failed > 0))) {
       clusterdeploymentStatus = 'provisionfailed';
+    } else if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active > 0)) {
+      clusterdeploymentStatus = 'destroying';
+    } else if (install && install.items) {
+      clusterdeploymentStatus = 'creating';
     } else {
       clusterdeploymentStatus = 'unknown';
     }
