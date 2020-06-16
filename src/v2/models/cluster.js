@@ -55,10 +55,19 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
     if (_.get(cluster, 'metadata.deletionTimestamp')) {
       return 'detaching';
     }
-    // Empty status indicates cluster has not been imported
-    // status with conditions[0].type === '' indicates cluster is offline
-    const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pending');
-    const status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
+
+    let status;
+    if (cluster.kind === 'Cluster') {
+      // Empty status indicates cluster has not been imported
+      // status with conditions[0].type === '' indicates cluster is offline
+      const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pending');
+      status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
+    } else {
+      const clusterConditions = _.get(cluster, 'status.conditions') || [];
+      const clusterAvailable =
+        _.get(clusterConditions.find(c => c.type === 'ManagedClusterConditionAvailable'), 'status') === 'True';
+      status = clusterAvailable ? 'ok' : 'offline';
+    }
 
     // If cluster is pending import because Hive is installing or uninstalling,
     // show that status instead
