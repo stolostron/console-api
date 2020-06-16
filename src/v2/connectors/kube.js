@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
@@ -28,7 +28,7 @@ export default class KubeConnector {
     namespaces = isRequired('namespaces'),
     pollTimeout = config.get('hcmPollTimeout'),
     pollInterval = config.get('hcmPollInterval'),
-    uid = uuid,
+    uid = uuidv4,
   } = {}) {
     this.http = httpLib;
     this.kubeApiEndpoint = kubeApiEndpoint;

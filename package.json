@@ -70,7 +70,7 @@
     "request": "^2.88.2",
     "requestretry": "^4.1.1",
     "security-middleware": "github:open-cluster-management/security-middleware",
-    "uuid": "^3.3.3"
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
