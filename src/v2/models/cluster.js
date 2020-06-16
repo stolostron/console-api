@@ -127,7 +127,7 @@ function findMatchedStatus({
     const metadata = _.get(managedcluster || cluster, 'metadata')
       || _.pick(_.get(managedclusterinfo || clusterdeployment, 'metadata'), ['name', 'namespace']);
     if (!metadata.namespace) {
-      metadata.namespace = _.get(managedclusterinfo || clusterdeployment, 'metadata.namespace');
+      metadata.namespace = _.get(managedclusterinfo || clusterdeployment, 'metadata.namespace') || metadata.name;
     }
     const clusterversion = _.get(clusterVersionMap, metadata.name);
     const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
@@ -678,8 +678,10 @@ export default class ClusterModel extends KubeModel {
     const detachClusterResponse = await this.kubeConnector.delete(clusterRegistry);
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
 
-    if (!destroy && detachClusterResponse.kind === 'Status' && detachManagedClusterResponse.status !== 'Success') {
-      return detachClusterResponse.code;
+
+    if (!destroy && responseHasError(detachClusterResponse)
+    && responseHasError(detachManagedClusterResponse)) {
+      return detachClusterResponse.code || detachManagedClusterResponse.code;
     }
 
     if (destroy) {
