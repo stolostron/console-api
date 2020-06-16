@@ -158,7 +158,21 @@ function findMatchedStatus({
       isHive: !!clusterdeployment,
       isManaged: !!(managedcluster || cluster),
     };
-    if (clusterversion) {
+    const OCP_DISTRIBUTION_INFO = 'raw.status.distributionInfo.ocp';
+    if (managedclusterinfo && _.has(managedclusterinfo, OCP_DISTRIBUTION_INFO)) {
+      const {
+        availableUpdates: availableVersions,
+        desiredVersion,
+        upgradeFailed,
+        version: distributionVersion,
+      } = _.get(managedclusterinfo, OCP_DISTRIBUTION_INFO);
+      _.merge(data, {
+        availableVersions,
+        desiredVersion,
+        distributionVersion,
+        upgradeFailed,
+      });
+    } else if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
       data.availableVersions = availableUpdates ? availableUpdates.map((u) => u.version) : [];
       data.desiredVersion = _.get(clusterversion, 'status.desired.version');
