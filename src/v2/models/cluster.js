@@ -530,7 +530,8 @@ export default class ClusterModel extends KubeModel {
     const allClusters = [...clusters, ...managedclusters];
     const names = allClusters.filter((cluster) => getStatus(cluster) === 'ok').map((c) => c.metadata.name);
     // For clusterstatuses, query only namespaces that have clusters
-    const namespaces = Array.from(new Set(allClusters.map((c) => c.metadata.namespace)));
+    const namespaces = Array.from(new Set(allClusters.filter(c => c.metadata)
+      .map(c => c.metadata.namespace || c.metadata.name)));
     const [clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.getResources(
         (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
