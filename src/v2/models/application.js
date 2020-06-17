@@ -115,8 +115,8 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
   allSubscriptions.forEach((subscription) => {
     const deployablePaths = _.get(subscription, DEPLOYABLES, '').split(',').sort();
 
-    if (deployablePaths.length > 30) {
-      const chunks = _.chunk(deployablePaths, 25);
+    if (deployablePaths.length > 20) {
+      const chunks = _.chunk(deployablePaths, 16);
       // if last chunk is just one, append to 2nd to last chunk
       const len = chunks.length - 1;
       if (chunks[len].length === 1) {
