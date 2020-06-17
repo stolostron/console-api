@@ -367,7 +367,7 @@ Object {
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
         "nodes": 2,
-        "status": "pending",
+        "status": "pendingimport",
         "totalCPU": "36",
         "totalMemory": "21",
         "totalStorage": "60",
