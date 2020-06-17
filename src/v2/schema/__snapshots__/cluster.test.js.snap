@@ -6,7 +6,7 @@ Object {
     "createCluster": Object {
       "errors": Array [
         Object {
-          "message": "ClusterDeployment must specify a namespace",
+          "message": "Cannot find any endpoints",
         },
       ],
     },
@@ -337,6 +337,20 @@ Object {
           },
         },
       },
+    },
+  },
+}
+`;
+
+exports[`Cluster Mutation Create Kubernetes Cluster Resource for Import with No Namespace 1`] = `
+Object {
+  "data": Object {
+    "createCluster": Object {
+      "errors": Array [
+        Object {
+          "message": "Cannot find resource types: cluster.open-cluster-management.io/v1, agent.open-cluster-management.io/v1",
+        },
+      ],
     },
   },
 }
