@@ -786,7 +786,7 @@ export default class ClusterModel extends KubeModel {
 
     const [clusterTemplate, klusterletTemplate] = cluster;
     if (!klusterletTemplate) {
-      throw new Error('KlusterletConfig is required for createClusterResource');
+      throw new Error('KlusterletAddonConfig is required for createClusterResource');
     }
 
     const config = klusterletTemplate.spec;
@@ -812,12 +812,12 @@ export default class ClusterModel extends KubeModel {
 
     klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
     const klusterletConfigResponse = await this.kubeConnector.post(
-      `/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs`,
+      `/apis/agent.open-cluster-management.io/v1/namespaces/${clusterNamespace}/klusterletaddonconfigs`,
       klusterletTemplate,
     );
 
     if (responseHasError(klusterletConfigResponse)) {
-      return responseForError('Create KlusterletConfig resource failed', klusterletConfigResponse);
+      return responseForError('Create KlusterletAddonConfig resource failed', klusterletConfigResponse);
     }
 
     const clusterResponse = await this.kubeConnector.post('/apis/cluster.open-cluster-management.io/v1/managedclusters', clusterTemplate);
@@ -826,8 +826,8 @@ export default class ClusterModel extends KubeModel {
         return clusterResponse;
       }
 
-      // Delete the klusterletconfig so the user can try again
-      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/klusterletconfigs/${clusterName}`);
+      // Delete the klusterletaddonconfig so the user can try again
+      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1/namespaces/${clusterNamespace}/klusterletaddonconfigs/${clusterName}`);
       return responseForError('Create Cluster resource failed', clusterResponse);
     }
 
