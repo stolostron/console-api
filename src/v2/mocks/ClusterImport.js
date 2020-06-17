@@ -14,9 +14,9 @@ export const getNamespaceCreationResponse = {
   statusCode: 201,
 };
 
-export const getKlusterletConfigsResponse = {
+export const getKlusterletAddonConfigsResponse = {
   body: {
-    kind: 'KlusterletConfig',
+    kind: 'KlusterletAddonConfig',
   },
   statusCode: 201,
 };
