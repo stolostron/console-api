@@ -47,7 +47,6 @@ type Query {
   # List all cloud connections and orchestrations
   connections: [Connection]
   connectionDetails(name: String, namespace: String): [ConnectionDetail]
-  orchestrations: [Orchestration]
 
   # Get any kubernetes resource from any managed cluster.
   getResource(kind: String, name: String, namespace: String, cluster: String, selfLink: String, updateInterval: Int, deleteAfterUse: Boolean): JSON
@@ -153,8 +152,6 @@ type Mutation {
 
   # Create remote cluster
   createCluster(cluster: JSON!) : JSON
-  previewCluster(namespace: String!, cluster: JSON!) : JSON
-  createClusterResource(cluster: JSON!): JSON
 
   automatedImport(namespace: String, name: String, body: JSON): JSON
 

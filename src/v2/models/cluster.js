@@ -9,7 +9,6 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import logger from '../lib/logger';
 import { responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
@@ -40,13 +39,13 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
   if (clusterdeployment) {
     const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
     const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
-    if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
-      clusterdeploymentStatus = 'detached';
-    } else if ((install && install.items && install.items.some(i => i.status.failed > 0))
+    if ((install && install.items && install.items.some(i => i.status.failed > 0))
     || (uninstall && uninstall.items && install.items.some(i => i.status.failed > 0))) {
       clusterdeploymentStatus = 'provisionfailed';
     } else if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active > 0)) {
       clusterdeploymentStatus = 'destroying';
+    } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
+      clusterdeploymentStatus = 'detached';
     } else if (install && install.items) {
       clusterdeploymentStatus = 'creating';
     } else {
@@ -257,29 +256,6 @@ function findMatchedStatusForOverview({
   return [...resultMap.values()];
 }
 
-function getErrorMsg(response) {
-  let errorMsg = '';
-  const errorMsgKeys = ['code', 'message', 'description', 'statusCode', 'statusMessage'];
-  errorMsgKeys.forEach((key, i) => {
-    if (response[key]) {
-      (errorMsg += `${response[key]} ${(i !== errorMsgKeys.length - 1) && '- '}`);
-    }
-  });
-  return errorMsg;
-}
-
-function responseForError(errorTitle, response) {
-  const code = response.statusCode || response.code;
-  logger.error(`CLUSTER IMPORT ERROR: ${errorTitle} - ${getErrorMsg(response)}`);
-  return {
-    error: {
-      rawResponse: response,
-      statusCode: code,
-      statusMsg: response.message || response.description || response.statusMessage,
-    },
-  };
-}
-
 export default class ClusterModel extends KubeModel {
   constructor(args) {
     super(args);
@@ -362,7 +338,7 @@ export default class ClusterModel extends KubeModel {
 
     // get namespace and filter out any namespace resource
     let namespace;
-    resources = resources.filter(({ kind, metadata = {} }) => {
+    resources = resources.filter(({ kind, metadata = {}, spec = {} }) => {
       switch (kind) {
         case 'Namespace':
           namespace = metadata.name;
@@ -372,30 +348,18 @@ export default class ClusterModel extends KubeModel {
           ({ namespace } = metadata);
           break;
 
+        case 'ManagedCluster':
+          ({ name: namespace } = metadata);
+          break;
+
         default:
+          if (spec && spec.clusterNamespace) {
+            namespace = spec.clusterNamespace;
+          }
           break;
       }
       return true;
     });
-
-    // if there's a namespace, try to create it
-    if (!namespace) {
-      errors.push({ message: 'ClusterDeployment must specify a namespace' });
-      return { errors };
-    }
-
-    let namespaceResponse;
-    try {
-      namespaceResponse = this.createClusterNamespace(namespace, true);
-    } catch (error) {
-      errors.push({ message: error.message });
-      return { errors };
-    }
-    if (responseHasError(namespaceResponse)) {
-      // failed to create the namespace at all
-      errors.push({ message: namespaceResponse.message });
-      return { errors };
-    }
 
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/');
@@ -437,6 +401,24 @@ export default class ClusterModel extends KubeModel {
       }
       return true;
     });
+
+    // if there's a namespace, try to create it
+    if (!namespace) {
+      errors.push({ message: 'No namespace specified' });
+      return { errors };
+    }
+    let namespaceResponse;
+    try {
+      namespaceResponse = await this.createClusterNamespace(namespace, !!clusterResource);
+    } catch (error) {
+      errors.push({ message: error.message });
+      return { errors };
+    }
+    if (responseHasError(namespaceResponse)) {
+      // failed to create the namespace at all
+      errors.push({ message: namespaceResponse.message });
+      return { errors };
+    }
 
     // try to create resources
     const result = await Promise.all(resources.map((resource, index) => this.kubeConnector.post(requestPaths[index], resource)
@@ -495,16 +477,22 @@ export default class ClusterModel extends KubeModel {
       });
     }
 
-    // last but not least, if everything else deployed, deploy ClusterDeployment
-    // if that fails--user can press create again and not get a "Already Exists" message
+    let importSecret;
     if (errors.length === 0) {
-      const deployment = await this.kubeConnector.post(clusterRequestPath, clusterResource)
-        .catch((err) => ({
-          status: 'Failure',
-          message: err.message,
-        }));
-      if (deployment.code >= 400 || deployment.status === 'Failure' || deployment.message) {
-        errors.push({ message: deployment.message });
+      if (clusterResource) {
+        // last but not least, if everything else deployed, deploy ClusterDeployment
+        // if that fails--user can press create again and not get a "Already Exists" message
+        const deployment = await this.kubeConnector.post(clusterRequestPath, clusterResource)
+          .catch(err => ({
+            status: 'Failure',
+            message: err.message,
+          }));
+        if (deployment.code >= 400 || deployment.status === 'Failure' || deployment.message) {
+          errors.push({ message: deployment.message });
+        }
+      } else {
+        // import case - fetch and return the generated secret
+        importSecret = await this.pollImportYamlSecret(namespace, namespace);
       }
     }
 
@@ -512,6 +500,7 @@ export default class ClusterModel extends KubeModel {
       errors,
       updated,
       created,
+      importSecret,
     };
   }
 
@@ -776,63 +765,6 @@ export default class ClusterModel extends KubeModel {
       }
     });
     return Object.entries(clusterImageSets).map(([releaseImage, name]) => ({ releaseImage, name }));
-  }
-
-  async createClusterResource(args) {
-    const { cluster } = args;
-    if (!cluster || !Array.isArray(cluster)) {
-      throw new Error('cluster argument is required for createClusterResource');
-    }
-
-    const [clusterTemplate, klusterletTemplate] = cluster;
-    if (!klusterletTemplate) {
-      throw new Error('KlusterletAddonConfig is required for createClusterResource');
-    }
-
-    const config = klusterletTemplate.spec;
-    const { clusterName, clusterNamespace } = config;
-
-    const clusterNamespaceResponse = this.createClusterNamespace(clusterNamespace);
-    if (responseHasError(clusterNamespaceResponse)) {
-      return clusterNamespaceResponse;
-    }
-
-    if (config.privateRegistryEnabled) {
-      const { imageRegistry, registryUsername, registryPassword } = config;
-      const auth = Buffer.from(`${registryUsername}:${registryPassword}`).toString('base64');
-      const dockerConfigJson = Buffer.from(JSON.stringify({ auths: { [`${imageRegistry}`]: { auth } } })).toString('base64');
-      const secret = { metadata: { name: clusterName }, data: { '.dockerconfigjson': dockerConfigJson }, type: 'kubernetes.io/dockerconfigjson' };
-
-      const registrySecretResponse = await this.kubeConnector.post(`/api/v1/namespaces/${clusterNamespace}/secrets`, secret);
-      // skip error for existing secret
-      if (responseHasError(registrySecretResponse) && registrySecretResponse.code !== 409) {
-        return responseForError('Create private docker registry secret failed', registrySecretResponse);
-      }
-    }
-
-    klusterletTemplate.imagePullSecret = config.privateRegistryEnabled ? clusterName : undefined;
-    const klusterletConfigResponse = await this.kubeConnector.post(
-      `/apis/agent.open-cluster-management.io/v1/namespaces/${clusterNamespace}/klusterletaddonconfigs`,
-      klusterletTemplate,
-    );
-
-    if (responseHasError(klusterletConfigResponse)) {
-      return responseForError('Create KlusterletAddonConfig resource failed', klusterletConfigResponse);
-    }
-
-    const clusterResponse = await this.kubeConnector.post('/apis/cluster.open-cluster-management.io/v1/managedclusters', clusterTemplate);
-    if (responseHasError(clusterResponse)) {
-      if (clusterResponse.code === 409) {
-        return clusterResponse;
-      }
-
-      // Delete the klusterletaddonconfig so the user can try again
-      await this.kubeConnector.delete(`/apis/agent.open-cluster-management.io/v1/namespaces/${clusterNamespace}/klusterletaddonconfigs/${clusterName}`);
-      return responseForError('Create Cluster resource failed', clusterResponse);
-    }
-
-    // fetch and return the generated secret
-    return this.pollImportYamlSecret(clusterNamespace, clusterName);
   }
 
   async pollImportYamlSecret(clusterNamespace, clusterName) {

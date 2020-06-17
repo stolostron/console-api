@@ -133,7 +133,39 @@ describe('Cluster Mutation', () => {
       });
   }));
 
-  test('Correctly Resolves Detach Cluster', () => new Promise((done) => {
+  test('Create Kubernetes Cluster Resource for Import with No Namespace', (done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+            createCluster(
+              cluster: [
+                {
+                  apiVersion: "cluster.open-cluster-management.io/v1",
+                  kind: "ManagedCluster"
+                },
+                {
+                  apiVersion: "agent.open-cluster-management.io/v1",
+                  kind: "KlusterletAddonConfig",
+                  spec:
+                  {
+                    clusterName: "foo"
+                  }
+                }
+              ]
+            )
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.error)).toBeFalsy();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  });
+
+  test('Correctly Resolves Detach Cluster', (done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({

@@ -30,7 +30,6 @@ import * as genericResources from './generic-resources';
 import * as query from './query';
 import * as topology from './topology';
 import * as userAccess from './user-access';
-import * as clusterImport from './clusterImport';
 import * as connection from './connection';
 import * as bmAsset from './bare-metal-asset';
 
@@ -54,7 +53,6 @@ const modules = [
   genericResources,
   topology,
   userAccess,
-  clusterImport,
   connection,
   bmAsset,
 ];
