@@ -23,6 +23,9 @@ export const INSTALL_LABEL_SELECTOR = (cluster) => `labelSelector=${INSTALL_LABE
 export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
 export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
 
+export const CSR_LABEL = 'open-cluster-management.io/cluster-name';
+export const CSR_LABEL_SELECTOR = cluster => `labelSelector=${CSR_LABEL}%3D${cluster}`;
+
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
   return (usage.substring(0, usage.length - 2) / capacity.substring(0, capacity.length - 2)) * 100;
@@ -32,7 +35,7 @@ function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
 }
 
-function getStatus(cluster, clusterdeployment, uninstall, install) {
+function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
   let clusterdeploymentStatus = '';
   if (clusterdeployment) {
     const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
@@ -60,20 +63,34 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
     if (cluster.kind === 'Cluster') {
       // Empty status indicates cluster has not been imported
       // status with conditions[0].type === '' indicates cluster is offline
-      const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pending');
+      const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pendingimport');
       status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
     } else {
       const clusterConditions = _.get(cluster, 'status.conditions') || [];
-      const clusterAvailable =
-        _.get(clusterConditions.find(c => c.type === 'ManagedClusterConditionAvailable'), 'status') === 'True';
-      status = clusterAvailable ? 'ok' : 'offline';
+      const checkForCondition = condition => _.get(
+        clusterConditions.find(c => c.type === condition),
+        'status',
+      ) === 'True';
+      const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
+      const clusterJoined = checkForCondition('ManagedClusterJoined');
+      const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
+      if (!clusterAccepted) {
+        status = 'notaccepted';
+      } else if (!clusterJoined) {
+        status = 'pendingimport';
+        if (csrs && csrs.some(c => !_.get(c, 'status.certificate'))) {
+          status = 'needsapproval';
+        }
+      } else {
+        status = clusterAvailable ? 'ok' : 'offline';
+      }
     }
 
-    // If cluster is pending import because Hive is installing or uninstalling,
-    // show that status instead
-    if (status === 'pending'
-      && clusterdeploymentStatus
-      && clusterdeploymentStatus !== 'detached') {
+    // If cluster is pendingimport/notaccepted/needsapproval import because Hive is
+    // installing/uninstalling/failed, show that status instead
+    if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval') &&
+      clusterdeploymentStatus &&
+      clusterdeploymentStatus !== 'detached') {
       return clusterdeploymentStatus;
     }
     return status;
@@ -644,7 +661,7 @@ export default class ClusterModel extends KubeModel {
     const nullIfNotFound = (query, kind) => (
       query.then((response) => (_.get(response, 'kind') === kind ? response : null))
     );
-    const [managedcluster, cluster, clusterdeployment] = await Promise.all([
+    const [managedcluster, cluster, clusterdeployment, csrList] = await Promise.all([
       nullIfNotFound(
         this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
         'ManagedCluster',
@@ -656,6 +673,10 @@ export default class ClusterModel extends KubeModel {
       nullIfNotFound(
         this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace || name}/clusterdeployments/${name}`),
         'ClusterDeployment',
+      ),
+      nullIfNotFound(
+        this.kubeConnector.get(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
+        'CertificateSigningRequestList',
       ),
     ]);
 
@@ -670,7 +691,13 @@ export default class ClusterModel extends KubeModel {
       install = creates;
     }
 
-    return getStatus(managedcluster || cluster, clusterdeployment, uninstall, install);
+    return getStatus(
+      managedcluster || cluster,
+      clusterdeployment,
+      csrList && csrList.items,
+      uninstall,
+      install,
+    );
   }
 
   async getClusterStatus() {
@@ -704,7 +731,6 @@ export default class ClusterModel extends KubeModel {
 
     const detachClusterResponse = await this.kubeConnector.delete(clusterRegistry);
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
-
 
     if (!destroy && responseHasError(detachClusterResponse)
     && responseHasError(detachManagedClusterResponse)) {

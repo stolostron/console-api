@@ -37,7 +37,7 @@ Object {
             "namespace": "default",
             "uid": null,
           },
-          "status": "pending",
+          "status": "pendingimport",
           "usage": Object {
             "cpu": "6598m",
             "memory": "6728Mi",
