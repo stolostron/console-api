@@ -269,12 +269,12 @@ export default class ClusterModel extends KubeModel {
     if (responseHasError(projectResponse)) {
       if (projectResponse.code === 409) {
         const existingNamespaceClusters = await this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${clusterNamespace}/clusters`);
-        if (existingNamespaceClusters.items.length > 0) {
+        if (existingNamespaceClusters.items && existingNamespaceClusters.items.length > 0) {
           throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a Cluster resource`);
         }
         if (checkForDeployment) {
           const existingNamespaceClusterDeployments = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${clusterNamespace}/clusterdeployments`);
-          if (existingNamespaceClusterDeployments.items.length > 0) {
+          if (existingNamespaceClusterDeployments.items && existingNamespaceClusterDeployments.items.length > 0) {
             throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a ClusterDeployment resource`);
           }
         }
