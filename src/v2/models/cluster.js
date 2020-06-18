@@ -18,12 +18,15 @@ export const INSTALL_LABEL = `${HIVE_DOMAIN}/install`;
 export const CLUSTER_LABEL = `${HIVE_DOMAIN}/cluster-deployment-name`;
 export const UNINSTALL_LABEL_SELECTOR = (cluster) => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 export const INSTALL_LABEL_SELECTOR = (cluster) => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
+export const UNINSTALL_LABEL_SELECTOR_ALL = `labelSelector=${UNINSTALL_LABEL}%3Dtrue`;
+export const INSTALL_LABEL_SELECTOR_ALL = `labelSelector=${INSTALL_LABEL}%3Dtrue`;
 
 export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
-export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
+export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedCluster`;
 
 export const CSR_LABEL = 'open-cluster-management.io/cluster-name';
 export const CSR_LABEL_SELECTOR = (cluster) => `labelSelector=${CSR_LABEL}%3D${cluster}`;
+export const CSR_LABEL_SELECTOR_ALL = `labelSelector=${CSR_LABEL}`;
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -34,24 +37,26 @@ function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
 }
 
-function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
-  let clusterdeploymentStatus = '';
-  if (clusterdeployment) {
-    const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-    const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
-    if ((install && install.items && install.items.some((i) => i.status.failed > 0))
-    || (uninstall && uninstall.items && install.items.some((i) => i.status.failed > 0))) {
-      clusterdeploymentStatus = 'provisionfailed';
-    } else if (uninstall && uninstall.items && uninstall.items.some((i) => i.status.active > 0)) {
-      clusterdeploymentStatus = 'destroying';
-    } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
-      clusterdeploymentStatus = 'detached';
-    } else if (install && install.items) {
-      clusterdeploymentStatus = 'creating';
-    } else {
-      clusterdeploymentStatus = 'unknown';
-    }
+function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
+  const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
+  const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
+  if ((install && install.some((i) => i.status.failed > 0))
+  || (uninstall && uninstall.some((i) => i.status.failed > 0))) {
+    return 'provisionfailed';
+  } if (uninstall && uninstall.some((i) => i.status.active > 0)) {
+    return 'destroying';
+  } if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
+    return 'detached';
+  } if (install) {
+    return 'creating';
   }
+  return 'unknown';
+}
+
+function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
+  const clusterDeploymentStatus = clusterDeployment
+    ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
+    : '';
 
   if (cluster) {
     if (_.get(cluster, 'metadata.deletionTimestamp')) {
@@ -59,56 +64,43 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
     }
 
     let status;
-    if (cluster.kind === 'Cluster') {
-      // Empty status indicates cluster has not been imported
-      // status with conditions[0].type === '' indicates cluster is offline
-      const clusterStatus = _.get(cluster, 'status.conditions[0].type', 'pendingimport');
-      status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
-    } else {
-      const clusterConditions = _.get(cluster, 'status.conditions') || [];
-      const checkForCondition = (condition) => _.get(
-        clusterConditions.find((c) => c.type === condition),
-        'status',
-      ) === 'True';
-      const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
-      const clusterJoined = checkForCondition('ManagedClusterJoined');
-      const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
-      if (!clusterAccepted) {
-        status = 'notaccepted';
-      } else if (!clusterJoined) {
-        status = 'pendingimport';
-        if (csrs && csrs.some((c) => !_.get(c, 'status.certificate'))) {
-          status = 'needsapproval';
-        }
-      } else {
-        status = clusterAvailable ? 'ok' : 'offline';
+    const clusterConditions = _.get(cluster, 'status.conditions') || [];
+    const checkForCondition = (condition) => _.get(
+      clusterConditions.find((c) => c.type === condition),
+      'status',
+    ) === 'True';
+    const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
+    const clusterJoined = checkForCondition('ManagedClusterJoined');
+    const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
+    if (!clusterAccepted) {
+      status = 'notaccepted';
+    } else if (!clusterJoined) {
+      status = 'pendingimport';
+      if (csrs && csrs.some((c) => !_.get(c, 'status.certificate'))) {
+        status = 'needsapproval';
       }
+    } else {
+      status = clusterAvailable ? 'ok' : 'offline';
     }
 
     // If cluster is pendingimport/notaccepted/needsapproval import because Hive is
     // installing/uninstalling/failed, show that status instead
     if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval')
-      && clusterdeploymentStatus
-      && clusterdeploymentStatus !== 'detached') {
-      return clusterdeploymentStatus;
+      && clusterDeploymentStatus
+      && clusterDeploymentStatus !== 'detached') {
+      return clusterDeploymentStatus;
     }
     return status;
   }
-  return clusterdeploymentStatus;
+  return clusterDeploymentStatus;
 }
 
-function getUniqueResourceName(resource) {
-  const name = _.get(resource, 'metadata.name', 'noClusterName');
-  const namespace = _.get(resource, 'metadata.namespace', name);
-  return `${name}_${namespace}`;
-}
-
-function mapResources(resource, kind = 'Cluster') {
+function mapResources(resources, kind) {
   const resultMap = new Map();
-  if (resource) {
-    resource.forEach((r) => {
+  if (resources) {
+    resources.forEach((r) => {
       if (r.metadata && (!r.kind || r.kind === kind)) {
-        const key = getUniqueResourceName(r);
+        const key = r.metadata.name;
         resultMap.set(key, { metadata: r.metadata, raw: r });
       }
     });
@@ -116,100 +108,142 @@ function mapResources(resource, kind = 'Cluster') {
   return resultMap;
 }
 
-function mapClusterVersions(rawClusterversions) {
-  let clusterversions = {};
-  rawClusterversions.forEach((cv) => {
-    if (_.has(cv, 'status.results')) {
-      const clusterversion = _.get(cv, 'status.results', {});
-      clusterversions = { ...clusterversions, ...clusterversion };
-    }
-  });
-  return clusterversions;
+function mapResourceListByLabel(resourceList, label) {
+  return new Map(Object.entries(_.groupBy(resourceList, (i) => i.metadata.labels[label])));
 }
 
-function findMatchedStatus({
-  clusters, clusterstatuses, clusterversions,
-  managedclusters, managedclusterinfos, clusterdeployments,
+function mapData({
+  managedClusters,
+  managedClusterInfos,
+  clusterDeployments,
+  certificateSigningRequestList,
+  uninstallJobList,
+  installJobList,
 }) {
-  const resultMap = new Map();
-  const clusterMap = mapResources(clusters);
-  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
-  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
-  const clusterDeploymentMap = mapResources(clusterdeployments, 'ClusterDeployment');
-  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
-  const clusterVersionMap = mapClusterVersions(clusterversions);
+  const managedClusterMap = mapResources(managedClusters, 'ManagedCluster');
+  const clusterDeploymentMap = mapResources(clusterDeployments, 'ClusterDeployment');
+  const managedClusterInfoMap = mapResources(managedClusterInfos, 'ManagedClusterInfo');
+  const certificateSigningRequestListMap = mapResourceListByLabel(certificateSigningRequestList, CSR_LABEL);
+  const uninstallJobListMap = mapResourceListByLabel(uninstallJobList, CLUSTER_LABEL);
+  const installJobListMap = mapResourceListByLabel(installJobList, CLUSTER_LABEL);
 
   const uniqueClusterNames = new Set([
-    ...clusterMap.keys(),
     ...managedClusterMap.keys(),
     ...clusterDeploymentMap.keys(),
   ]);
+
+  return {
+    managedClusterMap,
+    clusterDeploymentMap,
+    managedClusterInfoMap,
+    certificateSigningRequestListMap,
+    uninstallJobListMap,
+    installJobListMap,
+    uniqueClusterNames,
+  };
+}
+
+function getClusterResourcesFromMappedData({
+  managedClusterMap,
+  clusterDeploymentMap,
+  managedClusterInfoMap,
+  certificateSigningRequestListMap,
+  uninstallJobListMap,
+  installJobListMap,
+}, cluster) {
+  const managedCluster = managedClusterMap.get(cluster);
+  const managedClusterInfo = managedClusterInfoMap.get(cluster);
+  const clusterDeployment = clusterDeploymentMap.get(cluster);
+  const certificateSigningRequestList = certificateSigningRequestListMap.get(cluster);
+  const uninstallJobList = uninstallJobListMap.get(cluster);
+  const installJobList = installJobListMap.get(cluster);
+  return {
+    managedCluster,
+    managedClusterInfo,
+    clusterDeployment,
+    certificateSigningRequestList,
+    uninstallJobList,
+    installJobList,
+  };
+}
+
+function getBaseCluster(mappedData, cluster) {
+  const { managedCluster, managedClusterInfo, clusterDeployment } = getClusterResourcesFromMappedData(mappedData, cluster);
+
+  const metadata = _.get(managedCluster, 'metadata')
+  || _.pick(_.get(managedClusterInfo || clusterDeployment, 'metadata'), ['name', 'namespace']);
+  if (!metadata.namespace) {
+    metadata.namespace = _.get(managedClusterInfo || clusterDeployment, 'metadata.namespace') || metadata.name;
+  }
+
+  const clusterip = _.get(managedClusterInfo, 'raw.spec.masterEndpoint');
+
+  const consoleURL = _.get(managedClusterInfo, 'raw.status.consoleURL') || _.get(clusterDeployment, 'raw.status.webConsoleURL');
+
+  const apiURL = _.get(clusterDeployment, 'raw.status.apiURL');
+  const masterEndpoint = _.get(managedClusterInfo, 'raw.spec.masterEndpoint');
+  const serverAddress = apiURL || masterEndpoint;
+
+  return {
+    metadata,
+    clusterip,
+    consoleURL,
+    rawCluster: _.get(managedCluster, 'raw'),
+    rawStatus: _.get(managedClusterInfo, 'raw'),
+    serverAddress,
+  };
+}
+
+function findMatchedStatus(data) {
+  const mappedData = mapData(data);
+  const { uniqueClusterNames } = mappedData;
+  const resultMap = new Map();
+
   uniqueClusterNames.forEach((c) => {
-    const cluster = clusterMap.get(c);
-    const managedcluster = managedClusterMap.get(c);
-    const clusterstatus = clusterStatusMap.get(c);
-    const clusterdeployment = clusterDeploymentMap.get(c);
-    const managedclusterinfo = managedClusterInfoMap.get(c);
-    const metadata = _.get(managedcluster || cluster, 'metadata')
-      || _.pick(_.get(managedclusterinfo || clusterdeployment, 'metadata'), ['name', 'namespace']);
-    if (!metadata.namespace) {
-      metadata.namespace = _.get(managedclusterinfo || clusterdeployment, 'metadata.namespace') || metadata.name;
-    }
-    const clusterversion = _.get(clusterVersionMap, metadata.name);
-    const apiURL = _.get(clusterdeployment, 'raw.status.apiURL');
-    const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
-    const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
-    const serverAddress = apiURL || (masterEndpoint || rawServerAddress ? `https://${masterEndpoint || rawServerAddress}` : null);
-    const nodeCount = _.get(clusterstatus, 'raw.spec.capacity.nodes')
-    || (_.get(managedclusterinfo, 'raw.status.nodeList') || []).length;
-    const data = {
-      metadata,
-      nodes: nodeCount > 0 ? nodeCount : null,
-      clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(
-        managedclusterinfo,
-        'raw.status.consoleURL',
-        _.get(
-          clusterstatus,
-          'raw.spec.consoleURL',
-          _.get(
-            clusterdeployment,
-            'raw.status.webConsoleURL',
-          ),
-        ),
-      ),
-      rawStatus: _.get(clusterstatus, 'raw'),
-      klusterletVersion: _.get(clusterstatus, 'raw.spec.klusterletVersion', '-'),
-      k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
-      serverAddress,
-      isHive: !!clusterdeployment,
-      isManaged: !!(managedcluster || cluster),
-    };
+    const cluster = getBaseCluster(mappedData, c);
+    const {
+      managedCluster,
+      managedClusterInfo,
+      clusterDeployment,
+      certificateSigningRequestList,
+      uninstallJobList,
+      installJobList,
+    } = getClusterResourcesFromMappedData(mappedData, c);
+
+    const nodeCount = (_.get(managedClusterInfo, 'raw.status.nodeList') || []).length;
+    const nodes = nodeCount > 0 ? nodeCount : null;
+    const k8sVersion = _.get(managedClusterInfo, 'raw.status.version', '-');
+    const status = getStatus(
+      _.get(managedCluster, 'raw'),
+      certificateSigningRequestList,
+      _.get(clusterDeployment, 'raw'),
+      uninstallJobList,
+      installJobList,
+    );
+    _.merge(cluster, {
+      nodes,
+      status,
+      k8sVersion,
+      isHive: !!clusterDeployment,
+      isManaged: !!managedCluster,
+    });
+
     const OCP_DISTRIBUTION_INFO = 'raw.status.distributionInfo.ocp';
-    if (managedclusterinfo && _.has(managedclusterinfo, OCP_DISTRIBUTION_INFO)) {
+    if (managedClusterInfo && _.has(managedClusterInfo, OCP_DISTRIBUTION_INFO)) {
       const {
         availableUpdates: availableVersions,
         desiredVersion,
         upgradeFailed,
         version: distributionVersion,
-      } = _.get(managedclusterinfo, OCP_DISTRIBUTION_INFO);
-      _.merge(data, {
+      } = _.get(managedClusterInfo, OCP_DISTRIBUTION_INFO);
+      _.merge(cluster, {
         availableVersions,
         desiredVersion,
         distributionVersion,
         upgradeFailed,
       });
-    } else if (clusterversion) {
-      const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
-      data.availableVersions = availableUpdates ? availableUpdates.map((u) => u.version) : [];
-      data.desiredVersion = _.get(clusterversion, 'status.desired.version');
-      const versionHistory = _.get(clusterversion, 'status.history', []);
-      const completedVersion = versionHistory ? versionHistory.filter((h) => h.state === 'Completed')[0] : null;
-      data.distributionVersion = completedVersion ? completedVersion.version : null;
-      const conditions = _.get(clusterversion, 'status.conditions', []);
-      data.upgradeFailed = conditions ? conditions.filter((cond) => cond.type === 'Failing')[0].status === 'True' : false;
     }
-    resultMap.set(c, data);
+    resultMap.set(c, cluster);
   });
   return [...resultMap.values()];
 }
@@ -222,36 +256,25 @@ function getClusterDeploymentSecrets(clusterDeployment) {
   };
 }
 
-function findMatchedStatusForOverview({
-  clusters, managedclusters, clusterstatuses, managedclusterinfos,
-}) {
+function findMatchedStatusForOverview(data) {
+  const mappedData = mapData(data);
+  const { uniqueClusterNames } = mappedData;
   const resultMap = new Map();
-  const clusterMap = mapResources(clusters);
-  const managedClusterMap = mapResources(managedclusters, 'ManagedCluster');
-  const clusterStatusMap = mapResources(clusterstatuses, 'ClusterStatus');
-  const managedClusterInfoMap = mapResources(managedclusterinfos, 'ManagedClusterInfo');
 
-  const uniqueClusterNames = new Set([
-    ...clusterMap.keys(),
-    ...managedClusterMap.keys(),
-  ]);
   uniqueClusterNames.forEach((c) => {
-    const cluster = clusterMap.get(c);
-    const managedcluster = managedClusterMap.get(c);
-    const clusterstatus = clusterStatusMap.get(c);
-    const managedclusterinfo = managedClusterInfoMap.get(c);
-    const data = {
-      metadata: _.get(managedcluster, 'metadata', _.get(cluster, 'metadata')),
-      status: getStatus(_.get(managedcluster || cluster, 'raw')),
-      clusterip: _.get(clusterstatus, 'raw.spec.masterAddresses[0].ip'),
-      consoleURL: _.get(managedclusterinfo, 'raw.status.consoleURL', _.get(clusterstatus, 'raw.spec.consoleURL')),
-      capacity: _.get(clusterstatus, 'raw.spec.capacity'),
-      usage: _.get(clusterstatus, 'raw.spec.usage'),
-      rawCluster: _.get(managedcluster, 'raw', _.get(cluster, 'raw')),
-      rawStatus: _.get(clusterstatus, 'raw'),
-      serverAddress: _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress'),
-    };
-    resultMap.set(c, data);
+    const cluster = getBaseCluster(mappedData, c);
+    const { managedCluster } = getClusterResourcesFromMappedData(mappedData, c);
+
+    const status = getStatus(_.get(managedCluster, 'raw'));
+    const capacity = _.get(managedCluster, 'raw.status.capacity');
+    const usage = _.get(managedCluster, 'raw.status.allocatable'); // TODO - need to reverse this from allocatable
+
+    _.merge(cluster, {
+      status,
+      capacity,
+      usage,
+    });
+    resultMap.set(c, cluster);
   });
   return [...resultMap.values()];
 }
@@ -538,74 +561,79 @@ export default class ClusterModel extends KubeModel {
         )))
     );
 
-    const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
-      rbacFallbackQuery(
-        '/apis/clusterregistry.k8s.io/v1alpha1/clusters',
-        (ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
-      ),
+    const [
+      managedClusters,
+      managedClusterInfos,
+      clusterDeployments,
+      certificateSigningRequestList,
+      uninstallJobList,
+      installJobList,
+    ] = await Promise.all([
       rbacFallbackQuery(
         '/apis/cluster.open-cluster-management.io/v1/managedclusters',
         (ns) => `/apis/cluster.open-cluster-management.io/v1/managedclusters/${ns}`,
       ),
       rbacFallbackQuery(
-        '/apis/hive.openshift.io/v1/clusterdeployments',
-        (ns) => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
-      ),
-      rbacFallbackQuery(
         '/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos',
         (ns) => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`,
       ),
+      rbacFallbackQuery(
+        '/apis/hive.openshift.io/v1/clusterdeployments',
+        (ns) => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
+      ),
+      this.kubeConnector.get(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR_ALL}`)
+        .then((allItems) => (allItems.items
+          ? allItems.items
+          : [])),
+      rbacFallbackQuery(
+        `/apis/batch/v1/jobs?${UNINSTALL_LABEL_SELECTOR_ALL}`,
+        (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${UNINSTALL_LABEL_SELECTOR(ns)}`,
+      ),
+      rbacFallbackQuery(
+        `/apis/batch/v1/jobs?${INSTALL_LABEL_SELECTOR_ALL}`,
+        (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${INSTALL_LABEL_SELECTOR(ns)}`,
+      ),
     ]);
 
-    // For clusterversions, query only clusters that are online
-    const allClusters = [...clusters, ...managedclusters];
-    const names = allClusters.filter((cluster) => getStatus(cluster) === 'ok').map((c) => c.metadata.name);
-    // For clusterstatuses, query only namespaces that have clusters
-    const namespaces = Array.from(new Set(allClusters.filter((c) => c.metadata)
-      .map((c) => c.metadata.namespace || c.metadata.name)));
-    const [clusterstatuses, ...clusterversions] = await Promise.all([
-      this.kubeConnector.getResources(
-        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
-        { namespaces },
-      ),
-      ...names.map((n) => this.kubeConnector.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
-    ]);
     return {
-      clusters,
-      managedclusters,
-      clusterstatuses,
-      clusterdeployments,
-      managedclusterinfos,
-      clusterversions,
+      managedClusters,
+      managedClusterInfos,
+      clusterDeployments,
+      certificateSigningRequestList,
+      uninstallJobList,
+      installJobList,
     };
   }
 
   async getSingleCluster(args = {}) {
     const { name, namespace } = args;
+    const listQuery = (query) => (
+      this.kubeConnector.get(query).then((allItems) => (allItems.items ? allItems.items : []))
+    );
     const [
-      cluster,
-      managedcluster,
-      clusterstatus,
-      clusterdeployment,
-      managedclusterinfo,
-      ...clusterversions
+      managedCluster,
+      clusterDeployment,
+      managedClusterInfo,
+      certificateSigningRequestList,
+      uninstallJobList,
+      installJobList,
     ] = await Promise.all([
-      this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
       this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
-      this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
       this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${namespace}/managedclusterinfos/${name}`),
-      this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
+      listQuery(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
+      listQuery(`/apis/batch/v1/namespaces/${namespace}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
+      listQuery(`/apis/batch/v1/namespaces/${namespace}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
     const [result] = findMatchedStatus({
-      clusters: [cluster],
-      managedclusters: [managedcluster],
-      clusterstatuses: [clusterstatus],
-      clusterdeployments: [clusterdeployment],
-      managedclusterinfos: [managedclusterinfo],
-      clusterversions,
+      managedClusters: [managedCluster],
+      clusterDeployments: [clusterDeployment],
+      managedClusterInfos: [managedClusterInfo],
+      certificateSigningRequestList,
+      uninstallJobList,
+      installJobList,
     });
-    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployment);
+    const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterDeployment);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
   }
@@ -645,85 +673,16 @@ export default class ClusterModel extends KubeModel {
     return parseInt(getPercentage(usage, capacity), 10);
   }
 
-  async getStatus(resource) {
-    const { metadata: { name, namespace } } = resource;
-    const nullIfNotFound = (query, kind) => (
-      query.then((response) => (_.get(response, 'kind') === kind ? response : null))
-    );
-    const [managedcluster, cluster, clusterdeployment, csrList] = await Promise.all([
-      nullIfNotFound(
-        this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
-        'ManagedCluster',
-      ),
-      nullIfNotFound(
-        this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
-        'Cluster',
-      ),
-      nullIfNotFound(
-        this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace || name}/clusterdeployments/${name}`),
-        'ClusterDeployment',
-      ),
-      nullIfNotFound(
-        this.kubeConnector.get(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
-        'CertificateSigningRequestList',
-      ),
-    ]);
-
-    let uninstall;
-    let install;
-    if (clusterdeployment) {
-      const [destroys, creates] = await Promise.all([
-        this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
-        this.kubeConnector.get(`/apis/batch/v1/namespaces/${namespace}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
-      ]);
-      uninstall = destroys;
-      install = creates;
-    }
-
-    return getStatus(
-      managedcluster || cluster,
-      clusterdeployment,
-      csrList && csrList.items,
-      uninstall,
-      install,
-    );
-  }
-
-  async getClusterStatus() {
-    const clusterstatuses = await this.kubeConnector.getResources((ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
-
-    return clusterstatuses.reduce((accum, cluster) => {
-      if (!cluster) {
-        return accum;
-      }
-
-      accum.push({
-        metadata: cluster.metadata,
-        nodes: _.get(cluster, 'spec.capacity.nodes'),
-        pods: _.get(cluster, 'spec.usage.pods'),
-        ip: cluster.spec.masterAddresses[0].ip,
-        memoryUtilization: this.constructor.resolveUsage('memory', cluster),
-        storageUtilization: this.constructor.resolveUsage('storage', cluster),
-        cpuUtilization: this.constructor.resolveUsage('cpu', cluster),
-      });
-
-      return accum;
-    }, []);
-  }
-
   async detachCluster(args) {
     const { namespace, cluster, destroy = false } = args;
-    const clusterRegistry = `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${cluster}`;
     const managedCluster = `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`;
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
     const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
-    const detachClusterResponse = await this.kubeConnector.delete(clusterRegistry);
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
 
-    if (!destroy && responseHasError(detachClusterResponse)
-    && responseHasError(detachManagedClusterResponse)) {
-      return detachClusterResponse.code || detachManagedClusterResponse.code;
+    if (!destroy && responseHasError(detachManagedClusterResponse)) {
+      return detachManagedClusterResponse.code;
     }
 
     if (destroy) {

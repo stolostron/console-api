@@ -31,7 +31,6 @@ type Cluster implements K8sObject {
   totalStorage: String
   # Returns % of CPU used.
   totalCPU: String
-  klusterletVersion: String
   k8sVersion: String
   upgradeFailed: Boolean
   adminKubeconfigSecret: String
@@ -52,7 +51,6 @@ export const resolver = {
     clusterImageSets: (parent, args, { clusterModel, req }) => clusterModel.getClusterImageSets({ ...args, user: req.user }),
   },
   Cluster: {
-    status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
     totalCPU: (parent) => ClusterModel.resolveUsage('cpu', parent.rawStatus),
     totalMemory: (parent) => ClusterModel.resolveUsage('memory', parent.rawStatus),
     totalStorage: (parent) => ClusterModel.resolveUsage('storage', parent.rawStatus),

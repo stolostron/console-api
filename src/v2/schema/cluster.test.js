@@ -52,7 +52,7 @@ describe('Cluster Resolver', () => {
       .send({
         query: `
         {
-          cluster(name: "hub-cluster", namespace: "kube-system") {
+          cluster(name: "hub-cluster", namespace: "hub-cluster") {
             clusterip
             metadata {
               creationTimestamp
