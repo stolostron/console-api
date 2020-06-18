@@ -96,44 +96,43 @@ export default class BareMetalAssetModel extends KubeModel {
   }
 
   async syncBMAs(hosts) {
-    
-    // make sure all hosts have a bare metal asset  
+    // make sure all hosts have a bare metal asset
     const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets');
     const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
-      const name = _.get(item, 'metadata.name')
-      const namespace = _.get(item, 'metadata.namespace')
+      const name = _.get(item, 'metadata.name');
+      const namespace = _.get(item, 'metadata.namespace');
       return `${name}-${namespace}`;
     });
     const newAssets = [];
     hosts.forEach((host) => {
       const { name, namespace } = host;
       if (!assetsMap[`${name}-${namespace}`]) {
-        newAssets.push(host)
+        newAssets.push(host);
       }
-    })
-    if (newAssets.length>0) {
+    });
+    if (newAssets.length > 0) {
       await Promise.all(newAssets.map((asset) => {
-        const {name, namespace, bmc: {address, username, password }, bootMACAddress  } = asset
+        const {
+          name, namespace, bmc: { address, username, password }, bootMACAddress,
+        } = asset;
         return this.createBareMetalAsset({
-          name, 
-          namespace, 
-          bmcAddress: address, 
-          username, 
-          password, 
-          bootMac: bootMACAddress
-          });
+          name,
+          namespace,
+          bmcAddress: address,
+          username,
+          password,
+          bootMac: bootMACAddress,
+        });
       }));
     }
-    
+
     // make sure all hosts have a user/password
-    hosts = hosts.filter((host) => {
-      return !_.get(host, 'bmc.username')
-    });
+    hosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
     if (hosts.length > 0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
       const secretMap = _.keyBy(secrets, (secret) => {
-        const name = _.get(secret, 'metadata.ownerReferences[0].name')
-        const namespace = _.get(secret, 'metadata.namespace')
+        const name = _.get(secret, 'metadata.ownerReferences[0].name');
+        const namespace = _.get(secret, 'metadata.namespace');
         return `${name}-${namespace}`;
       });
       hosts.forEach((host) => {
