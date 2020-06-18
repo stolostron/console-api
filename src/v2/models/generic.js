@@ -361,8 +361,6 @@ export default class GenericModel extends KubeModel {
       }
       return response;
     }
-    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
-    const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
@@ -373,7 +371,7 @@ export default class GenericModel extends KubeModel {
       kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
-        namespace: clusterNamespace,
+        namespace: cluster,
       },
       spec: {
         cluster: {
@@ -393,7 +391,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`${routePrefix}/${clusterNamespace}/managedclusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -406,7 +404,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`${routePrefix}/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${cluster}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
@@ -442,8 +440,6 @@ export default class GenericModel extends KubeModel {
       return response;
     }
 
-    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
-    const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
@@ -455,7 +451,7 @@ export default class GenericModel extends KubeModel {
       kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
-        namespace: clusterNamespace,
+        namespace: cluster,
       },
       spec: {
         cluster: {
@@ -475,7 +471,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`${routePrefix}/${clusterNamespace}/managedclusteractions`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -487,7 +483,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`${routePrefix}/${clusterNamespace}/managedclusteractions/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${cluster}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.conditions[0].reason');
