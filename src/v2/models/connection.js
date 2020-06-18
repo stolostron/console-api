@@ -18,7 +18,7 @@ export const CONNECTION_LABEL = `${CLUSTER_DOMAIN}/cloudconnection`;
 export const CONNECTION_LABEL_SELECTOR = `labelSelector=${CONNECTION_LABEL}`;
 export const PROVIDER_LABEL = `${CLUSTER_DOMAIN}/provider`;
 
-const generateSecret = body => ({
+const generateSecret = (body) => ({
   apiVersion: 'v1',
   kind: 'Secret',
   type: 'Opaque',
@@ -45,7 +45,7 @@ export default class ConnectionModel extends KubeModel {
   }
 
   async getConnections() {
-    const connections = await this.kubeConnector.getResources(ns => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
+    const connections = await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
     const ret = [];
     connections.forEach(({ metadata }) => {
       ret.push({
@@ -62,9 +62,9 @@ export default class ConnectionModel extends KubeModel {
 
   async getConnectionDetails(args) {
     const { namespace = null, name = null } = args;
-    const connections = namespace && name ?
-      [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`)] :
-      await this.kubeConnector.getResources(ns => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
+    const connections = namespace && name
+      ? [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`)]
+      : await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
     const ret = [];
     connections.forEach(({ metadata, data }) => {
       ret.push({
@@ -91,4 +91,3 @@ export default class ConnectionModel extends KubeModel {
     return { ...response, statusCode };
   }
 }
-

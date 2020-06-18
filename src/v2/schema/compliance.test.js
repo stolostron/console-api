@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Compliance Resolver', () => {
-  test('Correctly Resolves Compliance List Query', (done) => {
+  test('Correctly Resolves Compliance List Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -48,9 +48,9 @@ describe('Compliance Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Single Compliance Query', (done) => {
+  test('Correctly Resolves Single Compliance Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -217,9 +217,9 @@ describe('Compliance Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Compliance Mutation', (done) => {
+  test('Correctly Resolves Create Compliance Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -392,5 +392,5 @@ describe('Compliance Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

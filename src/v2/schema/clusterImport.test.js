@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Cluster Import Resolver', () => {
-  test('Create Kubernetes Cluster Resource for Import should return error msg', (done) => {
+  test('Create Kubernetes Cluster Resource for Import should return error msg', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -26,9 +26,9 @@ describe('Cluster Import Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Create Kubernetes Cluster Resource for Import', (done) => {
+  test('Create Kubernetes Cluster Resource for Import', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -51,5 +51,5 @@ describe('Cluster Import Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
