@@ -6,20 +6,20 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import getApplicationElements, {
-  createReplicaChild
-  , createGenericPackageObject
-  , addSubscriptionCharts
-  , addSubscriptionDeployable
-  , addClusters
-  , processRouteIngress
-  , processServices
-  , processDeployables,
+  createReplicaChild,
+  createGenericPackageObject,
+  addSubscriptionCharts,
+  addSubscriptionDeployable,
+  addClusters,
+  processRouteIngress,
+  processServices,
+  processDeployables,
 
 } from './applicationHelper';
-
 
 describe('applicationHelper', () => {
   it('should match snapshot with subscription', () => {
@@ -120,8 +120,8 @@ describe('createGenericPackageObject', () => {
     };
 
     expect(createGenericPackageObject(
-      parentId, appNamespace
-      , [], [], subscriptionName,
+      parentId, appNamespace,
+      [], [], subscriptionName,
     )).toEqual(result);
   });
 });
@@ -166,7 +166,6 @@ describe('addClusters', () => {
     )).toEqual(result);
   });
 });
-
 
 describe('addSubscriptionDeployable', () => {
   it('addSubscriptionDeployable', () => {
@@ -822,7 +821,6 @@ describe('addSubscriptionCharts', () => {
             },
             spec: {
 
-
             },
 
           },
@@ -846,7 +844,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -872,7 +869,6 @@ describe('addSubscriptionCharts', () => {
             },
             spec: {
 
-
             },
 
           },
@@ -896,7 +892,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -922,7 +917,6 @@ describe('addSubscriptionCharts', () => {
             },
             spec: {
 
-
             },
 
           },
@@ -947,7 +941,6 @@ describe('addSubscriptionCharts', () => {
             },
             spec: {
 
-
             },
 
           },
@@ -959,11 +952,9 @@ describe('addSubscriptionCharts', () => {
       },
     ];
 
-
     expect(addSubscriptionCharts(
       parentId, subscriptionStatusMap,
       [], [], appNamespace, channelInfo, subscriptionName,
     )).toEqual(result);
   });
 });
-

@@ -5,13 +5,13 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import supertest from 'supertest';
 import nock from 'nock';
 import server, { GRAPHQL_PATH } from '../index';
 import { mockOccurrences } from '../mocks/OccurrenceList';
-
 
 describe('Occurrences Resolver', () => {
   beforeAll(() => {
@@ -23,7 +23,7 @@ describe('Occurrences Resolver', () => {
       .reply(200, mockOccurrences);
   });
 
-  test('Correctly Resolves Occurrences Query', (done) => {
+  test('Correctly Resolves Occurrences Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -48,5 +48,5 @@ describe('Occurrences Resolver', () => {
         expect(textMessage).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

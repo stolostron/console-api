@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Generic Resources', () => {
-  test('Correctly Resolves Get Resource Locally', (done) => {
+  test('Correctly Resolves Get Resource Locally', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -25,9 +25,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Update Local Resource', (done) => {
+  test('Correctly Resolves Update Local Resource', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -41,9 +41,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Update Remote Resource', (done) => {
+  test('Correctly Resolves Update Remote Resource', () => new Promise((done) => {
     Date.now = jest.fn(() => 1234);
     supertest(server)
       .post(GRAPHQL_PATH)
@@ -58,9 +58,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Should Report Error While Create Resources Mutation', (done) => {
+  test('Should Report Error While Create Resources Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -101,9 +101,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Resources Mutation', (done) => {
+  test('Correctly Resolves Create Resources Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -145,9 +145,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Update Cluster Labels', (done) => {
+  test('Correctly Resolves Update Cluster Labels', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -161,9 +161,9 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves update Compliance Mutation', (done) => {
+  test('Correctly Resolves update Compliance Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -251,6 +251,5 @@ describe('Generic Resources', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
-

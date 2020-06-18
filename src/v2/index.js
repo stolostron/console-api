@@ -34,7 +34,7 @@ import SFModel from './models/findings';
 import ConnectionModel from './models/connection';
 
 import createMockKubeHTTP from './mocks/kube-http';
-import schema from './schema/';
+import schema from './schema';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
 import BareMetalAssetModel from './models/bare-metal-asset';
@@ -67,9 +67,9 @@ const apolloServer = new ApolloServer({
 
     const namespaceList = _.get(req, 'user.namespaces', []);
     const rawNamespaces = Array.isArray(namespaceList.items) ? namespaceList.items : [];
-    const namespaces = rawNamespaces.map(ns => ns.metadata.name);
-    const clusterNamespaces = rawNamespaces.filter(ns => _.has(ns, `metadata.labels["${CLUSTER_NAMESPACE_LABEL}"]`))
-      .map(ns => ns.metadata.name);
+    const namespaces = rawNamespaces.map((ns) => ns.metadata.name);
+    const clusterNamespaces = rawNamespaces.filter((ns) => _.has(ns, `metadata.labels["${CLUSTER_NAMESPACE_LABEL}"]`))
+      .map((ns) => ns.metadata.name);
 
     const { updateUserNamespaces } = req;
 
@@ -99,8 +99,8 @@ const apolloServer = new ApolloServer({
 const graphQLServer = express();
 graphQLServer.use(compression());
 
-const requestLogger = isProd ?
-  morgan('combined', {
+const requestLogger = isProd
+  ? morgan('combined', {
     skip: (req, res) => res.statusCode < 400,
   })
   : morgan('dev');

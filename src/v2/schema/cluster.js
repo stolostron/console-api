@@ -45,21 +45,17 @@ type ClusterImageSet {
 }
 `;
 
-
 export const resolver = {
   Query: {
-    cluster: (parent, args, { clusterModel, req }) =>
-      clusterModel.getSingleCluster({ ...args, user: req.user }),
-    clusters: (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, user: req.user }),
-    clusterImageSets: (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusterImageSets({ ...args, user: req.user }),
+    cluster: (parent, args, { clusterModel, req }) => clusterModel.getSingleCluster({ ...args, user: req.user }),
+    clusters: (parent, args, { clusterModel, req }) => clusterModel.getClusters({ ...args, user: req.user }),
+    clusterImageSets: (parent, args, { clusterModel, req }) => clusterModel.getClusterImageSets({ ...args, user: req.user }),
   },
   Cluster: {
     status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
-    totalCPU: parent => ClusterModel.resolveUsage('cpu', parent.rawStatus),
-    totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
-    totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
+    totalCPU: (parent) => ClusterModel.resolveUsage('cpu', parent.rawStatus),
+    totalMemory: (parent) => ClusterModel.resolveUsage('memory', parent.rawStatus),
+    totalStorage: (parent) => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {

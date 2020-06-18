@@ -54,13 +54,14 @@ const secret3 = {
   },
 };
 
-const bma2 = Object.assign({}, bma1, {
+const bma2 = {
+  ...bma1,
   status: {
     conditions: [
       {
         type: 'condType1',
         status: 'False',
-        // the rest is unused
+      // the rest is unused
       },
       {
         type: 'condType2',
@@ -76,16 +77,16 @@ const bma2 = Object.assign({}, bma1, {
       },
     ],
   },
-});
+};
 
-
-const bma3 = Object.assign({}, bma1, {
+const bma3 = {
+  ...bma1,
   status: {
     conditions: [
       {
         type: 'condType1',
         status: 'True',
-        // the rest is unused
+      // the rest is unused
       },
       {
         type: 'condType2',
@@ -101,13 +102,14 @@ const bma3 = Object.assign({}, bma1, {
       },
     ],
   },
-});
+};
 
-const bma4 = Object.assign({}, bma1, {
+const bma4 = {
+  ...bma1,
   status: {
     condidtons: [],
   },
-});
+};
 
 describe('Bare Metal Asset model', () => {
   test('BMA transform function', () => {

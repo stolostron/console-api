@@ -204,11 +204,13 @@ type ConnectionMetadata {
 
 export const resolver = {
   K8sObject: {
+    // eslint-disable-next-line no-underscore-dangle
     __resolveType() {
       return null;
     },
   },
   ConnectionObject: {
+    // eslint-disable-next-line no-underscore-dangle
     __resolveType() {
       return null;
     },

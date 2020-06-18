@@ -20,7 +20,6 @@ type Namespace implements K8sObject {
 
 export const resolver = {
   Query: {
-    namespaces: (root, args, { resourceViewModel }) =>
-      resourceViewModel.fetchResources({ type: 'namespaces' }),
+    namespaces: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'namespaces' }),
   },
 };

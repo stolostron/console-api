@@ -33,11 +33,11 @@ export default class GenericModel extends KubeModel {
     // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
     if (k8sPaths) {
       const { apiVersion, kind } = resource;
-      const apiPath = k8sPaths.paths.find(path => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         return (async () => {
           const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
-          const resourceType = k8sResourceList.resources.find(item => item.kind === kind);
+          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
           const namespace = _.get(resource, 'metadata.namespace');
           const { name, namespaced } = resourceType;
           if (namespaced && !namespace) {
@@ -85,8 +85,7 @@ export default class GenericModel extends KubeModel {
 
     const k8sPaths = await this.kubeConnector.get('/');
     // get resource end point for each resource
-    const requestPaths = await Promise.all(resources.map(async resource =>
-      this.getResourceEndPoint(resource, k8sPaths)));
+    const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
     if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
       if (requestPaths.length > 0) {
         const resourceIndex = requestPaths.indexOf(undefined);
@@ -97,18 +96,17 @@ export default class GenericModel extends KubeModel {
       return {
         errors: [{ message: 'Cannot find resource path' }],
       };
-    } else if (requestPaths.includes(null)) {
+    } if (requestPaths.includes(null)) {
       return {
         errors: [{ message: 'Namespace not found in the template' }],
       };
     }
 
-    const result = await Promise.all(resources.map((resource, index) =>
-      this.kubeConnector.post(requestPaths[index], resource)
-        .catch(err => ({
-          status: 'Failure',
-          message: err.message,
-        }))));
+    const result = await Promise.all(resources.map((resource, index) => this.kubeConnector.post(requestPaths[index], resource)
+      .catch((err) => ({
+        status: 'Failure',
+        message: err.message,
+      }))));
 
     const errors = [];
     result.forEach((item) => {
@@ -267,7 +265,7 @@ export default class GenericModel extends KubeModel {
       logger.debug('result:', result);
       if (result) {
         this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets/${response.metadata.name}`)
-          .catch(e => logger.error(`Error deleting workset ${response.metadata.name}`, e.message));
+          .catch((e) => logger.error(`Error deleting workset ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
       if (reason) {
@@ -286,7 +284,7 @@ export default class GenericModel extends KubeModel {
     if (clusterName === 'local-cluster') { // TODO: Use flag _hubClusterResource instead of cluster name
       return this.kubeConnector.get(`/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&tailLines=1000`);
     }
-    const cluster = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${clusterName}`);
+    const cluster = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${clusterName}`);
     if (cluster && cluster.length === 1) {
       const clusterNamespace = cluster[0].metadata.namespace;
       return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
@@ -357,7 +355,7 @@ export default class GenericModel extends KubeModel {
       }
       return response;
     }
-    const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
+    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
     const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
     // Else If updating resource on remote cluster use an Action Type Work
@@ -403,7 +401,7 @@ export default class GenericModel extends KubeModel {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
         this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
-          .catch(e => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
+          .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
       if (reason) {
@@ -438,7 +436,7 @@ export default class GenericModel extends KubeModel {
       return response;
     }
 
-    const clusterResponse = await this.kubeConnector.getResources(ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
+    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
     const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
@@ -485,7 +483,7 @@ export default class GenericModel extends KubeModel {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
         this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
-          .catch(e => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
+          .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
       if (reason) {
@@ -506,12 +504,11 @@ export default class GenericModel extends KubeModel {
       return [];
     }
 
-    const result = await Promise.all(resources.map(resource =>
-      this.kubeConnector.delete(resource.selfLink)
-        .catch(err => ({
-          status: 'Failure',
-          message: err.message,
-        }))));
+    const result = await Promise.all(resources.map((resource) => this.kubeConnector.delete(resource.selfLink)
+      .catch((err) => ({
+        status: 'Failure',
+        message: err.message,
+      }))));
 
     const errors = [];
     result.forEach((item) => {

@@ -69,7 +69,6 @@ const formatNode = (clusterName, node) => ({
   status: node.status,
 });
 
-
 const formatNamespace = (clusterName, namespace) => ({
   cluster: clusterName,
   metadata: namespace.metadata,
@@ -97,7 +96,7 @@ export default class ResourceView extends KubeModel {
     const transform = this.transforms[type];
     return Object.keys(results).reduce((accum, clusterName) => {
       const resourceList = response.status.results[clusterName].items;
-      resourceList.map(resource => accum.push(transform(clusterName, resource)));
+      resourceList.map((resource) => accum.push(transform(clusterName, resource)));
 
       return accum;
     }, []);
@@ -120,7 +119,7 @@ export default class ResourceView extends KubeModel {
     const transform = this.transforms[type];
     return Object.keys(results).reduce((accum, cluster) => {
       const resourceList = response.status.results[cluster].items;
-      resourceList.map(resource => accum.push(transform(cluster, resource)));
+      resourceList.map((resource) => accum.push(transform(cluster, resource)));
 
       return accum;
     }, []);

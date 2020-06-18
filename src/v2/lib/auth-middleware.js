@@ -9,12 +9,12 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import lru from 'lru-cache';
+import LRU from 'lru-cache';
 import createMockIAMHTTP from '../mocks/iam-http';
 import request from './request';
 
 // Async middleware error handler
-const asyncMiddleware = fn => (req, res, next) => {
+const asyncMiddleware = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next))
     .catch(next);
 };
@@ -57,7 +57,7 @@ async function getNamespaces(usertoken) {
 }
 
 export default function createAuthMiddleWare({
-  cache = lru({
+  cache = new LRU({
     max: 1000,
     maxAge: 2 * 60 * 1000, // 2 mins. Must keep low because user's permissions can change.
   }),

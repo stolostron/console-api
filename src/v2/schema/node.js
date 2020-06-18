@@ -33,7 +33,7 @@ type Node implements K8sObject {
 
 async function resolveStatus(parent) {
   const { status: { conditions } } = parent;
-  const nodeStatus = conditions.find(cond => (cond.type === 'Ready'));
+  const nodeStatus = conditions.find((cond) => (cond.type === 'Ready'));
   return nodeStatus.status;
 }
 
@@ -52,15 +52,12 @@ async function resolveRoles(parent) {
 
 export const resolver = {
   Query: {
-    nodes: (root, args, { resourceViewModel }) =>
-      resourceViewModel.fetchResources({ type: 'nodes' }),
-    node: (root, args, { resourceViewModel }) =>
-      resourceViewModel.fetchNodeResource('nodes', args.name, args.namespace),
+    nodes: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'nodes' }),
+    node: (root, args, { resourceViewModel }) => resourceViewModel.fetchNodeResource('nodes', args.name, args.namespace),
   },
   Node: {
-    cluster: async (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
-    roles: parent => resolveRoles(parent),
-    status: parent => resolveStatus(parent),
+    cluster: async (parent, args, { clusterModel, req }) => clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+    roles: (parent) => resolveRoles(parent),
+    status: (parent) => resolveStatus(parent),
   },
 };

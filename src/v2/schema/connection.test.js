@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Connection Resolver', () => {
-  test('Correctly Resolves Get Cloud Connections', (done) => {
+  test('Correctly Resolves Get Cloud Connections', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -34,9 +34,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Get Cloud Connection Details', (done) => {
+  test('Correctly Resolves Get Cloud Connection Details', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -54,9 +54,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Cloud Connection', (done) => {
+  test('Correctly Resolves Create Cloud Connection', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -70,9 +70,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Cloud Connection Error', (done) => {
+  test('Correctly Resolves Create Cloud Connection Error', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -86,9 +86,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Edit Cloud Connection', (done) => {
+  test('Correctly Resolves Edit Cloud Connection', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -102,9 +102,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Edit Cloud Connection Error', (done) => {
+  test('Correctly Resolves Edit Cloud Connection Error', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -118,9 +118,9 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Delete Cloud Connection', (done) => {
+  test('Correctly Resolves Delete Cloud Connection', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -134,5 +134,5 @@ describe('Connection Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

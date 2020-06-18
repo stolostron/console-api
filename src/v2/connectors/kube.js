@@ -9,16 +9,15 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import logger from '../lib/logger';
 import { isRequired } from '../lib/utils';
 import config from '../../../config';
 import requestLib from '../lib/request';
 
-
 function selectNamespace(namespaces) {
-  return namespaces.find(ns => ns === 'default') || namespaces[0];
+  return namespaces.find((ns) => ns === 'default') || namespaces[0];
 }
 
 export default class KubeConnector {
@@ -29,7 +28,7 @@ export default class KubeConnector {
     namespaces = isRequired('namespaces'),
     pollTimeout = config.get('hcmPollTimeout'),
     pollInterval = config.get('hcmPollInterval'),
-    uid = uuid,
+    uid = uuidv4,
   } = {}) {
     this.http = httpLib;
     this.kubeApiEndpoint = kubeApiEndpoint;
@@ -82,7 +81,7 @@ export default class KubeConnector {
   doRequest(defaults, opts) {
     const options = _.merge(defaults, opts);
     this.checkUrl(options.url);
-    return this.http(options).then(res => res.body);
+    return this.http(options).then((res) => res.body);
   }
 
   /**
@@ -154,10 +153,11 @@ export default class KubeConnector {
         return [];
       }
 
-      return items.map(item => (kind ? Object.assign({
+      return items.map((item) => (kind ? ({
         apiVersion: response.apiVersion,
         kind,
-      }, item) : item));
+        ...item,
+      }) : item));
     });
 
     return _.flatten(await Promise.all(requests));
@@ -209,50 +209,48 @@ export default class KubeConnector {
   }
 
   timeout() {
-    return new Promise((r, reject) =>
-      setTimeout(reject, this.pollTimeout, new Error('Manager request timed out')));
+    return new Promise((r, reject) => setTimeout(reject, this.pollTimeout, new Error('Manager request timed out')));
   }
 
   pollView(viewLink) {
     let cancel;
 
-    const promise = new Promise(async (resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
       let pendingRequest = false;
-      const intervalID =
-        // eslint-disable-next-line consistent-return
-        setInterval(async () => {
-          if (!pendingRequest) {
-            pendingRequest = true;
-            try {
-              const links = viewLink.split('/');
-              const viewName = links.pop();
-              const link = `${links.join('/')}?fieldSelector=metadata.name=${viewName}`;
+      const intervalID = setInterval(async () => {
+        if (!pendingRequest) {
+          pendingRequest = true;
+          try {
+            const links = viewLink.split('/');
+            const viewName = links.pop();
+            const link = `${links.join('/')}?fieldSelector=metadata.name=${viewName}`;
 
-              logger.debug('start polling: ', new Date(), link);
-              const response = await this.get(link, {}, true);
-              pendingRequest = false;
-              if (response.code || response.message) {
-                clearInterval(intervalID);
-                return reject(response);
-              }
-              // We are looking for the type to be Processing for ManagedClusterView resources
-              // TODO remove the 'Completed' logic when resource view is removed
-              const isComplete = _.get(response, 'items[0].status.conditions[0].type') || _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
-              if (isComplete === 'Processing' || isComplete === 'Completed') {
-                clearInterval(intervalID);
-                logger.debug('start to get resource: ', new Date(), viewLink);
-                const result = await this.get(viewLink, {}, true);
-                if (result.code || result.message) {
-                  return reject(result);
-                }
-                resolve(result);
-              }
-            } catch (err) {
+            logger.debug('start polling: ', new Date(), link);
+            const response = await this.get(link, {}, true);
+            pendingRequest = false;
+            if (response.code || response.message) {
               clearInterval(intervalID);
-              reject(err);
+              return reject(response);
             }
+            // We are looking for the type to be Processing for ManagedClusterView resources
+            // TODO remove the 'Completed' logic when resource view is removed
+            const isComplete = _.get(response, 'items[0].status.conditions[0].type') || _.get(response, 'items[0].status.status') || _.get(response, 'items[0].status.type') || _.get(response, 'items[0].status.conditions[0].type', 'NO');
+            if (isComplete === 'Processing' || isComplete === 'Completed') {
+              clearInterval(intervalID);
+              logger.debug('start to get resource: ', new Date(), viewLink);
+              const result = await this.get(viewLink, {}, true);
+              if (result.code || result.message) {
+                return reject(result);
+              }
+              resolve(result);
+            }
+          } catch (err) {
+            clearInterval(intervalID);
+            reject(err);
           }
-        }, this.pollInterval);
+        }
+        return null;
+      }, this.pollInterval);
 
       cancel = () => {
         clearInterval(intervalID);
@@ -275,7 +273,7 @@ export default class KubeConnector {
       const result = await Promise.race([pollPromise, this.timeout()]);
       if (result) {
         this.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.resourceViewNamespace}/resourceviews/${resource.metadata.name}`)
-          .catch(e => logger.error(`Error deleting resourceviews ${resource.metadata.name}`, e.message));
+          .catch((e) => logger.error(`Error deleting resourceviews ${resource.metadata.name}`, e.message));
       }
       return result;
     } catch (e) {
@@ -323,7 +321,7 @@ export default class KubeConnector {
         return [];
       }
 
-      return items.map(item => item);
+      return items.map((item) => item);
     });
 
     return _.flatten(await Promise.all(requests));
@@ -378,6 +376,6 @@ export default class KubeConnector {
 
   async deleteManagedClusterView(managedClusterNamespace, managedClusterViewName) {
     this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews/${managedClusterViewName}`)
-      .catch(e => logger.error(`Error deleting managed cluster view ${managedClusterViewName}`, e.message));
+      .catch((e) => logger.error(`Error deleting managed cluster view ${managedClusterViewName}`, e.message));
   }
 }

@@ -15,33 +15,41 @@ export function isRequired(paramName) {
 export function getType(item) {
   if (item.spec.hostPath) {
     return 'Hostpath';
-  } else if (item.spec.gcePersistentDisk) {
+  }
+  if (item.spec.gcePersistentDisk) {
     return 'GCEPersistentDisk';
-  } else if (item.spec.awsElasticBlockStore) {
+  }
+  if (item.spec.awsElasticBlockStore) {
     return 'AWSElasticBlockStore';
-  } else if (item.spec.nfs) {
+  }
+  if (item.spec.nfs) {
     return 'NFS';
-  } else if (item.spec.iscsi) {
+  }
+  if (item.spec.iscsi) {
     return 'iSCSI';
-  } else if (item.spec.glusterfs) {
+  }
+  if (item.spec.glusterfs) {
     return 'Glusterfs';
-  } else if (item.spec.rbd) {
+  }
+  if (item.spec.rbd) {
     return 'RBD';
-  } else if (item.spec.secret) {
+  }
+  if (item.spec.secret) {
     return 'Secret';
-  } else if (item.spec.local) {
+  }
+  if (item.spec.local) {
     return 'LocalVolume';
-  } else if (item.spec.vsphereVolume) {
+  }
+  if (item.spec.vsphereVolume) {
     return 'vSphere';
   }
 
   return '-';
 }
 
-
 export function responseHasError(response) {
   const code = response.statusCode || response.code;
-  return (code < 200 || code >= 300);
+  return code < 200 || code >= 300;
 }
 
 export default {};

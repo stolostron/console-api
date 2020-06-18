@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Policy Resolver', () => {
-  test('Correctly Resolves Policy List Query', (done) => {
+  test('Correctly Resolves Policy List Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -35,9 +35,9 @@ describe('Policy Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Single Policy Query', (done) => {
+  test('Correctly Resolves Single Policy Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -119,9 +119,9 @@ describe('Policy Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Policy Mutation', (done) => {
+  test('Correctly Resolves Create Policy Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -224,5 +224,5 @@ describe('Policy Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
