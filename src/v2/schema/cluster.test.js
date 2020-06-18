@@ -133,7 +133,7 @@ describe('Cluster Mutation', () => {
       });
   }));
 
-  test('Create Kubernetes Cluster Resource for Import with No Namespace', (done) => {
+  test('Create Kubernetes Cluster Resource for Import with No Namespace', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -163,9 +163,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Detach Cluster', (done) => {
+  test('Correctly Resolves Detach Cluster', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({

@@ -23,7 +23,7 @@ export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
 export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
 
 export const CSR_LABEL = 'open-cluster-management.io/cluster-name';
-export const CSR_LABEL_SELECTOR = cluster => `labelSelector=${CSR_LABEL}%3D${cluster}`;
+export const CSR_LABEL_SELECTOR = (cluster) => `labelSelector=${CSR_LABEL}%3D${cluster}`;
 
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
@@ -38,11 +38,11 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
   let clusterdeploymentStatus = '';
   if (clusterdeployment) {
     const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-    const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
-    if ((install && install.items && install.items.some(i => i.status.failed > 0))
-    || (uninstall && uninstall.items && install.items.some(i => i.status.failed > 0))) {
+    const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
+    if ((install && install.items && install.items.some((i) => i.status.failed > 0))
+    || (uninstall && uninstall.items && install.items.some((i) => i.status.failed > 0))) {
       clusterdeploymentStatus = 'provisionfailed';
-    } else if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active > 0)) {
+    } else if (uninstall && uninstall.items && uninstall.items.some((i) => i.status.active > 0)) {
       clusterdeploymentStatus = 'destroying';
     } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
       clusterdeploymentStatus = 'detached';
@@ -66,8 +66,8 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
       status = clusterStatus === '' ? 'offline' : clusterStatus.toLowerCase();
     } else {
       const clusterConditions = _.get(cluster, 'status.conditions') || [];
-      const checkForCondition = condition => _.get(
-        clusterConditions.find(c => c.type === condition),
+      const checkForCondition = (condition) => _.get(
+        clusterConditions.find((c) => c.type === condition),
         'status',
       ) === 'True';
       const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
@@ -77,7 +77,7 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
         status = 'notaccepted';
       } else if (!clusterJoined) {
         status = 'pendingimport';
-        if (csrs && csrs.some(c => !_.get(c, 'status.certificate'))) {
+        if (csrs && csrs.some((c) => !_.get(c, 'status.certificate'))) {
           status = 'needsapproval';
         }
       } else {
@@ -87,9 +87,9 @@ function getStatus(cluster, clusterdeployment, csrs, uninstall, install) {
 
     // If cluster is pendingimport/notaccepted/needsapproval import because Hive is
     // installing/uninstalling/failed, show that status instead
-    if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval') &&
-      clusterdeploymentStatus &&
-      clusterdeploymentStatus !== 'detached') {
+    if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval')
+      && clusterdeploymentStatus
+      && clusterdeploymentStatus !== 'detached') {
       return clusterdeploymentStatus;
     }
     return status;
@@ -160,8 +160,8 @@ function findMatchedStatus({
     const masterEndpoint = _.get(managedclusterinfo, 'raw.spec.masterEndpoint');
     const rawServerAddress = _.get(cluster, 'raw.spec.kubernetesApiEndpoints.serverEndpoints[0].serverAddress');
     const serverAddress = apiURL || (masterEndpoint || rawServerAddress ? `https://${masterEndpoint || rawServerAddress}` : null);
-    const nodeCount = _.get(clusterstatus, 'raw.spec.capacity.nodes') ||
-    (_.get(managedclusterinfo, 'raw.status.nodeList') || []).length;
+    const nodeCount = _.get(clusterstatus, 'raw.spec.capacity.nodes')
+    || (_.get(managedclusterinfo, 'raw.status.nodeList') || []).length;
     const data = {
       metadata,
       nodes: nodeCount > 0 ? nodeCount : null,
@@ -483,7 +483,7 @@ export default class ClusterModel extends KubeModel {
         // last but not least, if everything else deployed, deploy ClusterDeployment
         // if that fails--user can press create again and not get a "Already Exists" message
         const deployment = await this.kubeConnector.post(clusterRequestPath, clusterResource)
-          .catch(err => ({
+          .catch((err) => ({
             status: 'Failure',
             message: err.message,
           }));
@@ -561,8 +561,8 @@ export default class ClusterModel extends KubeModel {
     const allClusters = [...clusters, ...managedclusters];
     const names = allClusters.filter((cluster) => getStatus(cluster) === 'ok').map((c) => c.metadata.name);
     // For clusterstatuses, query only namespaces that have clusters
-    const namespaces = Array.from(new Set(allClusters.filter(c => c.metadata)
-      .map(c => c.metadata.namespace || c.metadata.name)));
+    const namespaces = Array.from(new Set(allClusters.filter((c) => c.metadata)
+      .map((c) => c.metadata.namespace || c.metadata.name)));
     const [clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.getResources(
         (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
