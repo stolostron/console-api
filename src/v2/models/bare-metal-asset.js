@@ -127,15 +127,15 @@ export default class BareMetalAssetModel extends KubeModel {
     }
 
     // make sure all hosts have a user/password
-    hosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
-    if (hosts.length > 0) {
+    const filteredHosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
+    if (filteredHosts.length > 0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
       const secretMap = _.keyBy(secrets, (secret) => {
         const name = _.get(secret, 'metadata.ownerReferences[0].name');
         const namespace = _.get(secret, 'metadata.namespace');
         return `${name}-${namespace}`;
       });
-      hosts.forEach((host) => {
+      filteredHosts.forEach((host) => {
         const { name, namespace } = host;
         const secret = secretMap[`${name}-${namespace}`];
         if (secret) {
