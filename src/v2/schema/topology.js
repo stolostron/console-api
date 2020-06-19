@@ -6,6 +6,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import { gql } from 'apollo-server-express';
@@ -67,8 +68,7 @@ export const resolver = {
       const { name, namespace, channel } = filter.application[0];
       const application = await applicationModel.getApplication(name, namespace, channel);
       if (application) {
-        ({ resources, relationships } =
-          await getApplicationElements(application, clusterModel));
+        ({ resources, relationships } = await getApplicationElements(application, clusterModel));
       }
       return { resources, relationships };
     },

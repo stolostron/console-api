@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import { mockServer } from 'graphql-tools';
@@ -19,4 +20,3 @@ describe('Schema', () => {
     expect(result.data.__schema.types).toBeInstanceOf(Array);
   });
 });
-

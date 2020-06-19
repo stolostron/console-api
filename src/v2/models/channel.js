@@ -29,7 +29,7 @@ export default class ChannelModel extends KubeModel {
       if (channelKinds[resource.kind] === 'channels') {
         return this.kubeConnector
           .post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/channels`, resource)
-          .catch(err => ({
+          .catch((err) => ({
             status: 'Failure',
             message: err.message,
           }));
@@ -40,7 +40,7 @@ export default class ChannelModel extends KubeModel {
           `/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${channelKinds[resource.kind]}`,
           resource,
         )
-        .catch(err => ({
+        .catch((err) => ({
           status: 'Failure',
           message: err.message,
         }));
@@ -63,14 +63,14 @@ export default class ChannelModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
     }
     chs = await Promise.all(chs);
-    return chs.map(channel => ({
+    return chs.map((channel) => ({
       metadata: channel.metadata,
       channelWorkNames: channel.channelWorkNames,
     }));
@@ -80,11 +80,11 @@ export default class ChannelModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
     }
     return chs.map(async (channel) => {
       const { spec } = channel;

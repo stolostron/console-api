@@ -533,7 +533,6 @@ export const mockCreatePolicy = {
   },
 };
 
-
 export const mockPlacementPolicyResponse = {
   body: {
     kind: 'PlacementPolicyList',

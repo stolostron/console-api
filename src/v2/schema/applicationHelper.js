@@ -5,6 +5,7 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
@@ -98,7 +99,6 @@ const getClusterName = (nodeId) => {
   return nodeId.slice(startPos, endPos);
 };
 
-
 export const createReplicaChild = (parentObject, template, links, nodes) => {
   if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
     return null; // no replica
@@ -123,7 +123,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     },
     spec: {
       desired: _.get(template, 'spec.replicas', 0),
-      template: Object.assign({}, _.get(template, 'spec.template', {})),
+      template: { ..._.get(template, 'spec.template', {}) },
     },
   };
   const deployableObj = {
@@ -159,20 +159,22 @@ export const addSubscriptionDeployable = (
 ) => {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
-  const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
 
+  const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
   // installs these K8 objects
   const deployStatuses = [];
-  names.forEach((cname) => {
-    const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
-    if (status) {
-      deployStatuses.push(status);
-    }
-  });
+  if (names) {
+    names.forEach((cname) => {
+      const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
+      if (status) {
+        deployStatuses.push(status);
+      }
+    });
+  }
 
-  const parentNode = nodes.find(n => n.id === parentId);
-  const parentObject = parentNode ?
-    {
+  const parentNode = nodes.find((n) => n.id === parentId);
+  const parentObject = parentNode
+    ? {
       parentId,
       parentName: parentNode.name,
       parentType: parentNode.type,
@@ -184,8 +186,7 @@ export const addSubscriptionDeployable = (
   kind = kind.toLowerCase();
   const memberId = `member--${deployableId}--${kind}--${k8Name}`;
 
-  const topoObject =
-  {
+  const topoObject = {
     name: k8Name,
     namespace: appNamespace,
     type: kind,
@@ -269,8 +270,8 @@ export const processServices = (
 };
 
 export const processDeployables = (
-  deployables
-  , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+  deployables,
+  clusterId, links, nodes, subscriptionStatusMap, names, namespace,
 ) => {
   const routes = _.filter(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
@@ -309,8 +310,8 @@ export const processDeployables = (
 };
 
 export const createGenericPackageObject = (
-  parentId, appNamespace
-  , nodes, links, subscriptionName,
+  parentId, appNamespace,
+  nodes, links, subscriptionName,
 ) => {
   const packageName = `Package-${subscriptionName}`;
   const memberId = `member--package--${packageName}`;
@@ -343,10 +344,66 @@ export const createGenericPackageObject = (
   return packageObj;
 };
 
+export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => {
+  const deployablesList = [];
+
+  const deployables = _.split(topoAnnotation, ',');
+
+  deployables.forEach((deployableInfo) => {
+    const deployableData = _.split(deployableInfo, '/');
+
+    const deployableTypeLower = _.toLower(deployableData[0]);
+    const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${deployableData[2]}-${deployableTypeLower}`;
+    const version = 'apps.open-cluster-management.io/v1';
+    if (deployableData && deployableData.length === 4) {
+      const hasReplica = deployableData[3] !== '0';
+      const deployable = {
+        apiVersion: version,
+        kind: 'Deployable',
+        metadata: {
+          namespace: deployableData[1],
+          name: deployableName,
+          selfLink: `/apis/${version}/namespaces/${deployableData[1]}/deployables/${deployableData[2]}-${deployableTypeLower}`,
+        },
+        spec: {
+          template: {
+            apiVersion: 'apps/v1',
+            kind: deployableData[0],
+            metadata: {
+              namespace: deployableData[1],
+              name: deployableData[2],
+            },
+            spec: {
+            },
+          },
+        },
+      };
+
+      if (hasReplica) {
+        deployable.spec.template.spec.replicas = _.parseInt(deployableData[3]);
+      }
+
+      deployablesList.push(deployable);
+    }
+  });
+
+  return deployablesList;
+};
+
 export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
-  nodes, links, appNamespace, channelInfo, subscriptionName,
+  nodes, links, names, appNamespace, channelInfo, subscriptionName,
+  topoAnnotation,
 ) => {
+  if (topoAnnotation) {
+    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName);
+    processDeployables(
+      deployablesFromTopo,
+      parentId, links, nodes, subscriptionStatusMap, names, appNamespace,
+    );
+    return nodes;
+  }
+
   let channelName = null;
   if (channelInfo) {
     const splitIndex = _.indexOf(channelInfo, '/');
@@ -358,7 +415,7 @@ export const addSubscriptionCharts = (
 
   if (!channelName) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
-    return null; // could not find the subscription channel name, abort
+    return nodes; // could not find the subscription channel name, abort
   }
 
   let foundDeployables = false;
@@ -387,7 +444,7 @@ export const addSubscriptionCharts = (
                 namespace: appNamespace,
                 type: objectType.toLowerCase(),
                 specs: {
-                  isDesign: true,
+                  isDesign: false,
                   raw: {
                     kind: objectType,
                     metadata: {
@@ -446,7 +503,6 @@ async function getApplicationElements(application, clusterModel) {
     },
   });
 
-
   // get clusters labels
   const labelMap = [];
   const clusters = await clusterModel.getAllClusters();
@@ -459,7 +515,6 @@ async function getApplicationElements(application, clusterModel) {
     });
   });
 
-
   // if application has subscriptions
   let memberId;
   let parentId;
@@ -469,6 +524,7 @@ async function getApplicationElements(application, clusterModel) {
     application.subscriptions.forEach((subscription) => {
       const subscriptionChannel = _.get(subscription, 'spec.channel');
       const subscriptionName = _.get(subscription, 'metadata.name', '');
+      const topoAnnotation = _.get(subscription, 'metadata.annotations', {})['apps.open-cluster-management.io/topo'];
       // get cluster placement if any
       const ruleDecisionMap = {};
       if (subscription.rules) {
@@ -509,8 +565,8 @@ async function getApplicationElements(application, clusterModel) {
       // add cluster(s) if any
       if (isRulePlaced) {
         // add cluster(s) if any or if too many
-        const clusterShapes = ruleClusterNames.length > 1 ?
-          [ruleClusterNames] : ruleClusterNames.map(cn => [cn]);
+        const clusterShapes = ruleClusterNames.length > 1
+          ? [ruleClusterNames] : ruleClusterNames.map((cn) => [cn]);
         clusterShapes.forEach((names) => {
           // add cluster element
           clusterId = addClusters(
@@ -521,24 +577,24 @@ async function getApplicationElements(application, clusterModel) {
           // add deployables if any
           if (subscription.deployables) {
             processDeployables(
-              subscription.deployables
-              , clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+              subscription.deployables,
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace,
             );
           } else if (isSubscriptionPlaced) {
           // else add charts which does deployment
             addSubscriptionCharts(
-              clusterId, subscriptionStatusMap, nodes
-              , links, namespace, subscriptionChannel, subscriptionName,
+              clusterId, subscriptionStatusMap, nodes,
+              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
             );
           }
         });
       }
 
-      // no deployables was placed on a clutser but there were subscription decisions
+      // no deployables was placed on a cluster but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
-          parentId, subscriptionStatusMap, nodes
-          , links, namespace, subscriptionChannel, subscriptionName,
+          parentId, subscriptionStatusMap, nodes,
+          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
         );
       }
       delete subscription.deployables;

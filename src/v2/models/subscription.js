@@ -11,8 +11,7 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 
-
-const mapSubscription = subscription => ({
+const mapSubscription = (subscription) => ({
   metadata: subscription.metadata,
   subscriptionWorkNames: subscription.metadata.name || '',
   namespace: subscription.metadata.namespace,
@@ -44,7 +43,7 @@ export default class SubscriptionModel extends KubeModel {
       if (subscriptionKinds[resource.kind] === 'subscriptions') {
         return this.kubeConnector
           .post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/subscriptions`, resource)
-          .catch(err => ({
+          .catch((err) => ({
             status: 'Failure',
             message: err.message,
           }));
@@ -55,7 +54,7 @@ export default class SubscriptionModel extends KubeModel {
           `/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/${subscriptionKinds[resource.kind]}`,
           resource,
         )
-        .catch(err => ({
+        .catch((err) => ({
           status: 'Failure',
           message: err.message,
         }));
@@ -78,14 +77,14 @@ export default class SubscriptionModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
     }
     chs = await Promise.all(chs);
-    return chs.map(subscription => ({
+    return chs.map((subscription) => ({
       metadata: subscription.metadata,
       subscriptionWorkNames: subscription.subscriptionWorkNames,
     }));
@@ -95,28 +94,28 @@ export default class SubscriptionModel extends KubeModel {
     let chs;
     if (name) {
       chs = await this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
       );
     } else {
-      chs = await this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
     }
     return chs.map(mapSubscription);
   }
 
   async getSubscriptionsForCluster(clusterName, clusterNamespace) {
     const [chs, deployables] = await Promise.all([
-      this.kubeConnector.getResources(ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`),
+      this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`),
       this.kubeConnector.getResources(
-        ns => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
         { namespaces: [clusterNamespace] },
       ),
     ]);
     // Return only subscriptions that have a corresponding deployable in the cluster namespace
-    return chs.filter(subscription => !!deployables.find(deployable => _.get(deployable, 'spec.template.kind') === 'Subscription' &&
-          _.get(deployable, 'metadata.annotations["apps.open-cluster-management.io/managed-cluster"]') === `${clusterNamespace}/${clusterName}` &&
-          _.get(deployable, 'spec.template.metadata.annotations["apps.open-cluster-management.io/hosting-subscription"]') ===
-            `${subscription.metadata.namespace}/${subscription.metadata.name}`))
+    return chs.filter((subscription) => !!deployables.find((deployable) => _.get(deployable, 'spec.template.kind') === 'Subscription'
+          && _.get(deployable, 'metadata.annotations["apps.open-cluster-management.io/managed-cluster"]') === `${clusterNamespace}/${clusterName}`
+          && _.get(deployable, 'spec.template.metadata.annotations["apps.open-cluster-management.io/hosting-subscription"]')
+            === `${subscription.metadata.namespace}/${subscription.metadata.name}`))
       .map(mapSubscription);
   }
 }

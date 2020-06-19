@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Pods Resolver', () => {
-  test('Correctly Resolves Pods Query', (done) => {
+  test('Correctly Resolves Pods Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -45,9 +45,9 @@ describe('Pods Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Pod log query', (done) => {
+  test('Correctly Resolves Pod log query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -61,5 +61,5 @@ describe('Pods Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });

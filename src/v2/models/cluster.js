@@ -17,8 +17,8 @@ export const HIVE_DOMAIN = 'hive.openshift.io';
 export const UNINSTALL_LABEL = `${HIVE_DOMAIN}/uninstall`;
 export const INSTALL_LABEL = `${HIVE_DOMAIN}/install`;
 export const CLUSTER_LABEL = `${HIVE_DOMAIN}/cluster-deployment-name`;
-export const UNINSTALL_LABEL_SELECTOR = cluster => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
-export const INSTALL_LABEL_SELECTOR = cluster => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
+export const UNINSTALL_LABEL_SELECTOR = (cluster) => `labelSelector=${UNINSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
+export const INSTALL_LABEL_SELECTOR = (cluster) => `labelSelector=${INSTALL_LABEL}%3Dtrue%2C${CLUSTER_LABEL}%3D${cluster}`;
 
 export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
 export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedcluster`;
@@ -36,10 +36,10 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
   let clusterdeploymentStatus = '';
   if (clusterdeployment) {
     const conditions = _.get(clusterdeployment, 'status.clusterVersionStatus.conditions');
-    const conditionIndex = _.findIndex(conditions, c => c.type === 'Available');
-    if (uninstall && uninstall.items && uninstall.items.some(i => i.status.active === 1)) {
+    const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
+    if (uninstall && uninstall.items && uninstall.items.some((i) => i.status.active === 1)) {
       clusterdeploymentStatus = 'destroying';
-    } else if (install && install.items && install.items.some(i => i.status.active === 1)) {
+    } else if (install && install.items && install.items.some((i) => i.status.active === 1)) {
       clusterdeploymentStatus = 'creating';
     } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
       clusterdeploymentStatus = 'detached';
@@ -61,9 +61,9 @@ function getStatus(cluster, clusterdeployment, uninstall, install) {
 
     // If cluster is pending import because Hive is installing or uninstalling,
     // show that status instead
-    if (status === 'pending' &&
-      clusterdeploymentStatus &&
-      clusterdeploymentStatus !== 'detached') {
+    if (status === 'pending'
+      && clusterdeploymentStatus
+      && clusterdeploymentStatus !== 'detached') {
       return clusterdeploymentStatus;
     }
     return status;
@@ -124,9 +124,8 @@ function findMatchedStatus({
     const clusterstatus = clusterStatusMap.get(c);
     const clusterdeployment = clusterDeploymentMap.get(c);
     const managedclusterinfo = managedClusterInfoMap.get(c);
-    const metadata =
-      _.get(managedcluster || cluster, 'metadata') ||
-      _.pick(_.get(managedclusterinfo || clusterdeployment, 'metadata'), ['name', 'namespace']);
+    const metadata = _.get(managedcluster || cluster, 'metadata')
+      || _.pick(_.get(managedclusterinfo || clusterdeployment, 'metadata'), ['name', 'namespace']);
     if (!metadata.namespace) {
       metadata.namespace = _.get(managedclusterinfo || clusterdeployment, 'metadata.namespace');
     }
@@ -156,17 +155,17 @@ function findMatchedStatus({
       k8sVersion: _.get(clusterstatus, 'raw.spec.version', '-'),
       serverAddress,
       isHive: !!clusterdeployment,
-      isManaged: managedcluster || !!cluster,
+      isManaged: !!(managedcluster || cluster),
     };
     if (clusterversion) {
       const availableUpdates = _.get(clusterversion, 'status.availableUpdates', []);
-      data.availableVersions = availableUpdates ? availableUpdates.map(u => u.version) : [];
+      data.availableVersions = availableUpdates ? availableUpdates.map((u) => u.version) : [];
       data.desiredVersion = _.get(clusterversion, 'status.desired.version');
       const versionHistory = _.get(clusterversion, 'status.history', []);
-      const completedVersion = versionHistory ? versionHistory.filter(h => h.state === 'Completed')[0] : null;
+      const completedVersion = versionHistory ? versionHistory.filter((h) => h.state === 'Completed')[0] : null;
       data.distributionVersion = completedVersion ? completedVersion.version : null;
       const conditions = _.get(clusterversion, 'status.conditions', []);
-      data.upgradeFailed = conditions ? conditions.filter(cond => cond.type === 'Failing')[0].status === 'True' : false;
+      data.upgradeFailed = conditions ? conditions.filter((cond) => cond.type === 'Failing')[0].status === 'True' : false;
     }
     resultMap.set(c, data);
   });
@@ -332,11 +331,9 @@ export default class ClusterModel extends KubeModel {
       return { errors };
     }
 
-
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/');
-    const requestPaths = await Promise.all(resources.map(async resource =>
-      this.getResourceEndPoint(resource, k8sPaths)));
+    const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
     if (requestPaths.length > 0) {
       const missingTypes = [];
       const missingEndPoints = [];
@@ -376,19 +373,18 @@ export default class ClusterModel extends KubeModel {
     });
 
     // try to create resources
-    const result = await Promise.all(resources.map((resource, index) =>
-      this.kubeConnector.post(requestPaths[index], resource)
-        .catch(err => ({
-          status: 'Failure',
-          message: err.message,
-        }))));
+    const result = await Promise.all(resources.map((resource, index) => this.kubeConnector.post(requestPaths[index], resource)
+      .catch((err) => ({
+        status: 'Failure',
+        message: err.message,
+      }))));
     const updates = [];
     result.filter((item, index) => {
       if (!responseHasError(item)) {
         const { kind, metadata = {} } = item;
         created.push({ name: metadata.name, kind });
         return false;
-      } else if (item.code === 409) {
+      } if (item.code === 409) {
         // filter out "already existing" errors
         updates.push({
           requestPath: requestPaths[index],
@@ -437,7 +433,7 @@ export default class ClusterModel extends KubeModel {
     // if that fails--user can press create again and not get a "Already Exists" message
     if (errors.length === 0) {
       const deployment = await this.kubeConnector.post(clusterRequestPath, clusterResource)
-        .catch(err => ({
+        .catch((err) => ({
           status: 'Failure',
           message: err.message,
         }));
@@ -458,11 +454,11 @@ export default class ClusterModel extends KubeModel {
     // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
     if (k8sPaths) {
       const { apiVersion, kind } = resource;
-      const apiPath = k8sPaths.paths.find(path => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         return (async () => {
           const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
-          const resourceType = k8sResourceList.resources.find(item => item.kind === kind);
+          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
           const namespace = _.get(resource, 'metadata.namespace');
           const { name, namespaced } = resourceType;
           if (namespaced && !namespace) {
@@ -479,7 +475,7 @@ export default class ClusterModel extends KubeModel {
   async getClusterResources() {
     // Try cluster scope queries, falling back to per-cluster-namespace
     const rbacFallbackQuery = (clusterQuery, namespaceQueryFunction) => (
-      this.kubeConnector.get(clusterQuery).then(allItems => (allItems.items
+      this.kubeConnector.get(clusterQuery).then((allItems) => (allItems.items
         ? allItems.items
         : this.kubeConnector.getResources(
           namespaceQueryFunction,
@@ -490,33 +486,33 @@ export default class ClusterModel extends KubeModel {
     const [clusters, managedclusters, clusterdeployments, managedclusterinfos] = await Promise.all([
       rbacFallbackQuery(
         '/apis/clusterregistry.k8s.io/v1alpha1/clusters',
-        ns => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
+        (ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters`,
       ),
       rbacFallbackQuery(
         '/apis/cluster.open-cluster-management.io/v1/managedclusters',
-        ns => `/apis/cluster.open-cluster-management.io/v1/managedclusters/${ns}`,
+        (ns) => `/apis/cluster.open-cluster-management.io/v1/managedclusters/${ns}`,
       ),
       rbacFallbackQuery(
         '/apis/hive.openshift.io/v1/clusterdeployments',
-        ns => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
+        (ns) => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
       ),
       rbacFallbackQuery(
         '/apis/internal.open-cluster-management.io/v1beta1/managedclusterinfos',
-        ns => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`,
+        (ns) => `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${ns}/managedclusterinfos`,
       ),
     ]);
 
     // For clusterversions, query only clusters that are online
     const allClusters = [...clusters, ...managedclusters];
-    const names = allClusters.filter(cluster => getStatus(cluster) === 'ok').map(c => c.metadata.name);
+    const names = allClusters.filter((cluster) => getStatus(cluster) === 'ok').map((c) => c.metadata.name);
     // For clusterstatuses, query only namespaces that have clusters
-    const namespaces = Array.from(new Set(allClusters.map(c => c.metadata.namespace)));
+    const namespaces = Array.from(new Set(allClusters.map((c) => c.metadata.namespace)));
     const [clusterstatuses, ...clusterversions] = await Promise.all([
       this.kubeConnector.getResources(
-        ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
+        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`,
         { namespaces },
       ),
-      ...names.map(n => this.kubeConnector.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
+      ...names.map((n) => this.kubeConnector.resourceViewQuery('clusterversions', n, 'version', null, 'config.openshift.io').catch(() => null)),
     ]);
     return {
       clusters,
@@ -537,8 +533,7 @@ export default class ClusterModel extends KubeModel {
       clusterdeployment,
       managedclusterinfo,
       ...clusterversions
-    ] =
-    await Promise.all([
+    ] = await Promise.all([
       this.kubeConnector.get(`/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${namespace}/clusters/${name}`),
       this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
       this.kubeConnector.get(`/apis/mcm.ibm.com/v1alpha1/namespaces/${namespace}/clusterstatuses/${name}`),
@@ -546,15 +541,14 @@ export default class ClusterModel extends KubeModel {
       this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${namespace}/managedclusterinfos/${name}`),
       this.kubeConnector.resourceViewQuery('clusterversions', name, 'version', null, 'config.openshift.io').catch(() => null),
     ]);
-    const [result] =
-      findMatchedStatus({
-        clusters: [cluster],
-        managedclusters: [managedcluster],
-        clusterstatuses: [clusterstatus],
-        clusterdeployments: [clusterdeployment],
-        managedclusterinfos: [managedclusterinfo],
-        clusterversions,
-      });
+    const [result] = findMatchedStatus({
+      clusters: [cluster],
+      managedclusters: [managedcluster],
+      clusterstatuses: [clusterstatus],
+      clusterdeployments: [clusterdeployment],
+      managedclusterinfos: [managedclusterinfo],
+      clusterversions,
+    });
     const clusterDeploymentSecrets = getClusterDeploymentSecrets(clusterdeployment);
 
     return [{ ...result, ...clusterDeploymentSecrets }];
@@ -564,7 +558,7 @@ export default class ClusterModel extends KubeModel {
     const resources = await this.getClusterResources();
     const results = findMatchedStatus(resources);
     if (args.name) {
-      return results.filter(c => c.metadata.name === args.name)[0];
+      return results.filter((c) => c.metadata.name === args.name)[0];
     }
     return results;
   }
@@ -573,7 +567,7 @@ export default class ClusterModel extends KubeModel {
     const resources = await this.getClusterResources();
     const results = findMatchedStatusForOverview(resources);
     if (args.name) {
-      return results.filter(c => c.metadata.name === args.name)[0];
+      return results.filter((c) => c.metadata.name === args.name)[0];
     }
     return results;
   }
@@ -598,7 +592,7 @@ export default class ClusterModel extends KubeModel {
   async getStatus(resource) {
     const { metadata: { name, namespace } } = resource;
     const nullIfNotFound = (query, kind) => (
-      query.then(response => (_.get(response, 'kind') === kind ? response : null))
+      query.then((response) => (_.get(response, 'kind') === kind ? response : null))
     );
     const [managedcluster, cluster, clusterdeployment] = await Promise.all([
       nullIfNotFound(
@@ -630,7 +624,7 @@ export default class ClusterModel extends KubeModel {
   }
 
   async getClusterStatus() {
-    const clusterstatuses = await this.kubeConnector.getResources(ns => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
+    const clusterstatuses = await this.kubeConnector.getResources((ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/clusterstatuses`);
 
     return clusterstatuses.reduce((accum, cluster) => {
       if (!cluster) {
@@ -670,20 +664,19 @@ export default class ClusterModel extends KubeModel {
       if (machinePoolsResponse.kind === 'Status') {
         return machinePoolsResponse.code;
       }
-      const machinePoolsToDelete = (machinePoolsResponse.items &&
-        machinePoolsResponse.items
-          .filter(item => _.get(item, 'spec.clusterDeploymentRef.name') === cluster)
-          .map(item => _.get(item, 'metadata.selfLink'))) || [];
+      const machinePoolsToDelete = (machinePoolsResponse.items
+        && machinePoolsResponse.items
+          .filter((item) => _.get(item, 'spec.clusterDeploymentRef.name') === cluster)
+          .map((item) => _.get(item, 'metadata.selfLink'))) || [];
 
       // Create full list of resources to delete
       const resourcesToDelete = [
         clusterDeployment,
         ...machinePoolsToDelete,
       ];
-      const destroyResponses =
-        await Promise.all(resourcesToDelete.map(link => this.kubeConnector.delete(link)));
+      const destroyResponses = await Promise.all(resourcesToDelete.map((link) => this.kubeConnector.delete(link)));
       // MachinePool deletion returns a Status with status==='Success'
-      const failedResponse = destroyResponses.find(dr => dr.kind === 'Status' && dr.status !== 'Success');
+      const failedResponse = destroyResponses.find((dr) => dr.kind === 'Status' && dr.status !== 'Success');
       if (failedResponse) {
         return failedResponse.code;
       }

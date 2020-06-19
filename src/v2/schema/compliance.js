@@ -83,22 +83,18 @@ type CompliancePolicy implements K8sObject {
 
 export const resolver = {
   Query: {
-    compliances: (root, args, { complianceModel }) =>
-      complianceModel.getCompliances(args.name, args.namespace),
+    compliances: (root, args, { complianceModel }) => complianceModel.getCompliances(args.name, args.namespace),
   },
   Compliance: {
-    compliancePolicies: parent => ComplianceModel.resolveCompliancePolicies(parent),
-    compliancePolicy: parent => ComplianceModel.resolveCompliancePolicy(parent),
-    complianceStatus: parent => ComplianceModel.resolveComplianceStatus(parent),
-    policyCompliant: parent => ComplianceModel.resolvePolicyCompliant(parent),
-    clusterCompliant: parent => ComplianceModel.resolveClusterCompliant(parent),
-    placementPolicies: (/* parent, args, { complianceModel } */) =>
-      [], // complianceModel.getPlacementPolicies(parent),
-    placementBindings: (/* parent, args, { complianceModel } */) =>
-      [], // complianceModel.getPlacementBindings(parent),
+    compliancePolicies: (parent) => ComplianceModel.resolveCompliancePolicies(parent),
+    compliancePolicy: (parent) => ComplianceModel.resolveCompliancePolicy(parent),
+    complianceStatus: (parent) => ComplianceModel.resolveComplianceStatus(parent),
+    policyCompliant: (parent) => ComplianceModel.resolvePolicyCompliant(parent),
+    clusterCompliant: (parent) => ComplianceModel.resolveClusterCompliant(parent),
+    placementPolicies: (/* parent, args, { complianceModel } */) => [], // complianceModel.getPlacementPolicies(parent),
+    placementBindings: (/* parent, args, { complianceModel } */) => [], // complianceModel.getPlacementBindings(parent),
   },
   Mutation: {
-    createCompliance: (root, args, { complianceModel }) =>
-      complianceModel.createCompliance(args.resources),
+    createCompliance: (root, args, { complianceModel }) => complianceModel.createCompliance(args.resources),
   },
 };

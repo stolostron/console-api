@@ -9,8 +9,7 @@ const MAX_PARALLEL_REQUESTS = 5;
 
 export function transform(bareMetalAsset, secrets = []) {
   const { metadata, spec, status } = bareMetalAsset;
-  const secret = secrets.find(s =>
-    s.metadata.name === spec.bmc.credentialsName && s.metadata.namespace === metadata.namespace);
+  const secret = secrets.find((s) => s.metadata.name === spec.bmc.credentialsName && s.metadata.namespace === metadata.namespace);
   const username = secret && secret.data ? secret.data.username : undefined;
   const password = secret && secret.data ? secret.data.password : undefined;
 
@@ -27,7 +26,7 @@ export function transform(bareMetalAsset, secrets = []) {
   // https://github.com/open-cluster-management/multicluster-inventory/blob/master/pkg/controller/baremetalasset/baremetalasset_controller.go
   const allConditions = _.get(status, 'conditions', []);
   if (allConditions.length > 0) {
-    const failingConditions = allConditions.filter(c => c.status === 'False');
+    const failingConditions = allConditions.filter((c) => c.status === 'False');
     if (failingConditions.length > 0) {
       // one or more conditions are not met, report the first one
       bma.status = failingConditions[0].type;
@@ -67,7 +66,7 @@ export default class BareMetalAssetModel extends KubeModel {
     const { name } = args;
     const allBareMetalAssets = await this.getAllBareMetalAssets(args);
     if (name) {
-      return allBareMetalAssets.find(bma => bma.metadata.name === name);
+      return allBareMetalAssets.find((bma) => bma.metadata.name === name);
     }
     return allBareMetalAssets;
   }
@@ -75,16 +74,16 @@ export default class BareMetalAssetModel extends KubeModel {
   async getAllBareMetalAssets({ fetchSecrets }) {
     const [bareMetalAssets, secrets] = await Promise.all([
       this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets')
-        .then(allBMAs => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources(ns => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))),
+        .then((allBMAs) => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources((ns) => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))),
       fetchSecrets
-        ? this.kubeConnector.get('/api/v1/secrets').then(allSecrets => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources(ns => `/api/v1/namespaces/${ns}/secrets`)))
+        ? this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)))
         : Promise.resolve({ items: [] }),
     ]);
 
     const BMAs = bareMetalAssets.items || bareMetalAssets || [];
     const k8sSecrets = secrets.items || secrets || [];
     if (BMAs.length > 0) {
-      return BMAs.map(bma => transform(bma, k8sSecrets));
+      return BMAs.map((bma) => transform(bma, k8sSecrets));
     }
     if (_.isArray(bareMetalAssets.paths)) {
       // missing BMA CRD
@@ -96,14 +95,69 @@ export default class BareMetalAssetModel extends KubeModel {
     return [];
   }
 
+  async syncBMAs(hosts) {
+    // make sure all hosts have a bare metal asset
+    const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets');
+    const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
+      const name = _.get(item, 'metadata.name');
+      const namespace = _.get(item, 'metadata.namespace');
+      return `${name}-${namespace}`;
+    });
+    const newAssets = [];
+    hosts.forEach((host) => {
+      const { name, namespace } = host;
+      if (!assetsMap[`${name}-${namespace}`]) {
+        newAssets.push(host);
+      }
+    });
+    if (newAssets.length > 0) {
+      await Promise.all(newAssets.map((asset) => {
+        const {
+          name, namespace, bmc: { address, username, password }, bootMACAddress,
+        } = asset;
+        return this.createBareMetalAsset({
+          name,
+          namespace,
+          bmcAddress: address,
+          username,
+          password,
+          bootMac: bootMACAddress,
+        });
+      }));
+    }
+
+    // make sure all hosts have a user/password
+    const filteredHosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
+    if (filteredHosts.length > 0) {
+      const secrets = await this.kubeConnector.get('/api/v1/secrets')
+        .then((allSecrets) => (allSecrets.items ? allSecrets.items
+          : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
+      const secretMap = _.keyBy(secrets, (secret) => {
+        const name = _.get(secret, 'metadata.ownerReferences[0].name');
+        const namespace = _.get(secret, 'metadata.namespace');
+        return `${name}-${namespace}`;
+      });
+      filteredHosts.forEach((host) => {
+        const { name, namespace } = host;
+        const secret = secretMap[`${name}-${namespace}`];
+        if (secret) {
+          const { data = {} } = secret;
+          const { username, password } = data;
+          _.set(host, 'bmc.username', username ? Buffer.from(username, 'base64').toString('ascii') : undefined);
+          _.set(host, 'bmc.password', password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
+        }
+      });
+    }
+  }
+
   async getBareMetalAssetSubresources(args = {}) {
     const [namespaces, bareMetalAsset] = await Promise.all([
       this.kubeConnector.get('/apis/project.openshift.io/v1/projects'),
       this.getSingleBareMetalAsset(args),
     ]);
     return {
-      namespaces: namespaces.items ?
-        namespaces.items.map(transformNamespaces)
+      namespaces: namespaces.items
+        ? namespaces.items.map(transformNamespaces)
         : { error: namespaces },
       bareMetalAsset,
     };
@@ -179,13 +233,14 @@ export default class BareMetalAssetModel extends KubeModel {
   }
 
   async patchBMA(oldSpec, namespace, name, address, credentialsName, bootMACAddress) {
-    const newSpec = Object.assign({}, oldSpec, {
+    const newSpec = {
+      ...oldSpec,
       bmc: {
         address,
         credentialsName,
       },
       bootMACAddress,
-    });
+    };
     const bmaBody = {
       body: [
         {
@@ -322,7 +377,7 @@ export default class BareMetalAssetModel extends KubeModel {
       for (let i = 0; i < chunks.length; i += 1) {
         const chunk = chunks[i];
         // eslint-disable-next-line no-await-in-loop
-        const results = await Promise.all(chunk.map(url => this.kubeConnector.delete(url)));
+        const results = await Promise.all(chunk.map((url) => this.kubeConnector.delete(url)));
         results.forEach((result) => {
           if (result.code) {
             errors.push({ statusCode: result.code, message: result.message });
@@ -348,7 +403,6 @@ export default class BareMetalAssetModel extends KubeModel {
     }
   }
 
-
   async attachBMAs(hosts, clusterName, errors) {
     // get requests to fetch the bmas
     const requests = hosts.map((bma) => {
@@ -362,7 +416,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
       // get the bmas
       // eslint-disable-next-line no-await-in-loop
-      let bmas = await Promise.all(chunk.map(url => this.kubeConnector.get(url)));
+      let bmas = await Promise.all(chunk.map((url) => this.kubeConnector.get(url)));
       bmas = bmas.filter((result) => {
         if (result.code) {
           errors.push({ statusCode: result.code, message: result.message });
@@ -374,13 +428,14 @@ export default class BareMetalAssetModel extends KubeModel {
       // assign bmas to hosts
       // eslint-disable-next-line no-await-in-loop
       const results = await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
-        const newSpec = Object.assign({}, spec, {
+        const newSpec = {
+          ...spec,
           role: hosts[inx].role,
           clusterDeployment: {
             name: clusterName,
             namespace: clusterName,
           },
-        });
+        };
         const bmaBody = {
           body: [
             {

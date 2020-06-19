@@ -6,20 +6,21 @@
  * Note to U.S. Government Users Restricted Rights:
  * Use, duplication or disclosure restricted by GSA ADP Schedule
  * Contract with IBM Corp.
+ * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
 import getApplicationElements, {
-  createReplicaChild
-  , createGenericPackageObject
-  , addSubscriptionCharts
-  , addSubscriptionDeployable
-  , addClusters
-  , processRouteIngress
-  , processServices
-  , processDeployables,
+  createReplicaChild,
+  createGenericPackageObject,
+  addSubscriptionCharts,
+  addSubscriptionDeployable,
+  addClusters,
+  processRouteIngress,
+  processServices,
+  processDeployables,
+  getSubscriptionPackageInfo,
 
 } from './applicationHelper';
-
 
 describe('applicationHelper', () => {
   it('should match snapshot with subscription', () => {
@@ -120,8 +121,8 @@ describe('createGenericPackageObject', () => {
     };
 
     expect(createGenericPackageObject(
-      parentId, appNamespace
-      , [], [], subscriptionName,
+      parentId, appNamespace,
+      [], [], subscriptionName,
     )).toEqual(result);
   });
 });
@@ -166,7 +167,6 @@ describe('addClusters', () => {
     )).toEqual(result);
   });
 });
-
 
 describe('addSubscriptionDeployable', () => {
   it('addSubscriptionDeployable', () => {
@@ -812,7 +812,7 @@ describe('addSubscriptionCharts', () => {
         name: 'frontend',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -821,7 +821,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -837,7 +836,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-master',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -846,7 +845,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -862,7 +860,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-slave',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Deployment',
             metadata: {
@@ -871,7 +869,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -887,7 +884,7 @@ describe('addSubscriptionCharts', () => {
         name: 'frontend',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
@@ -896,7 +893,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -912,7 +908,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-master',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
@@ -921,7 +917,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -937,7 +932,7 @@ describe('addSubscriptionCharts', () => {
         name: 'redis-slave',
         namespace: 'open-cluster-management',
         specs: {
-          isDesign: true,
+          isDesign: false,
           raw: {
             kind: 'Service',
             metadata: {
@@ -946,7 +941,6 @@ describe('addSubscriptionCharts', () => {
 
             },
             spec: {
-
 
             },
 
@@ -959,11 +953,55 @@ describe('addSubscriptionCharts', () => {
       },
     ];
 
-
     expect(addSubscriptionCharts(
       parentId, subscriptionStatusMap,
-      [], [], appNamespace, channelInfo, subscriptionName,
+      [], [], null, appNamespace, channelInfo, subscriptionName, null,
     )).toEqual(result);
   });
 });
 
+describe('getSubscriptionPackageInfo', () => {
+  it('getSubscriptionPackageInfo', () => {
+    const topoAnnotation = 'ServiceAccount/ns-sub-1/nginx-ingress-4f527/0,Deployment/ns-sub-1/nginx-ingress-4f527-controller/1';
+    const subscriptionName = 'guestbook-app';
+
+    const result = [
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata: {
+          namespace: 'ns-sub-1',
+          name: 'ns-sub-1/guestbook-app-resources-nginx-ingress-4f527-serviceaccount',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/nginx-ingress-4f527-serviceaccount',
+        },
+        spec: {
+          template: {
+            apiVersion: 'apps/v1',
+            kind: 'ServiceAccount',
+            metadata: { namespace: 'ns-sub-1', name: 'nginx-ingress-4f527' },
+            spec: {},
+          },
+        },
+      },
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata: {
+          namespace: 'ns-sub-1',
+          name: 'ns-sub-1/guestbook-app-resources-nginx-ingress-4f527-controller-deployment',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/nginx-ingress-4f527-controller-deployment',
+        },
+        spec: {
+          template: {
+            apiVersion: 'apps/v1',
+            kind: 'Deployment',
+            metadata: { namespace: 'ns-sub-1', name: 'nginx-ingress-4f527-controller' },
+            spec: { replicas: 1 },
+          },
+        },
+      },
+    ];
+
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName)).toEqual(result);
+  });
+});

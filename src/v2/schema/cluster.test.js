@@ -12,7 +12,7 @@ import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
 
 describe('Cluster Resolver', () => {
-  test('Correctly Resolves Cluster Query', (done) => {
+  test('Correctly Resolves Cluster Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -44,9 +44,9 @@ describe('Cluster Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Single Cluster Query', (done) => {
+  test('Correctly Resolves Single Cluster Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -78,9 +78,9 @@ describe('Cluster Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves ClusterImageSet Query', (done) => {
+  test('Correctly Resolves ClusterImageSet Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -97,11 +97,11 @@ describe('Cluster Resolver', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
 
 describe('Cluster Mutation', () => {
-  test('Correctly Resolves Update Cluster Labels', (done) => {
+  test('Correctly Resolves Update Cluster Labels', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -115,9 +115,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Create Cluster', (done) => {
+  test('Correctly Resolves Create Cluster', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -131,9 +131,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Detach Cluster', (done) => {
+  test('Correctly Resolves Detach Cluster', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -147,9 +147,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Detach Cluster with Failure', (done) => {
+  test('Correctly Resolves Detach Cluster with Failure', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -163,9 +163,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Destroy Cluster', (done) => {
+  test('Correctly Resolves Destroy Cluster', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -179,9 +179,9 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 
-  test('Correctly Resolves Destroy Cluster with Failure', (done) => {
+  test('Correctly Resolves Destroy Cluster with Failure', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
@@ -195,6 +195,5 @@ describe('Cluster Mutation', () => {
         expect(JSON.parse(res.text)).toMatchSnapshot();
         done();
       });
-  });
+  }));
 });
-

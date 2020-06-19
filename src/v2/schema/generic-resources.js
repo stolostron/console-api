@@ -12,14 +12,12 @@ export const typeDef = '';
 
 export const resolver = {
   Query: {
-    getResource: (parent, args, { genericModel }) =>
-      genericModel.getResource(args),
+    getResource: (parent, args, { genericModel }) => genericModel.getResource(args),
     updateResource: (parent, args, { genericModel }) => genericModel.updateResource(args),
   },
   Mutation: {
     // patch cluster labels
-    updateResourceLabels: (parent, args, { genericModel }) =>
-      genericModel.patchResource(args),
+    updateResourceLabels: (parent, args, { genericModel }) => genericModel.patchResource(args),
     updateResource: (parent, args, { genericModel }) => {
       if (args.resourcePath) {
         return genericModel.patchResource(args);
@@ -27,12 +25,10 @@ export const resolver = {
       return genericModel.putResource(args);
     },
     createResources: (parent, args, { genericModel }) => genericModel.createResources(args),
-    deleteResource: (root, args, { genericModel }) =>
-      genericModel.deleteResource(args),
-    deleteManagedClusterView: (root, args, { genericModel }) =>
-      genericModel.deleteManagedClusterView(
-        args.managedClusterNamespace,
-        args.managedClusterViewName,
-      ),
+    deleteResource: (root, args, { genericModel }) => genericModel.deleteResource(args),
+    deleteManagedClusterView: (root, args, { genericModel }) => genericModel.deleteManagedClusterView(
+      args.managedClusterNamespace,
+      args.managedClusterViewName,
+    ),
   },
 };

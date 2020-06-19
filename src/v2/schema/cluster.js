@@ -45,37 +45,36 @@ type ClusterImageSet {
 }
 `;
 
-
 export const resolver = {
   Query: {
-    cluster: (parent, args, { clusterModel, req }) =>
-      clusterModel.getSingleCluster({ ...args, user: req.user }),
-    clusters: (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusters({ ...args, user: req.user }),
-    clusterImageSets: (parent, args, { clusterModel, req }) =>
-      clusterModel.getClusterImageSets({ ...args, user: req.user }),
+    cluster: (parent, args, { clusterModel, req }) => clusterModel.getSingleCluster({ ...args, user: req.user }),
+    clusters: (parent, args, { clusterModel, req }) => clusterModel.getClusters({ ...args, user: req.user }),
+    clusterImageSets: (parent, args, { clusterModel, req }) => clusterModel.getClusterImageSets({ ...args, user: req.user }),
   },
   Cluster: {
     status: (parent, args, { clusterModel }) => clusterModel.getStatus(parent),
-    totalCPU: parent => ClusterModel.resolveUsage('cpu', parent.rawStatus),
-    totalMemory: parent => ClusterModel.resolveUsage('memory', parent.rawStatus),
-    totalStorage: parent => ClusterModel.resolveUsage('storage', parent.rawStatus),
+    totalCPU: (parent) => ClusterModel.resolveUsage('cpu', parent.rawStatus),
+    totalMemory: (parent) => ClusterModel.resolveUsage('memory', parent.rawStatus),
+    totalStorage: (parent) => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
+      // if creating a bare metal cluster, make sure all hosts have user/password
+      const map = _.keyBy(args.cluster, 'kind');
+      const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
+      if (hosts) {
+        await bareMetalAssetModel.syncBMAs(hosts);
+      }
+
+      // create the cluster
       const results = await clusterModel.createCluster(args);
 
       // if this was a successful bare metal deployment,
-      // update the bma's with what cluster grabbed them
+      // update the bma's with what cluster now owns them
       const { errors } = results;
-      if (errors.length === 0) {
-        const map = _.keyBy(args.cluster, 'kind');
-        const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
-        if (hosts) {
-          const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
-          // reserve these bmsa for this cluster
-          await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
-        }
+      if (errors.length === 0 && hosts) {
+        const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
+        await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
       }
       return results;
     },
