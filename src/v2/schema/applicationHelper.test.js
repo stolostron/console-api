@@ -18,6 +18,7 @@ import getApplicationElements, {
   processRouteIngress,
   processServices,
   processDeployables,
+  getSubscriptionPackageInfo
 
 } from './applicationHelper';
 
@@ -956,5 +957,17 @@ describe('addSubscriptionCharts', () => {
       parentId, subscriptionStatusMap,
       [], [], appNamespace, channelInfo, subscriptionName,
     )).toEqual(result);
+  });
+});
+
+
+describe('getSubscriptionPackageInfo', () => {
+  it('getSubscriptionPackageInfo', () => {
+    const topoAnnotation = 'ServiceAccount/ns-sub-1/nginx-ingress-4f527/0,ServiceAccount/ns-sub-1/nginx-ingress-4f527-backend/0,ClusterRole//nginx-ingress-4f527/0,ClusterRoleBinding//nginx-ingress-4f527/0,Role/ns-sub-1/nginx-ingress-4f527/0,RoleBinding/ns-sub-1/nginx-ingress-4f527/0,Service/ns-sub-1/nginx-ingress-4f527-controller/0,Service/ns-sub-1/nginx-ingress-4f527-default-backend/0,Deployment/ns-sub-1/nginx-ingress-4f527-controller/1';
+    const subscriptionName = 'guestbook-app';
+
+    const result = []
+
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName)).toEqual(result);
   });
 });
