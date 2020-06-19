@@ -35,6 +35,7 @@ export default {
       },
     },
     spec: {
+      masterEndpoint: '9.42.23.230',
     },
     status: {
       distributionInfo: {
@@ -51,6 +52,103 @@ export default {
         },
         type: 'OCP',
       },
+      nodeList: [
+        {
+          name: '9.37.137.174',
+          cluster: {
+            clusterip: '9.42.23.230',
+            metadata: {
+              name: 'hub-cluster',
+            },
+          },
+          labels: {
+            'beta.kubernetes.io/arch': 'amd64',
+            'beta.kubernetes.io/os': 'linux',
+            'kubernetes.io/hostname': '9.37.137.174',
+            'node-role.kubernetes.io/worker': 'true',
+          },
+          roles: [
+            'worker',
+          ],
+          conditions: [
+            {
+              lastHeartbeatTime: '2018-09-05T15:36:06Z',
+              lastTransitionTime: '2018-08-18T15:53:48Z',
+              message: 'kubelet is posting ready status. AppArmor enabled',
+              reason: 'KubeletReady',
+              status: 'True',
+              type: 'Ready',
+            },
+          ],
+        },
+        {
+          name: '9.37.137.92',
+          cluster: {
+            clusterip: '9.42.23.230',
+            metadata: {
+              name: 'hub-cluster',
+            },
+          },
+          labels: {
+            'beta.kubernetes.io/arch': 'amd64',
+            'beta.kubernetes.io/os': 'linux',
+            'kubernetes.io/hostname': '9.37.137.92',
+            'node-role.kubernetes.io/worker': 'true',
+          },
+          roles: [
+            'worker',
+          ],
+          conditions: [
+            {
+              lastHeartbeatTime: '2018-09-05T15:36:06Z',
+              lastTransitionTime: '2018-08-18T15:53:48Z',
+              message: 'kubelet is posting ready status. AppArmor enabled',
+              reason: 'KubeletReady',
+              status: 'True',
+              type: 'Ready',
+            },
+          ],
+        },
+        {
+          name: '9.42.23.230',
+          cluster: {
+            clusterip: '9.42.23.230',
+            metadata: {
+              name: 'hub-cluster',
+            },
+          },
+          labels: {
+            'beta.kubernetes.io/arch': 'amd64',
+            'beta.kubernetes.io/os': 'linux',
+            etcd: 'true',
+            'kubernetes.io/hostname': '9.42.23.230',
+            management: 'true',
+            master: 'true',
+            'node-role.kubernetes.io/etcd': 'true',
+            'node-role.kubernetes.io/management': 'true',
+            'node-role.kubernetes.io/master': 'true',
+            'node-role.kubernetes.io/proxy': 'true',
+            proxy: 'true',
+            role: 'master',
+          },
+          roles: [
+            'etcd',
+            'management',
+            'master',
+            'proxy',
+          ],
+          conditions: [
+            {
+              lastHeartbeatTime: '2018-09-05T15:36:06Z',
+              lastTransitionTime: '2018-08-18T15:53:48Z',
+              message: 'kubelet is posting ready status. AppArmor enabled',
+              reason: 'KubeletReady',
+              status: 'True',
+              type: 'Ready',
+            },
+          ],
+        },
+      ],
     },
   },
   'new-cluster': {

@@ -34,7 +34,6 @@ export default function createMockHttp() {
       default: require('./MachinePoolsByNS').default,
       kubeSystem: require('./MachinePoolsByNS').kubeSystem,
     },
-    nodes: require('./NodeList'),
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
     policies: require('./PolicyList'),
@@ -66,8 +65,6 @@ export default function createMockHttp() {
           return state.userAccess;
         case _.includes(_.get(params.json, 'metadata.name'), 'pods'):
           return state.pods.mockResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'nodes'):
-          return state.nodes.mockResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'namespace'):
           return state.namespace.mockResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'releases'):
@@ -162,8 +159,6 @@ export default function createMockHttp() {
         return state.pvs.mockPVsResponse;
       case params.url.includes('resourceviews/persistentvolumeclaims'):
         return state.pvs.mockPVsClaimResponse;
-      case params.url.includes('resourceviews/nodes'):
-        return state.nodes.mockResponse;
       case params.url.includes('resourceviews/namespace'):
         return state.namespace.mockResponse;
       case params.url.includes('resourceviews/release'):

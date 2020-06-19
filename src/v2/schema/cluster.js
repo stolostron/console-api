@@ -46,9 +46,9 @@ type ClusterImageSet {
 
 export const resolver = {
   Query: {
-    cluster: (parent, args, { clusterModel, req }) => clusterModel.getSingleCluster({ ...args, user: req.user }),
-    clusters: (parent, args, { clusterModel, req }) => clusterModel.getClusters({ ...args, user: req.user }),
-    clusterImageSets: (parent, args, { clusterModel, req }) => clusterModel.getClusterImageSets({ ...args, user: req.user }),
+    cluster: (parent, args, { clusterModel }) => clusterModel.getSingleCluster(args),
+    clusters: (parent, args, { clusterModel }) => clusterModel.getClusters(args),
+    clusterImageSets: (parent, args, { clusterModel }) => clusterModel.getClusterImageSets(),
   },
   Cluster: {
     totalCPU: (parent) => ClusterModel.resolveUsage('cpu', parent.rawStatus),

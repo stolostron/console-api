@@ -605,8 +605,16 @@ export default class ClusterModel extends KubeModel {
     };
   }
 
+  async getNodeList(args = {}) {
+    const { name } = args;
+    const managedClusterInfo = await this.kubeConnector.get(
+      `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`,
+    );
+    return (_.get(managedClusterInfo, 'status.nodeList') || []).map((n) => ({ ...n, cluster: name }));
+  }
+
   async getSingleCluster(args = {}) {
-    const { name, namespace } = args;
+    const { name } = args;
     const listQuery = (query) => (
       this.kubeConnector.get(query).then((allItems) => (allItems.items ? allItems.items : []))
     );
@@ -619,11 +627,11 @@ export default class ClusterModel extends KubeModel {
       installJobList,
     ] = await Promise.all([
       this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
-      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${name}`),
-      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${namespace}/managedclusterinfos/${name}`),
+      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${name}/clusterdeployments/${name}`),
+      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`),
       listQuery(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
-      listQuery(`/apis/batch/v1/namespaces/${namespace}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
-      listQuery(`/apis/batch/v1/namespaces/${namespace}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
+      listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
+      listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
     const [result] = findMatchedStatus({
       managedClusters: [managedCluster],

@@ -16,29 +16,24 @@ type NodeResources {
   memory: String
 }
 
-type Node implements K8sObject {
-  allocatable: NodeResources
-  architecture: String
+type Node {
   capacity: NodeResources
   cluster: Cluster
-  images: [String]
-  metadata: Metadata
-  operatingSystem: String
-  osImage: String
-  # Values: proxy, management, masater, va, etcd
+  name: String
+  labels: JSON
   roles: [String]
   status: String
 }
 `;
 
 async function resolveStatus(parent) {
-  const { status: { conditions } } = parent;
+  const { conditions } = parent;
   const nodeStatus = conditions.find((cond) => (cond.type === 'Ready'));
   return nodeStatus.status;
 }
 
 async function resolveRoles(parent) {
-  const { metadata: { labels } } = parent;
+  const { labels } = parent;
   const roles = [];
   const nodeRolePrefix = 'node-role.kubernetes.io/';
   const index = nodeRolePrefix.length;
@@ -52,11 +47,13 @@ async function resolveRoles(parent) {
 
 export const resolver = {
   Query: {
-    nodes: (root, args, { resourceViewModel }) => resourceViewModel.fetchResources({ type: 'nodes' }),
-    node: (root, args, { resourceViewModel }) => resourceViewModel.fetchNodeResource('nodes', args.name, args.namespace),
+    node: (root, args, { clusterModel }) => clusterModel.getNodeList(args),
   },
   Node: {
-    cluster: async (parent, args, { clusterModel, req }) => clusterModel.getClusters({ ...args, name: parent.cluster, user: req.user }),
+    cluster: async (parent, args, { clusterModel }) => (
+      clusterModel.getSingleCluster({ name: parent.cluster })
+        .then((response) => response[0])
+    ),
     roles: (parent) => resolveRoles(parent),
     status: (parent) => resolveStatus(parent),
   },

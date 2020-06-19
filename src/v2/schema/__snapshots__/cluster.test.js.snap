@@ -479,7 +479,7 @@ Object {
           "4.2.2",
           "4.2.9",
         ],
-        "clusterip": null,
+        "clusterip": "9.42.23.230",
         "desiredVersion": "4.2.2",
         "distributionVersion": "4.2.0",
         "metadata": Object {
@@ -497,7 +497,7 @@ Object {
           "namespace": "hub-cluster",
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
-        "nodes": null,
+        "nodes": 3,
         "status": "ok",
         "totalCPU": "0",
         "totalMemory": "0",
