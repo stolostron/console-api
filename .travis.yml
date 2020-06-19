@@ -31,7 +31,8 @@ branches:
 
 stages:
   - build
-  - test
+  - unit-test
+  - test-e2e
   - publish
 
 jobs:
@@ -44,14 +45,14 @@ jobs:
         - make component/build
         - make component/push
         - if [ "$IMAGE_SCAN" != "false" ]; then make security/scans; fi;
-        - if [ "$TRAVIS_BRANCH" == "master" ]; then 
+        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then 
             export COMPONENT_NEWTAG="latest";
             make component/tag;
             export COMPONENT_VERSION="latest";
             export COMPONENT_TAG_EXTENSION="";
             make component/push;
           fi;
-    - stage: test
+    - stage: unit-test
       name: "Run unit tests"
       script:
         # Set the image tag differently for PRs
@@ -62,7 +63,7 @@ jobs:
         - make sonar/js/jest-init
         - make component/test/unit
         - make sonar/js
-    - stage: test
+    - stage: test-e2e
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request
       script:
