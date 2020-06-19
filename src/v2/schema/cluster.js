@@ -59,19 +59,22 @@ export const resolver = {
   },
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
+      // if creating a bare metal cluster, make sure all hosts have user/password
+      const map = _.keyBy(args.cluster, 'kind');
+      const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
+      if (hosts) {
+        await bareMetalAssetModel.syncBMAs(hosts);
+      }
+
+      // create the cluster
       const results = await clusterModel.createCluster(args);
 
       // if this was a successful bare metal deployment,
-      // update the bma's with what cluster grabbed them
+      // update the bma's with what cluster now owns them
       const { errors } = results;
-      if (errors.length === 0) {
-        const map = _.keyBy(args.cluster, 'kind');
-        const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
-        if (hosts) {
-          const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
-          // reserve these bmsa for this cluster
-          await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
-        }
+      if (errors.length === 0 && hosts) {
+        const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
+        await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
       }
       return results;
     },
