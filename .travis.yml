@@ -44,10 +44,10 @@ jobs:
         - make component/build
         - make component/push
         - if [ "$IMAGE_SCAN" != "false" ]; then make security/scans; fi;
-        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then 
-            export COMPONENT_NEWTAG="latest";
+        - if [ "$TRAVIS_BRANCH" == "master" ]; then 
+            export COMPONENT_NEWTAG="newapi";
             make component/tag;
-            export COMPONENT_VERSION="latest";
+            export COMPONENT_VERSION="newapi";
             export COMPONENT_TAG_EXTENSION="";
             make component/push;
           fi;
