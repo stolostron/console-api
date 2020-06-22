@@ -15,22 +15,16 @@ import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
-    clustersByNamespace: {
-      default: require('./ClusterByNS').default,
-      kubeSystem: require('./ClusterByNS').kubeSystem,
-    },
-    clusterstatusesByNamespace: {
-      default: require('./ClusterStatusListByNS.js').default,
-      kubeSystem: require('./ClusterStatusListByNS.js').kubeSystem,
-    },
-    clusters: require('./ClusterList').default,
+    clustersByName: require('./ManagedClusterByName').default,
+    managedClusterInfosByName: require('./ManagedClusterInfosByName.js').default,
+    clusters: require('./ManagedClusterList').default,
     clusterImageSets: require('./ClusterImageSets').default,
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
     },
-    clusterStatus: require('./ClusterStatusList').default,
+    managedClusterInfos: require('./ManagedClusterInfoList').default,
     clusterVersions: require('./ClusterVersionsList'),
     repos: require('./ReposList').default,
     repoMutations: require('./RepoMutationsList').default,
@@ -40,7 +34,6 @@ export default function createMockHttp() {
       default: require('./MachinePoolsByNS').default,
       kubeSystem: require('./MachinePoolsByNS').kubeSystem,
     },
-    nodes: require('./NodeList'),
     namespace: require('./NamespaceList'),
     release: require('./RelsList'),
     policies: require('./PolicyList'),
@@ -56,7 +49,7 @@ export default function createMockHttp() {
   return async function MockLib(params) {
     if (params.method === 'DELETE') {
       switch (true) {
-        case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
+        case params.url.includes('managedclusters/hub-cluster'):
           return { body: { kind: 'Status', code: '401' } };
         case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
           return { body: { kind: 'Status', status: 'Not Acceptable', code: '406' } };
@@ -72,8 +65,6 @@ export default function createMockHttp() {
           return state.userAccess;
         case _.includes(_.get(params.json, 'metadata.name'), 'pods'):
           return state.pods.mockResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'nodes'):
-          return state.nodes.mockResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'namespace'):
           return state.namespace.mockResourceView;
         case _.includes(_.get(params.json, 'metadata.name'), 'releases'):
@@ -92,7 +83,7 @@ export default function createMockHttp() {
           return state.compliances.mockCreateCompliance;
         case params.url.includes('applications'):
           return state.apps.mockCreateAppResponse;
-        case params.url.includes('default/work'):
+        case params.url.includes('layne-remote/managedclusteractions'):
           return state.genericResourceList.mockedUpdateWorkResponse;
         case params.url.includes('/api/v1/namespaces/default/secrets') && _.get(params.json, 'metadata.name') === 'new-aws':
           return state.connectionApi.createCloudConnection;
@@ -102,9 +93,10 @@ export default function createMockHttp() {
           return state.clusterImport.getNamespaceCreationResponse;
         case params.url.includes('/apis/project.openshift.io/v1/projectrequests') && _.get(params.json, 'metadata.name') === 'foo':
           return state.clusterImport.getNamespaceCreationResponse;
-        case params.url.includes('/apis/agent.open-cluster-management.io/v1beta1/namespaces/foo/klusterletconfigs'):
-          return state.clusterImport.getKlusterletConfigsResponse;
+        case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/foo/klusterletaddonconfigs'):
+          return state.clusterImport.getKlusterletAddonConfigsResponse;
         case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
+        case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
           return state.clusterImport.getClusterResponse;
         default:
           return state.pods;
@@ -143,22 +135,20 @@ export default function createMockHttp() {
         return { body: { items: [] } };
       case params.url.endsWith('/apis/proxy.open-cluster-management.io/v1beta1/namespaces/default/clusterstatuses/cluster1/log/open-cluster-management/search-prod-28a0e-search-api-66cf776db5-7bzfh/search-api?tailLines=1000'):
         return state.logs.mockLogsResponse;
-      case params.url.includes('namespaces/default/clusterstatuses'):
-        return state.clusterstatusesByNamespace.default;
-      case params.url.includes('namespaces/kube-system/clusterstatuses'):
-        return state.clusterstatusesByNamespace.kubeSystem;
-      case params.url.includes('clusterstatuses'):
-        return state.clusterStatus;
-      case params.url.includes('namespaces/kube-system/clusters/hub-cluster'):
-        return { body: state.clustersByNamespace.kubeSystem.body.items[0] };
-      case params.url.includes('namespaces/kube-system/clusters/new-cluster'):
-        return { body: state.clustersByNamespace.kubeSystem.body.items[1] };
-      case params.url.includes('namespaces/default/clusters/managed-cluster'):
-        return { body: state.clustersByNamespace.default.body.items[0] };
-      case params.url.includes('namespaces/default/clusters'):
-        return state.clustersByNamespace.default;
-      case params.url.includes('namespaces/kube-system/clusters'):
-        return state.clustersByNamespace.kubeSystem;
+      case params.url.includes('namespaces/hub-cluster/managedclusterinfos'):
+        return { body: state.managedClusterInfosByName['hub-cluster'] };
+      case params.url.includes('namespaces/new-cluster/managedclusterinfos'):
+        return { body: state.managedClusterInfosByName['new-cluster'] };
+      case params.url.includes('namespaces/managed-cluster/managedclusterinfos'):
+        return { body: state.managedClusterInfosByName['managed-cluster'] };
+      case params.url.includes('managedclusterinfos'):
+        return state.managedClusterInfos;
+      case params.url.includes('managedclusters/hub-cluster'):
+        return { body: state.clustersByName['hub-cluster'] };
+      case params.url.includes('managedclusters/new-cluster'):
+        return { body: state.clustersByName['new-cluster'] };
+      case params.url.includes('managedclusters/managed-cluster'):
+        return { body: state.clustersByName['managed-cluster'] };
       case params.url.includes('kube-system/deployables'):
         return { body: { items: [] } };
       case params.url.includes('deployables'):
@@ -169,8 +159,6 @@ export default function createMockHttp() {
         return state.pvs.mockPVsResponse;
       case params.url.includes('resourceviews/persistentvolumeclaims'):
         return state.pvs.mockPVsClaimResponse;
-      case params.url.includes('resourceviews/nodes'):
-        return state.nodes.mockResponse;
       case params.url.includes('resourceviews/namespace'):
         return state.namespace.mockResponse;
       case params.url.includes('resourceviews/release'):

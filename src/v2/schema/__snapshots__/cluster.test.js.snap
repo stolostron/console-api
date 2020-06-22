@@ -6,7 +6,7 @@ Object {
     "createCluster": Object {
       "errors": Array [
         Object {
-          "message": "ClusterDeployment must specify a namespace",
+          "message": "Cannot find any endpoints",
         },
       ],
     },
@@ -342,6 +342,20 @@ Object {
 }
 `;
 
+exports[`Cluster Mutation Create Kubernetes Cluster Resource for Import with No Namespace 1`] = `
+Object {
+  "data": Object {
+    "createCluster": Object {
+      "errors": Array [
+        Object {
+          "message": "Cannot find resource types: cluster.open-cluster-management.io/v1, agent.open-cluster-management.io/v1",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`Cluster Resolver Correctly Resolves Cluster Query 1`] = `
 Object {
   "data": Object {
@@ -363,11 +377,11 @@ Object {
             "vendor": "ICP",
           },
           "name": "managed-cluster",
-          "namespace": "default",
+          "namespace": "managed-cluster",
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
         "nodes": 2,
-        "status": "pending",
+        "status": "pendingimport",
         "totalCPU": "36",
         "totalMemory": "21",
         "totalStorage": "60",
@@ -395,7 +409,7 @@ Object {
             "vendor": "ICP",
           },
           "name": "hub-cluster",
-          "namespace": "kube-system",
+          "namespace": "hub-cluster",
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
         "nodes": 3,
@@ -422,7 +436,7 @@ Object {
             "vendor": "ICP",
           },
           "name": "new-cluster",
-          "namespace": "kube-system",
+          "namespace": "new-cluster",
           "uid": "d9f3a6aa-9f19-11f8-855e-f2b908610543",
         },
         "nodes": 4,
@@ -465,7 +479,7 @@ Object {
           "4.2.2",
           "4.2.9",
         ],
-        "clusterip": null,
+        "clusterip": "9.42.23.230",
         "desiredVersion": "4.2.2",
         "distributionVersion": "4.2.0",
         "metadata": Object {
@@ -480,10 +494,10 @@ Object {
             "vendor": "ICP",
           },
           "name": "hub-cluster",
-          "namespace": "kube-system",
+          "namespace": "hub-cluster",
           "uid": "d9f3a5aa-9f19-11e8-855e-f2b998610544",
         },
-        "nodes": null,
+        "nodes": 3,
         "status": "ok",
         "totalCPU": "0",
         "totalMemory": "0",

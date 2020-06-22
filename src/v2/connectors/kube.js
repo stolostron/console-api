@@ -346,11 +346,14 @@ export default class KubeConnector {
       spec: {
         scope: {
           name: resourceName,
-          namespace,
           resource: `${kind}${apiGroup && `.${apiGroup}`}`,
         },
       },
     };
+    // Only set namespace if not null
+    if (namespace) {
+      body.spec.scope.namespace = namespace;
+    }
     if (updateInterval) {
       body.spec.scope.updateIntervalSeconds = updateInterval; // default is 30 secs
     }

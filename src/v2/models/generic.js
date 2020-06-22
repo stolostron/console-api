@@ -13,6 +13,9 @@ import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
+const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
+const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
+
 function getApiGroupFromSelfLink(selfLink, kind) {
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
@@ -58,8 +61,8 @@ export default class GenericModel extends KubeModel {
         let workName = `create-resource-${this.kubeConnector.uid()}`;
         workName = workName.substring(0, 63);
         const jsonBody = {
-          apiVersion: 'mcm.ibm.com/v1alpha1',
-          kind: 'Work',
+          apiVersion: clusterActionApiVersion,
+          kind: 'ManagedClusterAction',
           metadata: {
             name: workName,
             namespace: clusterInfo.clusterNameSpace,
@@ -77,8 +80,11 @@ export default class GenericModel extends KubeModel {
             },
           },
         };
-        const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterInfo.clusterNameSpace}/works`, jsonBody);
-        return response;
+        try {
+          return this.kubeConnector.post(`${routePrefix}/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
+        } catch (e) {
+          return e;
+        }
       }));
       return responseArr;
     }
@@ -355,19 +361,17 @@ export default class GenericModel extends KubeModel {
       }
       return response;
     }
-    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
-    const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
     let workName = `update-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'Work',
+      apiVersion: clusterActionApiVersion,
+      kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
-        namespace: clusterNamespace,
+        namespace: cluster,
       },
       spec: {
         cluster: {
@@ -387,7 +391,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -400,7 +404,7 @@ export default class GenericModel extends KubeModel {
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${cluster}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.reason');
@@ -436,8 +440,6 @@ export default class GenericModel extends KubeModel {
       return response;
     }
 
-    const clusterResponse = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${cluster}`);
-    const clusterNamespace = clusterResponse[0].metadata.namespace;
     const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
@@ -445,11 +447,11 @@ export default class GenericModel extends KubeModel {
     let workName = `delete-resource-${this.kubeConnector.uid()}`;
     workName = workName.substring(0, 63);
     const jsonBody = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'Work',
+      apiVersion: clusterActionApiVersion,
+      kind: 'ManagedClusterAction',
       metadata: {
         name: workName,
-        namespace: clusterNamespace,
+        namespace: cluster,
       },
       spec: {
         cluster: {
@@ -469,7 +471,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works`, jsonBody);
+    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -478,16 +480,16 @@ export default class GenericModel extends KubeModel {
       }];
     }
     const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
-
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${clusterNamespace}/works/${response.metadata.name}`)
+        this.kubeConnector.delete(`${routePrefix}/${cluster}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
-      const reason = _.get(result, 'status.reason');
+      const reason = _.get(result, 'status.conditions[0].reason');
       if (reason) {
-        throw new Error(`Failed to Update ${name}: ${reason}`);
+        const message = _.get(result, 'status.conditions[0].message');
+        throw new Error(`Failed to Delete ${name}. ${reason}. ${message}.`);
       } else {
         return _.get(result, 'metadata.name');
       }
