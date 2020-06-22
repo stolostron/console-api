@@ -18,22 +18,14 @@ describe('Nodes Resolver', () => {
       .send({
         query: `
         {
-          nodes {
-            architecture
+          node(name: "hub-cluster") {
             cluster {
               clusterip
               metadata {
                 name
               }
             }
-            metadata {
-              creationTimestamp
-              labels
-              name
-              uid
-            }
-            operatingSystem
-            osImage
+            labels
             roles
             status
           }
