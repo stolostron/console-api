@@ -344,6 +344,15 @@ export const createGenericPackageObject = (
   return packageObj;
 };
 
+// remove the release name from the deployable name
+export const removeHelmReleaseName = (name, releaseName) => {
+  const trimmedReleaseName = _.trimEnd(releaseName, '-');
+  let result = _.replace(name, `${trimmedReleaseName}-`, '');
+  result = _.replace(result, `${trimmedReleaseName}`, '');
+
+  return result;
+};
+
 export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => {
   const deployablesList = [];
 
@@ -352,26 +361,27 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => 
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
 
-    const deployableTypeLower = _.toLower(deployableData[0]);
-    const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${deployableData[2]}-${deployableTypeLower}`;
+    const deployableTypeLower = _.toLower(deployableData[2]);
+    const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+    const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${dName}-${deployableTypeLower}`;
     const version = 'apps.open-cluster-management.io/v1';
-    if (deployableData && deployableData.length === 4) {
-      const hasReplica = deployableData[3] !== '0';
+    if (deployableData && deployableData.length === 6) {
+      const hasReplica = deployableData[5] !== '0';
       const deployable = {
         apiVersion: version,
         kind: 'Deployable',
         metadata: {
-          namespace: deployableData[1],
+          namespace: deployableData[3],
           name: deployableName,
-          selfLink: `/apis/${version}/namespaces/${deployableData[1]}/deployables/${deployableData[2]}-${deployableTypeLower}`,
+          selfLink: `/apis/${version}/namespaces/${deployableData[3]}/deployables/${dName}-${deployableTypeLower}`,
         },
         spec: {
           template: {
             apiVersion: 'apps/v1',
-            kind: deployableData[0],
+            kind: deployableData[2],
             metadata: {
-              namespace: deployableData[1],
-              name: deployableData[2],
+              namespace: deployableData[3],
+              name: dName,
             },
             spec: {
             },
@@ -380,7 +390,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => 
       };
 
       if (hasReplica) {
-        deployable.spec.template.spec.replicas = _.parseInt(deployableData[3]);
+        deployable.spec.template.spec.replicas = _.parseInt(deployableData[5]);
       }
 
       deployablesList.push(deployable);
