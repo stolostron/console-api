@@ -1,4 +1,7 @@
 FROM registry.access.redhat.com/ubi8/nodejs-10:1
+USER root
+RUN yum -y remove nodejs-nodemon
+USER default
 
 ARG VCS_REF
 ARG VCS_URL
