@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- [node.js](https://nodejs.org/) version 10.x
+- [node.js](https://nodejs.org/) version 12.x
 - [nvm](https://github.com/nvm-sh/nvm) (optional)
 
 ## Installation
