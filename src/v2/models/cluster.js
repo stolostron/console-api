@@ -41,8 +41,8 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
   const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
   let status = 'unknown';
-  if ((install && install.some((i) => i.status.failed > 0))
-  || (uninstall && uninstall.some((i) => i.status.failed > 0))) {
+  if ((install && install.every((i) => i.status.failed > 0))
+  || (uninstall && uninstall.every((i) => i.status.failed > 0))) {
     status = 'provisionfailed';
   } else if (uninstall && uninstall.some((i) => i.status.active > 0)) {
     status = 'destroying';
