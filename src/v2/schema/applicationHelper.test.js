@@ -962,8 +962,8 @@ describe('addSubscriptionCharts', () => {
 
 describe('getSubscriptionPackageInfo', () => {
   it('getSubscriptionPackageInfo', () => {
-    const topoAnnotation = 'ServiceAccount/ns-sub-1/nginx-ingress-4f527/0,Deployment/ns-sub-1/nginx-ingress-4f527-controller/1';
-    const subscriptionName = 'guestbook-app';
+    const topoAnnotation = 'helmchart/nginx-ingress-4f527-/Service/ns-sub-1/default-backend/0,helmchart/nginx-ingress-4f527-/Deployment/ns-sub-1/controller/1';
+    const subscriptionName = 'nginx';
 
     const result = [
       {
@@ -971,14 +971,14 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'ns-sub-1/guestbook-app-resources-nginx-ingress-4f527-serviceaccount',
-          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/nginx-ingress-4f527-serviceaccount',
+          name: 'nginx-ingress-4f527-/nginx-resources-default-backend-service',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/default-backend-service',
         },
         spec: {
           template: {
             apiVersion: 'apps/v1',
-            kind: 'ServiceAccount',
-            metadata: { namespace: 'ns-sub-1', name: 'nginx-ingress-4f527' },
+            kind: 'Service',
+            metadata: { namespace: 'ns-sub-1', name: 'default-backend' },
             spec: {},
           },
         },
@@ -988,14 +988,14 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'ns-sub-1/guestbook-app-resources-nginx-ingress-4f527-controller-deployment',
-          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/nginx-ingress-4f527-controller-deployment',
+          name: 'nginx-ingress-4f527-/nginx-resources-controller-deployment',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/controller-deployment',
         },
         spec: {
           template: {
             apiVersion: 'apps/v1',
             kind: 'Deployment',
-            metadata: { namespace: 'ns-sub-1', name: 'nginx-ingress-4f527-controller' },
+            metadata: { namespace: 'ns-sub-1', name: 'controller' },
             spec: { replicas: 1 },
           },
         },
