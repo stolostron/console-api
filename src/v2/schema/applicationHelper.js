@@ -361,11 +361,11 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => 
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
 
-    const deployableTypeLower = _.toLower(deployableData[2]);
-    const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
-    const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${dName}-${deployableTypeLower}`;
-    const version = 'apps.open-cluster-management.io/v1';
-    if (deployableData && deployableData.length === 6) {
+    if (deployableData.length === 6) {
+      const deployableTypeLower = _.toLower(deployableData[2]);
+      const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+      const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${dName}-${deployableTypeLower}`;
+      const version = 'apps.open-cluster-management.io/v1';
       const hasReplica = deployableData[5] !== '0';
       const deployable = {
         apiVersion: version,
