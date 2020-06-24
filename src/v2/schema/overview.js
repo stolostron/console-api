@@ -21,7 +21,7 @@ type Overview {
 type ClusterOverview implements K8sObject {
   metadata: Metadata
   capacity: ClusterCapacity
-  usage: ClusterUsage
+  allocatable: ClusterAllocatable
   consoleURL: String
   status: String
 }
@@ -29,15 +29,11 @@ type ClusterOverview implements K8sObject {
 type ClusterCapacity {
   cpu: String
   memory: String
-  nodes: Int
-  storage: String
 }
 
-type ClusterUsage {
+type ClusterAllocatable {
   cpu: String
   memory: String
-  pods: Int
-  storage: String
 }
 
 type ApplicationOverview implements K8sObject {
@@ -59,7 +55,7 @@ export const resolver = {
     }) => {
       let clusters = await clusterModel.getAllClusters();
       clusters = clusters.map(({
-        metadata, status, capacity, usage, consoleURL,
+        metadata, status, capacity, allocatable, consoleURL,
       }) => {
         const { name, namespace, labels = {} } = metadata;
         ['vendor', 'cloud', 'region', 'environment'].forEach((key) => {
@@ -76,7 +72,7 @@ export const resolver = {
           consoleURL,
           status,
           capacity,
-          usage,
+          allocatable,
         };
       });
 

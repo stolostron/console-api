@@ -32,9 +32,6 @@ describe('Cluster Resolver', () => {
             distributionVersion
             nodes
             status
-            totalCPU
-            totalMemory
-            totalStorage
             upgradeFailed
           }
         }
@@ -66,9 +63,6 @@ describe('Cluster Resolver', () => {
             distributionVersion
             nodes
             status
-            totalCPU
-            totalMemory
-            totalStorage
             upgradeFailed
           }
         }

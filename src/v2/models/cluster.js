@@ -268,12 +268,12 @@ function findMatchedStatusForOverview(data) {
 
     const status = getStatus(_.get(managedCluster, 'raw'));
     const capacity = _.get(managedCluster, 'raw.status.capacity');
-    const usage = _.get(managedCluster, 'raw.status.allocatable'); // TODO - need to reverse this from allocatable
+    const allocatable = _.get(managedCluster, 'raw.status.allocatable');
 
     _.merge(cluster, {
       status,
       capacity,
-      usage,
+      allocatable,
     });
     resultMap.set(c, cluster);
   });
@@ -668,7 +668,7 @@ export default class ClusterModel extends KubeModel {
   static resolveUsage(kind, clusterstatus) {
     const defaultUsage = kind === 'cpu' ? '0m' : '0Mi';
     const defaultCapacity = kind === 'cpu' ? '1' : '1Mi';
-    const usage = _.get(clusterstatus, `spec.usage.${kind}`, defaultUsage);
+    const allocatable = _.get(clusterstatus, `spec.allocatable.${kind}`, defaultUsage);
     const capacity = _.get(clusterstatus, `spec.capacity.${kind}`, defaultCapacity);
 
     if (capacity === '0' || capacity === 0) {
@@ -676,10 +676,10 @@ export default class ClusterModel extends KubeModel {
     }
 
     if (kind === 'cpu') {
-      return parseInt(getCPUPercentage(usage, capacity), 10);
+      return parseInt(getCPUPercentage(allocatable, capacity), 10);
     }
 
-    return parseInt(getPercentage(usage, capacity), 10);
+    return parseInt(getPercentage(allocatable, capacity), 10);
   }
 
   async detachCluster(args) {
