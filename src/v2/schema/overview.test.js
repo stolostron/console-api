@@ -29,14 +29,10 @@ describe('Overview Resolver', () => {
             capacity {
               cpu
               memory
-              nodes
-              storage
             }
-            usage {
+            allocatable {
               cpu
               memory
-              pods
-              storage
             }
             consoleURL
             status

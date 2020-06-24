@@ -95,7 +95,6 @@ export default function createMockHttp() {
           return state.clusterImport.getNamespaceCreationResponse;
         case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/foo/klusterletaddonconfigs'):
           return state.clusterImport.getKlusterletAddonConfigsResponse;
-        case params.url.includes('/apis/clusterregistry.k8s.io/v1alpha1/namespaces/foo/clusters'):
         case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
           return state.clusterImport.getClusterResponse;
         default:

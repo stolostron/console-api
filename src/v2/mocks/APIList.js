@@ -44,8 +44,6 @@ export const mockResponse = {
       '/apis/certificates.k8s.io/v1beta1',
       '/apis/certmanager.k8s.io',
       '/apis/certmanager.k8s.io/v1alpha1',
-      '/apis/clusterregistry.k8s.io',
-      '/apis/clusterregistry.k8s.io/v1alpha1',
       '/apis/compliance.mcm.ibm.com',
       '/apis/compliance.mcm.ibm.com/v1alpha1',
       '/apis/custom.metrics.k8s.io',

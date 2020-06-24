@@ -10,7 +10,6 @@
 
 import _ from 'lodash';
 import { gql } from 'apollo-server-express';
-import ClusterModel from '../models/cluster';
 
 export const typeDef = gql`
 type Cluster implements K8sObject {
@@ -25,12 +24,6 @@ type Cluster implements K8sObject {
   nodes: Int
   serverAddress: String
   status: String
-  # Returns % of memory used.
-  totalMemory: String
-  # Returns % of storage used.
-  totalStorage: String
-  # Returns % of CPU used.
-  totalCPU: String
   k8sVersion: String
   upgradeFailed: Boolean
   adminKubeconfigSecret: String
@@ -49,11 +42,6 @@ export const resolver = {
     cluster: (parent, args, { clusterModel }) => clusterModel.getSingleCluster(args),
     clusters: (parent, args, { clusterModel }) => clusterModel.getClusters(args),
     clusterImageSets: (parent, args, { clusterModel }) => clusterModel.getClusterImageSets(),
-  },
-  Cluster: {
-    totalCPU: (parent) => ClusterModel.resolveUsage('cpu', parent.rawStatus),
-    totalMemory: (parent) => ClusterModel.resolveUsage('memory', parent.rawStatus),
-    totalStorage: (parent) => ClusterModel.resolveUsage('storage', parent.rawStatus),
   },
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
