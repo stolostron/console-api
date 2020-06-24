@@ -45,7 +45,7 @@ const mockResponse = {
             nodes: '3',
             storage: '80Gi',
           },
-          usage: {
+          allocatable: {
             cpu: '6598m',
             memory: '6728Mi',
             pods: '5071',
@@ -86,7 +86,7 @@ const mockResponse = {
             nodes: '3',
             storage: '80Gi',
           },
-          usage: {
+          allocatable: {
             cpu: '6598m',
             memory: '6728Mi',
             pods: '5071',
@@ -148,7 +148,7 @@ const mockResponse = {
             nodes: '4',
             storage: '80Gi',
           },
-          usage: {
+          allocatable: {
             cpu: '7483m',
             memory: '5390Mi',
             pods: '5031',
@@ -197,7 +197,7 @@ const mockResponse = {
             nodes: '2',
             storage: '100Gi',
           },
-          usage: {
+          allocatable: {
             cpu: '6598m',
             memory: '6728Mi',
             pods: '5071',

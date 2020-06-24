@@ -149,10 +149,10 @@ describe('addClusters', () => {
       clusterip: 'api.brave-man.dev06.red-chesterfield.com',
       consoleURL: 'https://console-openshift-console.apps.brave-man.dev06.red-chesterfield.com',
       capacity: {
-        cpu: '36', memory: '140809Mi', nodes: '6', storage: '8Gi',
+        cpu: '36', memory: '140809Mi',
       },
-      usage: {
-        cpu: '12682m', memory: '28464Mi', pods: '297', storage: '8Gi',
+      allocatable: {
+        cpu: '12682m', memory: '28464Mi',
       },
       rawCluster: { metadata: {}, spec: {}, status: {} },
       rawStatus: { metadata: {}, spec: {} },
