@@ -143,7 +143,7 @@ export default class GenericModel extends KubeModel {
     let resourceName = '';
     let response;
     const {
-      namespace, name, resourceType, body, resourcePath, selfLink,
+      name, resourceType, body, resourcePath, selfLink,
     } = args;
     const requestBody = {
       body: [
@@ -157,13 +157,13 @@ export default class GenericModel extends KubeModel {
     if (!selfLink) {
       switch (resourceType) {
         case 'HCMCluster':
-          endpointURL = 'clusterregistry.k8s.io';
-          resourceName = 'clusters';
+          endpointURL = 'cluster.open-cluster-management.io';
+          resourceName = 'managedclusters';
           break;
         default:
           throw new Error('OCM ERROR cannot find matched resource type');
       }
-      response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1alpha1/namespaces/${namespace}/${resourceName}/${name}`, requestBody);
+      response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1/${resourceName}/${name}`, requestBody);
     } else {
       // will use selfLink by default
       response = await this.kubeConnector.patch(`${selfLink}`, requestBody);
