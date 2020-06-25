@@ -704,22 +704,7 @@ export default class ClusterModel extends KubeModel {
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
     const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
-    const detachManagedClusterResponse = await this.kubeConnector.patch(
-      managedCluster,
-      {
-        headers: {
-          'Content-Type': 'application/merge-patch+json',
-        },
-        body: {
-          metadata: {
-            annotations: {
-              [CLUSTER_DETACH_ANNOTATION]: 'True',
-            },
-          },
-        },
-      },
-    );
-
+    const detachManagedClusterResponse = await this.setManagedClusterDetachAnnotation(managedCluster);
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
       return detachManagedClusterResponse.code;
     }
