@@ -353,7 +353,7 @@ export const removeHelmReleaseName = (name, releaseName) => {
   return result;
 };
 
-export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => {
+export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, channelInfo) => {
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
@@ -363,7 +363,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => 
 
     if (deployableData.length === 6) {
       const deployableTypeLower = _.toLower(deployableData[2]);
-      const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+      const dName = deployableData[0] === 'helmchart' ? removeHelmReleaseName(deployableData[4], deployableData[1]) : deployableData[4];
       const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${dName}-${deployableTypeLower}`;
       const version = 'apps.open-cluster-management.io/v1';
       const hasReplica = deployableData[5] !== '0';
@@ -393,6 +393,9 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName) => 
         deployable.spec.template.spec.replicas = _.parseInt(deployableData[5]);
       }
 
+      if (deployableTypeLower === 'helmrelease') {
+        deployable.spec.template.spec.channel = channelInfo;
+      }
       deployablesList.push(deployable);
     }
   });
@@ -406,7 +409,7 @@ export const addSubscriptionCharts = (
   topoAnnotation,
 ) => {
   if (topoAnnotation) {
-    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName);
+    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, channelInfo);
     processDeployables(
       deployablesFromTopo,
       parentId, links, nodes, subscriptionStatusMap, names, appNamespace,
@@ -584,17 +587,17 @@ async function getApplicationElements(application, clusterModel) {
             names, clusters, links, nodes,
           );
 
-          // add deployables if any
-          if (subscription.deployables) {
-            processDeployables(
-              subscription.deployables,
-              clusterId, links, nodes, subscriptionStatusMap, names, namespace,
-            );
-          } else if (isSubscriptionPlaced) {
-          // else add charts which does deployment
+          if (topoAnnotation || isSubscriptionPlaced) {
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes,
               links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
+            );
+          } else if (subscription.deployables) {
+            // add deployables if any
+
+            processDeployables(
+              subscription.deployables,
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace,
             );
           }
         });
