@@ -28,6 +28,9 @@ export const CSR_LABEL = 'open-cluster-management.io/cluster-name';
 export const CSR_LABEL_SELECTOR = (cluster) => `labelSelector=${CSR_LABEL}%3D${cluster}`;
 export const CSR_LABEL_SELECTOR_ALL = `labelSelector=${CSR_LABEL}`;
 
+export const AGENT_DOMAIN = 'agent.open-cluster-management.io';
+export const CLUSTER_DETACH_ANNOTATION = `${AGENT_DOMAIN}/detach`;
+
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
   return (usage.substring(0, usage.length - 2) / capacity.substring(0, capacity.length - 2)) * 100;
@@ -309,36 +312,21 @@ export default class ClusterModel extends KubeModel {
 
     // Mark namespace as a cluster namespace
     // First try adding a label
-    let labelNamespaceResponse = await this.kubeConnector.patch(
+    const labelNamespaceResponse = await this.kubeConnector.patch(
       `/api/v1/namespaces/${clusterNamespace}`,
       {
-        body: [
-          {
-            op: 'add',
-            path: `/metadata/labels/${CLUSTER_NAMESPACE_LABEL.replace('/', '~1')}`,
-            value: '',
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
+        body: {
+          metadata: {
+            labels: {
+              [CLUSTER_NAMESPACE_LABEL]: clusterNamespace,
+            },
           },
-        ],
+        },
       },
     );
-    if (responseHasError(labelNamespaceResponse)) {
-      // Otherwise, try labels object
-      labelNamespaceResponse = await this.kubeConnector.patch(
-        `/api/v1/namespaces/${clusterNamespace}`,
-        {
-          body: [
-            {
-              op: 'add',
-              path: '/metadata/labels',
-              value:
-              {
-                [CLUSTER_NAMESPACE_LABEL]: '',
-              },
-            },
-          ],
-        },
-      );
-    }
 
     // If we created this namespace but could not label it, we have a problem
     if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
@@ -688,7 +676,21 @@ export default class ClusterModel extends KubeModel {
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
     const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
-    const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
+    const detachManagedClusterResponse = await this.kubeConnector.patch(
+      managedCluster,
+      {
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
+        body: {
+          metadata: {
+            annotations: {
+              [CLUSTER_DETACH_ANNOTATION]: 'True',
+            },
+          },
+        },
+      },
+    );
 
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
       return detachManagedClusterResponse.code;
