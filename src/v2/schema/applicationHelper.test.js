@@ -1005,3 +1005,50 @@ describe('getSubscriptionPackageInfo', () => {
     expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName)).toEqual(result);
   });
 });
+
+describe('getSubscriptionPackageInfo git helm', () => {
+  it('getSubscriptionPackageInfo git helm', () => {
+    const topoAnnotation = 'deployable//HelmRelease//nginx-2.2.2/0,helmchart/nginx-fdab7-/Deployment/demo-ns-helm-git/nginx-deployment/2';
+    const subscriptionName = 'demo-subscription';
+    const channelInfo = 'demo-ns-helm-git-ch/git-helm-ch';
+
+    const result = [
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata: {
+          namespace: '',
+          name: '/demo-subscription-resources-nginx-2.2.2-helmrelease',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces//deployables/nginx-2.2.2-helmrelease',
+        },
+        spec: {
+          template: {
+            apiVersion: 'apps/v1',
+            kind: 'HelmRelease',
+            metadata: { namespace: '', name: 'nginx-2.2.2' },
+            spec: { channel: 'demo-ns-helm-git-ch/git-helm-ch' },
+          },
+        },
+      },
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Deployable',
+        metadata: {
+          namespace: 'demo-ns-helm-git',
+          name: 'nginx-fdab7-/demo-subscription-resources-nginx-deployment-deployment',
+          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/demo-ns-helm-git/deployables/nginx-deployment-deployment',
+        },
+        spec: {
+          template: {
+            apiVersion: 'apps/v1',
+            kind: 'Deployment',
+            metadata: { namespace: 'demo-ns-helm-git', name: 'nginx-deployment' },
+            spec: { replicas: 2 },
+          },
+        },
+      },
+    ];
+
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, channelInfo)).toEqual(result);
+  });
+});
