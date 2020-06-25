@@ -63,11 +63,8 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
     : '';
 
   if (cluster) {
-    if (_.get(cluster, 'metadata.deletionTimestamp')) {
-      return 'detaching';
-    }
-
     let status;
+    const clusterDetach = _.get(cluster, `metadata.annotations["${CLUSTER_DETACH_ANNOTATION}"]`) === 'True';
     const clusterConditions = _.get(cluster, 'status.conditions') || [];
     const checkForCondition = (condition) => _.get(
       clusterConditions.find((c) => c.type === condition),
@@ -76,7 +73,9 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
     const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
     const clusterJoined = checkForCondition('ManagedClusterJoined');
     const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
-    if (!clusterAccepted) {
+    if (clusterDetach) {
+      status = clusterAvailable ? 'detatching' : 'detached';
+    } else if (!clusterAccepted) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
