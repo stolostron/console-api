@@ -227,7 +227,7 @@ function findMatchedStatus(data) {
       status,
       k8sVersion,
       isHive: !!clusterDeployment,
-      isManaged: !!managedCluster,
+      isManaged: !!managedCluster && status !== 'detached',
     });
 
     const OCP_DISTRIBUTION_INFO = 'raw.status.distributionInfo.ocp';
