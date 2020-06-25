@@ -79,8 +79,9 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
-      if (csrs && csrs.some((c) => !_.get(c, 'status.certificate'))) {
-        status = 'needsapproval';
+      if (csrs) {
+        status = csrs.some((c) => !_.get(c, 'status.certificate'))
+          ? 'needsapproval' : 'pending';
       }
     } else {
       status = clusterAvailable ? 'ok' : 'offline';
