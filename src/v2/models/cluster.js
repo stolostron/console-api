@@ -690,7 +690,12 @@ export default class ClusterModel extends KubeModel {
     const { cluster } = args;
     const managedCluster = `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`;
 
-    return this.setManagedClusterDetachAnnotation(managedCluster, false);
+    const attachManagedClusterResponse = await this.setManagedClusterDetachAnnotation(managedCluster, false);
+    if (responseHasError(attachManagedClusterResponse)) {
+      return attachManagedClusterResponse.code;
+    }
+
+    return 204;
   }
 
   async detachCluster(args) {
