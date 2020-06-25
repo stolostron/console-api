@@ -3,10 +3,7 @@
 exports[`Cluster Mutation Correctly Resolves Attach Cluster 1`] = `
 Object {
   "data": Object {
-    "attachCluster": Object {
-      "code": "200",
-      "kind": "Status",
-    },
+    "attachCluster": 204,
   },
 }
 `;
