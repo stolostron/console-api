@@ -49,8 +49,6 @@ export default function createMockHttp() {
   return async function MockLib(params) {
     if (params.method === 'DELETE') {
       switch (true) {
-        case params.url.includes('managedclusters/hub-cluster'):
-          return { body: { kind: 'Status', code: '401' } };
         case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
           return { body: { kind: 'Status', status: 'Not Acceptable', code: '406' } };
         case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools/managed-cluster-worker'):
@@ -142,6 +140,8 @@ export default function createMockHttp() {
         return { body: state.managedClusterInfosByName['managed-cluster'] };
       case params.url.includes('managedclusterinfos'):
         return state.managedClusterInfos;
+      case params.method === 'PATCH' && params.url.includes('managedclusters/hub-cluster'):
+        return { body: { kind: 'Status', code: '401' } };
       case params.url.includes('managedclusters/hub-cluster'):
         return { body: state.clustersByName['hub-cluster'] };
       case params.url.includes('managedclusters/new-cluster'):
