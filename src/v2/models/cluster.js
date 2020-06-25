@@ -74,7 +74,7 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
     const clusterJoined = checkForCondition('ManagedClusterJoined');
     const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
     if (clusterDetach) {
-      status = clusterAvailable ? 'detatching' : 'detached';
+      status = clusterAvailable ? 'detaching' : 'detached';
     } else if (!clusterAccepted) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
@@ -87,11 +87,9 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = clusterAvailable ? 'ok' : 'offline';
     }
 
-    // If cluster is pendingimport/notaccepted/needsapproval import because Hive is
-    // installing/uninstalling/failed, show that status instead
-    if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval')
-      && clusterDeploymentStatus
-      && clusterDeploymentStatus !== 'detached') {
+    // if ManagedCluster has not joined or is being detached, show ClusterDeployment status
+    // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster)
+    if ((!clusterJoined || clusterDetach) && clusterDeploymentStatus && clusterDeploymentStatus !== 'detached') {
       return clusterDeploymentStatus;
     }
     return status;
