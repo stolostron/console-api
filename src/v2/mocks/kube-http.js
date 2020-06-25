@@ -142,6 +142,8 @@ export default function createMockHttp() {
         return state.managedClusterInfos;
       case params.method === 'PATCH' && params.url.includes('managedclusters/hub-cluster'):
         return { body: { kind: 'Status', code: '401' } };
+      case params.method === 'PATCH' && params.url.includes('managedclusters/managed-cluster'):
+        return { body: { kind: 'Status', code: '200' } };
       case params.url.includes('managedclusters/hub-cluster'):
         return { body: state.clustersByName['hub-cluster'] };
       case params.url.includes('managedclusters/new-cluster'):

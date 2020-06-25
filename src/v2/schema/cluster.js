@@ -44,6 +44,7 @@ export const resolver = {
     clusterImageSets: (parent, args, { clusterModel }) => clusterModel.getClusterImageSets(),
   },
   Mutation: {
+    attachCluster: (parent, args, { clusterModel }) => clusterModel.attachCluster(args),
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
       // if creating a bare metal cluster, make sure all hosts have user/password
       const map = _.keyBy(args.cluster, 'kind');

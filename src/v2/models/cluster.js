@@ -668,6 +668,31 @@ export default class ClusterModel extends KubeModel {
     return parseInt(getPercentage(allocatable, capacity), 10);
   }
 
+  async setManagedClusterDetachAnnotation(managedCluster, detach = true) {
+    return this.kubeConnector.patch(
+      managedCluster,
+      {
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
+        body: {
+          metadata: {
+            annotations: {
+              [CLUSTER_DETACH_ANNOTATION]: detach ? 'True' : null,
+            },
+          },
+        },
+      },
+    );
+  }
+
+  async attachCluster(args) {
+    const { cluster } = args;
+    const managedCluster = `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`;
+
+    return this.setManagedClusterDetachAnnotation(managedCluster, false);
+  }
+
   async detachCluster(args) {
     const { namespace, cluster, destroy = false } = args;
     const managedCluster = `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`;

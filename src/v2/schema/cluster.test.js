@@ -191,6 +191,22 @@ describe('Cluster Mutation', () => {
       });
   }));
 
+  test('Correctly Resolves Attach Cluster', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          attachCluster(cluster:"managed-cluster")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
+
   test('Correctly Resolves Destroy Cluster', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
