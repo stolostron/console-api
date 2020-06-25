@@ -587,7 +587,7 @@ async function getApplicationElements(application, clusterModel) {
             names, clusters, links, nodes,
           );
 
-          if (topoAnnotation) {
+          if (topoAnnotation || isSubscriptionPlaced) {
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes,
               links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
@@ -598,12 +598,6 @@ async function getApplicationElements(application, clusterModel) {
             processDeployables(
               subscription.deployables,
               clusterId, links, nodes, subscriptionStatusMap, names, namespace,
-            );
-          } else if (isSubscriptionPlaced) {
-          // else add charts which does deployment
-            addSubscriptionCharts(
-              clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
             );
           }
         });
