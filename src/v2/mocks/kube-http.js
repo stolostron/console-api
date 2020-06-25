@@ -132,7 +132,7 @@ export default function createMockHttp() {
         return state.logs.mockClusterResponse;
       case params.url.endsWith('kube-system/clusters/cluster1'):
         return { body: { items: [] } };
-      case params.url.endsWith('/apis/proxy.open-cluster-management.io/v1beta1/namespaces/default/clusterstatuses/cluster1/log/open-cluster-management/search-prod-28a0e-search-api-66cf776db5-7bzfh/search-api?tailLines=1000'):
+      case params.url.endsWith('/apis/proxy.open-cluster-management.io/v1beta1/namespaces/cluster1/clusterstatuses/cluster1/log/open-cluster-management/search-prod-28a0e-search-api-66cf776db5-7bzfh/search-api?tailLines=1000'):
         return state.logs.mockLogsResponse;
       case params.url.includes('namespaces/hub-cluster/managedclusterinfos'):
         return { body: state.managedClusterInfosByName['hub-cluster'] };

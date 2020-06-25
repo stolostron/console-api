@@ -290,12 +290,7 @@ export default class GenericModel extends KubeModel {
     if (clusterName === 'local-cluster') { // TODO: Use flag _hubClusterResource instead of cluster name
       return this.kubeConnector.get(`/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&tailLines=1000`);
     }
-    const cluster = await this.kubeConnector.getResources((ns) => `/apis/clusterregistry.k8s.io/v1alpha1/namespaces/${ns}/clusters/${clusterName}`);
-    if (cluster && cluster.length === 1) {
-      const clusterNamespace = cluster[0].metadata.namespace;
-      return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterNamespace}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
-    }
-    throw new Error(`Unable to find the cluster called ${clusterName}`);
+    return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterName}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
   }
 
   // Generic query to get local and remote resource data
