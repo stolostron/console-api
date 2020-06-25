@@ -309,36 +309,21 @@ export default class ClusterModel extends KubeModel {
 
     // Mark namespace as a cluster namespace
     // First try adding a label
-    let labelNamespaceResponse = await this.kubeConnector.patch(
+    const labelNamespaceResponse = await this.kubeConnector.patch(
       `/api/v1/namespaces/${clusterNamespace}`,
       {
-        body: [
-          {
-            op: 'add',
-            path: `/metadata/labels/${CLUSTER_NAMESPACE_LABEL.replace('/', '~1')}`,
-            value: '',
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
+        body: {
+          metadata: {
+            labels: {
+              [CLUSTER_NAMESPACE_LABEL]: clusterNamespace,
+            },
           },
-        ],
+        },
       },
     );
-    if (responseHasError(labelNamespaceResponse)) {
-      // Otherwise, try labels object
-      labelNamespaceResponse = await this.kubeConnector.patch(
-        `/api/v1/namespaces/${clusterNamespace}`,
-        {
-          body: [
-            {
-              op: 'add',
-              path: '/metadata/labels',
-              value:
-              {
-                [CLUSTER_NAMESPACE_LABEL]: '',
-              },
-            },
-          ],
-        },
-      );
-    }
 
     // If we created this namespace but could not label it, we have a problem
     if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
