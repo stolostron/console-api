@@ -15,7 +15,7 @@ import getApplicationElements, {
   addSubscriptionCharts,
   addSubscriptionDeployable,
   addClusters,
-  processRouteIngress,
+  processServiceOwner,
   processServices,
   processDeployables,
   getSubscriptionPackageInfo,
@@ -338,8 +338,8 @@ describe('addSubscriptionDeployable with parent node', () => {
   });
 });
 
-describe('processRouteIngress for Route', () => {
-  it('processRouteIngress for Route', () => {
+describe('processServiceOwner for Route', () => {
+  it('processServiceOwner for Route', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -405,15 +405,88 @@ describe('processRouteIngress for Route', () => {
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--route--undefined' };
 
-    expect(processRouteIngress(
+    expect(processServiceOwner(
       parentId, deployables, [], [],
       subscriptionStatusMap, names, appNamespace,
     )).toEqual(result);
   });
 });
 
-describe('processRouteIngress for Ingress', () => {
-  it('processRouteIngress for Ingress', () => {
+describe('processServiceOwner for StatefulSet', () => {
+  it('processServiceOwner for StatefulSet', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [{
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'StatefulSet',
+            spec: {
+              serviceName: 'aaa',
+            },
+            metadata: {},
+          },
+      },
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'StatefulSet',
+            metadata: {},
+            spec: {
+            },
+          },
+      },
+    },
+    ];
+
+    const result = {
+      aaa: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--statefulset--undefined',
+    };
+    expect(processServiceOwner(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace,
+    )).toEqual(result);
+  });
+});
+
+describe('processServiceOwner for Ingress', () => {
+  it('processServiceOwner for Ingress', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -481,6 +554,38 @@ describe('processRouteIngress for Ingress', () => {
             metadata: {},
             spec: {
               rules: [
+                {
+                  http: {
+                    paths: [{
+                      backend: {
+                      },
+                    },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+      },
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Ingress',
+            metadata: {},
+            spec: {
+              rules: [
               ],
             },
           },
@@ -489,7 +594,7 @@ describe('processRouteIngress for Ingress', () => {
     ];
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
-    expect(processRouteIngress(
+    expect(processServiceOwner(
       parentId, deployables, [], [],
       subscriptionStatusMap, names, appNamespace,
     )).toEqual(result);

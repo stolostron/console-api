@@ -213,7 +213,8 @@ export const addSubscriptionDeployable = (
   return topoObject;
 };
 
-export const processRouteIngress = (
+// Route, Ingress, StatefulSet
+export const processServiceOwner = (
   clusterId, routes, links, nodes,
   subscriptionStatusMap, names, namespace,
 ) => {
@@ -247,7 +248,9 @@ export const processRouteIngress = (
       });
     } else if (kind === 'StatefulSet') {
       const service = _.get(deployable, 'spec.template.spec.serviceName');
-      if (service) servicesMap[service] = topoObject.id;
+      if (service) {
+        servicesMap[service] = topoObject.id;
+      }
     }
   });
   // return a map of services that must be linked to these router
@@ -282,7 +285,7 @@ export const processDeployables = (
   });
 
   // process route and ingress first
-  const serviceMap = processRouteIngress(
+  const serviceMap = processServiceOwner(
     clusterId, routes, links, nodes,
     subscriptionStatusMap, names, namespace,
   );
