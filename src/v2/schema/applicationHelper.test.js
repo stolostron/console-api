@@ -15,7 +15,7 @@ import getApplicationElements, {
   addSubscriptionCharts,
   addSubscriptionDeployable,
   addClusters,
-  processRouteIngress,
+  processServiceOwner,
   processServices,
   processDeployables,
   getSubscriptionPackageInfo,
@@ -338,8 +338,8 @@ describe('addSubscriptionDeployable with parent node', () => {
   });
 });
 
-describe('processRouteIngress for Route', () => {
-  it('processRouteIngress for Route', () => {
+describe('processServiceOwner for Route', () => {
+  it('processServiceOwner for Route', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -405,15 +405,88 @@ describe('processRouteIngress for Route', () => {
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--route--undefined' };
 
-    expect(processRouteIngress(
+    expect(processServiceOwner(
       parentId, deployables, [], [],
       subscriptionStatusMap, names, appNamespace,
     )).toEqual(result);
   });
 });
 
-describe('processRouteIngress for Ingress', () => {
-  it('processRouteIngress for Ingress', () => {
+describe('processServiceOwner for StatefulSet', () => {
+  it('processServiceOwner for StatefulSet', () => {
+    const parentId = 'member--clusters--braveman';
+    const appNamespace = 'default';
+    const subscriptionStatusMap = {
+      braveman:
+      {
+        'mortgagedc-channel-Service-mortgagedc-svc':
+         {
+           lastUpdateTime: '2020-05-31T06:29:54Z',
+           phase: 'Failed',
+           reason: 'Service "mortgagedc-svc" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+           resourceStatus: {},
+         },
+      },
+    };
+    const names = ['braveman'];
+
+    const deployables = [{
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'StatefulSet',
+            spec: {
+              serviceName: 'aaa',
+            },
+            metadata: {},
+          },
+      },
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'StatefulSet',
+            metadata: {},
+            spec: {
+            },
+          },
+      },
+    },
+    ];
+
+    const result = {
+      aaa: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-route--statefulset--undefined',
+    };
+    expect(processServiceOwner(
+      parentId, deployables, [], [],
+      subscriptionStatusMap, names, appNamespace,
+    )).toEqual(result);
+  });
+});
+
+describe('processServiceOwner for Ingress', () => {
+  it('processServiceOwner for Ingress', () => {
     const parentId = 'member--clusters--braveman';
     const appNamespace = 'default';
     const subscriptionStatusMap = {
@@ -481,6 +554,38 @@ describe('processRouteIngress for Ingress', () => {
             metadata: {},
             spec: {
               rules: [
+                {
+                  http: {
+                    paths: [{
+                      backend: {
+                      },
+                    },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+      },
+    },
+    {
+      apiVersion: 'apps.open-cluster-management.io/v1',
+      kind: 'Deployable',
+      metadata:
+      {
+        name: 'mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress2',
+        namespace: 'default',
+        uid: '4ba0370e-4013-41ff-975a-63f87f0ed7ff',
+      },
+      spec:
+      {
+        template:
+          {
+            apiVersion: 'apps.openshift.io/v1',
+            kind: 'Ingress',
+            metadata: {},
+            spec: {
+              rules: [
               ],
             },
           },
@@ -489,7 +594,7 @@ describe('processRouteIngress for Ingress', () => {
     ];
 
     const result = { service1: 'member--member--deployable--member--clusters--braveman--default--mortgagedc-subscription-mortgagedc-mortgagedc-deploy-ingress--ingress--undefined' };
-    expect(processRouteIngress(
+    expect(processServiceOwner(
       parentId, deployables, [], [],
       subscriptionStatusMap, names, appNamespace,
     )).toEqual(result);
@@ -626,8 +731,8 @@ describe('processDeployables', () => {
   });
 });
 
-describe('addSubscriptionCharts', () => {
-  it('addSubscriptionCharts', () => {
+describe('addSubscriptionCharts ', () => {
+  it('addSubscriptionCharts ', () => {
     const parentId = 'member--clusters--possiblereptile, braveman, sharingpenguin, relievedox';
     const appNamespace = 'open-cluster-management';
     const channelInfo = 'gb-app-latest-ns/guestbook-app-latest';
@@ -636,177 +741,176 @@ describe('addSubscriptionCharts', () => {
 
     const subscriptionStatusMap = {
       braveman:
-      {
-        'guestbook-app-latest-Deployment-frontend':
-         {
-           lastUpdateTime: '2020-05-21T15:54:29Z',
-           phase: 'Failed',
-           reason: 'subscriptions.apps.open-cluster-management.io "sub123" not found',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T15:54:29Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T15:54:29Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-frontend':
-         {
-           lastUpdateTime: '2020-05-21T15:55:36Z',
-           phase: 'Failed',
-           reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T15:55:36Z',
-           phase: 'Failed',
-           reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T15:55:36Z',
-           phase: 'Failed',
-           reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-      },
+  {
+    'guestbook-app-latest-Deployment-frontend':
+     {
+       lastUpdateTime: '2020-05-21T15:54:29Z',
+       phase: 'Failed',
+       reason: 'subscriptions.apps.open-cluster-management.io "sub123" not found',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T15:54:29Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T15:54:29Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-frontend':
+     {
+       lastUpdateTime: '2020-05-21T15:55:36Z',
+       phase: 'Failed',
+       reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T15:55:36Z',
+       phase: 'Failed',
+       reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T15:55:36Z',
+       phase: 'Failed',
+       reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+  },
       possiblereptile:
-      {
-        'guestbook-app-latest-Deployment-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:16:05Z',
-           phase: 'Failed',
-           reason: 'subscriptions.apps.open-cluster-management.io "guestbook-redis" not found',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:16:05Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:16:05Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:15:57Z',
-           phase: 'Failed',
-           reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:15:56Z',
-           phase: 'Failed',
-           reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:15:58Z',
-           phase: 'Failed',
-           reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-      },
+  {
+    'guestbook-app-latest-Deployment-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:16:05Z',
+       phase: 'Failed',
+       reason: 'subscriptions.apps.open-cluster-management.io "guestbook-redis" not found',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:16:05Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:16:05Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:15:57Z',
+       phase: 'Failed',
+       reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:15:56Z',
+       phase: 'Failed',
+       reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:15:58Z',
+       phase: 'Failed',
+       reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+  },
       relievedox:
-      {
-        'guestbook-app-latest-Deployment-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:16:25Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:16:25Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:16:25Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:16:24Z',
-           phase: 'Failed',
-           reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:16:24Z',
-           phase: 'Failed',
-           reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:16:24Z',
-           phase: 'Failed',
-           reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-      },
+  {
+    'guestbook-app-latest-Deployment-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:16:25Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:16:25Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:16:25Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:16:24Z',
+       phase: 'Failed',
+       reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:16:24Z',
+       phase: 'Failed',
+       reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:16:24Z',
+       phase: 'Failed',
+       reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+  },
       sharingpenguin:
-      {
-        'guestbook-app-latest-Deployment-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Deployment-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Subscribed',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-frontend':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Failed',
-           reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-master':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Failed',
-           reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-        'guestbook-app-latest-Service-redis-slave':
-         {
-           lastUpdateTime: '2020-05-21T17:17:13Z',
-           phase: 'Failed',
-           reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
-           resourceStatus: {},
-         },
-      },
+  {
+    'guestbook-app-latest-Deployment-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Deployment-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Subscribed',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-frontend':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Failed',
+       reason: 'Service "frontend" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-master':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Failed',
+       reason: 'Service "redis-master" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+    'guestbook-app-latest-Service-redis-slave':
+     {
+       lastUpdateTime: '2020-05-21T17:17:13Z',
+       phase: 'Failed',
+       reason: 'Service "redis-slave" is invalid: spec.clusterIP: Invalid value: "": field is immutable',
+       resourceStatus: {},
+     },
+  },
     };
-
     const result = [
       {
         id: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--deployment--frontend',
@@ -959,37 +1063,57 @@ describe('addSubscriptionCharts', () => {
       [], [], null, appNamespace, channelInfo, subscriptionName, null,
     )).toEqual(result);
 
-    const result2 = [{
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox----/guestbook-app-resources-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
-      name: 'nginx-2.2.2',
-      namespace: 'open-cluster-management',
-      specs: {
-        deployStatuses: [],
-        isDesign: false,
-        parent: undefined,
-        raw: {
-          apiVersion: 'apps/v1', kind: 'HelmRelease', metadata: { name: 'nginx-2.2.2', namespace: '' }, spec: { channel: 'gb-app-latest-ns/guestbook-app-latest' },
+    const result2 = [
+      {
+        name: 'nginx-deployment',
+        namespace: 'open-cluster-management',
+        type: 'deployment',
+        id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
+        uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
+        specs: {
+          raw: {
+            apiVersion: 'apps/v1',
+            kind: 'Deployment',
+            metadata: {
+              name: 'nginx-deployment',
+              namespace: 'demo-ns-helm-git',
+            },
+            spec: {
+              replicas: 2,
+            },
+          },
+          deployStatuses: [],
+          isDesign: false,
+          parent: undefined,
         },
       },
-      type: 'helmrelease',
-      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox----/guestbook-app-resources-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
-    }, {
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment',
-      name: 'nginx-deployment',
-      namespace: 'open-cluster-management',
-      specs: {
-        deployStatuses: [],
-        isDesign: false,
-        parent: undefined,
-        raw: {
-          apiVersion: 'apps/v1', kind: 'Deployment', metadata: { name: 'nginx-deployment', namespace: 'demo-ns-helm-git' }, spec: { replicas: 2 },
+      {
+        name: 'nginx-deployment',
+        namespace: 'open-cluster-management',
+        type: 'replicaset',
+        id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment',
+        uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment',
+        specs: {
+          isDesign: false,
+          parent: {
+            parentId: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
+            parentName: 'nginx-deployment',
+            parentType: 'deployment',
+          },
+          raw: {
+            kind: 'replicaset',
+            metadata: {
+              name: 'nginx-deployment',
+              namespace: 'open-cluster-management',
+            },
+            spec: {
+              desired: 2,
+              template: {},
+            },
+          },
         },
       },
-      type: 'deployment',
-      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment',
-    }, {
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment', name: 'nginx-deployment', namespace: 'open-cluster-management', specs: { isDesign: false, parent: { parentId: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment', parentName: 'nginx-deployment', parentType: 'deployment' }, raw: { kind: 'replicaset', metadata: { name: 'nginx-deployment', namespace: 'open-cluster-management' }, spec: { desired: 2, template: {} } } }, type: 'replicaset', uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment',
-    }];
+    ];
     expect(addSubscriptionCharts(
       parentId, subscriptionStatusMap,
       [], [], null, appNamespace, channelInfo, subscriptionName, topo,
@@ -1001,6 +1125,7 @@ describe('getSubscriptionPackageInfo', () => {
   it('getSubscriptionPackageInfo', () => {
     const topoAnnotation = 'helmchart/nginx-ingress-4f527-/Service/ns-sub-1/default-backend/0,helmchart/nginx-ingress-4f527-/Deployment/ns-sub-1/controller/1';
     const subscriptionName = 'nginx';
+    const appNs = 'default';
 
     const result = [
       {
@@ -1008,7 +1133,7 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'nginx-ingress-4f527-/nginx-resources-default-backend-service',
+          name: 'nginx-default-backend-default-backend-service',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/default-backend-service',
         },
         spec: {
@@ -1025,7 +1150,7 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'nginx-ingress-4f527-/nginx-resources-controller-deployment',
+          name: 'nginx-controller-controller-deployment',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/controller-deployment',
         },
         spec: {
@@ -1039,7 +1164,7 @@ describe('getSubscriptionPackageInfo', () => {
       },
     ];
 
-    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName)).toEqual(result);
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNs)).toEqual(result);
   });
 });
 
@@ -1054,25 +1179,8 @@ describe('getSubscriptionPackageInfo git helm', () => {
         apiVersion: 'apps.open-cluster-management.io/v1',
         kind: 'Deployable',
         metadata: {
-          namespace: '',
-          name: '/demo-subscription-resources-nginx-2.2.2-helmrelease',
-          selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces//deployables/nginx-2.2.2-helmrelease',
-        },
-        spec: {
-          template: {
-            apiVersion: 'apps/v1',
-            kind: 'HelmRelease',
-            metadata: { namespace: '', name: 'nginx-2.2.2' },
-            spec: { channel: 'demo-ns-helm-git-ch/git-helm-ch' },
-          },
-        },
-      },
-      {
-        apiVersion: 'apps.open-cluster-management.io/v1',
-        kind: 'Deployable',
-        metadata: {
           namespace: 'demo-ns-helm-git',
-          name: 'nginx-fdab7-/demo-subscription-resources-nginx-deployment-deployment',
+          name: 'demo-subscription-nginx-deployment-nginx-deployment-deployment',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/demo-ns-helm-git/deployables/nginx-deployment-deployment',
         },
         spec: {
@@ -1086,6 +1194,6 @@ describe('getSubscriptionPackageInfo git helm', () => {
       },
     ];
 
-    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, channelInfo)).toEqual(result);
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, 'default', channelInfo)).toEqual(result);
   });
 });
