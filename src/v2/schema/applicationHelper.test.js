@@ -960,7 +960,7 @@ describe('addSubscriptionCharts', () => {
     )).toEqual(result);
 
     const result2 = [{
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox----/guestbook-app-resources-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--open-cluster-management--guestbook-app-nginx-2.2.2-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
       name: 'nginx-2.2.2',
       namespace: 'open-cluster-management',
       specs: {
@@ -968,13 +968,13 @@ describe('addSubscriptionCharts', () => {
         isDesign: false,
         parent: undefined,
         raw: {
-          apiVersion: 'apps/v1', kind: 'HelmRelease', metadata: { name: 'nginx-2.2.2', namespace: '' }, spec: { channel: 'gb-app-latest-ns/guestbook-app-latest' },
+          apiVersion: 'apps/v1', kind: 'HelmRelease', metadata: { name: 'nginx-2.2.2', namespace: 'open-cluster-management' }, spec: { channel: 'gb-app-latest-ns/guestbook-app-latest' },
         },
       },
       type: 'helmrelease',
-      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox----/guestbook-app-resources-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
+      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--open-cluster-management--guestbook-app-nginx-2.2.2-nginx-2.2.2-helmrelease--helmrelease--nginx-2.2.2',
     }, {
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment',
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
       name: 'nginx-deployment',
       namespace: 'open-cluster-management',
       specs: {
@@ -986,9 +986,9 @@ describe('addSubscriptionCharts', () => {
         },
       },
       type: 'deployment',
-      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment',
+      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
     }, {
-      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment', name: 'nginx-deployment', namespace: 'open-cluster-management', specs: { isDesign: false, parent: { parentId: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--nginx-fdab7-/guestbook-app-resources-nginx-deployment-deployment--deployment--nginx-deployment', parentName: 'nginx-deployment', parentType: 'deployment' }, raw: { kind: 'replicaset', metadata: { name: 'nginx-deployment', namespace: 'open-cluster-management' }, spec: { desired: 2, template: {} } } }, type: 'replicaset', uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment',
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment', name: 'nginx-deployment', namespace: 'open-cluster-management', specs: { isDesign: false, parent: { parentId: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment', parentName: 'nginx-deployment', parentType: 'deployment' }, raw: { kind: 'replicaset', metadata: { name: 'nginx-deployment', namespace: 'open-cluster-management' }, spec: { desired: 2, template: {} } } }, type: 'replicaset', uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--nginx-deployment',
     }];
     expect(addSubscriptionCharts(
       parentId, subscriptionStatusMap,
@@ -1001,6 +1001,7 @@ describe('getSubscriptionPackageInfo', () => {
   it('getSubscriptionPackageInfo', () => {
     const topoAnnotation = 'helmchart/nginx-ingress-4f527-/Service/ns-sub-1/default-backend/0,helmchart/nginx-ingress-4f527-/Deployment/ns-sub-1/controller/1';
     const subscriptionName = 'nginx';
+    const appNs = 'default';
 
     const result = [
       {
@@ -1008,7 +1009,7 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'nginx-ingress-4f527-/nginx-resources-default-backend-service',
+          name: 'nginx-default-backend-default-backend-service',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/default-backend-service',
         },
         spec: {
@@ -1025,7 +1026,7 @@ describe('getSubscriptionPackageInfo', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'ns-sub-1',
-          name: 'nginx-ingress-4f527-/nginx-resources-controller-deployment',
+          name: 'nginx-controller-controller-deployment',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/ns-sub-1/deployables/controller-deployment',
         },
         spec: {
@@ -1039,7 +1040,7 @@ describe('getSubscriptionPackageInfo', () => {
       },
     ];
 
-    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName)).toEqual(result);
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNs)).toEqual(result);
   });
 });
 
@@ -1054,15 +1055,15 @@ describe('getSubscriptionPackageInfo git helm', () => {
         apiVersion: 'apps.open-cluster-management.io/v1',
         kind: 'Deployable',
         metadata: {
-          namespace: '',
-          name: '/demo-subscription-resources-nginx-2.2.2-helmrelease',
+          namespace: 'default',
+          name: 'demo-subscription-nginx-2.2.2-nginx-2.2.2-helmrelease',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces//deployables/nginx-2.2.2-helmrelease',
         },
         spec: {
           template: {
             apiVersion: 'apps/v1',
             kind: 'HelmRelease',
-            metadata: { namespace: '', name: 'nginx-2.2.2' },
+            metadata: { namespace: 'default', name: 'nginx-2.2.2' },
             spec: { channel: 'demo-ns-helm-git-ch/git-helm-ch' },
           },
         },
@@ -1072,7 +1073,7 @@ describe('getSubscriptionPackageInfo git helm', () => {
         kind: 'Deployable',
         metadata: {
           namespace: 'demo-ns-helm-git',
-          name: 'nginx-fdab7-/demo-subscription-resources-nginx-deployment-deployment',
+          name: 'demo-subscription-nginx-deployment-nginx-deployment-deployment',
           selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/demo-ns-helm-git/deployables/nginx-deployment-deployment',
         },
         spec: {
@@ -1086,6 +1087,6 @@ describe('getSubscriptionPackageInfo git helm', () => {
       },
     ];
 
-    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, channelInfo)).toEqual(result);
+    expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, 'default', channelInfo)).toEqual(result);
   });
 });
