@@ -232,7 +232,7 @@ export const processRouteIngress = (
       if (service) {
         servicesMap[service] = topoObject.id;
       }
-    } else {
+    } else if (kind === 'Ingress') {
       // ingress
       const rules = _.get(deployable, 'spec.template.spec.rules', []);
 
@@ -245,6 +245,9 @@ export const processRouteIngress = (
           }
         });
       });
+    } else if (kind === 'StatefulSet') {
+      const service = _.get(deployable, 'spec.template.spec.serviceName');
+      if (service) servicesMap[service] = topoObject.id;
     }
   });
   // return a map of services that must be linked to these router
@@ -275,7 +278,7 @@ export const processDeployables = (
 ) => {
   const routes = _.filter(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
-    return _.includes(['Route', 'Ingress'], kind);
+    return _.includes(['Route', 'Ingress', 'StatefulSet'], kind);
   });
 
   // process route and ingress first
@@ -298,7 +301,7 @@ export const processDeployables = (
   // then the rest
   const other = _.remove(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
-    return !_.includes(['Route', 'Ingress', 'Service'], kind);
+    return !_.includes(['Route', 'Ingress', 'Service', 'StatefulSet'], kind);
   });
 
   other.forEach((deployable) => {
@@ -353,7 +356,7 @@ export const removeHelmReleaseName = (name, releaseName) => {
   return result;
 };
 
-export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, channelInfo) => {
+export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo) => {
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
@@ -361,17 +364,19 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, cha
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
 
-    if (deployableData.length === 6) {
+    if (deployableData.length === 6 && deployableData[0] === 'helmchart') { // process only helm charts
       const deployableTypeLower = _.toLower(deployableData[2]);
-      const dName = deployableData[0] === 'helmchart' ? removeHelmReleaseName(deployableData[4], deployableData[1]) : deployableData[4];
-      const deployableName = `${deployableData[1]}/${subscriptionName}-resources-${dName}-${deployableTypeLower}`;
+      const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+
+      const namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
+      const deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
       const version = 'apps.open-cluster-management.io/v1';
       const hasReplica = deployableData[5] !== '0';
       const deployable = {
         apiVersion: version,
         kind: 'Deployable',
         metadata: {
-          namespace: deployableData[3],
+          namespace,
           name: deployableName,
           selfLink: `/apis/${version}/namespaces/${deployableData[3]}/deployables/${dName}-${deployableTypeLower}`,
         },
@@ -380,7 +385,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, cha
             apiVersion: 'apps/v1',
             kind: deployableData[2],
             metadata: {
-              namespace: deployableData[3],
+              namespace,
               name: dName,
             },
             spec: {
@@ -399,7 +404,6 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, cha
       deployablesList.push(deployable);
     }
   });
-
   return deployablesList;
 };
 
@@ -409,7 +413,7 @@ export const addSubscriptionCharts = (
   topoAnnotation,
 ) => {
   if (topoAnnotation) {
-    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, channelInfo);
+    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo);
     processDeployables(
       deployablesFromTopo,
       parentId, links, nodes, subscriptionStatusMap, names, appNamespace,
@@ -562,7 +566,6 @@ async function getApplicationElements(application, clusterModel) {
           subscriptionStatusMap[clusterName] = _.get(value, 'packages');
         });
       }
-      const isSubscriptionPlaced = Object.keys(subscriptionStatusMap).length > 0;
 
       // add subscription
       parentId = addSubscription(appId, subscription, isRulePlaced, links, nodes);
@@ -587,17 +590,19 @@ async function getApplicationElements(application, clusterModel) {
             names, clusters, links, nodes,
           );
 
-          if (topoAnnotation || isSubscriptionPlaced) {
-            addSubscriptionCharts(
-              clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
-            );
-          } else if (subscription.deployables) {
+          if (subscription.deployables) {
             // add deployables if any
 
             processDeployables(
               subscription.deployables,
               clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+            );
+          }
+
+          if (topoAnnotation) {
+            addSubscriptionCharts(
+              clusterId, subscriptionStatusMap, nodes,
+              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
             );
           }
         });
