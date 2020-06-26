@@ -357,6 +357,7 @@ export const removeHelmReleaseName = (name, releaseName) => {
 };
 
 export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo) => {
+
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
@@ -367,9 +368,9 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
     if (deployableData.length === 6) {
       const deployableTypeLower = _.toLower(deployableData[2]);
       const dName = deployableData[0] === 'helmchart' ? removeHelmReleaseName(deployableData[4], deployableData[1]) : deployableData[4];
-
       const namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
       const deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
+
       const version = 'apps.open-cluster-management.io/v1';
       const hasReplica = deployableData[5] !== '0';
       const deployable = {
