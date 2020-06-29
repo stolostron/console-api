@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { responseHasError } from '../lib/utils';
+import { getLatestResource, responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
@@ -77,8 +77,8 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
-      if (csrs) {
-        status = csrs.some((c) => !_.get(c, 'status.certificate'))
+      if (csrs && csrs.length) {
+        status = !_.get(getLatestResource(csrs), 'status.certificate')
           ? 'needsapproval' : 'pending';
       }
     } else {

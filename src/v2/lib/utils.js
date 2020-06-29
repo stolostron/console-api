@@ -7,6 +7,7 @@
  * Contract with IBM Corp.
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
+import _ from 'lodash';
 
 export function isRequired(paramName) {
   throw new Error(`${paramName} is required`);
@@ -50,6 +51,20 @@ export function getType(item) {
 export function responseHasError(response) {
   const code = response.statusCode || response.code;
   return code < 200 || code >= 300;
+}
+
+export function getLatestResource(items) {
+  if (items.length === 0) {
+    return undefined;
+  }
+  if (items.length === 1) {
+    return items[0];
+  }
+
+  return items.reduce((a, b) => {
+    const [timeA, timeB] = [a, b].map((x) => new Date(_.get(x, 'metadata.creationTimestamp', '')));
+    return timeA > timeB ? a : b;
+  });
 }
 
 export default {};
