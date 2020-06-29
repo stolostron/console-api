@@ -22,6 +22,7 @@ type Cluster implements K8sObject {
   isManaged: Boolean
   metadata: Metadata
   nodes: Int
+  provisionStatus: String
   serverAddress: String
   status: String
   k8sVersion: String

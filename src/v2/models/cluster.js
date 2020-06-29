@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { getLatestResource, responseHasError } from '../lib/utils';
+import { responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
@@ -24,10 +24,6 @@ export const INSTALL_LABEL_SELECTOR_ALL = `labelSelector=${INSTALL_LABEL}%3Dtrue
 export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
 export const CLUSTER_NAMESPACE_LABEL = `${CLUSTER_DOMAIN}/managedCluster`;
 
-export const CSR_LABEL = 'open-cluster-management.io/cluster-name';
-export const CSR_LABEL_SELECTOR = (cluster) => `labelSelector=${CSR_LABEL}%3D${cluster}`;
-export const CSR_LABEL_SELECTOR_ALL = `labelSelector=${CSR_LABEL}`;
-
 // The last char(s) in usage are units - need to be removed in order to get an int for calculation
 function getPercentage(usage, capacity) {
   return (usage.substring(0, usage.length - 2) / capacity.substring(0, capacity.length - 2)) * 100;
@@ -37,28 +33,26 @@ function getCPUPercentage(usage, capacity) {
   return ((usage.substring(0, usage.length - 1) / 1000) / capacity) * 100;
 }
 
-function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
+function getProvisionStatus(clusterDeployment, uninstall, install) {
   const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
   const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
-  let status = 'unknown';
+  // unknown means there is a ClusterDeployment with undetermined status
+  // '' means there is no ClusterDeployment
+  let status = clusterDeployment ? 'unknown' : '';
   if ((install && install.every((i) => i.status.failed > 0))
   || (uninstall && uninstall.every((i) => i.status.failed > 0))) {
-    status = 'provisionfailed';
+    status = 'failed';
   } else if (uninstall && uninstall.some((i) => i.status.active > 0)) {
     status = 'destroying';
   } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
-    status = 'detached';
+    status = 'ok';
   } else if (install) {
     status = 'creating';
   }
   return status;
 }
 
-function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
-  const clusterDeploymentStatus = clusterDeployment
-    ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
-    : '';
-
+function getStatus(cluster) {
   if (cluster) {
     if (_.get(cluster, 'metadata.deletionTimestamp')) {
       return 'detaching';
@@ -77,22 +71,13 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
-      if (csrs && csrs.length) {
-        status = !_.get(getLatestResource(csrs), 'status.certificate')
-          ? 'needsapproval' : 'pending';
-      }
     } else {
       status = clusterAvailable ? 'ok' : 'offline';
     }
 
-    // if ManagedCluster has not joined, show ClusterDeployment status
-    // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster)
-    if (!clusterJoined && clusterDeploymentStatus && clusterDeploymentStatus !== 'detached') {
-      return clusterDeploymentStatus;
-    }
     return status;
   }
-  return clusterDeploymentStatus;
+  return '';
 }
 
 function mapResources(resources, kind) {
@@ -116,14 +101,12 @@ function mapData({
   managedClusters,
   managedClusterInfos,
   clusterDeployments,
-  certificateSigningRequestList,
   uninstallJobList,
   installJobList,
 }) {
   const managedClusterMap = mapResources(managedClusters, 'ManagedCluster');
   const clusterDeploymentMap = mapResources(clusterDeployments, 'ClusterDeployment');
   const managedClusterInfoMap = mapResources(managedClusterInfos, 'ManagedClusterInfo');
-  const certificateSigningRequestListMap = mapResourceListByLabel(certificateSigningRequestList, CSR_LABEL);
   const uninstallJobListMap = mapResourceListByLabel(uninstallJobList, CLUSTER_LABEL);
   const installJobListMap = mapResourceListByLabel(installJobList, CLUSTER_LABEL);
 
@@ -136,7 +119,6 @@ function mapData({
     managedClusterMap,
     clusterDeploymentMap,
     managedClusterInfoMap,
-    certificateSigningRequestListMap,
     uninstallJobListMap,
     installJobListMap,
     uniqueClusterNames,
@@ -147,21 +129,18 @@ function getClusterResourcesFromMappedData({
   managedClusterMap,
   clusterDeploymentMap,
   managedClusterInfoMap,
-  certificateSigningRequestListMap,
   uninstallJobListMap,
   installJobListMap,
 }, cluster) {
   const managedCluster = managedClusterMap.get(cluster);
   const managedClusterInfo = managedClusterInfoMap.get(cluster);
   const clusterDeployment = clusterDeploymentMap.get(cluster);
-  const certificateSigningRequestList = certificateSigningRequestListMap.get(cluster);
   const uninstallJobList = uninstallJobListMap.get(cluster);
   const installJobList = installJobListMap.get(cluster);
   return {
     managedCluster,
     managedClusterInfo,
     clusterDeployment,
-    certificateSigningRequestList,
     uninstallJobList,
     installJobList,
   };
@@ -205,7 +184,6 @@ function findMatchedStatus(data) {
       managedCluster,
       managedClusterInfo,
       clusterDeployment,
-      certificateSigningRequestList,
       uninstallJobList,
       installJobList,
     } = getClusterResourcesFromMappedData(mappedData, c);
@@ -213,15 +191,15 @@ function findMatchedStatus(data) {
     const nodeCount = (_.get(managedClusterInfo, 'raw.status.nodeList') || []).length;
     const nodes = nodeCount > 0 ? nodeCount : null;
     const k8sVersion = _.get(managedClusterInfo, 'raw.status.version', '-');
-    const status = getStatus(
-      _.get(managedCluster, 'raw'),
-      certificateSigningRequestList,
+    const status = getStatus(_.get(managedCluster, 'raw'));
+    const provisionStatus = getProvisionStatus(
       _.get(clusterDeployment, 'raw'),
       uninstallJobList,
       installJobList,
     );
     _.merge(cluster, {
       nodes,
+      provisionStatus,
       status,
       k8sVersion,
       isHive: !!clusterDeployment,
@@ -550,7 +528,6 @@ export default class ClusterModel extends KubeModel {
       managedClusters,
       managedClusterInfos,
       clusterDeployments,
-      certificateSigningRequestList,
       uninstallJobList,
       installJobList,
     ] = await Promise.all([
@@ -566,10 +543,6 @@ export default class ClusterModel extends KubeModel {
         '/apis/hive.openshift.io/v1/clusterdeployments',
         (ns) => `/apis/hive.openshift.io/v1/namespaces/${ns}/clusterdeployments`,
       ),
-      this.kubeConnector.get(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR_ALL}`)
-        .then((allItems) => (allItems.items
-          ? allItems.items
-          : [])),
       rbacFallbackQuery(
         `/apis/batch/v1/jobs?${UNINSTALL_LABEL_SELECTOR_ALL}`,
         (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${UNINSTALL_LABEL_SELECTOR(ns)}`,
@@ -584,7 +557,6 @@ export default class ClusterModel extends KubeModel {
       managedClusters,
       managedClusterInfos,
       clusterDeployments,
-      certificateSigningRequestList,
       uninstallJobList,
       installJobList,
     };
@@ -607,14 +579,12 @@ export default class ClusterModel extends KubeModel {
       managedCluster,
       clusterDeployment,
       managedClusterInfo,
-      certificateSigningRequestList,
       uninstallJobList,
       installJobList,
     ] = await Promise.all([
       this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${name}/clusterdeployments/${name}`),
       this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`),
-      listQuery(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
@@ -622,7 +592,6 @@ export default class ClusterModel extends KubeModel {
       managedClusters: [managedCluster],
       clusterDeployments: [clusterDeployment],
       managedClusterInfos: [managedClusterInfo],
-      certificateSigningRequestList,
       uninstallJobList,
       installJobList,
     });
