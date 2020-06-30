@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { responseHasError } from '../lib/utils';
+import { getLatestResource, responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
@@ -77,18 +77,17 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
-      if (csrs && csrs.some((c) => !_.get(c, 'status.certificate'))) {
-        status = 'needsapproval';
+      if (csrs && csrs.length) {
+        status = !_.get(getLatestResource(csrs), 'status.certificate')
+          ? 'needsapproval' : 'pending';
       }
     } else {
       status = clusterAvailable ? 'ok' : 'offline';
     }
 
-    // If cluster is pendingimport/notaccepted/needsapproval import because Hive is
-    // installing/uninstalling/failed, show that status instead
-    if ((status === 'pendingimport' || status === 'notaccepted' || status === 'needsapproval')
-      && clusterDeploymentStatus
-      && clusterDeploymentStatus !== 'detached') {
+    // if ManagedCluster has not joined, show ClusterDeployment status
+    // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster)
+    if (!clusterJoined && clusterDeploymentStatus && clusterDeploymentStatus !== 'detached') {
       return clusterDeploymentStatus;
     }
     return status;
@@ -309,36 +308,21 @@ export default class ClusterModel extends KubeModel {
 
     // Mark namespace as a cluster namespace
     // First try adding a label
-    let labelNamespaceResponse = await this.kubeConnector.patch(
+    const labelNamespaceResponse = await this.kubeConnector.patch(
       `/api/v1/namespaces/${clusterNamespace}`,
       {
-        body: [
-          {
-            op: 'add',
-            path: `/metadata/labels/${CLUSTER_NAMESPACE_LABEL.replace('/', '~1')}`,
-            value: '',
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
+        body: {
+          metadata: {
+            labels: {
+              [CLUSTER_NAMESPACE_LABEL]: clusterNamespace,
+            },
           },
-        ],
+        },
       },
     );
-    if (responseHasError(labelNamespaceResponse)) {
-      // Otherwise, try labels object
-      labelNamespaceResponse = await this.kubeConnector.patch(
-        `/api/v1/namespaces/${clusterNamespace}`,
-        {
-          body: [
-            {
-              op: 'add',
-              path: '/metadata/labels',
-              value:
-              {
-                [CLUSTER_NAMESPACE_LABEL]: '',
-              },
-            },
-          ],
-        },
-      );
-    }
 
     // If we created this namespace but could not label it, we have a problem
     if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
