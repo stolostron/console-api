@@ -3,6 +3,7 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 import _ from 'lodash';
+import yaml from 'js-yaml';
 import KubeModel from './kube';
 
 const MAX_PARALLEL_REQUESTS = 5;
@@ -95,7 +96,7 @@ export default class BareMetalAssetModel extends KubeModel {
     return [];
   }
 
-  async syncBMAs(hosts) {
+  async syncBMAs(hosts, cluster) {
     // make sure all hosts have a bare metal asset
     const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets');
     const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
@@ -126,9 +127,13 @@ export default class BareMetalAssetModel extends KubeModel {
       }));
     }
 
-    // make sure all hosts have a user/password
+    // make sure all hosts have a user/password in both ClusterDeployment and install-config.yaml
     const filteredHosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
-    if (filteredHosts.length > 0) {
+    const installConfig = cluster.find(({data})=>{return data && data["install-config.yaml"]});
+    const installConfigData = yaml.safeLoad(Buffer.from(installConfig.data["install-config.yaml"], 'base64').toString('ascii'));
+    const installConfigHosts = _.get(installConfigData, 'platform.baremetal.hosts', []);
+    const filteredInstallConfigHosts = installConfigHosts.filter((host) => !_.get(host, 'bmc.username'));
+    if (filteredHosts.length > 0 || filteredInstallConfigHosts.length>0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets')
         .then((allSecrets) => (allSecrets.items ? allSecrets.items
           : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
@@ -137,16 +142,23 @@ export default class BareMetalAssetModel extends KubeModel {
         const namespace = _.get(secret, 'metadata.namespace');
         return `${name}-${namespace}`;
       });
-      filteredHosts.forEach((host) => {
-        const { name, namespace } = host;
-        const secret = secretMap[`${name}-${namespace}`];
-        if (secret) {
-          const { data = {} } = secret;
-          const { username, password } = data;
-          _.set(host, 'bmc.username', username ? Buffer.from(username, 'base64').toString('ascii') : undefined);
-          _.set(host, 'bmc.password', password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
-        }
-      });
+      const setSecrets = (fhosts) => {
+        fhosts.forEach((host) => {
+          const { name, namespace } = host;
+          const secret = secretMap[`${name}-${namespace}`];
+          if (secret) {
+            const { data = {} } = secret;
+            const { username, password } = data;
+            _.set(host, 'bmc.username', username ? Buffer.from(username, 'base64').toString('ascii') : undefined);
+            _.set(host, 'bmc.password', password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
+          }
+        });
+      }
+      setSecrets(filteredHosts);
+      setSecrets(filteredInstallConfigHosts);
+      if (filteredInstallConfigHosts.length>0) {
+        installConfig.data["install-config.yaml"] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
+      }
     }
   }
 
@@ -454,4 +466,35 @@ export default class BareMetalAssetModel extends KubeModel {
       });
     }
   }
+  
+
+  async detachBMAs({namespace, cluster}, errors) {
+    // find the bma's attached to this cluster
+    const allBareMetalAssets = await this.getAllBareMetalAssets({});
+    const filteredBareMetalAssets = allBareMetalAssets.filter(bma=>{
+      return _.get(bma, 'clusterDeployment.name')===cluster && _.get(bma, 'clusterDeployment.namespace')===namespace;
+    })
+    
+    // remove the attachment
+    await Promise.all(filteredBareMetalAssets.map(({ spec, metadata: { namespace, name } }) => {
+      const newSpec = {
+        ...spec,
+        clusterDeployment: {
+          name: "",
+          namespace: "",
+        },
+      };
+      const bmaBody = {
+        body: [
+          {
+            op: 'replace',
+            path: '/spec',
+            value: newSpec,
+          },
+        ],
+      };
+      return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+    }));
+  }
+
 }
