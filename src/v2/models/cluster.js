@@ -40,7 +40,7 @@ function getCPUPercentage(usage, capacity) {
 function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
   const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
-  let status = 'unknown';
+  let status = 'pending';
   if ((install && install.every((i) => i.status.failed > 0))
   || (uninstall && uninstall.every((i) => i.status.failed > 0))) {
     status = 'provisionfailed';
