@@ -474,7 +474,7 @@ export default class BareMetalAssetModel extends KubeModel {
 
     // get the full asset
     const requests = hosts.map((bma) => {
-      const { metadata: { namespace:ns, name } } = bma;
+      const { metadata: { namespace: ns, name } } = bma;
       return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`;
     });
     let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
@@ -487,7 +487,7 @@ export default class BareMetalAssetModel extends KubeModel {
     });
 
     // remove the attachment
-    await Promise.all(bmas.map(({ spec, metadata: { namespace:ns, name } } ) => {
+    await Promise.all(bmas.map(({ spec, metadata: { namespace: ns, name } }) => {
       const newSpec = _.cloneDeep(spec);
       delete newSpec.role;
       delete newSpec.clusterDeployment;
