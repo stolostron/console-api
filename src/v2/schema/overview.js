@@ -87,7 +87,7 @@ export const resolver = {
 
       // policy compliances
       let compliances = await complianceModel.getCompliances();
-      compliances = compliances.filter((c) => _.has(c, 'raw.status.status')).map(({ raw: { status: { status } } }) => ({
+      compliances = compliances.filter((c) => _.has(c, 'raw.status')).map(({ raw: { status: { status } } }) => ({
         raw: {
           status: {
             status,
