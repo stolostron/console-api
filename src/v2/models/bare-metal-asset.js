@@ -114,10 +114,8 @@ export default class BareMetalAssetModel extends KubeModel {
     if (newAssets.length > 0) {
       // make sure there's a namespace for all assets
       const namespaces = _.keyBy(newAssets, 'namespace');
-      await Promise.all(Object.keys(namespaces).map((namespace) => {
-        return this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } });
-      }));
-      
+      await Promise.all(Object.keys(namespaces).map((namespace) => this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } })));
+
       // then create secrets and bma's
       await Promise.all(newAssets.map((asset) => {
         const {
