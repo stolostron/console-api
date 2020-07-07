@@ -129,11 +129,11 @@ export default class BareMetalAssetModel extends KubeModel {
 
     // make sure all hosts have a user/password in both ClusterDeployment and install-config.yaml
     const filteredHosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
-    const installConfig = cluster.find(({data})=>{return data && data["install-config.yaml"]});
-    const installConfigData = yaml.safeLoad(Buffer.from(installConfig.data["install-config.yaml"], 'base64').toString('ascii'));
+    const installConfig = cluster.find(({ data }) => data && data['install-config.yaml']);
+    const installConfigData = yaml.safeLoad(Buffer.from(installConfig.data['install-config.yaml'], 'base64').toString('ascii'));
     const installConfigHosts = _.get(installConfigData, 'platform.baremetal.hosts', []);
     const filteredInstallConfigHosts = installConfigHosts.filter((host) => !_.get(host, 'bmc.username'));
-    if (filteredHosts.length > 0 || filteredInstallConfigHosts.length>0) {
+    if (filteredHosts.length > 0 || filteredInstallConfigHosts.length > 0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets')
         .then((allSecrets) => (allSecrets.items ? allSecrets.items
           : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
@@ -153,11 +153,11 @@ export default class BareMetalAssetModel extends KubeModel {
             _.set(host, 'bmc.password', password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
           }
         });
-      }
+      };
       setSecrets(filteredHosts);
       setSecrets(filteredInstallConfigHosts);
-      if (filteredInstallConfigHosts.length>0) {
-        installConfig.data["install-config.yaml"] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
+      if (filteredInstallConfigHosts.length > 0) {
+        installConfig.data['install-config.yaml'] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
       }
     }
   }
@@ -466,19 +466,16 @@ export default class BareMetalAssetModel extends KubeModel {
       });
     }
   }
-  
 
-  async detachBMAs({namespace, cluster}, errors) {
+  async detachBMAs({ namespace, cluster }, errors) {
     // find the bma's attached to this cluster
     const allBareMetalAssets = await this.getAllBareMetalAssets({});
-    const hosts = allBareMetalAssets.filter(bma=>{
-      return _.get(bma, 'clusterDeployment.name')===cluster && _.get(bma, 'clusterDeployment.namespace')===namespace;
-    })
-    
+    const hosts = allBareMetalAssets.filter((bma) => _.get(bma, 'clusterDeployment.name') === cluster && _.get(bma, 'clusterDeployment.namespace') === namespace);
+
     // get the full asset
     const requests = hosts.map((bma) => {
-      const { metadata: {namespace, name} } = bma;
-      return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+      const { metadata: { namespace:ns, name } } = bma;
+      return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`;
     });
     let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
     bmas = bmas.filter((result) => {
@@ -490,9 +487,9 @@ export default class BareMetalAssetModel extends KubeModel {
     });
 
     // remove the attachment
-    await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
+    await Promise.all(bmas.map(({ spec, metadata: { namespace:ns, name } } ) => {
       const newSpec = _.cloneDeep(spec);
-      delete newSpec.role
+      delete newSpec.role;
       delete newSpec.clusterDeployment;
       const bmaBody = {
         body: [
@@ -503,8 +500,7 @@ export default class BareMetalAssetModel extends KubeModel {
           },
         ],
       };
-      return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+      return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`, bmaBody);
     }));
   }
-
 }

@@ -46,7 +46,7 @@ export const resolver = {
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
       // if creating a bare metal cluster, make sure all hosts have user/password
-      const {cluster} = args
+      const { cluster } = args;
       const map = _.keyBy(cluster, 'kind');
       const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
       if (hosts) {
@@ -68,7 +68,7 @@ export const resolver = {
     detachCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
       const result = await clusterModel.detachCluster(args);
       await bareMetalAssetModel.detachBMAs(args);
-      return result
-    }
+      return result;
+    },
   },
 };
