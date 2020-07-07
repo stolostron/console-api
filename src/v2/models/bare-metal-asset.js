@@ -471,19 +471,29 @@ export default class BareMetalAssetModel extends KubeModel {
   async detachBMAs({namespace, cluster}, errors) {
     // find the bma's attached to this cluster
     const allBareMetalAssets = await this.getAllBareMetalAssets({});
-    const filteredBareMetalAssets = allBareMetalAssets.filter(bma=>{
+    const hosts = allBareMetalAssets.filter(bma=>{
       return _.get(bma, 'clusterDeployment.name')===cluster && _.get(bma, 'clusterDeployment.namespace')===namespace;
     })
     
+    // get the full asset
+    const requests = hosts.map((bma) => {
+      const { metadata: {namespace, name} } = bma;
+      return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`;
+    });
+    let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
+    bmas = bmas.filter((result) => {
+      if (result.code) {
+        errors.push({ statusCode: result.code, message: result.message });
+        return false;
+      }
+      return true;
+    });
+
     // remove the attachment
-    await Promise.all(filteredBareMetalAssets.map(({ spec, metadata: { namespace, name } }) => {
-      const newSpec = {
-        ...spec,
-        clusterDeployment: {
-          name: "",
-          namespace: "",
-        },
-      };
+    await Promise.all(bmas.map(({ spec, metadata: { namespace, name } }, inx) => {
+      const newSpec = _.cloneDeep(spec);
+      delete newSpec.role
+      delete newSpec.clusterDeployment;
       const bmaBody = {
         body: [
           {

@@ -66,8 +66,9 @@ export const resolver = {
       return results;
     },
     detachCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
-      await clusterModel.detachCluster(args);
+      const result = await clusterModel.detachCluster(args);
       await bareMetalAssetModel.detachBMAs(args);
+      return result
     }
   },
 };
