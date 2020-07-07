@@ -524,16 +524,7 @@ async function getApplicationElements(application, clusterModel) {
   });
 
   // get clusters labels
-  const labelMap = [];
   const clusters = await clusterModel.getAllClusters();
-  clusters.forEach(({
-    metadata,
-  }) => {
-    const { labels } = metadata;
-    Object.entries(labels).forEach(([key, value]) => {
-      labelMap[`${key}: "${value}"`] = { key, value };
-    });
-  });
 
   // if application has subscriptions
   let memberId;
