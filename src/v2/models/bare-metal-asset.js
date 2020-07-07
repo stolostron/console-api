@@ -7,6 +7,9 @@ import yaml from 'js-yaml';
 import KubeModel from './kube';
 
 const MAX_PARALLEL_REQUESTS = 5;
+const INSTALL_CONFIG = 'install-config.yaml';
+const BMC_USERNAME = 'bmc.username';
+const BMC_PASSWORD = 'bmc.password';
 
 export function transform(bareMetalAsset, secrets = []) {
   const { metadata, spec, status } = bareMetalAsset;
@@ -133,11 +136,11 @@ export default class BareMetalAssetModel extends KubeModel {
     }
 
     // make sure all hosts have a user/password in both ClusterDeployment and install-config.yaml
-    const filteredHosts = hosts.filter((host) => !_.get(host, 'bmc.username'));
-    const installConfig = cluster.find(({ data }) => data && data['install-config.yaml']);
-    const installConfigData = yaml.safeLoad(Buffer.from(installConfig.data['install-config.yaml'], 'base64').toString('ascii'));
+    const filteredHosts = hosts.filter((host) => !_.get(host, BMC_USERNAME));
+    const installConfig = cluster.find(({ data }) => data && data[INSTALL_CONFIG]);
+    const installConfigData = yaml.safeLoad(Buffer.from(installConfig.data[INSTALL_CONFIG], 'base64').toString('ascii'));
     const installConfigHosts = _.get(installConfigData, 'platform.baremetal.hosts', []);
-    const filteredInstallConfigHosts = installConfigHosts.filter((host) => !_.get(host, 'bmc.username'));
+    const filteredInstallConfigHosts = installConfigHosts.filter((host) => !_.get(host, BMC_USERNAME));
     if (filteredHosts.length > 0 || filteredInstallConfigHosts.length > 0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets')
         .then((allSecrets) => (allSecrets.items ? allSecrets.items
@@ -154,15 +157,15 @@ export default class BareMetalAssetModel extends KubeModel {
           if (secret) {
             const { data = {} } = secret;
             const { username, password } = data;
-            _.set(host, 'bmc.username', username ? Buffer.from(username, 'base64').toString('ascii') : undefined);
-            _.set(host, 'bmc.password', password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
+            _.set(host, BMC_USERNAME, username ? Buffer.from(username, 'base64').toString('ascii') : undefined);
+            _.set(host, BMC_PASSWORD, password ? Buffer.from(password, 'base64').toString('ascii') : undefined);
           }
         });
       };
       setSecrets(filteredHosts);
       setSecrets(filteredInstallConfigHosts);
       if (filteredInstallConfigHosts.length > 0) {
-        installConfig.data['install-config.yaml'] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
+        installConfig.data[INSTALL_CONFIG] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
       }
     }
   }
@@ -472,7 +475,7 @@ export default class BareMetalAssetModel extends KubeModel {
     }
   }
 
-  async detachBMAs({ namespace, cluster }, errors) {
+  async detachBMAs({ namespace, cluster }) {
     // find the bma's attached to this cluster
     const allBareMetalAssets = await this.getAllBareMetalAssets({});
     const hosts = allBareMetalAssets.filter((bma) => _.get(bma, 'clusterDeployment.name') === cluster && _.get(bma, 'clusterDeployment.namespace') === namespace);
@@ -484,11 +487,7 @@ export default class BareMetalAssetModel extends KubeModel {
     });
     let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
     bmas = bmas.filter((result) => {
-      if (result.code) {
-        errors.push({ statusCode: result.code, message: result.message });
-        return false;
-      }
-      return true;
+      return !result.code;
     });
 
     // remove the attachment
