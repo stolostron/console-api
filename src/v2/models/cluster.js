@@ -291,14 +291,19 @@ export default class ClusterModel extends KubeModel {
 
     if (responseHasError(projectResponse)) {
       if (projectResponse.code === 409) {
+        projectResponse = await this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`);
+        // Check for terminating namespace
+        if (_.get(projectResponse, 'status.phase') === 'Terminating') {
+          throw new Error(`Namespace ${clusterNamespace} is terminating. Wait until it is terminated or use a different namespace.`);
+        }
         const existingNamespaceClusters = await this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${clusterNamespace}`);
         if (existingNamespaceClusters.items && existingNamespaceClusters.items.length > 0) {
-          throw new Error(`Create Cluster Namespace failed: A ManagedCluster of the name "${clusterNamespace}" already exists.`);
+          throw new Error(`A ManagedCluster of the name "${clusterNamespace}" already exists.`);
         }
         if (checkForDeployment) {
           const existingNamespaceClusterDeployments = await this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${clusterNamespace}/clusterdeployments`);
           if (existingNamespaceClusterDeployments.items && existingNamespaceClusterDeployments.items.length > 0) {
-            throw new Error(`Create Cluster Namespace failed: Namespace "${clusterNamespace}" already contains a ClusterDeployment resource`);
+            throw new Error(`Namespace "${clusterNamespace}" already contains a ClusterDeployment resource`);
           }
         }
       } else {
