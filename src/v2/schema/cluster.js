@@ -67,7 +67,7 @@ export const resolver = {
     },
     detachCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
       const result = await clusterModel.detachCluster(args);
-      if (result===204) {
+      if (result === 204) {
         await bareMetalAssetModel.detachBMAs(args);
       }
       return result;
