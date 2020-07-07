@@ -486,9 +486,7 @@ export default class BareMetalAssetModel extends KubeModel {
       return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`;
     });
     let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
-    bmas = bmas.filter((result) => {
-      return !result.code;
-    });
+    bmas = bmas.filter((result) => !result.code);
 
     // remove the attachment
     await Promise.all(bmas.map(({ spec, metadata: { namespace: ns, name } }) => {
