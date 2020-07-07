@@ -718,7 +718,9 @@ export default class ClusterModel extends KubeModel {
       const name = _.get(imageSet, 'metadata.name');
       const releaseImage = _.get(imageSet, 'spec.releaseImage');
       if (name && releaseImage) {
-        clusterImageSets[releaseImage] = { releaseImage: releaseImage, name: name };
+        clusterImageSets[releaseImage] = {};
+        clusterImageSets[releaseImage].releaseImage = releaseImage;
+        clusterImageSets[releaseImage].name = name;
         clusterImageSets[releaseImage].channel = _.get(imageSet, 'metadata.labels.channel');
         clusterImageSets[releaseImage].visible = _.get(imageSet, 'metadata.labels.visible');
         clusterImageSets[releaseImage].platformAws = _.get(imageSet, 'metadata.labels')['platform.aws'];
@@ -732,7 +734,7 @@ export default class ClusterModel extends KubeModel {
         }
       }
     });
-    return Object.entries(clusterImageSets).map(([releaseImage, data]) => (data));
+    return Object.entries(clusterImageSets).map(([, data]) => (data));
   }
 
   async pollImportYamlSecret(clusterNamespace, clusterName) {
