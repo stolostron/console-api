@@ -83,6 +83,15 @@ describe('Cluster Resolver', () => {
           clusterImageSets {
             name
             releaseImage
+            channel
+            visible
+            platformAws
+            platformGcp
+            platformAzure
+            platformBmc
+            platformVmware
+            imagecontentsourceUrl
+            imagecontentsourceMirrorUrl
           }
         }
       `,

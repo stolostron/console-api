@@ -34,6 +34,15 @@ type Cluster implements K8sObject {
 type ClusterImageSet {
   name: String
   releaseImage: String
+  channel: String
+  visible: String
+  platformAws: String
+  platformGcp: String
+  platformAzure: String
+  platformBmc: String
+  platformVmware: String
+  imagecontentsourceUrl: String
+  imagecontentsourceMirrorUrl: String
 }
 `;
 
