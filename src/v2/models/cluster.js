@@ -349,6 +349,14 @@ export default class ClusterModel extends KubeModel {
     const updated = [];
     const errors = [];
 
+    const checkAndCollectError = (response) => {
+      if (response.code >= 400 || response.status === 'Failure' || response.message) {
+        errors.push({ message: response.message });
+        return true;
+      }
+      return false;
+    };
+
     // get namespace and filter out any namespace resource
     let namespace;
     resources = resources.filter(({ kind, metadata = {}, spec = {} }) => {
@@ -427,9 +435,7 @@ export default class ClusterModel extends KubeModel {
       errors.push({ message: error.message });
       return { errors };
     }
-    if (responseHasError(namespaceResponse)) {
-      // failed to create the namespace at all
-      errors.push({ message: namespaceResponse.message });
+    if (checkAndCollectError(namespaceResponse)) {
       return { errors };
     }
 
@@ -455,9 +461,7 @@ export default class ClusterModel extends KubeModel {
       }
       return true;
     }).forEach((item) => {
-      if (item.code >= 400 || item.status === 'Failure' || item.message) {
-        errors.push({ message: item.message });
-      }
+      checkAndCollectError(item);
     });
 
     // if the only errors were "already existing", patch those resources
@@ -481,11 +485,9 @@ export default class ClusterModel extends KubeModel {
 
       // report any errors
       replaced.forEach((item) => {
-        if (!responseHasError(item)) {
+        if (!checkAndCollectError(item)) {
           const { kind, metadata = {} } = item;
           updated.push({ name: metadata.name, kind });
-        } else if (item.code >= 400 || item.status === 'Failure' || item.message) {
-          errors.push({ message: item.message });
         }
       });
     }
@@ -500,12 +502,11 @@ export default class ClusterModel extends KubeModel {
             status: 'Failure',
             message: err.message,
           }));
-        if (deployment.code >= 400 || deployment.status === 'Failure' || deployment.message) {
-          errors.push({ message: deployment.message });
-        }
+        checkAndCollectError(deployment);
       } else {
         // import case - fetch and return the generated secret
         importSecret = await this.pollImportYamlSecret(namespace, namespace);
+        checkAndCollectError(importSecret);
       }
     }
 

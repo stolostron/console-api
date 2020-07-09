@@ -10,6 +10,10 @@
 export const getNamespaceCreationResponse = {
   body: {
     kind: 'Namespace',
+    metadata:
+    {
+      name: 'a-namespace',
+    },
   },
   statusCode: 201,
 };
@@ -24,6 +28,10 @@ export const getKlusterletAddonConfigsResponse = {
 export const getClusterResponse = {
   body: {
     kind: 'Cluster',
+    metadata:
+    {
+      name: 'a-cluster',
+    },
   },
   statusCode: 201,
 };
@@ -33,4 +41,17 @@ export const getImportYamlSecret = {
     kind: 'Secret',
   },
   statusCode: 200,
+};
+
+export const badImportYamlSecret = {
+  body: {
+    'kind': 'Status',
+    'apiVersion': 'v1',
+    'metadata': {},
+    'status': 'Failure',
+    'message': 'secrets "no-yaml-import" not found',
+    'reason': 'NotFound',
+    'details': { 'name': 'no-yaml-import', 'kind': 'secrets' },
+    'code': 404,
+  },
 };
