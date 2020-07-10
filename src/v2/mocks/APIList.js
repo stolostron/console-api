@@ -18,6 +18,8 @@ export const mockResponse = {
       '/apis/admissionregistration.k8s.io',
       '/apis/admissionregistration.k8s.io/v1alpha1',
       '/apis/admissionregistration.k8s.io/v1beta1',
+      '/apis/agent.open-cluster-management.io',
+      '/apis/agent.open-cluster-management.io/v1',
       '/apis/apiextensions.k8s.io',
       '/apis/apiextensions.k8s.io/v1beta1',
       '/apis/apiregistration.k8s.io',
@@ -44,6 +46,8 @@ export const mockResponse = {
       '/apis/certificates.k8s.io/v1beta1',
       '/apis/certmanager.k8s.io',
       '/apis/certmanager.k8s.io/v1alpha1',
+      '/apis/cluster.open-cluster-management.io',
+      '/apis/cluster.open-cluster-management.io/v1',
       '/apis/compliance.mcm.ibm.com',
       '/apis/compliance.mcm.ibm.com/v1alpha1',
       '/apis/custom.metrics.k8s.io',
@@ -479,6 +483,82 @@ export const apiPath = {
         singularName: '',
         namespaced: true,
         kind: 'WorkSet',
+        verbs: [
+          'get',
+          'patch',
+          'update',
+        ],
+      },
+    ],
+  },
+};
+
+export const ocmClusterApiPath = {
+  body: {
+    kind: 'APIResourceList',
+    apiVersion: 'v1',
+    groupVersion: 'cluster.open-cluster-management.io/v1',
+    resources: [
+      {
+        name: 'managedclusters',
+        singularName: 'managedcluster',
+        namespaced: false,
+        kind: 'ManagedCluster',
+        verbs: [
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'create',
+          'update',
+          'watch',
+        ],
+        storageVersionHash: 'DuqQMgCnGgw=',
+      },
+      {
+        name: 'managedclusters/status',
+        singularName: '',
+        namespaced: false,
+        kind: 'ManagedCluster',
+        verbs: [
+          'get',
+          'patch',
+          'update',
+        ],
+      },
+    ],
+  },
+};
+
+export const ocmAgentApiPath = {
+  body: {
+    kind: 'APIResourceList',
+    apiVersion: 'v1',
+    groupVersion: 'agent.open-cluster-management.io/v1',
+    resources: [
+      {
+        name: 'klusterletaddonconfigs',
+        singularName: 'klusterletaddonconfig',
+        namespaced: true,
+        kind: 'KlusterletAddonConfig',
+        verbs: [
+          'delete',
+          'deletecollection',
+          'get',
+          'list',
+          'patch',
+          'create',
+          'update',
+          'watch',
+        ],
+        storageVersionHash: 'XAiWNFFUtMs=',
+      },
+      {
+        name: 'klusterletaddonconfigs/status',
+        singularName: '',
+        namespaced: true,
+        kind: 'KlusterletAddonConfig',
         verbs: [
           'get',
           'patch',

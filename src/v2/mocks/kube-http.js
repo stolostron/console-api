@@ -23,6 +23,8 @@ export default function createMockHttp() {
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
+      ocmClusterApiPath: require('./APIList').ocmClusterApiPath,
+      ocmAgentApiPath: require('./APIList').ocmAgentApiPath,
     },
     managedClusterInfos: require('./ManagedClusterInfoList').default,
     clusterVersions: require('./ClusterVersionsList'),
@@ -89,11 +91,11 @@ export default function createMockHttp() {
           return state.connectionApi.createCloudConnection;
         case params.url.includes('/api/v1/namespaces/hive/secrets') && _.get(params.json, 'metadata.name') === 'google':
           return state.connectionApi.createCloudConnectionError;
-        case params.url.includes('/api/v1/namespaces') && _.get(params.json, 'metadata.name') === 'foo':
-          return state.clusterImport.getNamespaceCreationResponse;
-        case params.url.includes('/apis/project.openshift.io/v1/projectrequests') && _.get(params.json, 'metadata.name') === 'foo':
+        case params.url.includes('/api/v1/namespaces') && (_.get(params.json, 'metadata.name') === 'foo' || _.get(params.json, 'metadata.name') === 'no-yaml'):
+        case params.url.includes('/apis/project.openshift.io/v1/projectrequests') && (_.get(params.json, 'metadata.name') === 'foo' || _.get(params.json, 'metadata.name') === 'no-yaml'):
           return state.clusterImport.getNamespaceCreationResponse;
         case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/foo/klusterletaddonconfigs'):
+        case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/no-yaml/klusterletaddonconfigs'):
           return state.clusterImport.getKlusterletAddonConfigsResponse;
         case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
           return state.clusterImport.getClusterResponse;
@@ -102,6 +104,12 @@ export default function createMockHttp() {
       }
     }
     switch (true) {
+      case params.url.endsWith('/apis/cluster.open-cluster-management.io/v1'):
+        return state.apiList.ocmClusterApiPath;
+      case params.url.endsWith('/apis/agent.open-cluster-management.io/v1'):
+        return state.apiList.ocmAgentApiPath;
+      case params.url.endsWith('/apis/mcm.ibm.com/v1alpha1'):
+        return state.apiList.apiPath;
       case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.body, 'metadata.name') === 'aws':
         return state.connectionApi.editCloudConnection;
       case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.body, 'metadata.name') === 'google':
@@ -182,8 +190,6 @@ export default function createMockHttp() {
         return state.resourceViews.mockWorksetPollComplete;
       case params.url.includes('clusters'):
         return state.clusters;
-      case params.url.includes('apis/mcm.ibm.com/v1alpha1'):
-        return state.apiList.apiPath;
       case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):
         return state.genericResourceList.getResourceMock;
       case params.url.includes('/api/v1/namespaces/klusterlet'):
@@ -196,6 +202,13 @@ export default function createMockHttp() {
         return state.bareMetalAssets;
       case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
         return state.clusterImport.getImportYamlSecret;
+      case params.url.includes('/api/v1/namespaces/no-yaml/secrets/no-yaml-import'):
+        return state.clusterImport.badImportYamlSecret;
+      case params.url.includes('/apis/project.openshift.io/v1/projects/foo'):
+      case params.url.includes('apis/project.openshift.io/v1/projects/no-yaml'):
+      case params.url.includes('/api/v1/namespaces/foo'):
+      case params.url.includes('/api/v1/namespaces/no-yaml'):
+        return state.clusterImport.getNamespaceCreationResponse;
       case params.url.includes('/apis/hive.openshift.io/v1/clusterimagesets'):
         return state.clusterImageSets;
       case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools'):

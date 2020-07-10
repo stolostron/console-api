@@ -342,13 +342,50 @@ Object {
 }
 `;
 
+exports[`Cluster Mutation Create Kubernetes Cluster Resource for Import with Import YAML Problem 1`] = `
+Object {
+  "data": Object {
+    "createCluster": Object {
+      "created": Array [
+        Object {
+          "kind": "Cluster",
+          "name": "a-cluster",
+        },
+        Object {
+          "kind": "KlusterletAddonConfig",
+        },
+      ],
+      "errors": Array [
+        Object {
+          "message": "secrets \\"no-yaml-import\\" not found",
+        },
+      ],
+      "importSecret": Object {
+        "apiVersion": "v1",
+        "code": 404,
+        "details": Object {
+          "kind": "secrets",
+          "name": "no-yaml-import",
+        },
+        "kind": "Status",
+        "message": "secrets \\"no-yaml-import\\" not found",
+        "metadata": Object {},
+        "reason": "NotFound",
+        "status": "Failure",
+      },
+      "updated": Array [],
+    },
+  },
+}
+`;
+
 exports[`Cluster Mutation Create Kubernetes Cluster Resource for Import with No Namespace 1`] = `
 Object {
   "data": Object {
     "createCluster": Object {
       "errors": Array [
         Object {
-          "message": "Cannot find resource types: cluster.open-cluster-management.io/v1, agent.open-cluster-management.io/v1",
+          "message": "No namespace specified",
         },
       ],
     },
