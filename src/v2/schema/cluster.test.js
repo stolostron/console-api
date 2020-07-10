@@ -90,7 +90,6 @@ describe('Cluster Resolver', () => {
             platformAzure
             platformBmc
             platformVmware
-            imagecontentsourceMirrorUrl
           }
         }
       `,
@@ -150,9 +149,55 @@ describe('Cluster Mutation', () => {
                 {
                   apiVersion: "agent.open-cluster-management.io/v1",
                   kind: "KlusterletAddonConfig",
+                  metadata:
+                  {
+                    name: "foo",
+                    namespace: "foo"
+                  },
                   spec:
                   {
                     clusterName: "foo"
+                  }
+                }
+              ]
+            )
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.error)).toBeFalsy();
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
+
+  test('Create Kubernetes Cluster Resource for Import with Import YAML Problem', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+            createCluster(
+              cluster: [
+                {
+                  apiVersion: "cluster.open-cluster-management.io/v1",
+                  kind: "ManagedCluster"
+                  metadata:
+                  {
+                    name: "no-yaml"
+                  }
+                },
+                {
+                  apiVersion: "agent.open-cluster-management.io/v1",
+                  kind: "KlusterletAddonConfig",
+                  metadata:
+                  {
+                    name: "no-yaml",
+                    namespace: "no-yaml"
+                  },
+                  spec:
+                  {
+                    clusterName: "no-yaml"
                   }
                 }
               ]
