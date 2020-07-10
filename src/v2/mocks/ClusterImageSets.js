@@ -10,10 +10,6 @@ export default {
         apiVersion: 'hive.openshift.io/v1',
         kind: 'ClusterImageSet',
         metadata: {
-          annotations: {
-            'imagecontentsource.url': 'my-registry.io',
-            'imagecontentsource.mirror-url': 'my2-registry.io',
-          },
           creationTimestamp: '2020-04-24T23:35:41Z',
           generation: 1,
           name: 'img4.3.0-x86-64',
