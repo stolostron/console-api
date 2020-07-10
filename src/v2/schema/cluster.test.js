@@ -90,7 +90,6 @@ describe('Cluster Resolver', () => {
             platformAzure
             platformBmc
             platformVmware
-            imagecontentsourceMirrorUrl
           }
         }
       `,
