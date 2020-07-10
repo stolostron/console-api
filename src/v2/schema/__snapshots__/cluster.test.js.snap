@@ -485,7 +485,6 @@ Object {
     "clusterImageSets": Array [
       Object {
         "channel": "fast",
-        "imagecontentsourceMirrorUrl": "my2-registry.io",
         "name": "img4.3.0-x86-64",
         "platformAws": "true",
         "platformAzure": "true",
@@ -497,7 +496,6 @@ Object {
       },
       Object {
         "channel": "stable",
-        "imagecontentsourceMirrorUrl": null,
         "name": "img4.4.8-x86-64",
         "platformAws": "true",
         "platformAzure": "true",

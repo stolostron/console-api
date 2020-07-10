@@ -41,7 +41,6 @@ type ClusterImageSet {
   platformAzure: String
   platformBmc: String
   platformVmware: String
-  imagecontentsourceMirrorUrl: String
 }
 `;
 

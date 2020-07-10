@@ -729,9 +729,6 @@ export default class ClusterModel extends KubeModel {
         clusterImageSets[releaseImage].platformAzure = _.get(imageSet, 'metadata.labels')['platform.azure'];
         clusterImageSets[releaseImage].platformBmc = _.get(imageSet, 'metadata.labels')['platform.bmc'];
         clusterImageSets[releaseImage].platformVmware = _.get(imageSet, 'metadata.labels')['platform.vmware'];
-        if (_.get(imageSet, 'metadata.annotations')) {
-          clusterImageSets[releaseImage].imagecontentsourceMirrorUrl = _.get(imageSet, 'metadata.annotations')['imagecontentsource.mirror-url'];
-        }
       }
     });
     return Object.entries(clusterImageSets).map(([, data]) => (data));
