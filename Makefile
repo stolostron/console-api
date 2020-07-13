@@ -73,6 +73,7 @@ ifeq ($(UNIT_TESTS), TRUE)
 	if [ ! -d "test-output" ]; then \
 		mkdir test-output; \
 	fi
+	npm ci
 	npm test
 endif
 
