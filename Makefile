@@ -77,7 +77,7 @@ ifeq ($(UNIT_TESTS), TRUE)
 endif
 
 .PHONY: image
-image: build lint prune
+image: build prune
 	make docker/info
 	make docker/build
 
