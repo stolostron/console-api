@@ -40,30 +40,28 @@ function getCPUPercentage(usage, capacity) {
 function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
   const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
+  const latestJobActive = (jobs) => (jobs && _.get(getLatestResource(jobs), 'status.active', 0) > 0);
+  const latestJobFailed = (jobs) => (jobs && _.get(getLatestResource(jobs), 'status.failed', 0) > 0);
+
   let status = 'pending';
-  if ((install && install.every((i) => i.status.failed > 0))
-  || (uninstall && uninstall.every((i) => i.status.failed > 0))) {
-    status = 'provisionfailed';
-  } else if (uninstall && uninstall.some((i) => i.status.active > 0)) {
+  if (latestJobActive(uninstall)) {
     status = 'destroying';
+  } else if (latestJobActive(install)) {
+    status = 'creating';
+  } else if (latestJobFailed(install) || latestJobFailed(uninstall)) {
+    status = 'provisionfailed';
   } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
     status = 'detached';
-  } else if (install) {
-    status = 'creating';
   }
   return status;
 }
 
-function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
+export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
   const clusterDeploymentStatus = clusterDeployment
     ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
     : '';
 
   if (cluster) {
-    if (_.get(cluster, 'metadata.deletionTimestamp')) {
-      return 'detaching';
-    }
-
     let status;
     const clusterConditions = _.get(cluster, 'status.conditions') || [];
     const checkForCondition = (condition) => _.get(
@@ -73,7 +71,9 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
     const clusterAccepted = checkForCondition('HubAcceptedManagedCluster');
     const clusterJoined = checkForCondition('ManagedClusterJoined');
     const clusterAvailable = checkForCondition('ManagedClusterConditionAvailable');
-    if (!clusterAccepted) {
+    if (_.get(cluster, 'metadata.deletionTimestamp')) {
+      status = 'detaching';
+    } else if (!clusterAccepted) {
       status = 'notaccepted';
     } else if (!clusterJoined) {
       status = 'pendingimport';
@@ -85,9 +85,10 @@ function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
       status = clusterAvailable ? 'ok' : 'offline';
     }
 
-    // if ManagedCluster has not joined, show ClusterDeployment status
-    // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster)
-    if (!clusterJoined && clusterDeploymentStatus && clusterDeploymentStatus !== 'detached') {
+    // if ManagedCluster has not joined or is detaching, show ClusterDeployment status
+    // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster,
+    // so this is the case is the cluster is being detached but not destroyed)
+    if ((status === 'detaching' || !clusterJoined) && (clusterDeploymentStatus && clusterDeploymentStatus !== 'detached')) {
       return clusterDeploymentStatus;
     }
     return status;
@@ -681,14 +682,14 @@ export default class ClusterModel extends KubeModel {
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
 
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
-      return detachManagedClusterResponse.code;
+      return detachManagedClusterResponse;
     }
 
     if (destroy) {
       // Find MachinePools to delete
       const machinePoolsResponse = await this.kubeConnector.get(machinePools);
       if (machinePoolsResponse.kind === 'Status') {
-        return machinePoolsResponse.code;
+        return machinePoolsResponse;
       }
       const machinePoolsToDelete = (machinePoolsResponse.items
         && machinePoolsResponse.items
@@ -704,7 +705,7 @@ export default class ClusterModel extends KubeModel {
       // MachinePool deletion returns a Status with status==='Success'
       const failedResponse = destroyResponses.find((dr) => dr.kind === 'Status' && dr.status !== 'Success');
       if (failedResponse) {
-        return failedResponse.code;
+        return failedResponse;
       }
     }
 
