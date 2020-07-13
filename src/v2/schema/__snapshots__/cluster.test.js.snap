@@ -25,7 +25,11 @@ Object {
 exports[`Cluster Mutation Correctly Resolves Destroy Cluster with Failure 1`] = `
 Object {
   "data": Object {
-    "detachCluster": "406",
+    "detachCluster": Object {
+      "code": "406",
+      "kind": "Status",
+      "status": "Not Acceptable",
+    },
   },
 }
 `;
@@ -41,7 +45,10 @@ Object {
 exports[`Cluster Mutation Correctly Resolves Detach Cluster with Failure 1`] = `
 Object {
   "data": Object {
-    "detachCluster": "401",
+    "detachCluster": Object {
+      "code": "401",
+      "kind": "Status",
+    },
   },
 }
 `;
