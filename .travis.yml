@@ -30,24 +30,14 @@ branches:
     - /^release-[0-9]+\..*$/
 
 stages:
-  - test
   - build
-  - e2e
+  - test
   - publish
 
 jobs:
   include:
-    - stage: test
-      name: "Run unit tests"
-      install: npm ci
-      script:
-        - make
-        - make sonar/js/jest-init
-        - make component/test/unit
-        - make sonar/js
-
     - stage: build
-      name: "Build the image and push it"
+      name: "Build the test image and push it"
       script:
         - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         - make
@@ -61,8 +51,18 @@ jobs:
           export COMPONENT_TAG_EXTENSION="";
           make component/push;
           fi;
-
-    - stage: e2e
+    - stage: test
+      name: "Run unit tests"
+      script:
+        # Set the image tag differently for PRs
+        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
+        # Bootstrap the build harness, pull test image, and run unit tests.
+        - make
+        - make component/pull
+        - make sonar/js/jest-init
+        - make component/test/unit
+        - make sonar/js
+    - stage: test
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request
       script:
@@ -71,14 +71,12 @@ jobs:
         - make
         - make component/pull
         - make component/test/e2e
-
     - stage: release-ff
       name: "Push commits to current release branch"
       if: type = push AND branch =~ /^master$/
       script:
         - make
         - make release-ff
-
     - stage: publish
       name: "Publish the image to quay with an official version/sha tag and publish entry to integration pipeline stage"
       if: type = push AND branch =~ /^release-[0-9]+\..*$/
