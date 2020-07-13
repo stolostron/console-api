@@ -682,14 +682,14 @@ export default class ClusterModel extends KubeModel {
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
 
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
-      return detachManagedClusterResponse.code;
+      return detachManagedClusterResponse;
     }
 
     if (destroy) {
       // Find MachinePools to delete
       const machinePoolsResponse = await this.kubeConnector.get(machinePools);
       if (machinePoolsResponse.kind === 'Status') {
-        return machinePoolsResponse.code;
+        return machinePoolsResponse;
       }
       const machinePoolsToDelete = (machinePoolsResponse.items
         && machinePoolsResponse.items
@@ -705,7 +705,7 @@ export default class ClusterModel extends KubeModel {
       // MachinePool deletion returns a Status with status==='Success'
       const failedResponse = destroyResponses.find((dr) => dr.kind === 'Status' && dr.status !== 'Success');
       if (failedResponse) {
-        return failedResponse.code;
+        return failedResponse;
       }
     }
 
