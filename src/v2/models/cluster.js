@@ -56,7 +56,7 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   return status;
 }
 
-function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
+export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
   const clusterDeploymentStatus = clusterDeployment
     ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
     : '';
