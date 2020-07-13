@@ -50,7 +50,7 @@ lint:
 	npm run lint
 
 install:
-	npm install
+	npm ci
 
 prune:
 	npm prune --production
@@ -73,7 +73,6 @@ ifeq ($(UNIT_TESTS), TRUE)
 	if [ ! -d "test-output" ]; then \
 		mkdir test-output; \
 	fi
-	npm ci
 	npm test
 endif
 
