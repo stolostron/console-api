@@ -28,7 +28,7 @@ const jestConfig = {
     'text-summary',
   ],
   testResultsProcessor: 'jest-sonar-reporter',
-  testPathIgnorePatterns: ['/node_modules/', '/build/'],
+  testPathIgnorePatterns: ['/node_modules/'],
   coverageThreshold: {
     global: {
       branches: 21,
