@@ -154,7 +154,7 @@ export default class BareMetalAssetModel extends KubeModel {
       });
       if (errors.length) {
         return { errors };
-    }
+      }
     }
 
     // make sure all hosts have a user/password in both ClusterDeployment and install-config.yaml
