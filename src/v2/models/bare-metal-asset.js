@@ -100,6 +100,16 @@ export default class BareMetalAssetModel extends KubeModel {
   }
 
   async syncBMAs(hosts, cluster) {
+    const errors = [];
+
+    const checkAndCollectError = (response) => {
+      if (response.code !== 409 && (response.code >= 400 || response.status === 'Failure' || response.message)) {
+        errors.push({ message: response.message });
+        return true;
+      }
+      return false;
+    };
+
     // make sure all hosts have a bare metal asset
     const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets');
     const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
@@ -117,10 +127,16 @@ export default class BareMetalAssetModel extends KubeModel {
     if (newAssets.length > 0) {
       // make sure there's a namespace for all assets
       const namespaces = _.keyBy(newAssets, 'namespace');
-      await Promise.all(Object.keys(namespaces).map((namespace) => this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } })));
+      let response = await Promise.all(Object.keys(namespaces).map((namespace) => this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } })));
+      response.forEach((item) => {
+        checkAndCollectError(item);
+      });
+      if (errors.length) {
+        return { errors };
+      }
 
       // then create secrets and bma's
-      await Promise.all(newAssets.map((asset) => {
+      response = await Promise.all(newAssets.map((asset) => {
         const {
           name, namespace, bmc: { address, username, password }, bootMACAddress,
         } = asset;
@@ -133,6 +149,12 @@ export default class BareMetalAssetModel extends KubeModel {
           bootMac: bootMACAddress,
         });
       }));
+      response.forEach(({ bmaResult }) => {
+        checkAndCollectError(bmaResult);
+      });
+      if (errors.length) {
+        return { errors };
+      }
     }
 
     // make sure all hosts have a user/password in both ClusterDeployment and install-config.yaml
@@ -168,6 +190,7 @@ export default class BareMetalAssetModel extends KubeModel {
         installConfig.data[INSTALL_CONFIG] = Buffer.from(yaml.safeDump(installConfigData)).toString('base64');
       }
     }
+    return { errors };
   }
 
   async getBareMetalAssetSubresources(args = {}) {

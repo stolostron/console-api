@@ -53,19 +53,25 @@ export const resolver = {
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
       // if creating a bare metal cluster, make sure all hosts have user/password
+      let results;
+      let errors;
       const { cluster } = args;
       const map = _.keyBy(cluster, 'kind');
       const hosts = _.get(map, 'ClusterDeployment.spec.platform.baremetal.hosts');
       if (hosts) {
-        await bareMetalAssetModel.syncBMAs(hosts, cluster);
+        results = await bareMetalAssetModel.syncBMAs(hosts, cluster, errors);
+        ({ errors } = results);
+        if (errors.length) {
+          return results;
+        }
       }
 
       // create the cluster
-      const results = await clusterModel.createCluster(args);
+      results = await clusterModel.createCluster(args);
 
       // if this was a successful bare metal deployment,
       // update the bma's with what cluster now owns them
-      const { errors } = results;
+      ({ errors } = results);
       if (errors.length === 0 && hosts) {
         const clusterName = _.get(map, 'ClusterDeployment.metadata.name');
         await bareMetalAssetModel.attachBMAs(hosts, clusterName, errors);
