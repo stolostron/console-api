@@ -323,7 +323,7 @@ export default class GenericModel extends KubeModel {
         namespace,
         updateInterval,
         deleteAfterUse,
-      ).catch(() => null);
+      );
 
       const resourceResult = _.get(response, 'status.result');
       if (resourceResult) {
