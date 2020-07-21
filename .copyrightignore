@@ -4,7 +4,7 @@
 .yaml
 .properties
 # directories to ingore
-build/*
+built/*
 operator-sdk/*
 build-harness/*
 build-harness-extensions/*
