@@ -62,7 +62,7 @@ RETURNCODE=0
 
 echo "##### Copyright check #####"
 #Loop through all files. Ignore .FILENAME types
-#for f in `find .. -type f ! -path "../.eslintrc.js" ! -path "../build-harness/*" ! -path "../auth-setup/*" ! -path "../sslcert/*" ! -path "../node_modules/*" ! -path "../coverage/*" ! -path "../test-output/*" ! -path "../build/*" ! -path "../nls/*" ! -path "../public/*"`; do
+#for f in `find .. -type f ! -path "../.eslintrc.js" ! -path "../build-harness/*" ! -path "../auth-setup/*" ! -path "../sslcert/*" ! -path "../node_modules/*" ! -path "../coverage/*" ! -path "../test-output/*" ! -path "../built/*" ! -path "../nls/*" ! -path "../public/*"`; do
 for f in $FILES_TO_SCAN; do
   if [ ! -f "$f" ]; then
    continue

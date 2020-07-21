@@ -38,12 +38,12 @@ LABEL org.label-schema.vendor="$IMAGE_VENDOR" \
 #RUN mkdir -p /opt/app-root/console-api
 WORKDIR /opt/app-root/console-api
 
-COPY build/src /opt/app-root/console-api/build
-COPY build/config /opt/app-root/console-api/config
+COPY built/src /opt/app-root/console-api/built
+COPY built/config /opt/app-root/console-api/config
 COPY node_modules /opt/app-root/console-api/node_modules
 COPY sslcert /opt/app-root/console-api/sslcert
 
 EXPOSE 4000
 
 ENV NODE_ENV production
-CMD ["node", "./build/index.js"]
+CMD ["node", "./built/index.js"]

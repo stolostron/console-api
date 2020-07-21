@@ -1,6 +1,6 @@
 node_modules
 build-harness
-build
+built
 coverage
 package.json
 package-lock.json
