@@ -11,7 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "outDir": "./built",
+    "outDir": "./build",
     "noImplicitUseStrict": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -20,5 +20,6 @@
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": ["./src/**/*.ts", "./src/**/*.js"]
+  "include": ["./src/**/*.ts", "./src/**/*.js"],
+  "exclude": ["./src/**/*.test.ts", "./src/**/*.test.js"]
 }

@@ -1,6 +1,6 @@
 node_modules
 .vscode
-built
+build
 config/config-development.json
 .idea
 coverage

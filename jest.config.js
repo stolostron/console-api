@@ -59,7 +59,7 @@ const jestConfig = {
     'default',
   ],
   preset: 'ts-jest/presets/js-with-ts',
-  testPathIgnorePatterns: ["/node_modules/", "/built/"]
+  testPathIgnorePatterns: ["/node_modules/", "/build/"]
 }
 
 jestConfig.reporters = process.env.TRAVIS ? ['default', tapReporter] : ['default'];
