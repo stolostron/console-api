@@ -723,13 +723,15 @@ export default class ClusterModel extends KubeModel {
         clusterImageSets[releaseImage] = {};
         clusterImageSets[releaseImage].releaseImage = releaseImage;
         clusterImageSets[releaseImage].name = name;
-        clusterImageSets[releaseImage].channel = _.get(imageSet, 'metadata.labels.channel');
-        clusterImageSets[releaseImage].visible = _.get(imageSet, 'metadata.labels.visible');
-        clusterImageSets[releaseImage].platformAws = _.get(imageSet, 'metadata.labels')['platform.aws'];
-        clusterImageSets[releaseImage].platformGcp = _.get(imageSet, 'metadata.labels')['platform.gcp'];
-        clusterImageSets[releaseImage].platformAzure = _.get(imageSet, 'metadata.labels')['platform.azure'];
-        clusterImageSets[releaseImage].platformBmc = _.get(imageSet, 'metadata.labels')['platform.bmc'];
-        clusterImageSets[releaseImage].platformVmware = _.get(imageSet, 'metadata.labels')['platform.vmware'];
+        if (_.get(imageSet, 'metadata.labels')) {
+          clusterImageSets[releaseImage].channel = _.get(imageSet, 'metadata.labels.channel');
+          clusterImageSets[releaseImage].visible = _.get(imageSet, 'metadata.labels.visible');
+          clusterImageSets[releaseImage].platformAws = _.get(imageSet, 'metadata.labels')['platform.aws'];
+          clusterImageSets[releaseImage].platformGcp = _.get(imageSet, 'metadata.labels')['platform.gcp'];
+          clusterImageSets[releaseImage].platformAzure = _.get(imageSet, 'metadata.labels')['platform.azure'];
+          clusterImageSets[releaseImage].platformBmc = _.get(imageSet, 'metadata.labels')['platform.bmc'];
+          clusterImageSets[releaseImage].platformVmware = _.get(imageSet, 'metadata.labels')['platform.vmware'];
+        }
       }
     });
     return Object.entries(clusterImageSets).map(([, data]) => (data));
