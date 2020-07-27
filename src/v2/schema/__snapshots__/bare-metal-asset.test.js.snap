@@ -198,6 +198,16 @@ Object {
 }
 `;
 
+exports[`BareMetalAsset Resolver Correctly Resolves DeleteBareMetalAsset Query 1`] = `
+Object {
+  "data": Object {
+    "deleteBareMetalAssets": Object {
+      "statusCode": 200,
+    },
+  },
+}
+`;
+
 exports[`BareMetalAsset Resolver Correctly Resolves UpdateBareMetalAsset Query 1`] = `
 Object {
   "data": Object {
