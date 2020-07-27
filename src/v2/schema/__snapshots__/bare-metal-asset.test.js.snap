@@ -27,6 +27,28 @@ Object {
 }
 `;
 
+exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAssetSubresources Query 1`] = `
+Object {
+  "data": Object {
+    "bareMetalAssetSubresources": Object {
+      "bareMetalAsset": Array [
+        Object {
+          "metadata": Object {
+            "annotations": Object {
+              "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+            },
+          },
+        },
+      ],
+      "namespaces": Array [
+        "fake-cluster",
+      ],
+    },
+  },
+}
+`;
+
 exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAssets Query 1`] = `
 Object {
   "data": Object {

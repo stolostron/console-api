@@ -217,6 +217,8 @@ export default function createMockHttp() {
         return state.machinePoolsByNamespace.kubeSystem;
       case params.url.includes('/secrets/worker-0-bmc-secret'):
         return state.bareMetalAssetPatchedSecret;
+      case params.url.includes('/apis/project.openshift.io/v1/projects'):
+        return state.project;
       default:
         return state.apiList.mockResponse;
     }

@@ -74,4 +74,27 @@ describe('BareMetalAsset Resolver', () => {
         done();
       });
   }));
+
+  test('Correctly Resolves BareMetalAssetSubresources Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          bareMetalAssetSubresources (name:"baremetalasset-worker-0", namespace:"fake-cluster"){
+            namespaces
+            bareMetalAsset {
+              metadata {
+                annotations
+              }
+            }
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
 });
