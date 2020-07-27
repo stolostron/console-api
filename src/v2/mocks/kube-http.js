@@ -44,9 +44,9 @@ export default function createMockHttp() {
     clusterImport: require('./ClusterImport'),
     connectionApi: require('./ConnectionApi'),
     bareMetalAssets: require('./BareMetalAssetList').default,
-    bareMetalAsset: require('./BareMetalAssetSingle').default,
+    bareMetalAsset: require('./BareMetalAssetList').singleAsset,
     bareMetalAssetSecret: require('./BareMetalAssetSecret').default,
-    bareMetalAssetPatchedSecret: require('./BareMetalAssetPatchedSecret').default,
+    bareMetalAssetPatchedSecret: require('./BareMetalAssetSecret').patchedSecret,
     project: require('./ProjectList').default,
   };
 
