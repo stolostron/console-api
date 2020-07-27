@@ -27,6 +27,14 @@ Object {
 }
 `;
 
+exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAsset Query Failure 1`] = `
+Object {
+  "data": Object {
+    "bareMetalAsset": Array [],
+  },
+}
+`;
+
 exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAssetSubresources Query 1`] = `
 Object {
   "data": Object {
