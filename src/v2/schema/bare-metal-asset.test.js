@@ -75,36 +75,6 @@ describe('BareMetalAsset Resolver', () => {
       });
   }));
 
-  test('Correctly Resolves BareMetalAsset Query Failure', () => new Promise((done) => {
-    supertest(server)
-      .post(GRAPHQL_PATH)
-      .send({
-        query: `
-        {
-          bareMetalAsset (name:"", namespace:""){
-            metadata {
-              annotations
-              creationTimestamp
-              labels
-              name
-              namespace
-              resourceVersion
-              selfLink
-              status
-              uid
-            }
-            hardwareProfile
-            role
-          }
-        }
-      `,
-      })
-      .end((err, res) => {
-        expect(JSON.parse(res.text)).toMatchSnapshot();
-        done();
-      });
-  }));
-
   test('Correctly Resolves BareMetalAssetSubresources Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
