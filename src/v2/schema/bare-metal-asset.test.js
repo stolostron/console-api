@@ -113,4 +113,19 @@ describe('BareMetalAsset Resolver', () => {
         done();
       });
   }));
+  test('Correctly Resolves UpdateBareMetalAsset Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          updateBareMetalAsset (namespace: "fake-cluster", name: "worker-0", bmcAddress:"ipmi://192.168.122.2:6233", username:"test1", password:"test1", bootMac:"00:1B:44:11:3A:B7")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
 });
