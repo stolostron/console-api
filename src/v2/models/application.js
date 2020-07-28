@@ -214,24 +214,13 @@ export default class ApplicationModel extends KubeModel {
       return false;
     };
 
-    // get namespace and filter out any namespace resource
+    // determine resources that require a namespace
     let namespace;
     let namespaces = new Set();
-    resources = resources.filter(({ kind, metadata = {} }) => {
+    resources.forEach(({ kind, metadata = {} }) => {
       switch (kind) {
-        case 'Namespace':
-          return false;
-
         case 'Application':
-          ({ namespace } = metadata);
-          namespaces.add(namespace);
-          break;
-
         case 'Channel':
-          ({ namespace } = metadata);
-          namespaces.add(namespace);
-          break;
-
         case 'Subscription':
           ({ namespace } = metadata);
           namespaces.add(namespace);
@@ -242,6 +231,11 @@ export default class ApplicationModel extends KubeModel {
       }
       return true;
     });
+
+    // filter out Namespace resources that don't belong to App, Channel, Subscription
+    // if a namespace belongs to app, etc, we create them all at once
+    // if a namespace is independant, we create it separately (might be a secret, etc)
+    resources = resources.filter(({ kind, metadata = {} }) => kind !== 'Namespace' || !namespaces.has(metadata.name));
     namespaces = Array.from(namespaces);
 
     // get resource end point for each resource
@@ -286,7 +280,7 @@ export default class ApplicationModel extends KubeModel {
     });
 
     // if there's a namespace, try to create it
-    if (!namespaces.length === 0) {
+    if (namespaces.length === 0) {
       errors.push({ message: 'No namespaces specified' });
       return { errors };
     }
@@ -311,7 +305,8 @@ export default class ApplicationModel extends KubeModel {
         const { kind, metadata = {} } = item;
         created.push({ name: metadata.name, kind });
         return false;
-      } if (item.code === 409) {
+      }
+      if (item.code === 409) {
         // filter out "already existing" errors
         updates.push({
           requestPath: requestPaths[index],
@@ -384,8 +379,8 @@ export default class ApplicationModel extends KubeModel {
           if (namespaced && !namespace) {
             return null;
           }
-          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
-          return requestPath;
+          const requestPath = namespaced ? `namespaces/${namespace}/` : '';
+          return `${apiPath}/${requestPath}${name}`;
         })();
       }
     }
