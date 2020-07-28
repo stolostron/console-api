@@ -138,6 +138,6 @@ export const resolver = {
     placementPolicies: (/* parent, args, { applicationModel } */) => [], // applicationModel.getPlacementPolicies({ matchNames: parent.placementPolicyNames }),
   },
   Mutation: {
-    createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args.resources),
+    createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args),
   },
 };
