@@ -236,6 +236,9 @@ export default class ApplicationModel extends KubeModel {
           ({ namespace } = metadata);
           namespaces.add(namespace);
           break;
+
+        default:
+          break;
       }
       return true;
     });
@@ -397,10 +400,10 @@ export default class ApplicationModel extends KubeModel {
         name: namespace,
       },
     };
-    const response = await this.kubeConnector.post('/api/v1/namespaces', body);
+    let response = await this.kubeConnector.post('/api/v1/namespaces', body);
     if (responseHasError(response)) {
       if (response.code === 409) {
-        return await this.kubeConnector.get(`/api/v1/namespaces/${namespace}`);
+        response = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}`);
       }
     }
     return response;
