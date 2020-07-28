@@ -10,6 +10,7 @@
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 import KubeModel from './kube';
+import { responseHasError } from '../lib/utils';
 
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 const DEPLOYABLES = 'metadata.annotations["apps.open-cluster-management.io/deployables"]';
@@ -199,61 +200,210 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
 };
 
 export default class ApplicationModel extends KubeModel {
-  async createApplication(resources) {
-    const appKinds = {
-      Application: 'applications',
-      ApplicationRelationship: 'applicationrelationships',
-      ConfigMap: 'configmaps',
-      DeployableOverride: 'deployableoverrides',
-      Deployable: 'deployables',
-      PlacementBinding: 'placementbindings',
-      PlacementPolicy: 'placementpolicies',
+  async createApplication(args) {
+    let { application: resources } = args;
+    const created = [];
+    const updated = [];
+    const errors = [];
+
+    const checkAndCollectError = (response) => {
+      if (response.code >= 400 || response.status === 'Failure' || response.message) {
+        errors.push({ message: response.message });
+        return true;
+      }
+      return false;
     };
 
-    const result = await Promise.all(resources.map((resource) => {
-      const namespace = _.get(resource, NAMESPACE, 'default');
-      if (appKinds[resource.kind] === 'undefined') {
-        return Promise.resolve({
-          status: 'Failure',
-          message: `Invalid Kind: ${resource.kind}`,
-        });
-      }
-      if (appKinds[resource.kind] === 'applications') {
-        return this.kubeConnector.post(`/apis/app.k8s.io/v1beta1/namespaces/${namespace}/applications`, resource)
-          .catch((err) => ({
-            status: 'Failure',
-            message: err.message,
-          }));
-      }
+    // get namespace and filter out any namespace resource
+    let namespace;
+    let namespaces = new Set();
+    resources = resources.filter(({ kind, metadata = {} }) => {
+      switch (kind) {
+        case 'Namespace':
+          return false;
 
-      return this.kubeConnector.post(`/apis/apps.open-cluster-management.io/v1/namespaces/${namespace}/${appKinds[resource.kind]}`, resource)
+        case 'Application':
+          ({ namespace } = metadata);
+          namespaces.add(namespace);
+          break;
+
+        case 'Channel':
+          ({ namespace } = metadata);
+          namespaces.add(namespace);
+          break;
+
+        case 'Subscription':
+          ({ namespace } = metadata);
+          namespaces.add(namespace);
+          break;
+      }
+      return true;
+    });
+    namespaces = Array.from(namespaces);
+
+    // get resource end point for each resource
+    const k8sPaths = await this.kubeConnector.get('/');
+    const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
+    if (requestPaths.length > 0) {
+      const missingTypes = [];
+      const missingEndPoints = [];
+      requestPaths.forEach((path, index) => {
+        if (path === undefined) {
+          missingTypes.push(`${resources[index].apiVersion}`);
+        } else if (path === null) {
+          missingEndPoints.push(`${resources[index].kind}`);
+        }
+      });
+      if (missingTypes.length > 0) {
+        errors.push({ message: `Cannot find resource types: ${missingTypes.join(', ')}` });
+      }
+      if (missingEndPoints.length > 0) {
+        errors.push({ message: `Cannot find endpoints: ${missingEndPoints.join(', ')}` });
+      }
+      if (errors.length > 0) {
+        return { errors };
+      }
+    } else {
+      errors.push({ message: 'Cannot find any endpoints' });
+      return { errors };
+    }
+
+    // try to create all resouces EXCEPT ClusterDeployment
+    // we don't want to create ClusterDeployment until all the other resources successfully created
+    // because we check if the ClusterDeployment exists in this namespace
+    let applicationResource;
+    let applicationRequestPath;
+    resources = resources.filter((resource, index) => {
+      if (resource.kind === 'Application') {
+        applicationResource = resource;
+        ([applicationRequestPath] = requestPaths.splice(index, 1));
+        return false;
+      }
+      return true;
+    });
+
+    // if there's a namespace, try to create it
+    if (!namespaces.length === 0) {
+      errors.push({ message: 'No namespaces specified' });
+      return { errors };
+    }
+
+    const namespaceResponses = await Promise.all(namespaces.map((ns) => this.createNamespace(ns)));
+    namespaceResponses.forEach((item) => {
+      checkAndCollectError(item);
+    });
+    if (errors.length !== 0) {
+      return { errors };
+    }
+
+    // try to create application resources
+    const result = await Promise.all(resources.map((resource, index) => this.kubeConnector.post(requestPaths[index], resource)
+      .catch((err) => ({
+        status: 'Failure',
+        message: err.message,
+      }))));
+    const updates = [];
+    result.filter((item, index) => {
+      if (!responseHasError(item)) {
+        const { kind, metadata = {} } = item;
+        created.push({ name: metadata.name, kind });
+        return false;
+      } if (item.code === 409) {
+        // filter out "already existing" errors
+        updates.push({
+          requestPath: requestPaths[index],
+          resource: resources[index],
+        });
+        return false;
+      }
+      return true;
+    }).forEach((item) => {
+      checkAndCollectError(item);
+    });
+
+    // if the only errors were "already existing", patch those resources
+    if (errors.length === 0 && updates.length > 0) {
+      // get the selfLinks of the existing resources
+      const existing = await Promise.all(updates.map(({ requestPath, resource }) => {
+        const name = _.get(resource, 'metadata.name');
+        return this.kubeConnector.get(`${requestPath}/${name}`);
+      }));
+
+      // then update the resources
+      const replaced = await Promise.all(updates.map(({ resource }, index) => {
+        const selfLink = _.get(existing, `[${index}].metadata.selfLink`);
+        const resourceVersion = _.get(existing, `[${index}].metadata.resourceVersion`);
+        _.set(resource, 'metadata.resourceVersion', resourceVersion);
+        const requestBody = {
+          body: resource,
+        };
+        return this.kubeConnector.put(`${selfLink}`, requestBody);
+      }));
+
+      // report any errors
+      replaced.forEach((item) => {
+        if (!checkAndCollectError(item)) {
+          const { kind, metadata = {} } = item;
+          updated.push({ name: metadata.name, kind });
+        }
+      });
+    }
+
+    if (errors.length === 0) {
+      // last but not least, if everything else deployed, deploy Application
+      const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
         .catch((err) => ({
           status: 'Failure',
           message: err.message,
         }));
-    }));
-
-    const errors = [];
-    result.forEach((item) => {
-      if (item.code >= 400 || item.status === 'Failure') {
-        errors.push({ message: item.message });
-      }
-    });
+      checkAndCollectError(deployment);
+    }
 
     return {
       errors,
-      result,
+      updated,
+      created,
     };
   }
 
-  // return application namespace object
-  async getApplicationNamespace(namespace) {
-    const namespaces = await this.kubeConnector.getNamespaceResources({ namespaces: namespace.split(',') });
-    return namespaces.map(async (ns) => ({
-      metadata: ns.metadata,
-      name: ns.metadata.name || '',
-      raw: ns,
-    }));
+  async getResourceEndPoint(resource, k8sPaths) {
+    // dynamically get resource endpoint from kebernetes API
+    // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
+    if (k8sPaths) {
+      const { apiVersion, kind } = resource;
+      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      if (apiPath) {
+        return (async () => {
+          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
+          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
+          const namespace = _.get(resource, 'metadata.namespace');
+          const { name, namespaced } = resourceType;
+          if (namespaced && !namespace) {
+            return null;
+          }
+          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
+          return requestPath;
+        })();
+      }
+    }
+    return undefined;
+  }
+
+  async createNamespace(namespace) {
+    const body = {
+      apiVersion: 'v1',
+      kind: 'Namespace',
+      metadata: {
+        name: namespace,
+      },
+    };
+    const response = await this.kubeConnector.post('/api/v1/namespaces', body);
+    if (responseHasError(response)) {
+      if (response.code === 409) {
+        return await this.kubeConnector.get(`/api/v1/namespaces/${namespace}`);
+      }
+    }
+    return response;
   }
 
   // //////////////// USED IN OVERVIEW PAGE /////////
