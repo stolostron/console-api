@@ -11,6 +11,7 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 import { responseHasError } from '../lib/utils';
+import logger from '../lib/logger';
 
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 const DEPLOYABLES = 'metadata.annotations["apps.open-cluster-management.io/deployables"]';
