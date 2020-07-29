@@ -12,6 +12,7 @@
 
 import yaml from 'js-yaml';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 export const CLUSTER_DOMAIN = 'cluster.open-cluster-management.io';
 export const CONNECTION_LABEL = `${CLUSTER_DOMAIN}/cloudconnection`;
@@ -39,13 +40,17 @@ export default class ConnectionModel extends KubeModel {
   async createConnection(args) {
     const { body } = args;
     const resource = generateSecret(body);
-    const response = await this.kubeConnector.post(`/api/v1/namespaces/${body.namespace}/secrets`, resource);
+    const response = await this.kubeConnector.post(`/api/v1/namespaces/${body.namespace}/secrets`, resource).catch((err) => {
+      logger.error(err);
+    });
     const statusCode = response.kind === 'Status' ? response.code : 201;
     return { ...response, statusCode };
   }
 
   async getConnections() {
-    const connections = await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
+    const connections = await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`).catch((err) => {
+      logger.error(err);
+    });
     const ret = [];
     connections.forEach(({ metadata }) => {
       ret.push({
@@ -63,8 +68,8 @@ export default class ConnectionModel extends KubeModel {
   async getConnectionDetails(args) {
     const { namespace = null, name = null } = args;
     const connections = namespace && name
-      ? [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`)]
-      : await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`);
+      ? [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => { logger.error(err); })]
+      : await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`).catch((err) => { logger.error(err); });
     const ret = [];
     connections.forEach(({ metadata, data }) => {
       ret.push({
@@ -79,14 +84,18 @@ export default class ConnectionModel extends KubeModel {
 
   async deleteConnection(args) {
     const { namespace, name } = args;
-    const response = await this.kubeConnector.delete(`/api/v1/namespaces/${namespace}/secrets/${name}`);
+    const response = await this.kubeConnector.delete(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => {
+      logger.error(err);
+    });
     return response;
   }
 
   async editConnection(args) {
     const { body, namespace, name } = args;
     const resource = generateSecret(body);
-    const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, { body: resource });
+    const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, { body: resource }).catch((err) => {
+      logger.error(err);
+    });
     const statusCode = response.kind === 'Status' ? response.code : 200;
     return { ...response, statusCode };
   }

@@ -5,6 +5,7 @@
 import _ from 'lodash';
 import yaml from 'js-yaml';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 const MAX_PARALLEL_REQUESTS = 5;
 const INSTALL_CONFIG = 'install-config.yaml';
@@ -54,11 +55,15 @@ export default class BareMetalAssetModel extends KubeModel {
   async getSingleBareMetalAsset(args = {}) {
     const { name, namespace } = args;
     if (name && namespace) {
-      const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
+      const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`).catch((err) => {
+        logger.error(err);
+      });
       let secret;
       if (bareMetalAsset.metadata !== undefined) {
         if (bareMetalAsset.spec.bmc && bareMetalAsset.spec.bmc.credentialsName) {
-          secret = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${bareMetalAsset.spec.bmc.credentialsName}`);
+          secret = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${bareMetalAsset.spec.bmc.credentialsName}`).catch((err) => {
+            logger.error(err);
+          });
         }
         return [transform(bareMetalAsset, [secret])];
       }
@@ -78,9 +83,13 @@ export default class BareMetalAssetModel extends KubeModel {
   async getAllBareMetalAssets({ fetchSecrets }) {
     const [bareMetalAssets, secrets] = await Promise.all([
       this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets')
-        .then((allBMAs) => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources((ns) => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))),
+        .then((allBMAs) => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources((ns) => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))).catch((err) => {
+          logger.error(err);
+        }),
       fetchSecrets
-        ? this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)))
+        ? this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`))).catch((err) => {
+          logger.error(err);
+        })
         : Promise.resolve({ items: [] }),
     ]);
 
@@ -111,7 +120,9 @@ export default class BareMetalAssetModel extends KubeModel {
     };
 
     // make sure all hosts have a bare metal asset
-    const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets');
+    const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets').catch((err) => {
+      logger.error(err);
+    });
     const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
       const name = _.get(item, 'metadata.name');
       const namespace = _.get(item, 'metadata.namespace');
@@ -127,7 +138,10 @@ export default class BareMetalAssetModel extends KubeModel {
     if (newAssets.length > 0) {
       // make sure there's a namespace for all assets
       const namespaces = _.keyBy(newAssets, 'namespace');
-      let response = await Promise.all(Object.keys(namespaces).map((namespace) => this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } })));
+      let response = await Promise.all(Object.keys(namespaces).map((namespace) => this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } })))
+        .catch((err) => {
+          logger.error(err);
+        });
       response.forEach((item) => {
         checkAndCollectError(item);
       });
@@ -166,7 +180,10 @@ export default class BareMetalAssetModel extends KubeModel {
     if (filteredHosts.length > 0 || filteredInstallConfigHosts.length > 0) {
       const secrets = await this.kubeConnector.get('/api/v1/secrets')
         .then((allSecrets) => (allSecrets.items ? allSecrets.items
-          : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)));
+          : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`)))
+        .catch((err) => {
+          logger.error(err);
+        });
       const secretMap = _.keyBy(secrets, (secret) => {
         const name = _.get(secret, 'metadata.ownerReferences[0].name');
         const namespace = _.get(secret, 'metadata.namespace');
@@ -195,7 +212,10 @@ export default class BareMetalAssetModel extends KubeModel {
 
   async getBareMetalAssetSubresources(args = {}) {
     const [namespaces, bareMetalAsset] = await Promise.all([
-      this.kubeConnector.get('/apis/project.openshift.io/v1/projects'),
+      this.kubeConnector.get('/apis/project.openshift.io/v1/projects')
+        .catch((err) => {
+          logger.error(err);
+        }),
       this.getSingleBareMetalAsset(args),
     ]);
     return {
@@ -220,7 +240,9 @@ export default class BareMetalAssetModel extends KubeModel {
         password: Buffer.from(password).toString('base64'),
       },
     };
-    return this.kubeConnector.post(`/api/v1/namespaces/${namespace}/secrets`, secret);
+    return this.kubeConnector.post(`/api/v1/namespaces/${namespace}/secrets`, secret).catch((err) => {
+      logger.error(err);
+    });
   }
 
   async createBMA(namespace, name, address, credentialsName, bootMACAddress) {
@@ -238,7 +260,9 @@ export default class BareMetalAssetModel extends KubeModel {
         bootMACAddress,
       },
     };
-    return this.kubeConnector.post(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets`, bma);
+    return this.kubeConnector.post(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets`, bma).catch((err) => {
+      logger.error(err);
+    });
   }
 
   async patchSecret(namespace, secretName, username, password) {
@@ -254,7 +278,9 @@ export default class BareMetalAssetModel extends KubeModel {
         },
       ],
     };
-    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
+    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody).catch((err) => {
+      logger.error(err);
+    });
   }
 
   async patchSecretOwnerRef(namespace, secretName, ownerName, ownerUID) {
@@ -272,7 +298,9 @@ export default class BareMetalAssetModel extends KubeModel {
         },
       ],
     };
-    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody);
+    return this.kubeConnector.patch(`/api/v1/namespaces/${namespace}/secrets/${secretName}`, secretBody).catch((err) => {
+      logger.error(err);
+    });
   }
 
   async patchBMA(oldSpec, namespace, name, address, credentialsName, bootMACAddress) {
@@ -293,7 +321,9 @@ export default class BareMetalAssetModel extends KubeModel {
         },
       ],
     };
-    return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+    return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody).catch((err) => {
+      logger.error(err);
+    });
   }
 
   async createBareMetalAsset(args) {
@@ -341,7 +371,10 @@ export default class BareMetalAssetModel extends KubeModel {
       namespace, name, bmcAddress, username, password, bootMac,
     } = args;
 
-    const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`);
+    const bareMetalAsset = await this.kubeConnector.get(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`)
+      .catch((err) => {
+        logger.error(err);
+      });
     if (bareMetalAsset.metadata !== undefined) {
       let secretResult;
       let patchedSecretResult;
@@ -420,7 +453,10 @@ export default class BareMetalAssetModel extends KubeModel {
       for (let i = 0; i < chunks.length; i += 1) {
         const chunk = chunks[i];
         // eslint-disable-next-line no-await-in-loop
-        const results = await Promise.all(chunk.map((url) => this.kubeConnector.delete(url)));
+        const results = await Promise.all(chunk.map((url) => this.kubeConnector.delete(url)))
+          .catch((err) => {
+            logger.error(err);
+          });
         results.forEach((result) => {
           if (result.code) {
             errors.push({ statusCode: result.code, message: result.message });
@@ -459,7 +495,10 @@ export default class BareMetalAssetModel extends KubeModel {
 
       // get the bmas
       // eslint-disable-next-line no-await-in-loop
-      let bmas = await Promise.all(chunk.map((url) => this.kubeConnector.get(url)));
+      let bmas = await Promise.all(chunk.map((url) => this.kubeConnector.get(url)))
+        .catch((err) => {
+          logger.error(err);
+        });
       bmas = bmas.filter((result) => {
         if (result.code) {
           errors.push({ statusCode: result.code, message: result.message });
@@ -488,7 +527,10 @@ export default class BareMetalAssetModel extends KubeModel {
             },
           ],
         };
-        return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody);
+        return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${namespace}/baremetalassets/${name}`, bmaBody)
+          .catch((err) => {
+            logger.error(err);
+          });
       }));
       results.forEach((result) => {
         if (result.code) {
@@ -508,7 +550,10 @@ export default class BareMetalAssetModel extends KubeModel {
       const { metadata: { namespace: ns, name } } = bma;
       return `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`;
     });
-    let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)));
+    let bmas = await Promise.all(requests.map((url) => this.kubeConnector.get(url)))
+      .catch((err) => {
+        logger.error(err);
+      });
     bmas = bmas.filter((result) => !result.code);
 
     // remove the attachment
@@ -525,7 +570,9 @@ export default class BareMetalAssetModel extends KubeModel {
           },
         ],
       };
-      return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`, bmaBody);
+      return this.kubeConnector.patch(`/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets/${name}`, bmaBody).catch((err) => {
+        logger.error(err);
+      });
     }));
   }
 }

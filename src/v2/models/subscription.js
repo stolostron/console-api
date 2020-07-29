@@ -10,6 +10,7 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 const mapSubscription = (subscription) => ({
   metadata: subscription.metadata,
@@ -79,9 +80,14 @@ export default class SubscriptionModel extends KubeModel {
       chs = await this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
-      );
+      ).catch((err) => {
+        logger.error(err);
+      });
     } else {
-      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`)
+        .catch((err) => {
+          logger.error(err);
+        });
     }
     chs = await Promise.all(chs);
     return chs.map((subscription) => ({
@@ -96,20 +102,29 @@ export default class SubscriptionModel extends KubeModel {
       chs = await this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions/${name}`,
         { namespaces: [namespace] },
-      );
+      ).catch((err) => {
+        logger.error(err);
+      });
     } else {
-      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`)
+        .catch((err) => {
+          logger.error(err);
+        });
     }
     return chs.map(mapSubscription);
   }
 
   async getSubscriptionsForCluster(clusterName, clusterNamespace) {
     const [chs, deployables] = await Promise.all([
-      this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`),
+      this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`).catch((err) => {
+        logger.error(err);
+      }),
       this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
         { namespaces: [clusterNamespace] },
-      ),
+      ).catch((err) => {
+        logger.error(err);
+      }),
     ]);
     // Return only subscriptions that have a corresponding deployable in the cluster namespace
     return chs.filter((subscription) => !!deployables.find((deployable) => _.get(deployable, 'spec.template.kind') === 'Subscription'

@@ -80,14 +80,18 @@ export default class ComplianceModel {
 
     if (!name) {
       // for getting policy list
-      const policyResponse = await this.kubeConnector.getResources((ns) => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`);
+      const policyResponse = await this.kubeConnector.getResources((ns) => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`).catch((err) => {
+        logger.error(err);
+      });
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       }
       policies = policyResponse || [];
     } else {
       // get single policy with a specific name - walkaround of no type field
-      const policyResponse = await this.kubeConnector.get(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies/${name}`);
+      const policyResponse = await this.kubeConnector.get(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies/${name}`).catch((err) => {
+        logger.error(err);
+      });
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
       } else {
@@ -297,7 +301,9 @@ export default class ComplianceModel {
     const response = await this.kubeConnector.getResources(
       (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
       { kind: 'PlacementPolicy' },
-    );
+    ).catch((err) => {
+      logger.error(err);
+    });
     const map = new Map();
     if (response) {
       response.forEach((item) => map.set(item.metadata.name, item));
@@ -325,7 +331,9 @@ export default class ComplianceModel {
     const response = await this.kubeConnector.getResources(
       (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
       { kind: 'PlacementBinding' },
-    );
+    ).catch((err) => {
+      logger.error(err);
+    });
     const map = new Map();
     if (response) {
       response.forEach((item) => map.set(item.metadata.name, item));

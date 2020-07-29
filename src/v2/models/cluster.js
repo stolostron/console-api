@@ -11,6 +11,7 @@
 import _ from 'lodash';
 import { getLatestResource, responseHasError } from '../lib/utils';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 export const HIVE_DOMAIN = 'hive.openshift.io';
 export const UNINSTALL_LABEL = `${HIVE_DOMAIN}/uninstall`;
@@ -288,7 +289,9 @@ export default class ClusterModel extends KubeModel {
   }
 
   async createClusterNamespace(clusterNamespace, checkForDeployment = false) {
-    let projectResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } });
+    let projectResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } }).catch((err) => {
+      logger.error(err);
+    });
 
     if (responseHasError(projectResponse)) {
       if (projectResponse.code === 409) {
@@ -328,7 +331,9 @@ export default class ClusterModel extends KubeModel {
           },
         },
       },
-    );
+    ).catch((err) => {
+      logger.error(err);
+    });
 
     // If we created this namespace but could not label it, we have a problem
     if (projectResponse.code !== 409 && responseHasError(labelNamespaceResponse)) {
@@ -337,7 +342,9 @@ export default class ClusterModel extends KubeModel {
 
     // Get updated project and update namespace cache as long as we were able to label it
     if (!responseHasError(labelNamespaceResponse)) {
-      projectResponse = this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`);
+      projectResponse = this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`).catch((err) => {
+        logger.error(err);
+      });
       this.updateUserNamespaces(labelNamespaceResponse);
     }
 
@@ -384,7 +391,9 @@ export default class ClusterModel extends KubeModel {
     });
 
     // get resource end point for each resource
-    const k8sPaths = await this.kubeConnector.get('/');
+    const k8sPaths = await this.kubeConnector.get('/').catch((err) => {
+      logger.error(err);
+    });
     const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
     if (requestPaths.length > 0) {
       const missingTypes = [];
@@ -470,7 +479,9 @@ export default class ClusterModel extends KubeModel {
       // get the selfLinks of the existing resources
       const existing = await Promise.all(updates.map(({ requestPath, resource }) => {
         const name = _.get(resource, 'metadata.name');
-        return this.kubeConnector.get(`${requestPath}/${name}`);
+        return this.kubeConnector.get(`${requestPath}/${name}`).catch((err) => {
+          logger.error(err);
+        });
       }));
 
       // then update the resources
@@ -481,7 +492,9 @@ export default class ClusterModel extends KubeModel {
         const requestBody = {
           body: resource,
         };
-        return this.kubeConnector.put(`${selfLink}`, requestBody);
+        return this.kubeConnector.put(`${selfLink}`, requestBody).catch((err) => {
+          logger.error(err);
+        });
       }));
 
       // report any errors
@@ -527,7 +540,9 @@ export default class ClusterModel extends KubeModel {
       const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         return (async () => {
-          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
+          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
+            logger.error(err);
+          });
           const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
           const namespace = _.get(resource, 'metadata.namespace');
           const { name, namespaced } = resourceType;
@@ -550,7 +565,9 @@ export default class ClusterModel extends KubeModel {
         : this.kubeConnector.getResources(
           namespaceQueryFunction,
           { namespaces: this.clusterNamespaces },
-        )))
+        ))).catch((err) => {
+        logger.error(err);
+      })
     );
 
     const [
@@ -576,7 +593,9 @@ export default class ClusterModel extends KubeModel {
       this.kubeConnector.get(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR_ALL}`)
         .then((allItems) => (allItems.items
           ? allItems.items
-          : [])),
+          : [])).catch((err) => {
+          logger.error(err);
+        }),
       rbacFallbackQuery(
         `/apis/batch/v1/jobs?${UNINSTALL_LABEL_SELECTOR_ALL}`,
         (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${UNINSTALL_LABEL_SELECTOR(ns)}`,
@@ -601,14 +620,18 @@ export default class ClusterModel extends KubeModel {
     const { name } = args;
     const managedClusterInfo = await this.kubeConnector.get(
       `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`,
-    );
+    ).catch((err) => {
+      logger.error(err);
+    });
     return (_.get(managedClusterInfo, 'status.nodeList') || []).map((n) => ({ ...n, cluster: name }));
   }
 
   async getSingleCluster(args = {}) {
     const { name } = args;
     const listQuery = (query) => (
-      this.kubeConnector.get(query).then((allItems) => (allItems.items ? allItems.items : []))
+      this.kubeConnector.get(query).then((allItems) => (allItems.items ? allItems.items : [])).catch((err) => {
+        logger.error(err);
+      })
     );
     const [
       managedCluster,
@@ -618,9 +641,15 @@ export default class ClusterModel extends KubeModel {
       uninstallJobList,
       installJobList,
     ] = await Promise.all([
-      this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`),
-      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${name}/clusterdeployments/${name}`),
-      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`),
+      this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`).catch((err) => {
+        logger.error(err);
+      }),
+      this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${name}/clusterdeployments/${name}`).catch((err) => {
+        logger.error(err);
+      }),
+      this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`).catch((err) => {
+        logger.error(err);
+      }),
       listQuery(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
@@ -679,7 +708,9 @@ export default class ClusterModel extends KubeModel {
     const clusterDeployment = `/apis/hive.openshift.io/v1/namespaces/${namespace}/clusterdeployments/${cluster}`;
     const machinePools = `/apis/hive.openshift.io/v1/namespaces/${namespace}/machinepools`;
 
-    const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster);
+    const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster).catch((err) => {
+      logger.error(err);
+    });
 
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
       return detachManagedClusterResponse;
@@ -687,7 +718,9 @@ export default class ClusterModel extends KubeModel {
 
     if (destroy) {
       // Find MachinePools to delete
-      const machinePoolsResponse = await this.kubeConnector.get(machinePools);
+      const machinePoolsResponse = await this.kubeConnector.get(machinePools).catch((err) => {
+        logger.error(err);
+      });
       if (machinePoolsResponse.kind === 'Status') {
         return machinePoolsResponse;
       }
@@ -701,7 +734,9 @@ export default class ClusterModel extends KubeModel {
         clusterDeployment,
         ...machinePoolsToDelete,
       ];
-      const destroyResponses = await Promise.all(resourcesToDelete.map((link) => this.kubeConnector.delete(link)));
+      const destroyResponses = await Promise.all(resourcesToDelete.map((link) => this.kubeConnector.delete(link))).catch((err) => {
+        logger.error(err);
+      });
       // MachinePool deletion returns a Status with status==='Success'
       const failedResponse = destroyResponses.find((dr) => dr.kind === 'Status' && dr.status !== 'Success');
       if (failedResponse) {
@@ -715,7 +750,9 @@ export default class ClusterModel extends KubeModel {
   async getClusterImageSets() {
     const clusterImageSets = {};
     // global--no namespace
-    const response = await this.kubeConnector.get('/apis/hive.openshift.io/v1/clusterimagesets');
+    const response = await this.kubeConnector.get('/apis/hive.openshift.io/v1/clusterimagesets').catch((err) => {
+      logger.error(err);
+    });
     response.items.forEach((imageSet) => {
       const name = _.get(imageSet, 'metadata.name');
       const releaseImage = _.get(imageSet, 'spec.releaseImage');
@@ -741,7 +778,9 @@ export default class ClusterModel extends KubeModel {
 
     const poll = async (resolve, reject) => {
       const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
-      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true);
+      importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true).catch((err) => {
+        logger.error(err);
+      });
 
       if (importYamlSecret.code === 404 && count < 5) {
         count += 1;

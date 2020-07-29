@@ -11,6 +11,7 @@
 import _ from 'lodash';
 import KubeModel from './kube';
 import { isRequired, getType } from '../lib/utils';
+import logger from '../lib/logger';
 
 const formatPod = (clusterName, pod) => ({
   cluster: { metadata: { name: clusterName } },
@@ -90,7 +91,9 @@ export default class ResourceView extends KubeModel {
 
   async fetchResources({ type = isRequired('type') }, clusterNames) {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterNames)
-      .catch(() => null);
+      .catch((err) => {
+        logger.error(err);
+      });
     const results = _.get(response, 'status.results', {});
 
     const transform = this.transforms[type];
@@ -104,7 +107,9 @@ export default class ResourceView extends KubeModel {
 
   async fetchResource(type, clusterName, name, namespace) {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace)
-      .catch(() => null);
+      .catch((err) => {
+        logger.error(err);
+      });
     const transform = this.transforms[type];
     if (response && response.status.results !== undefined) {
       return [transform(clusterName, response.status.results[clusterName])];
@@ -114,7 +119,9 @@ export default class ResourceView extends KubeModel {
 
   async fetchNodeResource(type, clusterName, namespace) {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterName, namespace)
-      .catch(() => null);
+      .catch((err) => {
+        logger.error(err);
+      });
     const results = _.get(response, 'status.results', {});
     const transform = this.transforms[type];
     return Object.keys(results).reduce((accum, cluster) => {

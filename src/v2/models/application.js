@@ -10,6 +10,7 @@
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 const DEPLOYABLES = 'metadata.annotations["apps.open-cluster-management.io/deployables"]';
@@ -213,6 +214,7 @@ export default class ApplicationModel extends KubeModel {
     const result = await Promise.all(resources.map((resource) => {
       const namespace = _.get(resource, NAMESPACE, 'default');
       if (appKinds[resource.kind] === 'undefined') {
+        logger.error(`Invalid Kind: ${resource.kind}`);
         return Promise.resolve({
           status: 'Failure',
           message: `Invalid Kind: ${resource.kind}`,
@@ -237,6 +239,7 @@ export default class ApplicationModel extends KubeModel {
     result.forEach((item) => {
       if (item.code >= 400 || item.status === 'Failure') {
         errors.push({ message: item.message });
+        logger.error(item.message);
       }
     });
 
@@ -248,7 +251,13 @@ export default class ApplicationModel extends KubeModel {
 
   // return application namespace object
   async getApplicationNamespace(namespace) {
-    const namespaces = await this.kubeConnector.getNamespaceResources({ namespaces: namespace.split(',') });
+    let namespaces;
+    try {
+      namespaces = await this.kubeConnector.getNamespaceResources({ namespaces: namespace.split(',') });
+    } catch (err) {
+      logger.error(err);
+    }
+
     return namespaces.map(async (ns) => ({
       metadata: ns.metadata,
       name: ns.metadata.name || '',
@@ -263,15 +272,19 @@ export default class ApplicationModel extends KubeModel {
 
   async getApplicationOverview(name, namespace = 'default') {
     let apps;
-    if (name) {
-      apps = await this.kubeConnector.getResources(
-        (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
-        { namespaces: [namespace] },
-      );
-    } else {
-      apps = await this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+    try {
+      if (name) {
+        apps = await this.kubeConnector.getResources(
+          (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+          { namespaces: [namespace] },
+        );
+      } else {
+        apps = await this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+      }
+      apps = await Promise.all(apps);
+    } catch (err) {
+      logger.error(err);
     }
-    apps = await Promise.all(apps);
     return apps.filter((app) => app.metadata)
       .map((app) => ({
         metadata: app.metadata,
@@ -286,10 +299,16 @@ export default class ApplicationModel extends KubeModel {
   async getApplication(name, namespace, selectedChannel) {
     // get application
     let model = null;
-    const apps = await this.kubeConnector.getResources(
-      (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
-      { namespaces: [namespace] },
-    );
+    let apps;
+    try {
+      apps = await this.kubeConnector.getResources(
+        (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+        { namespaces: [namespace] },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
+
     if (apps.length > 0) {
       const app = apps[0];
 
@@ -337,10 +356,15 @@ export default class ApplicationModel extends KubeModel {
   async getAppDeployables(deployableMap) {
     const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
       // get all deployables in this namespace
-      const response = await this.kubeConnector.getResources(
-        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
-        { kind: 'Deployable', namespaces: [namespace] },
-      ) || [];
+      let response;
+      try {
+        response = await this.kubeConnector.getResources(
+          (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
+          { kind: 'Deployable', namespaces: [namespace] },
+        ) || [];
+      } catch (err) {
+        logger.error(err);
+      }
 
       // stuff responses into subscriptions that requested them
       response.forEach((deployable) => {
@@ -356,32 +380,43 @@ export default class ApplicationModel extends KubeModel {
   }
 
   async getAppRules(rulesMap) {
-    const requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
-      // get all rules in this namespace
-      const response = await this.kubeConnector.getResources(
-        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
-        { kind: 'PlacementRule', namespaces: [namespace] },
-      ) || [];
+    let requests;
+    try {
+      requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
+        // get all rules in this namespace
+        const response = await this.kubeConnector.getResources(
+          (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
+          { kind: 'PlacementRule', namespaces: [namespace] },
+        ) || [];
 
-      // stuff responses into subscriptions that requested them
-      response.forEach((rule) => {
-        const name = _.get(rule, 'metadata.name');
-        values.forEach(({ ruleName, subscription }) => {
-          if (name === ruleName) {
-            subscription.rules.push(rule);
-          }
+        // stuff responses into subscriptions that requested them
+        response.forEach((rule) => {
+          const name = _.get(rule, 'metadata.name');
+          values.forEach(({ ruleName, subscription }) => {
+            if (name === ruleName) {
+              subscription.rules.push(rule);
+            }
+          });
         });
       });
-    });
+    } catch (err) {
+      logger.error(err);
+    }
     return Promise.all(requests);
   }
 
   async getApplicationResources(names, type, kind) {
     const namespaces = new Set(names.map((name) => name.split('/')[0]));
-    const response = await this.kubeConnector.getResources(
-      (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/${type}`,
-      { kind, namespaces: Array.from(namespaces) },
-    );
+    let response;
+    try {
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/${type}`,
+        { kind, namespaces: Array.from(namespaces) },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
+
     return filterByNameNamespace(names, response);
   }
 
@@ -391,10 +426,15 @@ export default class ApplicationModel extends KubeModel {
       const name = _.get(resource, 'spec.placement.placementRef.name');
       if (name) {
         const namespace = _.get(resource, NAMESPACE);
-        const response = await this.kubeConnector.getResources(
-          (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
-          { kind: 'PlacementRule', namespaces: [namespace] },
-        );
+        let response;
+        try {
+          response = await this.kubeConnector.getResources(
+            (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/placementrules`,
+            { kind: 'PlacementRule', namespaces: [namespace] },
+          );
+        } catch (err) {
+          logger.error(err);
+        }
         if (Array.isArray(response)) {
           const [rules] = filterByName([name], response);
           return _.merge(resource, { rules });
@@ -412,21 +452,33 @@ export default class ApplicationModel extends KubeModel {
 
   async getApplications(name, namespace = 'default') {
     let apps;
-    if (name) {
-      apps = await this.kubeConnector.getResources(
-        (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
-        { namespaces: [namespace] },
-      );
-    } else {
-      apps = await this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+    try {
+      if (name) {
+        apps = await this.kubeConnector.getResources(
+          (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+          { namespaces: [namespace] },
+        );
+      } else {
+        apps = await this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+      }
+    } catch (err) {
+      logger.error(err);
     }
+
     return apps.filter((app) => app.metadata)
       .map(async (app) => {
         const deployableNames = _.get(app, DEPLOYABLES)
           ? _.get(app, DEPLOYABLES).split(',') : [];
         const placementBindingNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]')
           ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/placementbindings"]').split(',') : [];
-        const placementPolicyItems = await Promise.all(placementBindingNames.map((pbName) => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+
+        let placementPolicyItems;
+        try {
+          placementPolicyItems = await Promise.all(placementBindingNames.map((pbName) => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+        } catch (err) {
+          logger.error(err);
+        }
+
         const placementPolicyNames = placementPolicyItems.map((pp) => pp.placementRef && pp.placementRef.name);
         return {
           applicationRelationshipNames: _.get(app, 'metadata.annotations["apps.open-cluster-management.io/applicationrelationships"]') ? _.get(app, 'metadata.annotations["apps.open-cluster-management.io/applicationrelationships"]').split(',') : [],
@@ -444,11 +496,16 @@ export default class ApplicationModel extends KubeModel {
 
   async getApplicationRelationships(selector = {}) {
     const { matchNames } = selector;
+    let response;
+    try {
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applicationrelationships`,
+        { kind: 'ApplicationRelationship' },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
 
-    const response = await this.kubeConnector.getResources(
-      (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/applicationrelationships`,
-      { kind: 'ApplicationRelationship' },
-    );
     const appRelationships = matchNames ? filterByName(matchNames, response) : response;
 
     return appRelationships.map((ar) => ({
@@ -462,11 +519,15 @@ export default class ApplicationModel extends KubeModel {
 
   async getDeployables(selector = {}) {
     const { matchNames } = selector;
-
-    const response = await this.kubeConnector.getResources(
-      (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
-      { kind: 'Deployable' },
-    );
+    let response;
+    try {
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
+        { kind: 'Deployable' },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
     const deployables = matchNames ? filterByName(matchNames, response) : response;
 
     return deployables.map((deployable) => ({
@@ -490,11 +551,16 @@ export default class ApplicationModel extends KubeModel {
 
   async getPlacementBindings(selector = {}) {
     const { matchNames } = selector;
+    let response;
+    try {
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
+        { kind: 'PlacementBinding' },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
 
-    const response = await this.kubeConnector.getResources(
-      (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementbindings`,
-      { kind: 'PlacementBinding' },
-    );
     const placementBindings = matchNames ? filterByName(matchNames, response) : response;
 
     return placementBindings.map((pb) => ({
@@ -507,11 +573,16 @@ export default class ApplicationModel extends KubeModel {
 
   async getPlacementPolicies(selector = {}) {
     const { matchNames } = selector;
+    let response;
+    try {
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
+        { kind: 'PlacementPolicy' },
+      );
+    } catch (err) {
+      logger.error(err);
+    }
 
-    const response = await this.kubeConnector.getResources(
-      (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/placementpolicies`,
-      { kind: 'PlacementPolicy' },
-    );
     const placementPolicies = matchNames ? filterByName(matchNames, response) : response;
 
     return placementPolicies.map((pp) => ({
@@ -526,8 +597,12 @@ export default class ApplicationModel extends KubeModel {
 
   async getApplicationWorks(selector = {}) {
     const { deployableNames, placementBindingNames } = selector;
-
-    const response = await this.kubeConnector.getResources((ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable+in+%28${deployableNames.join(',')}%29%2CplacementBinding+in+%28${placementBindingNames.join(',')}%29`);
+    let response;
+    try {
+      response = await this.kubeConnector.getResources((ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable+in+%28${deployableNames.join(',')}%29%2CplacementBinding+in+%28${placementBindingNames.join(',')}%29`);
+    } catch (err) {
+      logger.error(err);
+    }
     return response.map((work) => ({
       metadata: work.metadata,
       release: _.get(work, 'status.result.metadata.name', '-'),

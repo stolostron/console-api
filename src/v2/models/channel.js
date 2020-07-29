@@ -10,6 +10,7 @@
 
 import _ from 'lodash';
 import KubeModel from './kube';
+import logger from '../lib/logger';
 
 export default class ChannelModel extends KubeModel {
   async createChannel(resources) {
@@ -65,9 +66,13 @@ export default class ChannelModel extends KubeModel {
       chs = await this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
-      );
+      ).catch((err) => {
+        logger.error(err);
+      });
     } else {
-      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`).catch((err) => {
+        logger.error(err);
+      });
     }
     chs = await Promise.all(chs);
     return chs.map((channel) => ({
@@ -82,9 +87,13 @@ export default class ChannelModel extends KubeModel {
       chs = await this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${name}`,
         { namespaces: [namespace] },
-      );
+      ).catch((err) => {
+        logger.error(err);
+      });
     } else {
-      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`);
+      chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`).catch((err) => {
+        logger.error(err);
+      });
     }
     return chs.map(async (channel) => {
       const { spec } = channel;
