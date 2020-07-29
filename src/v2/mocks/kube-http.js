@@ -46,6 +46,10 @@ export default function createMockHttp() {
     clusterImport: require('./ClusterImport'),
     connectionApi: require('./ConnectionApi'),
     bareMetalAssets: require('./BareMetalAssetList').default,
+    bareMetalAsset: require('./BareMetalAssetList').singleAsset,
+    bareMetalAssetSecret: require('./BareMetalAssetSecret').default,
+    bareMetalAssetPatchedSecret: require('./BareMetalAssetSecret').patchedSecret,
+    project: require('./ProjectList').default,
   };
 
   return async function MockLib(params) {
@@ -99,6 +103,12 @@ export default function createMockHttp() {
           return state.clusterImport.getKlusterletAddonConfigsResponse;
         case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
           return state.clusterImport.getClusterResponse;
+        case params.url.includes('/api/v1/namespaces/fake-cluster/secrets'):
+          return state.bareMetalAssetSecret;
+        case params.url.includes('/fake-cluster/baremetalassets'):
+          return state.bareMetalAsset;
+        case params.url.includes('/secrets/worker-0-bmc-secret'):
+          return state.bareMetalAssetPatchedSecret;
         default:
           return state.pods;
       }
@@ -200,6 +210,9 @@ export default function createMockHttp() {
         return state.connectionApi.getCloudConnectionSecrets;
       case params.url.includes('v1alpha1/baremetalassets'):
         return state.bareMetalAssets;
+      case params.url.includes('/baremetalassets/baremetalasset-worker-0'):
+      case params.url.includes('/fake-cluster/baremetalassets'):
+        return state.bareMetalAsset;
       case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
         return state.clusterImport.getImportYamlSecret;
       case params.url.includes('/api/v1/namespaces/no-yaml/secrets/no-yaml-import'):
@@ -215,6 +228,10 @@ export default function createMockHttp() {
         return state.machinePoolsByNamespace.default;
       case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools'):
         return state.machinePoolsByNamespace.kubeSystem;
+      case params.url.includes('/secrets/worker-0-bmc-secret'):
+        return state.bareMetalAssetPatchedSecret;
+      case params.url.includes('/apis/project.openshift.io/v1/projects'):
+        return state.project;
       default:
         return state.apiList.mockResponse;
     }

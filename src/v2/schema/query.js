@@ -107,9 +107,7 @@ type Query {
 # Multicloud Manager Mutations
 type Mutation {
   # Creates an Application.
-  # Requires a resource of kind "Application".
-  # Other supported kinds are: ConfigMap, Deployable, DeployableOverride, and PlacementPolicy
-  createApplication(resources: [JSON]): JSON
+  createApplication(application: [JSON]!): JSON
 
   # Creates a channel resource.
   createChannel(resources: [JSON]): JSON

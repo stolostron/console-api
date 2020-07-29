@@ -69,64 +69,32 @@ Object {
 
 exports[`Application Resolver Correctly Resolves Create Application Mutation 1`] = `
 Object {
-  "data": Object {
-    "createApplication": Object {
-      "errors": Array [],
-      "result": Array [
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "GRAPHQL_VALIDATION_FAILED",
+      },
+      "locations": Array [
         Object {
-          "apiVersion": "mcm.ibm.com/v1alpha1",
-          "kind": "Application",
-          "metadata": Object {
-            "annotations": Object {
-              "mcm.ibm.com/user-group": "c3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
-              "mcm.ibm.com/user-identity": "aHR0cHM6Ly9teWNsdXN0ZXIuaWNwOjk0NDMvb2lkYy9lbmRwb2ludC9PUCNhZG1pbg==",
-            },
-            "creationTimestamp": "2018-09-07T14:19:02Z",
-            "labels": Object {
-              "deployable": "deployable01",
-              "hcmapp": "testapp",
-            },
-            "name": "testapp",
-            "namespace": "default",
-            "resourceVersion": "59905",
-            "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/testapp",
-            "uid": "f849165a-b2a8-11e8-bd43-b69970856045",
-          },
-          "spec": Object {
-            "componentKinds": Array [
-              Object {
-                "group": "mcm.ibm.com/v1alpha1",
-                "kind": "PlacementPolicy",
-              },
-              Object {
-                "group": "mcm.ibm.com/v1alpha1",
-                "kind": "Deployable",
-              },
-            ],
-            "descriptor": Object {},
-            "selector": Object {
-              "matchLabels": Object {
-                "hcmapp": "testapp",
-              },
-            },
-          },
-          "status": Object {
-            "Deployable": Object {
-              "metadata": Object {
-                "creationTimestamp": null,
-              },
-              "spec": Object {
-                "deployer": Object {
-                  "helm": Object {},
-                },
-              },
-              "status": Object {},
-            },
-          },
+          "column": 29,
+          "line": 3,
         },
       ],
+      "message": "Unknown argument \\"resources\\" on field \\"Mutation.createApplication\\".",
     },
-  },
+    Object {
+      "extensions": Object {
+        "code": "GRAPHQL_VALIDATION_FAILED",
+      },
+      "locations": Array [
+        Object {
+          "column": 11,
+          "line": 3,
+        },
+      ],
+      "message": "Field \\"createApplication\\" argument \\"application\\" of type \\"[JSON]!\\" is required, but it was not provided.",
+    },
+  ],
 }
 `;
 
