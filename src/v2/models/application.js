@@ -614,7 +614,9 @@ export default class ApplicationModel extends KubeModel {
 
         let placementPolicyItems;
         try {
-          placementPolicyItems = await Promise.all(placementBindingNames.map((pbName) => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`)));
+          placementPolicyItems = await Promise.all(placementBindingNames.map(
+            (pbName) => this.kubeConnector.get(`/apis/apps.open-cluster-management.io/v1/namespaces/${app.metadata.namespace}/placementbindings/${pbName}`),
+          ));
         } catch (err) {
           logger.error(err);
         }
@@ -739,7 +741,10 @@ export default class ApplicationModel extends KubeModel {
     const { deployableNames, placementBindingNames } = selector;
     let response;
     try {
-      response = await this.kubeConnector.getResources((ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable+in+%28${deployableNames.join(',')}%29%2CplacementBinding+in+%28${placementBindingNames.join(',')}%29`);
+      response = await this.kubeConnector.getResources(
+        (ns) => `/apis/mcm.ibm.com/v1alpha1/namespaces/${ns}/works?labelSelector=deployable+in+%28${deployableNames.join(',')
+        }%29%2CplacementBinding+in+%28${placementBindingNames.join(',')}%29`,
+      );
     } catch (err) {
       logger.error(err);
     }
