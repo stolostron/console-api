@@ -83,13 +83,18 @@ export default class BareMetalAssetModel extends KubeModel {
   async getAllBareMetalAssets({ fetchSecrets }) {
     const [bareMetalAssets, secrets] = await Promise.all([
       this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets')
-        .then((allBMAs) => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources((ns) => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`))).catch((err) => {
+        .then((allBMAs) => (allBMAs.items ? allBMAs.items : this.kubeConnector.getResources(
+          (ns) => `/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/${ns}/baremetalassets`,
+        ))).catch((err) => {
           logger.error(err);
         }),
       fetchSecrets
-        ? this.kubeConnector.get('/api/v1/secrets').then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`))).catch((err) => {
-          logger.error(err);
-        })
+        ? this.kubeConnector.get('/api/v1/secrets')
+          .then((allSecrets) => (allSecrets.items ? allSecrets.items : this.kubeConnector.getResources(
+            (ns) => `/api/v1/namespaces/${ns}/secrets`,
+          ))).catch((err) => {
+            logger.error(err);
+          })
         : Promise.resolve({ items: [] }),
     ]);
 
@@ -120,9 +125,10 @@ export default class BareMetalAssetModel extends KubeModel {
     };
 
     // make sure all hosts have a bare metal asset
-    const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets').catch((err) => {
-      logger.error(err);
-    });
+    const bareMetalAssets = await this.kubeConnector.get('/apis/inventory.open-cluster-management.io/v1alpha1/baremetalassets')
+      .catch((err) => {
+        logger.error(err);
+      });
     const assetsMap = _.keyBy(bareMetalAssets.items, (item) => {
       const name = _.get(item, 'metadata.name');
       const namespace = _.get(item, 'metadata.namespace');
