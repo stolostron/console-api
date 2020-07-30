@@ -84,10 +84,9 @@ export default class ConnectionModel extends KubeModel {
 
   async deleteConnection(args) {
     const { namespace, name } = args;
-    const response = await this.kubeConnector.delete(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => {
+    return this.kubeConnector.delete(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => {
       logger.error(err);
     });
-    return response;
   }
 
   async editConnection(args) {
