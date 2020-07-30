@@ -306,7 +306,8 @@ export default class GenericModel extends KubeModel {
         logger.error(err);
       });
     }
-    return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterName}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true).catch((err) => {
+    return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterName
+    }/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true).catch((err) => {
       logger.error(err);
     });
   }
