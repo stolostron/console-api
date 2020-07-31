@@ -282,9 +282,7 @@ export default class GenericModel extends KubeModel {
     });
 
     try {
-      const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]).catch((err) => {
-        logger.error(err);
-      });
+      const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       logger.debug('result:', result);
       if (result) {
         this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets/${response.metadata.name}`)
