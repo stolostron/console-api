@@ -350,10 +350,7 @@ export const createGenericPackageObject = (
   return packageObj;
 };
 
-export const removeReleaseGeneratedSuffix = (name) => {
-  const newName = name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
-  return newName;
-};
+export const removeReleaseGeneratedSuffix = (name) => name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
 
 // remove the release name from the deployable name
 export const removeHelmReleaseName = (name, releaseName) => {
