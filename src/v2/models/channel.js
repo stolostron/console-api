@@ -68,10 +68,12 @@ export default class ChannelModel extends KubeModel {
         { namespaces: [namespace] },
       ).catch((err) => {
         logger.error(err);
+        throw err;
       });
     } else {
       chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`).catch((err) => {
         logger.error(err);
+        throw err;
       });
     }
     chs = await Promise.all(chs);
@@ -89,10 +91,12 @@ export default class ChannelModel extends KubeModel {
         { namespaces: [namespace] },
       ).catch((err) => {
         logger.error(err);
+        throw err;
       });
     } else {
       chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels`).catch((err) => {
         logger.error(err);
+        throw err;
       });
     }
     return chs.map(async (channel) => {

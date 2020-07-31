@@ -82,11 +82,13 @@ export default class SubscriptionModel extends KubeModel {
         { namespaces: [namespace] },
       ).catch((err) => {
         logger.error(err);
+        throw err;
       });
     } else {
       chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`)
         .catch((err) => {
           logger.error(err);
+          throw err;
         });
     }
     chs = await Promise.all(chs);
@@ -104,11 +106,13 @@ export default class SubscriptionModel extends KubeModel {
         { namespaces: [namespace] },
       ).catch((err) => {
         logger.error(err);
+        throw err;
       });
     } else {
       chs = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`)
         .catch((err) => {
           logger.error(err);
+          throw err;
         });
     }
     return chs.map(mapSubscription);
@@ -118,12 +122,14 @@ export default class SubscriptionModel extends KubeModel {
     const [chs, deployables] = await Promise.all([
       this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/subscriptions`).catch((err) => {
         logger.error(err);
+        throw err;
       }),
       this.kubeConnector.getResources(
         (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/deployables`,
         { namespaces: [clusterNamespace] },
       ).catch((err) => {
         logger.error(err);
+        throw err;
       }),
     ]);
     // Return only subscriptions that have a corresponding deployable in the cluster namespace

@@ -424,6 +424,7 @@ export default class ApplicationModel extends KubeModel {
       apps = await Promise.all(apps);
     } catch (err) {
       logger.error(err);
+      throw err;
     }
     return apps.filter((app) => app.metadata)
       .map((app) => ({
@@ -447,6 +448,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     if (apps.length > 0) {
@@ -504,6 +506,7 @@ export default class ApplicationModel extends KubeModel {
         ) || [];
       } catch (err) {
         logger.error(err);
+        throw err;
       }
 
       // stuff responses into subscriptions that requested them
@@ -541,6 +544,7 @@ export default class ApplicationModel extends KubeModel {
       });
     } catch (err) {
       logger.error(err);
+      throw err;
     }
     return Promise.all(requests);
   }
@@ -555,6 +559,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     return filterByNameNamespace(names, response);
@@ -574,6 +579,7 @@ export default class ApplicationModel extends KubeModel {
           );
         } catch (err) {
           logger.error(err);
+          throw err;
         }
         if (Array.isArray(response)) {
           const [rules] = filterByName([name], response);
@@ -603,6 +609,7 @@ export default class ApplicationModel extends KubeModel {
       }
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     return apps.filter((app) => app.metadata)
@@ -619,6 +626,7 @@ export default class ApplicationModel extends KubeModel {
           ));
         } catch (err) {
           logger.error(err);
+          throw err;
         }
 
         const placementPolicyNames = placementPolicyItems.map((pp) => pp.placementRef && pp.placementRef.name);
@@ -646,6 +654,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     const appRelationships = matchNames ? filterByName(matchNames, response) : response;
@@ -669,6 +678,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
     const deployables = matchNames ? filterByName(matchNames, response) : response;
 
@@ -701,6 +711,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     const placementBindings = matchNames ? filterByName(matchNames, response) : response;
@@ -723,6 +734,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
 
     const placementPolicies = matchNames ? filterByName(matchNames, response) : response;
@@ -747,6 +759,7 @@ export default class ApplicationModel extends KubeModel {
       );
     } catch (err) {
       logger.error(err);
+      throw err;
     }
     return response.map((work) => ({
       metadata: work.metadata,

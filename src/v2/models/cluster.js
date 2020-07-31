@@ -291,6 +291,7 @@ export default class ClusterModel extends KubeModel {
   async createClusterNamespace(clusterNamespace, checkForDeployment = false) {
     let projectResponse = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: clusterNamespace } }).catch((err) => {
       logger.error(err);
+      throw err;
     });
 
     if (responseHasError(projectResponse)) {
@@ -333,6 +334,7 @@ export default class ClusterModel extends KubeModel {
       },
     ).catch((err) => {
       logger.error(err);
+      throw err;
     });
 
     // If we created this namespace but could not label it, we have a problem
@@ -344,6 +346,7 @@ export default class ClusterModel extends KubeModel {
     if (!responseHasError(labelNamespaceResponse)) {
       projectResponse = this.kubeConnector.get(`/apis/project.openshift.io/v1/projects/${clusterNamespace}`).catch((err) => {
         logger.error(err);
+        throw err;
       });
       this.updateUserNamespaces(labelNamespaceResponse);
     }
@@ -393,6 +396,7 @@ export default class ClusterModel extends KubeModel {
     // get resource end point for each resource
     const k8sPaths = await this.kubeConnector.get('/').catch((err) => {
       logger.error(err);
+      throw err;
     });
     const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
     if (requestPaths.length > 0) {
@@ -481,6 +485,7 @@ export default class ClusterModel extends KubeModel {
         const name = _.get(resource, 'metadata.name');
         return this.kubeConnector.get(`${requestPath}/${name}`).catch((err) => {
           logger.error(err);
+          throw err;
         });
       }));
 
@@ -494,6 +499,7 @@ export default class ClusterModel extends KubeModel {
         };
         return this.kubeConnector.put(`${selfLink}`, requestBody).catch((err) => {
           logger.error(err);
+          throw err;
         });
       }));
 
@@ -542,6 +548,7 @@ export default class ClusterModel extends KubeModel {
         return (async () => {
           const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
             logger.error(err);
+            throw err;
           });
           const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
           const namespace = _.get(resource, 'metadata.namespace');
@@ -567,6 +574,7 @@ export default class ClusterModel extends KubeModel {
           { namespaces: this.clusterNamespaces },
         ))).catch((err) => {
         logger.error(err);
+        throw err;
       })
     );
 
@@ -595,6 +603,7 @@ export default class ClusterModel extends KubeModel {
           ? allItems.items
           : [])).catch((err) => {
           logger.error(err);
+          throw err;
         }),
       rbacFallbackQuery(
         `/apis/batch/v1/jobs?${UNINSTALL_LABEL_SELECTOR_ALL}`,
@@ -622,6 +631,7 @@ export default class ClusterModel extends KubeModel {
       `/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`,
     ).catch((err) => {
       logger.error(err);
+      throw err;
     });
     return (_.get(managedClusterInfo, 'status.nodeList') || []).map((n) => ({ ...n, cluster: name }));
   }
@@ -631,6 +641,7 @@ export default class ClusterModel extends KubeModel {
     const listQuery = (query) => (
       this.kubeConnector.get(query).then((allItems) => (allItems.items ? allItems.items : [])).catch((err) => {
         logger.error(err);
+        throw err;
       })
     );
     const [
@@ -643,12 +654,15 @@ export default class ClusterModel extends KubeModel {
     ] = await Promise.all([
       this.kubeConnector.get(`/apis/cluster.open-cluster-management.io/v1/managedclusters/${name}`).catch((err) => {
         logger.error(err);
+        throw err;
       }),
       this.kubeConnector.get(`/apis/hive.openshift.io/v1/namespaces/${name}/clusterdeployments/${name}`).catch((err) => {
         logger.error(err);
+        throw err;
       }),
       this.kubeConnector.get(`/apis/internal.open-cluster-management.io/v1beta1/namespaces/${name}/managedclusterinfos/${name}`).catch((err) => {
         logger.error(err);
+        throw err;
       }),
       listQuery(`/apis/certificates.k8s.io/v1beta1/certificatesigningrequests?${CSR_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
@@ -710,6 +724,7 @@ export default class ClusterModel extends KubeModel {
 
     const detachManagedClusterResponse = await this.kubeConnector.delete(managedCluster).catch((err) => {
       logger.error(err);
+      throw err;
     });
 
     if (!destroy && responseHasError(detachManagedClusterResponse)) {
@@ -720,6 +735,7 @@ export default class ClusterModel extends KubeModel {
       // Find MachinePools to delete
       const machinePoolsResponse = await this.kubeConnector.get(machinePools).catch((err) => {
         logger.error(err);
+        throw err;
       });
       if (machinePoolsResponse.kind === 'Status') {
         return machinePoolsResponse;
@@ -736,6 +752,7 @@ export default class ClusterModel extends KubeModel {
       ];
       const destroyResponses = await Promise.all(resourcesToDelete.map((link) => this.kubeConnector.delete(link))).catch((err) => {
         logger.error(err);
+        throw err;
       });
       // MachinePool deletion returns a Status with status==='Success'
       const failedResponse = destroyResponses.find((dr) => dr.kind === 'Status' && dr.status !== 'Success');
@@ -752,6 +769,7 @@ export default class ClusterModel extends KubeModel {
     // global--no namespace
     const response = await this.kubeConnector.get('/apis/hive.openshift.io/v1/clusterimagesets').catch((err) => {
       logger.error(err);
+      throw err;
     });
     response.items.forEach((imageSet) => {
       const name = _.get(imageSet, 'metadata.name');
@@ -780,6 +798,7 @@ export default class ClusterModel extends KubeModel {
       const secretUrl = `/api/v1/namespaces/${clusterNamespace}/secrets/${clusterName}-import`;
       importYamlSecret = await this.kubeConnector.get(secretUrl, {}, true).catch((err) => {
         logger.error(err);
+        throw err;
       });
 
       if (importYamlSecret.code === 404 && count < 5) {

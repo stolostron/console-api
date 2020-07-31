@@ -82,6 +82,7 @@ export default class ComplianceModel {
       // for getting policy list
       const policyResponse = await this.kubeConnector.getResources((ns) => `/apis/policy.open-cluster-management.io/v1/namespaces/${ns}/policies`).catch((err) => {
         logger.error(err);
+        throw err;
       });
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
@@ -91,6 +92,7 @@ export default class ComplianceModel {
       // get single policy with a specific name - walkaround of no type field
       const policyResponse = await this.kubeConnector.get(`/apis/policy.open-cluster-management.io/v1/namespaces/${namespace}/policies/${name}`).catch((err) => {
         logger.error(err);
+        throw err;
       });
       if (policyResponse.code || policyResponse.message) {
         logger.error(`HCM ERROR ${policyResponse.code} - ${policyResponse.message}`);
@@ -303,6 +305,7 @@ export default class ComplianceModel {
       { kind: 'PlacementPolicy' },
     ).catch((err) => {
       logger.error(err);
+      throw err;
     });
     const map = new Map();
     if (response) {
@@ -333,6 +336,7 @@ export default class ComplianceModel {
       { kind: 'PlacementBinding' },
     ).catch((err) => {
       logger.error(err);
+      throw err;
     });
     const map = new Map();
     if (response) {

@@ -42,6 +42,7 @@ export default class ConnectionModel extends KubeModel {
     const resource = generateSecret(body);
     const response = await this.kubeConnector.post(`/api/v1/namespaces/${body.namespace}/secrets`, resource).catch((err) => {
       logger.error(err);
+      throw err;
     });
     const statusCode = response.kind === 'Status' ? response.code : 201;
     return { ...response, statusCode };
@@ -50,6 +51,7 @@ export default class ConnectionModel extends KubeModel {
   async getConnections() {
     const connections = await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`).catch((err) => {
       logger.error(err);
+      throw err;
     });
     const ret = [];
     connections.forEach(({ metadata }) => {
@@ -68,8 +70,14 @@ export default class ConnectionModel extends KubeModel {
   async getConnectionDetails(args) {
     const { namespace = null, name = null } = args;
     const connections = namespace && name
-      ? [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => { logger.error(err); })]
-      : await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`).catch((err) => { logger.error(err); });
+      ? [await this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => {
+        logger.error(err);
+        throw err;
+      })]
+      : await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets?${CONNECTION_LABEL_SELECTOR}`).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
     const ret = [];
     connections.forEach(({ metadata, data }) => {
       ret.push({
@@ -86,6 +94,7 @@ export default class ConnectionModel extends KubeModel {
     const { namespace, name } = args;
     return this.kubeConnector.delete(`/api/v1/namespaces/${namespace}/secrets/${name}`).catch((err) => {
       logger.error(err);
+      throw err;
     });
   }
 
@@ -94,6 +103,7 @@ export default class ConnectionModel extends KubeModel {
     const resource = generateSecret(body);
     const response = await this.kubeConnector.put(`/api/v1/namespaces/${namespace}/secrets/${name}`, { body: resource }).catch((err) => {
       logger.error(err);
+      throw err;
     });
     const statusCode = response.kind === 'Status' ? response.code : 200;
     return { ...response, statusCode };
