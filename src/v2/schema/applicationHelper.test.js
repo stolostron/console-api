@@ -19,7 +19,7 @@ import getApplicationElements, {
   processServices,
   processDeployables,
   getSubscriptionPackageInfo,
-
+  removeReleaseGeneratedSuffix,
 } from './applicationHelper';
 
 describe('applicationHelper', () => {
@@ -1195,5 +1195,11 @@ describe('getSubscriptionPackageInfo git helm', () => {
     ];
 
     expect(getSubscriptionPackageInfo(topoAnnotation, subscriptionName, 'default', channelInfo)).toEqual(result);
+  });
+});
+
+describe('removeReleaseGeneratedSuffix remove suffix', () => {
+  it('removeReleaseGeneratedSuffix remove suffix', () => {
+    expect(removeReleaseGeneratedSuffix('nginx-ingress-66f46')).toEqual('nginx-ingress');
   });
 });

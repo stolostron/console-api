@@ -350,12 +350,21 @@ export const createGenericPackageObject = (
   return packageObj;
 };
 
+export const removeReleaseGeneratedSuffix = (name) => {
+  const newName = name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
+  return newName;
+};
+
 // remove the release name from the deployable name
 export const removeHelmReleaseName = (name, releaseName) => {
   const trimmedReleaseName = _.trimEnd(releaseName, '-');
   let result = _.replace(name, `${trimmedReleaseName}-`, '');
   result = _.replace(result, `${trimmedReleaseName}`, '');
 
+  // resource name only contains release name, return without the generated suffix
+  if (result.length === 0) {
+    return removeReleaseGeneratedSuffix(name);
+  }
   return result;
 };
 
