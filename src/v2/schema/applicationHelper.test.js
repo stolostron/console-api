@@ -20,6 +20,7 @@ import getApplicationElements, {
   processDeployables,
   getSubscriptionPackageInfo,
   removeReleaseGeneratedSuffix,
+  removeHelmReleaseName,
 } from './applicationHelper';
 
 describe('applicationHelper', () => {
@@ -1201,5 +1202,11 @@ describe('getSubscriptionPackageInfo git helm', () => {
 describe('removeReleaseGeneratedSuffix remove suffix', () => {
   it('removeReleaseGeneratedSuffix remove suffix', () => {
     expect(removeReleaseGeneratedSuffix('nginx-ingress-66f46')).toEqual('nginx-ingress');
+  });
+});
+
+describe('removeHelmReleaseName test resource with only release name as the name', () => {
+  it('removeHelmReleaseName test resource with only release name as the name', () => {
+    expect(removeHelmReleaseName('nginx-ingress-66f46', 'nginx-ingress-66f46')).toEqual('nginx-ingress');
   });
 });
