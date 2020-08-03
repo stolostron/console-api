@@ -93,7 +93,7 @@ export default class ResourceView extends KubeModel {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterNames)
       .catch((err) => {
         logger.error(err);
-        throw err;
+        return null;
       });
     const results = _.get(response, 'status.results', {});
 
@@ -110,7 +110,7 @@ export default class ResourceView extends KubeModel {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterName, name, namespace)
       .catch((err) => {
         logger.error(err);
-        throw err;
+        return null;
       });
     const transform = this.transforms[type];
     if (response && response.status.results !== undefined) {
@@ -123,7 +123,7 @@ export default class ResourceView extends KubeModel {
     const response = await this.kubeConnector.resourceViewQuery(type, clusterName, namespace)
       .catch((err) => {
         logger.error(err);
-        throw err;
+        return null;
       });
     const results = _.get(response, 'status.results', {});
     const transform = this.transforms[type];
