@@ -173,11 +173,13 @@ export default class GenericModel extends KubeModel {
       }
       response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1/${resourceName}/${name}`, requestBody).catch((err) => {
         logger.error(err);
+        throw err;
       });
     } else {
       // will use selfLink by default
       response = await this.kubeConnector.patch(`${selfLink}`, requestBody).catch((err) => {
         logger.error(err);
+        throw err;
       });
     }
     if (response && (response.code || response.message)) {
