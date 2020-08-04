@@ -343,7 +343,7 @@ export default class GenericModel extends KubeModel {
       `/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/managedclusterviews/${managedClusterViewName}`,
     ).catch((err) => {
       logger.error(err);
-      return null;
+      throw err;
     });
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
       const apiGroup = getApiGroupFromSelfLink(selfLink);
@@ -377,7 +377,7 @@ export default class GenericModel extends KubeModel {
       managedClusterViewName,
     ).catch((err) => {
       logger.error(err);
-      throw err;
+      return null;
     });
   }
 
