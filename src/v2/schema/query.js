@@ -15,7 +15,7 @@ export const typeDef = gql`
 # Multicloud Manager Queries
 type Query {
   # Get application resources.
-  applications(name: String, namespace: String): [Application]
+  application(name: String, namespace: String): Application
 
   # Get all channel resources. Optionally, specify name and namespace to filter results.
   channels(name: String, namespace: String): [Channel]
