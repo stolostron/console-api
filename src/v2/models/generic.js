@@ -15,6 +15,7 @@ import logger from '../lib/logger';
 
 const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
 const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
+const metadataSelfLink = 'metadata.selfLink';
 
 function getApiGroupFromSelfLink(selfLink, kind) {
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
@@ -39,7 +40,10 @@ export default class GenericModel extends KubeModel {
       const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         return (async () => {
-          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`);
+          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
+            logger.error(err);
+            throw err;
+          });
           const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
           const namespace = _.get(resource, 'metadata.namespace');
           const { name, namespaced } = resourceType;
@@ -83,13 +87,17 @@ export default class GenericModel extends KubeModel {
         try {
           return this.kubeConnector.post(`${routePrefix}/${clusterInfo.clusterNameSpace}/managedclusteractions`, jsonBody);
         } catch (e) {
-          return e;
+          logger.error(e);
+          throw e;
         }
       }));
       return responseArr;
     }
 
-    const k8sPaths = await this.kubeConnector.get('/');
+    const k8sPaths = await this.kubeConnector.get('/').catch((err) => {
+      logger.error(err);
+      throw err;
+    });
     // get resource end point for each resource
     const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
     if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
@@ -163,10 +171,16 @@ export default class GenericModel extends KubeModel {
         default:
           throw new Error('OCM ERROR cannot find matched resource type');
       }
-      response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1/${resourceName}/${name}`, requestBody);
+      response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1/${resourceName}/${name}`, requestBody).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
     } else {
       // will use selfLink by default
-      response = await this.kubeConnector.patch(`${selfLink}`, requestBody);
+      response = await this.kubeConnector.patch(`${selfLink}`, requestBody).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
     }
     if (response && (response.code || response.message)) {
       throw new Error(`${response.code} - ${response.message}`);
@@ -264,7 +278,10 @@ export default class GenericModel extends KubeModel {
       throw new Error(`Create Resource Action Failed [${response.code}] - ${response.message}`);
     }
 
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink)).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
 
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
@@ -288,9 +305,16 @@ export default class GenericModel extends KubeModel {
 
   async getLogs(containerName, podName, podNamespace, clusterName) {
     if (clusterName === 'local-cluster') { // TODO: Use flag _hubClusterResource instead of cluster name
-      return this.kubeConnector.get(`/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&tailLines=1000`);
+      return this.kubeConnector.get(`/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&tailLines=1000`).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
     }
-    return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterName}/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true);
+    return this.kubeConnector.get(`/apis/proxy.open-cluster-management.io/v1beta1/namespaces/${clusterName
+    }/clusterstatuses/${clusterName}/log/${podNamespace}/${podName}/${containerName}?tailLines=1000`, { json: false }, true).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
   }
 
   // Generic query to get local and remote resource data
@@ -306,13 +330,21 @@ export default class GenericModel extends KubeModel {
       deleteAfterUse = true,
     } = args;
     if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
-      return this.kubeConnector.get(selfLink);
+      return this.kubeConnector.get(selfLink).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
     }
 
     // Check if the ManagedClusterView already exists if not create it
     const managedClusterViewName = crypto.createHash('sha1').update(`${cluster}-${name}-${kind}`).digest('hex').substr(0, 63);
 
-    const resourceResponse = await this.kubeConnector.get(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/managedclusterviews/${managedClusterViewName}`);
+    const resourceResponse = await this.kubeConnector.get(
+      `/apis/view.open-cluster-management.io/v1beta1/namespaces/${cluster}/managedclusterviews/${managedClusterViewName}`,
+    ).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
       const apiGroup = getApiGroupFromSelfLink(selfLink);
       const response = await this.kubeConnector.managedClusterViewQuery(
@@ -323,7 +355,10 @@ export default class GenericModel extends KubeModel {
         namespace,
         updateInterval,
         deleteAfterUse,
-      );
+      ).catch((err) => {
+        logger.error(err);
+        throw err;
+      });
 
       const resourceResult = _.get(response, 'status.result');
       if (resourceResult) {
@@ -340,7 +375,10 @@ export default class GenericModel extends KubeModel {
     await this.kubeConnector.deleteManagedClusterView(
       managedClusterNamespace,
       managedClusterViewName,
-    ).catch(() => null);
+    ).catch((err) => {
+      logger.error(err);
+      return null;
+    });
   }
 
   async updateResource(args) {
@@ -394,7 +432,7 @@ export default class GenericModel extends KubeModel {
         message: response.message,
       }];
     }
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink));
 
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
@@ -474,7 +512,7 @@ export default class GenericModel extends KubeModel {
         message: response.message,
       }];
     }
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, 'metadata.selfLink'));
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink));
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
