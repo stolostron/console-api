@@ -502,6 +502,17 @@ Object {
         "visible": "true",
       },
       Object {
+        "channel": "",
+        "name": "img4.4.6-x86-64",
+        "platformAws": "",
+        "platformAzure": "",
+        "platformBmc": "",
+        "platformGcp": "",
+        "platformVmware": "",
+        "releaseImage": "quay.io/openshift-release-dev/ocp-release:4.4.6-x86_64",
+        "visible": "",
+      },
+      Object {
         "channel": "stable",
         "name": "img4.4.8-x86-64",
         "platformAws": "true",
