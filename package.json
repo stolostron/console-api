@@ -1,5 +1,5 @@
 {
-  "name": "console-api",
+  "name": "@open-cluster-management/console-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
