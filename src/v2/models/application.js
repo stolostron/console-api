@@ -168,19 +168,21 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   subscriptions.forEach((subscription) => {
     modelSubscriptions.push(subscription);
     // build up map of what deployables to get for a bulk fetch
-    subscription.deployablePaths.forEach((deployablePath) => {
-      if (deployablePath && deployablePath.split('/').length > 0) {
-        const [deployableNamespace, deployableName] = deployablePath.split('/');
-        arr = deployableMap[deployableNamespace];
-        if (!arr) {
-          deployableMap[deployableNamespace] = [];
+    if (subscription.deployablePaths) {
+      subscription.deployablePaths.forEach((deployablePath) => {
+        if (deployablePath && deployablePath.split('/').length > 0) {
+          const [deployableNamespace, deployableName] = deployablePath.split('/');
           arr = deployableMap[deployableNamespace];
+          if (!arr) {
+            deployableMap[deployableNamespace] = [];
+            arr = deployableMap[deployableNamespace];
+          }
+          arr.push({ deployableName, subscription });
+          subscription.deployables = [];
         }
-        arr.push({ deployableName, subscription });
-        subscription.deployables = [];
-      }
-    });
-    delete subscription.deployablePaths;
+      });
+      delete subscription.deployablePaths;
+    }
 
     // ditto for channels
     const [chnNamespace, chnName] = _.get(subscription, 'spec.channel', '').split('/');
