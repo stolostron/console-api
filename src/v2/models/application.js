@@ -633,3 +633,4 @@ export default class ApplicationModel extends KubeModel {
     });
     return Promise.all(requests);
   }
+}
