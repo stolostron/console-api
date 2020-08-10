@@ -413,35 +413,140 @@ describe('buildDeployablesMap', () => {
 
     const result = {
       deployableMap: {
-        default: [{
-          deployableName: 'cassandra-app-subscription-cassandra-cassandra-service',
-          subscription: {
-            apiVersion: 'apps.open-cluster-management.io/v1',
-            deployables: [],
-            kind: 'Subscription',
-            metadata: {
-              annotations: {}, creationTimestamp: '2020-05-12T19:41:20Z', generation: 2, labels: {}, name: 'cassandra-app-subscription', namespace: 'default', resourceVersion: '55436209', selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription', uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
-            },
-            spec: { channel: 'cassandra-ch/cassandra-channel', placement: {} },
-            status: { lastUpdateTime: '2020-06-01T10:42:30Z', phase: 'Propagated', statuses: {} },
-          },
-        }, {
-          deployableName: 'cassandra-app-subscription-cassandra-cassandra-statefulset',
-          subscription: {
-            apiVersion: 'apps.open-cluster-management.io/v1',
-            deployables: [],
-            kind: 'Subscription',
-            metadata: {
-              annotations: {}, creationTimestamp: '2020-05-12T19:41:20Z', generation: 2, labels: {}, name: 'cassandra-app-subscription', namespace: 'default', resourceVersion: '55436209', selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription', uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
-            },
-            spec: { channel: 'cassandra-ch/cassandra-channel', placement: {} },
-            status: { lastUpdateTime: '2020-06-01T10:42:30Z', phase: 'Propagated', statuses: {} },
-          },
-        }],
-      },
-      rulesMap: {},
-    };
+        default: [
+          {
+            deployableName: 'cassandra-app-subscription-cassandra-cassandra-service',
+            subscription: {
+              apiVersion: 'apps.open-cluster-management.io/v1',
+              kind: 'Subscription',
+              metadata: {
+                annotations: {
 
+                },
+                creationTimestamp: '2020-05-12T19:41:20Z',
+                generation: 2,
+                labels: {
+
+                },
+                name: 'cassandra-app-subscription',
+                namespace: 'default',
+                resourceVersion: '55436209',
+                selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+                uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+              },
+              spec: {
+                channel: 'cassandra-ch/cassandra-channel',
+                placement: {
+
+                },
+              },
+              status: {
+                lastUpdateTime: '2020-06-01T10:42:30Z',
+                phase: 'Propagated',
+                statuses: {
+
+                },
+              },
+              deployables: [
+
+              ],
+              channels: [
+
+              ],
+            },
+          },
+          {
+            deployableName: 'cassandra-app-subscription-cassandra-cassandra-statefulset',
+            subscription: {
+              apiVersion: 'apps.open-cluster-management.io/v1',
+              kind: 'Subscription',
+              metadata: {
+                annotations: {
+
+                },
+                creationTimestamp: '2020-05-12T19:41:20Z',
+                generation: 2,
+                labels: {
+
+                },
+                name: 'cassandra-app-subscription',
+                namespace: 'default',
+                resourceVersion: '55436209',
+                selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+                uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+              },
+              spec: {
+                channel: 'cassandra-ch/cassandra-channel',
+                placement: {
+
+                },
+              },
+              status: {
+                lastUpdateTime: '2020-06-01T10:42:30Z',
+                phase: 'Propagated',
+                statuses: {
+
+                },
+              },
+              deployables: [
+
+              ],
+              channels: [
+
+              ],
+            },
+          },
+        ],
+      },
+      channelsMap: {
+        'cassandra-ch': [
+          {
+            chnName: 'cassandra-channel',
+            subscription: {
+              apiVersion: 'apps.open-cluster-management.io/v1',
+              kind: 'Subscription',
+              metadata: {
+                annotations: {
+
+                },
+                creationTimestamp: '2020-05-12T19:41:20Z',
+                generation: 2,
+                labels: {
+
+                },
+                name: 'cassandra-app-subscription',
+                namespace: 'default',
+                resourceVersion: '55436209',
+                selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+                uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+              },
+              spec: {
+                channel: 'cassandra-ch/cassandra-channel',
+                placement: {
+
+                },
+              },
+              status: {
+                lastUpdateTime: '2020-06-01T10:42:30Z',
+                phase: 'Propagated',
+                statuses: {
+
+                },
+              },
+              deployables: [
+
+              ],
+              channels: [
+
+              ],
+            },
+          },
+        ],
+      },
+      rulesMap: {
+
+      },
+    };
     expect(buildDeployablesMap(subscriptions, [])).toEqual(result);
   });
 });

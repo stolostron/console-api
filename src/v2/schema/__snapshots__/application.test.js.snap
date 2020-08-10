@@ -2,68 +2,20 @@
 
 exports[`Application Resolver Correctly Resolves Applications Query 1`] = `
 Object {
-  "data": Object {
-    "applications": Array [
-      Object {
-        "applicationRelationships": Array [],
-        "applicationWorks": Array [
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-cluster1",
-            },
-          },
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-redismaster-cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redismaster-cluster1",
-            },
-          },
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-redisslave-cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redisslave-cluster1",
-            },
-          },
-        ],
-        "dashboard": "https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-        "deployables": Array [
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp",
-            },
-          },
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-redismaster",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redismaster",
-            },
-          },
-          Object {
-            "metadata": Object {
-              "name": "gbapp-gbapp-redisslave",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redisslave",
-            },
-          },
-        ],
-        "metadata": Object {
-          "creationTimestamp": "2018-11-12T18:48:14Z",
-          "labels": Object {
-            "app": "gbapp",
-            "chart": "gbapp-0.1.0",
-            "heritage": "Tiller",
-            "name": "gbapp-gbapp",
-            "release": "gbapp",
-          },
-          "name": "gbapp-gbapp",
-          "namespace": "default",
-          "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-        },
-        "placementPolicies": Array [],
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "GRAPHQL_VALIDATION_FAILED",
       },
-    ],
-  },
+      "locations": Array [
+        Object {
+          "column": 11,
+          "line": 3,
+        },
+      ],
+      "message": "Cannot query field \\"applications\\" on type \\"Query\\". Did you mean \\"application\\"?",
+    },
+  ],
 }
 `;
 
@@ -100,310 +52,19 @@ Object {
 
 exports[`Application Resolver Correctly Resolves Single Applications Query 1`] = `
 Object {
-  "data": Object {
-    "applications": Array [
-      Object {
-        "applicationRelationships": Array [],
-        "applicationWorks": Array [
-          Object {
-            "cluster": "cluster1",
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:27Z",
-              "labels": Object {
-                "clusterName": "cluster1",
-                "deployable": "gbapp-gbapp",
-                "placementPolicy": "gbapp-gbapp",
-              },
-              "name": "gbapp-gbapp-cluster1",
-              "namespace": "cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-cluster1",
-            },
-            "reason": "-",
-            "release": "-",
-            "status": "Completed",
-          },
-          Object {
-            "cluster": "cluster1",
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:31Z",
-              "labels": Object {
-                "clusterName": "cluster1",
-                "deployable": "gbapp-gbapp",
-                "placementPolicy": "gbapp-gbapp",
-              },
-              "name": "gbapp-gbapp-redismaster-cluster1",
-              "namespace": "cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redismaster-cluster1",
-            },
-            "reason": "-",
-            "release": "-",
-            "status": "Completed",
-          },
-          Object {
-            "cluster": "cluster1",
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:35Z",
-              "labels": Object {
-                "clusterName": "cluster1",
-                "deployable": "gbapp-gbapp",
-                "placementPolicy": "gbapp-gbapp",
-              },
-              "name": "gbapp-gbapp-redisslave-cluster1",
-              "namespace": "cluster1",
-              "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/cluster1/works/gbapp-gbapp-redisslave-cluster1",
-            },
-            "reason": "-",
-            "release": "-",
-            "status": "Completed",
-          },
-        ],
-        "dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-        "deployables": Array [
-          Object {
-            "dependencies": null,
-            "deployer": Object {
-              "chartName": null,
-              "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbf-0.1.0.tgz",
-              "namespace": "default",
-              "repository": null,
-              "version": null,
-            },
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "name": "gbapp-gbapp",
-              "namespace": "default",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "Deployable",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
-                  "mcm.ibm.com/user-identity": "YWRtaW4=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "heritage": "Tiller",
-                  "name": "gbapp-gbapp",
-                  "release": "gbapp",
-                  "servicekind": "ApplicationService",
-                },
-                "name": "gbapp-gbapp",
-                "namespace": "default",
-                "resourceVersion": "236",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp",
-                "uid": "830687cb-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "deployer": Object {
-                  "helm": Object {
-                    "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbf-0.1.0.tgz",
-                    "kubeKind": "helm",
-                    "kubeName": "",
-                    "namespace": "default",
-                  },
-                  "kind": "helm",
-                },
-              },
-              "status": Object {},
-            },
-          },
-          Object {
-            "dependencies": null,
-            "deployer": Object {
-              "chartName": null,
-              "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrm-0.1.0.tgz",
-              "namespace": "default",
-              "repository": null,
-              "version": null,
-            },
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "name": "gbapp-gbapp-redismaster",
-              "namespace": "default",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "Deployable",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
-                  "mcm.ibm.com/user-identity": "YWRtaW4=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "heritage": "Tiller",
-                  "name": "gbapp-gbapp-redismaster",
-                  "release": "gbapp",
-                  "servicekind": "CacheService",
-                },
-                "name": "gbapp-gbapp-redismaster",
-                "namespace": "default",
-                "resourceVersion": "237",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redismaster",
-                "uid": "8307a1ec-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "deployer": Object {
-                  "helm": Object {
-                    "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrm-0.1.0.tgz",
-                    "kubeKind": "helm",
-                    "kubeName": "",
-                    "namespace": "default",
-                  },
-                  "kind": "helm",
-                },
-              },
-              "status": Object {},
-            },
-          },
-          Object {
-            "dependencies": null,
-            "deployer": Object {
-              "chartName": null,
-              "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrs-0.1.0.tgz",
-              "namespace": "default",
-              "repository": null,
-              "version": null,
-            },
-            "metadata": Object {
-              "creationTimestamp": "2018-11-12T18:48:14Z",
-              "name": "gbapp-gbapp-redisslave",
-              "namespace": "default",
-            },
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "Deployable",
-              "metadata": Object {
-                "annotations": Object {
-                  "mcm.ibm.com/user-group": "c3lzdGVtOm1hc3RlcnMsc3lzdGVtOmF1dGhlbnRpY2F0ZWQ=",
-                  "mcm.ibm.com/user-identity": "YWRtaW4=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "heritage": "Tiller",
-                  "name": "gbapp-gbapp-redisslave",
-                  "release": "gbapp",
-                  "servicekind": "CacheService",
-                },
-                "name": "gbapp-gbapp-redisslave",
-                "namespace": "default",
-                "resourceVersion": "238",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/deployables/gbapp-gbapp-redisslave",
-                "uid": "830a0150-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "deployer": Object {
-                  "helm": Object {
-                    "chartURL": "https://raw.githubusercontent.com/abdasgupta/helm-repo/master/3.1-mcm-guestbook/gbrs-0.1.0.tgz",
-                    "kubeKind": "helm",
-                    "kubeName": "",
-                    "namespace": "default",
-                  },
-                  "kind": "helm",
-                },
-              },
-              "status": Object {},
-            },
-          },
-        ],
-        "metadata": Object {
-          "annotations": Object {
-            "apps.open-cluster-management.io/applicationrelationships": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
-            "apps.open-cluster-management.io/dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-            "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
-            "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
-            "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-            "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-          },
-          "creationTimestamp": "2018-11-12T18:48:14Z",
-          "labels": Object {
-            "app": "gbapp",
-            "chart": "gbapp-0.1.0",
-            "heritage": "Tiller",
-            "name": "gbapp-gbapp",
-            "release": "gbapp",
-          },
-          "name": "gbapp-gbapp",
-          "namespace": "default",
-          "resourceVersion": "281",
-          "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-          "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
-        },
-        "placementPolicies": Array [],
-        "raw": Object {
-          "apiVersion": "mcm.ibm.com/v1alpha1",
-          "kind": "Application",
-          "metadata": Object {
-            "annotations": Object {
-              "apps.open-cluster-management.io/applicationrelationships": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
-              "apps.open-cluster-management.io/dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-              "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
-              "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
-              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-            },
-            "creationTimestamp": "2018-11-12T18:48:14Z",
-            "labels": Object {
-              "app": "gbapp",
-              "chart": "gbapp-0.1.0",
-              "heritage": "Tiller",
-              "name": "gbapp-gbapp",
-              "release": "gbapp",
-            },
-            "name": "gbapp-gbapp",
-            "namespace": "default",
-            "resourceVersion": "281",
-            "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-            "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
-          },
-          "spec": Object {
-            "componentKinds": Array [
-              Object {
-                "group": "core",
-                "kind": "Pods",
-              },
-            ],
-            "descriptor": Object {},
-            "selector": Object {
-              "matchExpressions": Array [
-                Object {
-                  "key": "app",
-                  "operator": "In",
-                  "values": Array [
-                    "gbapp",
-                    "gbf",
-                    "gbrm",
-                    "gbrs",
-                  ],
-                },
-              ],
-            },
-          },
-          "status": Object {},
-        },
-        "selector": Object {
-          "matchExpressions": Array [
-            Object {
-              "key": "app",
-              "operator": "In",
-              "values": Array [
-                "gbapp",
-                "gbf",
-                "gbrm",
-                "gbrs",
-              ],
-            },
-          ],
-        },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "GRAPHQL_VALIDATION_FAILED",
       },
-    ],
-  },
+      "locations": Array [
+        Object {
+          "column": 11,
+          "line": 3,
+        },
+      ],
+      "message": "Cannot query field \\"applications\\" on type \\"Query\\". Did you mean \\"application\\"?",
+    },
+  ],
 }
 `;
