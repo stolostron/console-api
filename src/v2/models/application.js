@@ -243,6 +243,12 @@ export default class ApplicationModel extends KubeModel {
         case 'Channel':
         case 'Subscription':
           ({ namespace } = metadata);
+          if (namespace === null) {
+            // namespace has all whitespace characters
+            errors.push({ message: `${kind} namespace is invalid, it contains only whitespace characters.` });
+            return { errors };
+          }
+
           namespaces.add(namespace);
           break;
 
