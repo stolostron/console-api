@@ -555,7 +555,7 @@ export default class GenericModel extends KubeModel {
   }
 
   async userAccess({
-    resource, action, namespace = '', group = '*', name = '', version = '*',
+    resource, action, namespace = '', apiGroup = '*', name = '', version = '*',
   }) {
     const body = {
       apiVersion: 'authorization.k8s.io/v1',
@@ -565,7 +565,7 @@ export default class GenericModel extends KubeModel {
           verb: action,
           resource,
           namespace,
-          group,
+          group: apiGroup,
           name,
           version,
         },
