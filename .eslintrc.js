@@ -9,10 +9,28 @@
  ****************************************************************************** */
 
 module.exports = {
-  plugins: ['jest'],
-  extends: ['plugin:jest/recommended', 'airbnb-base'],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module",
+      "project": [
+          "./tsconfig.json",
+      ]
+  },
+  plugins: ["jest"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    // "plugin:@typescript-eslint/recommended",
+    // "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:jest/recommended",
+    "airbnb-base",
+  ],
   rules: {
-    'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['accum', 'req'] }],
-    'max-len': 'off',
+    "no-param-reassign": [
+      "error",
+      { props: true, ignorePropertyModificationsFor: ["accum", "req"] },
+    ],
+    "max-len": "off",
   },
 };

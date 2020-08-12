@@ -38,8 +38,8 @@ LABEL org.label-schema.vendor="$IMAGE_VENDOR" \
 #RUN mkdir -p /opt/app-root/console-api
 WORKDIR /opt/app-root/console-api
 
-COPY build /opt/app-root/console-api/build
-COPY config /opt/app-root/console-api/config
+COPY build/src /opt/app-root/console-api/build
+COPY build/config /opt/app-root/console-api/config
 COPY node_modules /opt/app-root/console-api/node_modules
 COPY sslcert /opt/app-root/console-api/sslcert
 

@@ -25,8 +25,12 @@ const jestConfig = {
     'html',
     'lcov',
     'text',
+    'text-summary',
   ],
   testResultsProcessor: 'jest-sonar-reporter',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+  ],
   coverageThreshold: {
     global: {
       branches: 21,
@@ -36,12 +40,26 @@ const jestConfig = {
     },
   },
   collectCoverageFrom: [
-    'src/**/*.{js,jsx}',
-    '!src/**/mocks/*.js',
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!src/**/mocks/*.{js,ts}',
   ],
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['./jest.setup.js'],
-};
+  setupFilesAfterEnv: [
+    './jest.setup.js',
+  ],
+  moduleFileExtensions: [
+    'js',
+    'json',
+    'jsx',
+    'node',
+    'ts',
+    'tsx',
+  ],
+  reporters: [
+    'default',
+  ],
+  preset: 'ts-jest/presets/js-with-ts',
+}
 
 jestConfig.reporters = process.env.TRAVIS ? ['default', tapReporter] : ['default'];
 
