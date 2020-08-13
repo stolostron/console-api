@@ -55,6 +55,8 @@ type Subject {
 export const resolver = {
   Query: {
     application: (root, args, { applicationModel }) => applicationModel.getApplication(args.name, args.namespace, null, true),
+    applicationNamespaces: (parent, args, { applicationModel }) =>
+      applicationModel.getApplicationNamespace(args.namespace),  
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args),
