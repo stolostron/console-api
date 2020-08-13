@@ -219,7 +219,20 @@ export default class ApplicationModel extends KubeModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
+  async getApplicationNamespace() {
+    const namespaces = await this.kubeConnector.getNamespaceResources({ });
 
+    const filteredNS = _.filter(namespaces, function(ns) 
+          { return !_.get(ns, 'metadata.name', '').startsWith('openshift') 
+              && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management')})
+      
+    const result = filteredNS.map(async ns => ({
+      name: ns.metadata.name || '',
+      metadata: ns.metadata
+    }))
+    return result
+  }    
+  
   async createApplication(args) {
     let { application: resources } = args;
     const created = [];
@@ -641,18 +654,4 @@ export default class ApplicationModel extends KubeModel {
     });
     return Promise.all(requests);
   }
-
-  async getApplicationNamespace() {
-    const namespaces = await this.kubeConnector.getNamespaceResources({ });
-
-    const filteredNS = _.filter(namespaces, function(ns) 
-          { return !_.get(ns, 'metadata.name', '').startsWith('openshift') 
-              && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management')})
-      
-    const result = filteredNS.map(async ns => ({
-      name: ns.metadata.name || '',
-      metadata: ns.metadata
-    }))
-    return result
-  }    
 }
