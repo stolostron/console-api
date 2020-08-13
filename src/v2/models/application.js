@@ -218,8 +218,8 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
 export default class ApplicationModel extends KubeModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
-  // ///////////// CREATE APPLICATION //////////////// 
-     
+  // ///////////// CREATE APPLICATION ////////////////
+
   async createApplication(args) {
     let { application: resources } = args;
     const created = [];
