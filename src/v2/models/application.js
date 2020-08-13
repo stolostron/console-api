@@ -642,11 +642,9 @@ export default class ApplicationModel extends KubeModel {
     return Promise.all(requests);
   }
 
-  // return all namespaces accessible by the user of this application object
   async getApplicationNamespace() {
     const namespaces = await this.kubeConnector.getNamespaceResources({ });
 
-    //filter openshift and open-cluster-management ns since those are internally used
     const filteredNS = _.filter(namespaces, function(ns) 
           { return !_.get(ns, 'metadata.name', '').startsWith('openshift') 
               && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management')})
