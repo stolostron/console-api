@@ -311,9 +311,21 @@ export default class ApplicationModel extends KubeModel {
       return { errors };
     }
 
-    const namespaceResponses = await Promise.all(namespaces.map((ns) => this.createNamespace(ns)));
+    const existingNamespaces = await this.kubeConnector.get('/api/v1/namespaces');
+    const namespaceResponses = await Promise.all(namespaces.map((ns) => {
+        const namespaceExists = existingNamespaces.items.find((existingNamespace) => {
+          return existingNamespace.metadata.name === ns;
+        });
+        if (!namespaceExists) {
+          return this.createNamespace(ns);
+        }
+      }
+    ));
+
     namespaceResponses.forEach((item) => {
-      checkAndCollectError(item);
+      if (item) {
+        checkAndCollectError(item);
+      }
     });
     if (errors.length !== 0) {
       return { errors };
