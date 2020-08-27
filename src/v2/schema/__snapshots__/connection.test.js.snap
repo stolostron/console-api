@@ -4,18 +4,8 @@ exports[`Connection Resolver Correctly Resolves Create Cloud Connection 1`] = `
 Object {
   "data": Object {
     "createCloudConnection": Object {
-      "apiVersion": "v1",
-      "code": 409,
-      "details": Object {
-        "kind": "secrets",
-        "name": "new-aws",
-      },
-      "kind": "Status",
-      "message": "secrets \\"new-aws\\" already exists",
-      "metadata": Object {},
-      "reason": "AlreadyExists",
-      "status": "Failure",
-      "statusCode": 409,
+      "kind": "Secret",
+      "statusCode": 201,
     },
   },
 }
@@ -25,17 +15,8 @@ exports[`Connection Resolver Correctly Resolves Create Cloud Connection Error 1`
 Object {
   "data": Object {
     "createCloudConnection": Object {
-      "apiVersion": "v1",
       "code": 409,
-      "details": Object {
-        "kind": "secrets",
-        "name": "google",
-      },
       "kind": "Status",
-      "message": "secrets \\"google\\" already exists",
-      "metadata": Object {},
-      "reason": "AlreadyExists",
-      "status": "Failure",
       "statusCode": 409,
     },
   },
@@ -45,19 +26,7 @@ Object {
 exports[`Connection Resolver Correctly Resolves Delete Cloud Connection 1`] = `
 Object {
   "data": Object {
-    "deleteCloudConnection": Object {
-      "apiVersion": "v1",
-      "code": 404,
-      "details": Object {
-        "kind": "secrets",
-        "name": "microsoft",
-      },
-      "kind": "Status",
-      "message": "secrets \\"microsoft\\" not found",
-      "metadata": Object {},
-      "reason": "NotFound",
-      "status": "Failure",
-    },
+    "deleteCloudConnection": "204",
   },
 }
 `;
@@ -66,18 +35,8 @@ exports[`Connection Resolver Correctly Resolves Edit Cloud Connection 1`] = `
 Object {
   "data": Object {
     "editCloudConnection": Object {
-      "apiVersion": "v1",
-      "code": 404,
-      "details": Object {
-        "kind": "secrets",
-        "name": "aws",
-      },
-      "kind": "Status",
-      "message": "secrets \\"aws\\" not found",
-      "metadata": Object {},
-      "reason": "NotFound",
-      "status": "Failure",
-      "statusCode": 404,
+      "kind": "Secret",
+      "statusCode": 200,
     },
   },
 }
@@ -87,25 +46,9 @@ exports[`Connection Resolver Correctly Resolves Edit Cloud Connection Error 1`] 
 Object {
   "data": Object {
     "editCloudConnection": Object {
-      "apiVersion": "v1",
-      "data": Object {
-        "metadata": "bWV0ZGF0YQ==",
-      },
-      "kind": "Secret",
-      "metadata": Object {
-        "creationTimestamp": "2020-08-27T15:40:39Z",
-        "labels": Object {
-          "cluster.open-cluster-management.io/cloudconnection": "",
-          "cluster.open-cluster-management.io/provider": "gke",
-        },
-        "name": "google",
-        "namespace": "hive",
-        "resourceVersion": "15690823",
-        "selfLink": "/api/v1/namespaces/hive/secrets/google",
-        "uid": "efea350a-2e5f-4cfe-8d6e-c176b966f35a",
-      },
-      "statusCode": 200,
-      "type": "Opaque",
+      "code": 409,
+      "kind": "Status",
+      "statusCode": 409,
     },
   },
 }
@@ -116,93 +59,82 @@ Object {
   "data": Object {
     "connectionDetails": Array [
       Object {
-        "metadata": "metdata",
-        "name": "new-aws",
+        "metadata": Object {
+          "awsAccessKeyID": "aws-access-key-id",
+          "awsSecretAccessKeyID": "aws-secret-access-key-id",
+          "isOcp": true,
+          "pullSecret": "{\\"not\\":\\"a\\",\\"real\\":\\"pull\\",\\"secret\\":\\"!\\"}",
+          "sshPrivatekey": "ssh-private-key",
+          "sshPublickey": "ssh-public-key",
+        },
+        "name": "aws",
         "namespace": "default",
         "provider": "aws",
       },
       Object {
         "metadata": Object {
-          "baseDomain": "testing.com",
-          "cacertificate": "-----BEGIN CERTIFICATE-----
-MIIEFzCCAv+gAwIBAgIUR51LnFfrTrRFtk3p6vIinn8fXiswDQYJKoZIhvcNAQEL
-BQAwgYoxCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJOQzEQMA4GA1UEBwwHUmFsZWln
-aDEVMBMGA1UECgwMVGVzdCBDb21wYW55MRAwDgYDVQQLDAdUZXN0aW5nMTMwMQYD
-VQQDDCpmMDUtaDE1LTAwMC0xMDI5cC5yZHUyLnNjYWxlbGFiLnJlZGhhdC5jb20w
-HhcNMjAwNzA4MjE0NzU0WhcNMjEwNzA4MjE0NzU0WjCBijELMAkGA1UEBhMCVVMx
-CzAJBgNVBAgMAk5DMRAwDgYDVQQHDAdSYWxlaWdoMRUwEwYDVQQKDAxUZXN0IENv
-bXBhbnkxEDAOBgNVBAsMB1Rlc3RpbmcxMzAxBgNVBAMMKmYwNS1oMTUtMDAwLTEw
-MjlwLnJkdTIuc2NhbGVsYWIucmVkaGF0LmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
-ggEPADCCAQoCggEBAMvrQjzO7Y8veYdVCjum/zmM7qymBr7jWsSVUCxNBlWxXlaz
-p8+2Lj5ob+m4XiSYsv/7DJW2VF5uk2JCqER6odTCsFW529t7zCNxpzpQwl6csmBb
-TsBImOue3axf+NrYpCWs6wwJmB6Iis8BSSl1SidONXSpHO4/ylUhftgI308ee62j
-BtRYR3sBJWDeqS2exeFpHghmnlwQYXsCOWg7fUPD+/Az7PFjCkGsB5CPuKDo2+E7
-bXLTrxPWPhQRlNyNx2HmLhayho8h+6+hElGG/OiZcKAcYVaIaLYcmiEjrnJxpOP+
-g24N6wYkUYK7ZwJSReUCpskRj/D0k2jLYMvyPgECAwEAAaNzMHEwDwYDVR0TBAgw
-BgEB/wIBADBeBgNVHREEVzBVgi5yZWdpc3RyeS5vY3A0NC1lZGdlLWJtLWgxNS0w
-LnFlLmxhYi5yZWRoYXQuY29tghFmMDUtaDE1LTAwMC0xMDI5cIcEwKh7AYcEwKh6
-AYcECgEoEDANBgkqhkiG9w0BAQsFAAOCAQEAwIsfVrmAE+TNnMHVcOaXnCTG07yt
-hw70x1VyTBNqc2e6SMdZ+elT7vHQBUFUZ7OfTATMtjaaXnM0mzhQ9mXofmsCNrrs
-371Ep8nRfNBcbF2PIaGRYIOPu+E+emJsCsWymC7byUtLmuWJnOMQ7bgB82y9V2rA
-8fcSyMdaV3Py3DQiNaQ1cKgXnH7Ec149ZSv4Jbos0WG6CUjEk7S7B586sOvrwPUW
-3pe+QMJeSxSNo0L+SM1wu6LzfPxi6hj9Wnvyl0GjNAwVxzqLHIi9H1XBe/Sg1UkH
-mdSmC9wrE5oGay2J3Le06ulZQke6lTw+StP5TjSu6od+v2nsEfBggWXioQ==
------END CERTIFICATE-----
-",
-          "datacenter": "dc1",
-          "datastore": "nvme-ds1",
+          "gcProjectID": "gcp-project",
+          "gcServiceAccountKey": "{\\"fake\\":\\"json\\",\\"key\\":\\"haha!\\"}",
           "isOcp": true,
-          "password": "lkjlkulklk",
-          "pullSecret": "{\\"auths\\":{\\"\\\\\\"quay.io\\\\\\"\\":{\\"username\\":\\"mdelder\\",\\"password\\":\\"\\\\\\"fff/mND+wY1S1qJvRUBzycaFmNRujD+nPZj/w6crNQhkPGGzTBbMu2d0tENqG2B0DXgqi4DNh0efB+7qqONgyYf8hE2I=\\\\\\"\\",\\"email\\":\\"\\\\\\"mdelder@us.ibm.com\\\\\\"\\",\\"auth\\":\\"bWRlbGRlcjoiV2hpNlc5Q2ZWcTlCc2gySXNRL21ORCt3WTFTMXFKdlJVQnp5Y2FGbU5SdWpEK25QWmovdzZjck5RaGtQR0d6VEJiTXUyZDB0RU5xRzJCMERYZ3FpNEROaDBlZkIrN3FxT05neVlmOGhFMkk9Ig==\\"}}}
-",
-          "sshPrivatekey": "-----BEGIN RSA PRIVATE KEY-----
-MIIEhTCCAm2gAwIBAgIRAOl4lLFFaPt/Ge0+1Xh0/dcwDQYJKoZIhvcNAQELBQAw
-YzELMAkGA1UEBhMCVVMxETAPBgNVBAgMCE5ldyBZb3JrMQ8wDQYDVQQHDAZBcm1v
-bmsxGjAYBgNVBAoMEUlCTSBDbG91ZCBQcml2YXRlMRQwEgYDVQQDDAt3d3cuaWJt
-LmNvbTAeFw0xOTA3MjkxNjM0MDZaFw0xOTEwMjcxNjM0MDZaMDExFTATBgNVBAoT
-DGNlcnQtbWFuYWdlcjEYMBYGA1UEAxMPbW9uZ29kYi1zZXJ2aWNlMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsCxoUXzotY0C8Q4oOwBi/ZbY4UueVAXi
-ZWCnsTVyLCGFSi/UbxVnKqjl4W3oOFhGOsPc3FZpOLxqOgkt09FjxfaYIiSSe4H4
-Xoih969y6J4wVhdeEnnlP2mwaaV8bEf3rJSjRcR+pktt8eLmygU7q/P5lU4UhSBu
-BkcHsU1nss2aEZB3zmYPnhkLftUB4TFumBh1B2N0pcqU0z27B3xcT2R4ZmUZpOu4
-3XveVkQUBsBKvXVuefpv/LgCps0m19Q2E3IGeAIvFNj0FijLzxKqb0ztqkQvQau/
-C4Kx5N6MtW1maF8CQHVSzSdxdc1EJ/QMqMrmJOswBxDE5gkmTK6RowIDAQABo2Yw
-ZDAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBSSCGjZ
-IEeV639FQr+T2/8lm/QchzAjBgNVHREEHDAagg9tb25nb2RiLXNlcnZpY2WCB21v
-bmdvZGIwDQYJKoZIhvcNAQELBQADggIBAIbOV1FnVDINxcjV2TqI9cuHYICFkxCU
-gHfj6zCBMSWUigF0AbgqJJKNH3dYgM9ev1fy26pU4MRNjwK64lW2rVzju0oWJIUT
-NJWOZo+AD3rz3KNFGs5uu4TYc1yU8HjQdKXBWglpXseXij4d4DGUNgBsBrHq1sT+
-4116h145sE1uXnPTWPsIOCM00h3KAXQ9nBLUx82wnBcMNinAlr1ArZVDyRbFz4I3
-+IJJfUm0DPZLGOndGxT1NGF9ugIrUXODVnx1w7dpAmTqukavUMuLaEU5iemqZOO/
-qZOzeCy3+8HWeecJEVxpyirDLSfuk1GKjb7ybkE7IvTbTP4kJceG1qFnbQmPQnVF
-2D10415lkdgU1NE/IGdGT24U7uKqcLZ0y+9fpC59YZ7qMYja/fup9P0uOUPhw3Lj
-MHu5DEQ4f1FUQzX6dK2/pDb0n5muKgaN6Cga9juI5SBwAI2keHjDjoDwJmzivMw5
-gYNaFXtQbsb8hRh6P6kopAygdmHWe3wKLJ7yKgN8EVCDkfwj+DGtqDa5JpYcbzcP
-tbv6/zD6UOsB24X20R1MmX0/QAiB8l2C3RYPLOGNqpfHobUkV5qufFPpKgY/ZIL4
-9ThYihdH6TevrAKncmBfziOhm8bnF39mj6hcA8WnxPbgnIglGSvp2fkIKwrre2Iq
-0+uRUjdKiciL
------END RSA PRIVATE KEY-----
-",
-          "sshPublickey": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAklOUpkDHrfHY17SbrmTIpNLTGK9Tjom/BWDSU
-GPl+nafzlHDTYW7hdI4yZ5ew18JH4JW9jbhUFrviQzM7xlELEVf4h9lFX5QVkbPppSwg0cda3
-Pbv7kOdJ/MTyBlWXFCR+HAo3FXRitBqxiX1nKhXpHAZsMciLq8V6RjsNAQwdsdMFvSlVK/7XA
-t3FaoJoAsncM1Q9x5+3V0Ww68/eIFmb1zuUFljQJKprrX88XypNDvjYNby6vw/Pb0rwert/En
-mZ+AW4OZPnTPI89ZPmVMLuayrD2cE86Z/il8b+gw3r3+1nKatmIkjn2so1d01QraTlMqVSsbx
-NrRFi9wrf+M7Q== schacon@mylaptop.local
-",
-          "username": "kubeadmin",
-          "vcenter": "vcsa.vmware.devcluster.openshift.com",
-          "vmClusterName": "julklkjl",
+          "pullSecret": "{\\"pull\\":\\"secret\\"}",
+          "sshPrivatekey": "ssh-private-key-for-google",
+          "sshPublickey": "google-public-key",
         },
-        "name": "vmw-junk",
-        "namespace": "default",
-        "provider": "vmw",
-      },
-      Object {
-        "metadata": "metdata",
         "name": "google",
         "namespace": "hive",
         "provider": "gke",
+      },
+      Object {
+        "metadata": Object {
+          "baseDomainResourceGroupName": "acm.microsoft.io",
+          "isOcp": true,
+          "osServicePrincipal": "{\\"fake\\":\\"json\\"}",
+          "pullSecret": "{\\"my\\":\\"pull\\",\\"secret\\":\\"nothing\\"}",
+          "sshPrivatekey": "msft-private-key",
+          "sshPublickey": "msft-public-key",
+        },
+        "name": "microsoft",
+        "namespace": "ocm",
+        "provider": "aks",
+      },
+      Object {
+        "metadata": Object {
+          "awsAccessKeyID": "aws-access-key-id",
+          "awsSecretAccessKeyID": "aws-secret-access-key-id",
+          "isOcp": true,
+          "pullSecret": "{\\"not\\":\\"a\\",\\"real\\":\\"pull\\",\\"secret\\":\\"!\\"}",
+          "sshPrivatekey": "ssh-private-key",
+          "sshPublickey": "ssh-public-key",
+        },
+        "name": "aws",
+        "namespace": "default",
+        "provider": "aws",
+      },
+      Object {
+        "metadata": Object {
+          "gcProjectID": "gcp-project",
+          "gcServiceAccountKey": "{\\"fake\\":\\"json\\",\\"key\\":\\"haha!\\"}",
+          "isOcp": true,
+          "pullSecret": "{\\"pull\\":\\"secret\\"}",
+          "sshPrivatekey": "ssh-private-key-for-google",
+          "sshPublickey": "google-public-key",
+        },
+        "name": "google",
+        "namespace": "hive",
+        "provider": "gke",
+      },
+      Object {
+        "metadata": Object {
+          "baseDomainResourceGroupName": "acm.microsoft.io",
+          "isOcp": true,
+          "osServicePrincipal": "{\\"fake\\":\\"json\\"}",
+          "pullSecret": "{\\"my\\":\\"pull\\",\\"secret\\":\\"nothing\\"}",
+          "sshPrivatekey": "msft-private-key",
+          "sshPublickey": "msft-public-key",
+        },
+        "name": "microsoft",
+        "namespace": "ocm",
+        "provider": "aks",
       },
     ],
   },
@@ -216,20 +148,10 @@ Object {
       Object {
         "errorMsg": null,
         "metadata": Object {
-          "name": "new-aws",
-          "name_namespace": "new-awsdefault",
+          "name": "aws",
+          "name_namespace": "awsdefault",
           "namespace": "default",
           "provider": "aws",
-        },
-        "statusCode": null,
-      },
-      Object {
-        "errorMsg": null,
-        "metadata": Object {
-          "name": "vmw-junk",
-          "name_namespace": "vmw-junkdefault",
-          "namespace": "default",
-          "provider": "vmw",
         },
         "statusCode": null,
       },
@@ -240,6 +162,46 @@ Object {
           "name_namespace": "googlehive",
           "namespace": "hive",
           "provider": "gke",
+        },
+        "statusCode": null,
+      },
+      Object {
+        "errorMsg": null,
+        "metadata": Object {
+          "name": "microsoft",
+          "name_namespace": "microsoftocm",
+          "namespace": "ocm",
+          "provider": "aks",
+        },
+        "statusCode": null,
+      },
+      Object {
+        "errorMsg": null,
+        "metadata": Object {
+          "name": "aws",
+          "name_namespace": "awsdefault",
+          "namespace": "default",
+          "provider": "aws",
+        },
+        "statusCode": null,
+      },
+      Object {
+        "errorMsg": null,
+        "metadata": Object {
+          "name": "google",
+          "name_namespace": "googlehive",
+          "namespace": "hive",
+          "provider": "gke",
+        },
+        "statusCode": null,
+      },
+      Object {
+        "errorMsg": null,
+        "metadata": Object {
+          "name": "microsoft",
+          "name_namespace": "microsoftocm",
+          "namespace": "ocm",
+          "provider": "aks",
         },
         "statusCode": null,
       },

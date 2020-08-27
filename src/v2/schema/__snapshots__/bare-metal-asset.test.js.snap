@@ -3,73 +3,111 @@
 exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAsset Query 1`] = `
 Object {
   "data": Object {
-    "bareMetalAsset": null,
-  },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "TypeError: Cannot read property 'bmc' of undefined",
-            "    at BareMetalAssetModel.getSingleBareMetalAsset (/Users/fxiang/workspaces/console-api/src/v2/models/bare-metal-asset.js:64:33)",
-            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
-          ],
+    "bareMetalAsset": Array [
+      Object {
+        "hardwareProfile": "hardwareProfile",
+        "metadata": Object {
+          "annotations": Object {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+          },
+          "creationTimestamp": "2020-03-05T12:01:11Z",
+          "labels": null,
+          "name": "baremetalasset-worker-0",
+          "namespace": "fake-cluster",
+          "resourceVersion": "579175",
+          "selfLink": "/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/fake-cluster/baremetalassets/baremetalasset-worker-0",
+          "status": null,
+          "uid": "cb6eaf0e-2a60-4c4c-b068-2a4257fcce42",
         },
+        "role": "worker",
       },
-      "locations": Array [
-        Object {
-          "column": 11,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'bmc' of undefined",
-      "path": Array [
-        "bareMetalAsset",
-      ],
-    },
-  ],
+    ],
+  },
 }
 `;
 
 exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAssetSubresources Query 1`] = `
 Object {
   "data": Object {
-    "bareMetalAssetSubresources": null,
-  },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "TypeError: Cannot read property 'bmc' of undefined",
-            "    at BareMetalAssetModel.getSingleBareMetalAsset (/Users/fxiang/workspaces/console-api/src/v2/models/bare-metal-asset.js:64:33)",
-            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
-            "    at async Promise.all (index 1)",
-            "    at BareMetalAssetModel.getBareMetalAssetSubresources (/Users/fxiang/workspaces/console-api/src/v2/models/bare-metal-asset.js:228:42)",
-          ],
-        },
-      },
-      "locations": Array [
+    "bareMetalAssetSubresources": Object {
+      "bareMetalAsset": Array [
         Object {
-          "column": 11,
-          "line": 3,
+          "metadata": Object {
+            "annotations": Object {
+              "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+            },
+          },
         },
       ],
-      "message": "Cannot read property 'bmc' of undefined",
-      "path": Array [
-        "bareMetalAssetSubresources",
+      "namespaces": Array [
+        "fake-cluster",
       ],
     },
-  ],
+  },
 }
 `;
 
 exports[`BareMetalAsset Resolver Correctly Resolves BareMetalAssets Query 1`] = `
 Object {
   "data": Object {
-    "bareMetalAssets": Array [],
+    "bareMetalAssets": Array [
+      Object {
+        "bmc": Object {
+          "address": "ipmi://192.168.122.1:6233",
+          "credentialsName": "worker-0-bmc-secret",
+        },
+        "bootMACAddress": "00:1B:44:11:3A:B7",
+        "clusterDeployment": Object {
+          "name": "cluster0",
+          "namespace": "cluster0",
+        },
+        "hardwareProfile": "hardwareProfile",
+        "metadata": Object {
+          "annotations": Object {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+          },
+          "creationTimestamp": "2020-03-05T12:01:11Z",
+          "labels": null,
+          "name": "baremetalasset-worker-0",
+          "namespace": "fake-cluster",
+          "resourceVersion": "579175",
+          "selfLink": "/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/fake-cluster/baremetalassets/baremetalasset-worker-0",
+          "status": null,
+          "uid": "cb6eaf0e-2a60-4c4c-b068-2a4257fcce42",
+        },
+        "role": "worker",
+      },
+      Object {
+        "bmc": Object {
+          "address": "ipmi://192.168.122.2:6233",
+          "credentialsName": "worker-1-bmc-secret",
+        },
+        "bootMACAddress": "00:1B:44:11:3A:B6",
+        "clusterDeployment": Object {
+          "name": "cluster0",
+          "namespace": "cluster0",
+        },
+        "hardwareProfile": "hardwareProfile",
+        "metadata": Object {
+          "annotations": Object {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-1\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.2:6233\\",\\"credentialsName\\":\\"worker-1-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B6\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+          },
+          "creationTimestamp": "2020-03-06T12:37:27Z",
+          "labels": null,
+          "name": "baremetalasset-worker-1",
+          "namespace": "fake-cluster",
+          "resourceVersion": "1186911",
+          "selfLink": "/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/fake-cluster/baremetalassets/baremetalasset-worker-1",
+          "status": null,
+          "uid": "f27a1799-e913-4d7e-a83b-875454210afb",
+        },
+        "role": "worker",
+      },
+    ],
   },
 }
 `;
@@ -79,42 +117,82 @@ Object {
   "data": Object {
     "createBareMetalAsset": Object {
       "bmaResult": Object {
-        "apiVersion": "v1",
-        "code": 404,
-        "details": Object {
-          "kind": "namespaces",
-          "name": "fake-cluster",
+        "apiVersion": "inventory.open-cluster-management.io/v1alpha1",
+        "kind": "BareMetalAsset",
+        "metadata": Object {
+          "annotations": Object {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+          },
+          "creationTimestamp": "2020-03-05T12:01:11Z",
+          "generation": 1,
+          "name": "baremetalasset-worker-0",
+          "namespace": "fake-cluster",
+          "resourceVersion": "579175",
+          "selfLink": "/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/fake-cluster/baremetalassets/baremetalasset-worker-0",
+          "uid": "cb6eaf0e-2a60-4c4c-b068-2a4257fcce42",
         },
-        "kind": "Status",
-        "message": "namespaces \\"fake-cluster\\" not found",
-        "metadata": Object {},
-        "reason": "NotFound",
-        "status": "Failure",
+        "spec": Object {
+          "bmc": Object {
+            "address": "ipmi://192.168.122.1:6233",
+            "credentialsName": "worker-0-bmc-secret",
+            "password": "test1",
+            "username": "test1",
+          },
+          "bootMACAddress": "00:1B:44:11:3A:B7",
+          "clusterDeployment": Object {
+            "name": "cluster0",
+            "namespace": "cluster0",
+          },
+          "hardwareProfile": "hardwareProfile",
+          "role": "worker",
+        },
       },
       "patchedSecretResult": Object {
         "apiVersion": "v1",
-        "code": 405,
-        "details": Object {},
-        "kind": "Status",
-        "message": "the server does not allow this method on the requested resource",
-        "metadata": Object {},
-        "reason": "MethodNotAllowed",
-        "status": "Failure",
+        "data": Object {
+          "password": "dGVzdDE=",
+          "username": "dGVzdDE=",
+        },
+        "kind": "Secret",
+        "metadata": Object {
+          "creationTimestamp": "2020-07-23T18:07:07Z",
+          "generateName": "worker-0-bmc-secret",
+          "name": "worker-0-bmc-secret",
+          "namespace": "fake-cluster",
+          "ownerReferences": Array [
+            Object {
+              "apiVersion": "inventory.open-cluster-management.io/v1alpha1",
+              "kind": "BareMetalAsset",
+              "name": "worker-0",
+              "uid": "86683623-be4d-4210-9276-3fa320b45617",
+            },
+          ],
+          "resourceVersion": "10449699",
+          "selfLink": "/api/v1/namespaces/fake-cluster/secrets/worker-0-bmc-secret-9bmgg",
+          "uid": "8c18d6a7-1f44-4928-81b5-489bdc4bacc7",
+        },
+        "type": "Opaque",
       },
       "secretResult": Object {
         "apiVersion": "v1",
-        "code": 404,
-        "details": Object {
-          "kind": "namespaces",
-          "name": "fake-cluster",
+        "data": Object {
+          "password": "dGVzdDE=",
+          "username": "dGVzdDE=",
         },
-        "kind": "Status",
-        "message": "namespaces \\"fake-cluster\\" not found",
-        "metadata": Object {},
-        "reason": "NotFound",
-        "status": "Failure",
+        "kind": "Secret",
+        "metadata": Object {
+          "creationTimestamp": "2020-07-23T18:07:07Z",
+          "generateName": "worker-0-bmc-secret",
+          "name": "worker-0-bmc-secret",
+          "namespace": "fake-cluster",
+          "ownerReferences": Array [],
+          "resourceVersion": "10449699",
+          "selfLink": "/api/v1/namespaces/fake-cluster/secrets/worker-0-bmc-secret-9bmgg",
+          "uid": "8c18d6a7-1f44-4928-81b5-489bdc4bacc7",
+        },
+        "type": "Opaque",
       },
-      "statusCode": 404,
     },
   },
 }
@@ -124,14 +202,7 @@ exports[`BareMetalAsset Resolver Correctly Resolves DeleteBareMetalAsset Query 1
 Object {
   "data": Object {
     "deleteBareMetalAssets": Object {
-      "errors": Array [
-        Object {
-          "message": "baremetalassets.inventory.open-cluster-management.io \\"undefined\\" not found",
-          "statusCode": 404,
-        },
-      ],
-      "message": "Failed to delete 1 bare metal asset(s)",
-      "statusCode": 500,
+      "statusCode": 200,
     },
   },
 }
@@ -140,31 +211,67 @@ Object {
 exports[`BareMetalAsset Resolver Correctly Resolves UpdateBareMetalAsset Query 1`] = `
 Object {
   "data": Object {
-    "updateBareMetalAsset": null,
-  },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "TypeError: Cannot read property 'bmc' of undefined",
-            "    at BareMetalAssetModel.updateBareMetalAsset (/Users/fxiang/workspaces/console-api/src/v2/models/bare-metal-asset.js:402:31)",
-            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
-          ],
+    "updateBareMetalAsset": Object {
+      "bmaResult": Object {
+        "apiVersion": "inventory.open-cluster-management.io/v1alpha1",
+        "kind": "BareMetalAsset",
+        "metadata": Object {
+          "annotations": Object {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\\"apiVersion\\":\\"inventory.open-cluster-management.io/v1alpha1\\",\\"kind\\":\\"BareMetalAsset\\",\\"metadata\\":{\\"annotations\\":{},\\"name\\":\\"baremetalasset-worker-0\\",\\"namespace\\":\\"fake-cluster\\"},\\"spec\\":{\\"bmc\\":{\\"address\\":\\"ipmi://192.168.122.1:6233\\",\\"credentialsName\\":\\"worker-0-bmc-secret\\"},\\"bootMACAddress\\":\\"00:1B:44:11:3A:B7\\",\\"clusterDeployment\\":{\\"name\\":\\"cluster0\\",\\"namespace\\":\\"cluster0\\"},\\"hardwareProfile\\":\\"hardwareProfile\\",\\"role\\":\\"worker\\"}}
+",
+          },
+          "creationTimestamp": "2020-03-05T12:01:11Z",
+          "generation": 1,
+          "name": "baremetalasset-worker-0",
+          "namespace": "fake-cluster",
+          "resourceVersion": "579175",
+          "selfLink": "/apis/inventory.open-cluster-management.io/v1alpha1/namespaces/fake-cluster/baremetalassets/baremetalasset-worker-0",
+          "uid": "cb6eaf0e-2a60-4c4c-b068-2a4257fcce42",
+        },
+        "spec": Object {
+          "bmc": Object {
+            "address": "ipmi://192.168.122.1:6233",
+            "credentialsName": "worker-0-bmc-secret",
+            "password": "test1",
+            "username": "test1",
+          },
+          "bootMACAddress": "00:1B:44:11:3A:B7",
+          "clusterDeployment": Object {
+            "name": "cluster0",
+            "namespace": "cluster0",
+          },
+          "hardwareProfile": "hardwareProfile",
+          "role": "worker",
         },
       },
-      "locations": Array [
-        Object {
-          "column": 11,
-          "line": 3,
+      "secretResult": Object {
+        "apiVersion": "v1",
+        "data": Object {
+          "password": "dGVzdDE=",
+          "username": "dGVzdDE=",
         },
-      ],
-      "message": "Cannot read property 'bmc' of undefined",
-      "path": Array [
-        "updateBareMetalAsset",
-      ],
+        "kind": "Secret",
+        "metadata": Object {
+          "creationTimestamp": "2020-07-23T18:07:07Z",
+          "generateName": "worker-0-bmc-secret",
+          "name": "worker-0-bmc-secret",
+          "namespace": "fake-cluster",
+          "ownerReferences": Array [
+            Object {
+              "apiVersion": "inventory.open-cluster-management.io/v1alpha1",
+              "kind": "BareMetalAsset",
+              "name": "worker-0",
+              "uid": "86683623-be4d-4210-9276-3fa320b45617",
+            },
+          ],
+          "resourceVersion": "10449699",
+          "selfLink": "/api/v1/namespaces/fake-cluster/secrets/worker-0-bmc-secret-9bmgg",
+          "uid": "8c18d6a7-1f44-4928-81b5-489bdc4bacc7",
+        },
+        "type": "Opaque",
+      },
+      "statusCode": 200,
     },
-  ],
+  },
 }
 `;

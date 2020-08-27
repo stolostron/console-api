@@ -7,223 +7,7 @@ Object {
       "applications": Array [
         Object {
           "metadata": Object {
-            "name": "nginx-app-acmtest-helmrepo",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "guestbook-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "cassandra-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "ansible-tower-job-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "guestbook-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "helloworld-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgage-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgagecm",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgagedc",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgageds",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgagepod",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgagerc",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "mortgagers",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "git-demo-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "demo-saude-digital",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "git-sub-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "helloworld",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "helm-sub-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "kevin-test",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "local-app-val",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "nginx-placement",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "nginx-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "nginx-blue",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "nginx-green",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "nginx-app-3",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "guestbook-app",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "gbapp-app01",
-            "namespace": null,
-          },
-          "raw": null,
-          "selector": null,
-        },
-        Object {
-          "metadata": Object {
-            "name": "test",
+            "name": "gbapp-gbapp",
             "namespace": null,
           },
           "raw": null,
@@ -233,30 +17,97 @@ Object {
       "clusters": Array [
         Object {
           "allocatable": Object {
-            "cpu": "33",
-            "memory": "137847Mi",
+            "cpu": "6598m",
+            "memory": "6728Mi",
           },
           "capacity": Object {
-            "cpu": "36",
-            "memory": "144591Mi",
+            "cpu": "18",
+            "memory": "32013Mi",
           },
-          "consoleURL": "https://console-openshift-console.apps.fxiang.dev06.red-chesterfield.com",
+          "consoleURL": null,
           "metadata": Object {
             "labels": Object {
-              "cloud": "AWS",
+              "cloud": "IBM",
+              "datacenter": "toronto",
               "environment": "Dev",
-              "name": "fxiang",
-              "region": "Other",
-              "vendor": "OpenShift",
+              "name": "managed-cluster",
+              "owner": "marketing",
+              "region": "US",
+              "vendor": "ICP",
             },
-            "name": "fxiang",
-            "namespace": "fxiang",
+            "name": "managed-cluster",
+            "namespace": "managed-cluster",
+            "uid": null,
+          },
+          "status": "pendingimport",
+        },
+        Object {
+          "allocatable": Object {
+            "cpu": "6598m",
+            "memory": "6728Mi",
+          },
+          "capacity": Object {
+            "cpu": "16",
+            "memory": "32013Mi",
+          },
+          "consoleURL": null,
+          "metadata": Object {
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "hub-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "hub-cluster",
+            "namespace": "hub-cluster",
             "uid": null,
           },
           "status": "ok",
         },
+        Object {
+          "allocatable": Object {
+            "cpu": "7483m",
+            "memory": "5390Mi",
+          },
+          "capacity": Object {
+            "cpu": "16",
+            "memory": "32013Mi",
+          },
+          "consoleURL": null,
+          "metadata": Object {
+            "labels": Object {
+              "cloud": "IBM",
+              "datacenter": "raleigh",
+              "environment": "Dev",
+              "name": "new-cluster",
+              "owner": "development",
+              "region": "US",
+              "vendor": "ICP",
+            },
+            "name": "new-cluster",
+            "namespace": "new-cluster",
+            "uid": null,
+          },
+          "status": "offline",
+        },
       ],
-      "compliances": Array [],
+      "compliances": Array [
+        Object {
+          "metadata": null,
+          "raw": Object {
+            "status": Object {},
+          },
+        },
+        Object {
+          "metadata": null,
+          "raw": Object {
+            "status": Object {},
+          },
+        },
+      ],
     },
   },
 }
