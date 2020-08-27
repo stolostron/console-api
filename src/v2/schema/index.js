@@ -32,7 +32,7 @@ import * as topology from './topology';
 import * as userAccess from './user-access';
 import * as connection from './connection';
 import * as bmAsset from './bare-metal-asset';
-import * as userAccessAllNamespaces from './user-access-all-namespaces';
+import * as userAccessAnyNamespaces from './user-access-any-namespaces';
 
 const modules = [
   applications,
@@ -56,7 +56,7 @@ const modules = [
   userAccess,
   connection,
   bmAsset,
-  userAccessAllNamespaces,
+  userAccessAnyNamespaces,
 ];
 
 const mainDefs = [gql`

@@ -3,7 +3,7 @@
 exports[`User Access All Namespaces Resolver Correctly Resolves User Access All Namespaces Query 1`] = `
 Object {
   "data": Object {
-    "userAccessAllNamespaces": null,
+    "userAccessAnyNamespaces": null,
   },
 }
 `;

@@ -11,7 +11,7 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDef = gql`
-type userAccessAllNamespaces {
+type userAccessAnyNamespaces {
   resource: String
   action: String
 }
@@ -19,6 +19,6 @@ type userAccessAllNamespaces {
 
 export const resolver = {
   Query: {
-    userAccessAllNamespaces: (parent, args, { genericModel }) => genericModel.userAccessAllNamespaces(args),
+    userAccessAnyNamespaces: (parent, args, { genericModel }) => genericModel.userAccessAnyNamespaces(args),
   },
 };

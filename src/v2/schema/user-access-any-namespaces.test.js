@@ -12,7 +12,7 @@ describe('User Access All Namespaces Resolver', () => {
       .send({
         query: `
           {
-            userAccessAllNamespaces(resource:"pods", action:"delete", apiGroup:"")
+            userAccessAnyNamespaces(resource:"pods", action:"delete", apiGroup:"")
           }
       `,
       })
