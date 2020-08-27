@@ -79,6 +79,9 @@ type Query {
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String!, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
 
+  # Resolves if the current user is authorized to access a given resource.
+  userAccessAllNamespaces(resource: String!, action: String!, apiGroup: String, name: String, version: String): JSON
+
   # Get cloud event manager queries .
   applicationNamespaces(namespace: String): [ApplicationNamespace]
 

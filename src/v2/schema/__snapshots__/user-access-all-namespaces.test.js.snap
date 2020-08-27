@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Access All Namespaces Resolver Correctly Resolves User Access All Namespaces Query 1`] = `
+Object {
+  "data": Object {
+    "userAccessAllNamespaces": null,
+  },
+}
+`;
