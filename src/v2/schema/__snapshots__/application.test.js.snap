@@ -6,6 +6,21 @@ Object {
     Object {
       "extensions": Object {
         "code": "GRAPHQL_VALIDATION_FAILED",
+        "exception": Object {
+          "stacktrace": Array [
+            "GraphQLError: Cannot query field \\"applications\\" on type \\"Query\\". Did you mean \\"application\\"?",
+            "    at Object.Field (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/rules/FieldsOnCorrectTypeRule.js:46:31)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:323:29)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/utilities/TypeInfo.js:370:25)",
+            "    at visit (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:243:26)",
+            "    at Object.validate (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/validate.js:69:24)",
+            "    at validate (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:518:14)",
+            "    at Object.<anonymous> (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:301:32)",
+            "    at Generator.next (<anonymous>)",
+            "    at fulfilled (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/dist/requestPipeline.js:5:58)",
+            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
+          ],
+        },
       },
       "locations": Array [
         Object {
@@ -25,6 +40,21 @@ Object {
     Object {
       "extensions": Object {
         "code": "GRAPHQL_VALIDATION_FAILED",
+        "exception": Object {
+          "stacktrace": Array [
+            "GraphQLError: Unknown argument \\"resources\\" on field \\"Mutation.createApplication\\".",
+            "    at Object.Argument (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/rules/KnownArgumentNamesRule.js:46:29)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:323:29)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/utilities/TypeInfo.js:370:25)",
+            "    at visit (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:243:26)",
+            "    at Object.validate (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/validate.js:69:24)",
+            "    at validate (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:518:14)",
+            "    at Object.<anonymous> (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:301:32)",
+            "    at Generator.next (<anonymous>)",
+            "    at fulfilled (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/dist/requestPipeline.js:5:58)",
+            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
+          ],
+        },
       },
       "locations": Array [
         Object {
@@ -37,6 +67,21 @@ Object {
     Object {
       "extensions": Object {
         "code": "GRAPHQL_VALIDATION_FAILED",
+        "exception": Object {
+          "stacktrace": Array [
+            "GraphQLError: Field \\"createApplication\\" argument \\"application\\" of type \\"[JSON]!\\" is required, but it was not provided.",
+            "    at Object.leave (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/rules/ProvidedRequiredArgumentsRule.js:62:33)",
+            "    at Object.leave (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:344:29)",
+            "    at Object.leave (/Users/fxiang/workspaces/console-api/node_modules/graphql/utilities/TypeInfo.js:390:21)",
+            "    at visit (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:243:26)",
+            "    at Object.validate (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/validate.js:69:24)",
+            "    at validate (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:518:14)",
+            "    at Object.<anonymous> (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:301:32)",
+            "    at Generator.next (<anonymous>)",
+            "    at fulfilled (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/dist/requestPipeline.js:5:58)",
+            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
+          ],
+        },
       },
       "locations": Array [
         Object {
@@ -56,6 +101,21 @@ Object {
     Object {
       "extensions": Object {
         "code": "GRAPHQL_VALIDATION_FAILED",
+        "exception": Object {
+          "stacktrace": Array [
+            "GraphQLError: Cannot query field \\"applications\\" on type \\"Query\\". Did you mean \\"application\\"?",
+            "    at Object.Field (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/rules/FieldsOnCorrectTypeRule.js:46:31)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:323:29)",
+            "    at Object.enter (/Users/fxiang/workspaces/console-api/node_modules/graphql/utilities/TypeInfo.js:370:25)",
+            "    at visit (/Users/fxiang/workspaces/console-api/node_modules/graphql/language/visitor.js:243:26)",
+            "    at Object.validate (/Users/fxiang/workspaces/console-api/node_modules/graphql/validation/validate.js:69:24)",
+            "    at validate (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:518:14)",
+            "    at Object.<anonymous> (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/src/requestPipeline.ts:301:32)",
+            "    at Generator.next (<anonymous>)",
+            "    at fulfilled (/Users/fxiang/workspaces/console-api/node_modules/apollo-server-core/dist/requestPipeline.js:5:58)",
+            "    at processTicksAndRejections (internal/process/task_queues.js:97:5)",
+          ],
+        },
       },
       "locations": Array [
         Object {
