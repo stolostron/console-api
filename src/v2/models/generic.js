@@ -580,7 +580,7 @@ export default class GenericModel extends KubeModel {
     return response.status;
   }
 
-  async userAccessAllNamespaces({
+  async userAccessAnyNamespaces({
     resource, action, apiGroup = '*', name = '', version = '*',
   }) {
     // assuming the hub will only support running on openshift or else this won't work
@@ -592,11 +592,7 @@ export default class GenericModel extends KubeModel {
       throw new Error(`Get User Access Failed [${existingNamespaces.code}] - ${existingNamespaces.message}`);
     }
 
-<<<<<<< HEAD
     let accessAllowed = false;
-=======
-    let canCreateApp = false;
->>>>>>> 56a36f059979d401031b37797ed3e0a49fb3a06c
 
     // generate request array
     const requests = existingNamespaces.items.map((item) => {
@@ -646,18 +642,10 @@ export default class GenericModel extends KubeModel {
     // wait for all requests to finish before proceeding
     await Promise.all(requests).then((data) => {
       data.forEach((res) => {
-<<<<<<< HEAD
         accessAllowed = accessAllowed || res.status.allowed;
       });
     });
 
     return accessAllowed;
-=======
-        canCreateApp = canCreateApp || res.status.allowed;
-      });
-    });
-
-    return canCreateApp;
->>>>>>> 56a36f059979d401031b37797ed3e0a49fb3a06c
   }
 }
