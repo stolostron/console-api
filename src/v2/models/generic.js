@@ -577,4 +577,73 @@ export default class GenericModel extends KubeModel {
     }
     return response.status;
   }
+
+  async userAccessAllNamespaces({
+    resource, action, apiGroup = '*', name = '', version = '*',
+  }) {
+    // assuming the hub will only support running on openshift or else this won't work
+    const existingNamespaces = await this.kubeConnector.get('/apis/project.openshift.io/v1/projects');
+    if (existingNamespaces.code === 403) {
+      return false;
+    }
+    if (existingNamespaces.status === 'Failure' || existingNamespaces.code >= 400) {
+      throw new Error(`Get User Access Failed [${existingNamespaces.code}] - ${existingNamespaces.message}`);
+    }
+
+    let canCreateApp = false;
+
+    // generate request array
+    const requests = existingNamespaces.items.map((item) => {
+      const body = {
+        apiVersion: 'authorization.k8s.io/v1',
+        kind: 'SelfSubjectAccessReview',
+        spec: {
+          resourceAttributes: {
+            verb: action,
+            resource,
+            namespace: item.metadata.name,
+            group: apiGroup,
+            name,
+            version,
+          },
+        },
+      };
+      return this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', body)
+        .catch((err) => ({
+          status: 'Failure',
+          message: err.message,
+        }));
+    });
+
+    // add code to check for permission to create namespaces
+    const checkNamespaceBody = {
+      apiVersion: 'authorization.k8s.io/v1',
+      kind: 'SelfSubjectAccessReview',
+      spec: {
+        resourceAttributes: {
+          verb: 'create',
+          resource: 'namespace',
+          group: '*',
+          version: 'v1',
+        },
+      },
+    };
+
+    const checkNamespacePromise = this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', checkNamespaceBody)
+      .catch((err) => ({
+        status: 'Failure',
+        message: err.message,
+      }));
+
+    requests.push(checkNamespacePromise);
+
+    // wait for all requests to finish before proceeding
+    await Promise.all(requests).then((data) => {
+      data.forEach((res) => {
+        canCreateApp = canCreateApp || res.status.allowed;
+      });
+    });
+
+    return canCreateApp;
+  }
 }
