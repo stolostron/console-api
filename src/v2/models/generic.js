@@ -16,6 +16,8 @@ import logger from '../lib/logger';
 const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
 const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
 const metadataSelfLink = 'metadata.selfLink';
+const authApiVersion = 'authorization.k8s.io/v1';
+const selfSubjectAccessReviewLink = '/apis/authorization.k8s.io/v1/selfsubjectaccessreviews';
 
 function getApiGroupFromSelfLink(selfLink, kind) {
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
@@ -558,7 +560,7 @@ export default class GenericModel extends KubeModel {
     resource, action, namespace = '', apiGroup = '*', name = '', version = '*',
   }) {
     const body = {
-      apiVersion: 'authorization.k8s.io/v1',
+      apiVersion: authApiVersion,
       kind: 'SelfSubjectAccessReview',
       spec: {
         resourceAttributes: {
@@ -571,7 +573,7 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', body);
+    const response = await this.kubeConnector.post(selfSubjectAccessReviewLink, body);
     if (response.status === 'Failure' || response.code >= 400) {
       throw new Error(`Get User Access Failed [${response.code}] - ${response.message}`);
     }
@@ -595,7 +597,7 @@ export default class GenericModel extends KubeModel {
     // generate request array
     const requests = existingNamespaces.items.map((item) => {
       const body = {
-        apiVersion: 'authorization.k8s.io/v1',
+        apiVersion: authApiVersion,
         kind: 'SelfSubjectAccessReview',
         spec: {
           resourceAttributes: {
@@ -608,7 +610,7 @@ export default class GenericModel extends KubeModel {
           },
         },
       };
-      return this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', body)
+      return this.kubeConnector.post(selfSubjectAccessReviewLink, body)
         .catch((err) => ({
           status: 'Failure',
           message: err.message,
@@ -617,7 +619,7 @@ export default class GenericModel extends KubeModel {
 
     // add code to check for permission to create namespaces
     const checkNamespaceBody = {
-      apiVersion: 'authorization.k8s.io/v1',
+      apiVersion: authApiVersion,
       kind: 'SelfSubjectAccessReview',
       spec: {
         resourceAttributes: {
@@ -629,7 +631,7 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const checkNamespacePromise = this.kubeConnector.post('/apis/authorization.k8s.io/v1/selfsubjectaccessreviews', checkNamespaceBody)
+    const checkNamespacePromise = this.kubeConnector.post(selfSubjectAccessReviewLink, checkNamespaceBody)
       .catch((err) => ({
         status: 'Failure',
         message: err.message,
