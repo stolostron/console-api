@@ -29,6 +29,9 @@ type Query {
   # List all cluster image sets.
   clusterImageSets: [ClusterImageSet]
 
+  # Get the ManagedClusterAddons
+  clusterAddons(name: String, namespace: String): [ClusterAddon]
+
   # BareMetalAssests
   bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
   bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]

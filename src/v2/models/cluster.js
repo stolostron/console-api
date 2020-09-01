@@ -9,7 +9,7 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
-import { getLatestResource, responseHasError } from '../lib/utils';
+import { getLatest, responseHasError } from '../lib/utils';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -41,8 +41,8 @@ function getCPUPercentage(usage, capacity) {
 function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
   const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
-  const latestJobActive = (jobs) => (jobs && _.get(getLatestResource(jobs), 'status.active', 0) > 0);
-  const latestJobFailed = (jobs) => (jobs && _.get(getLatestResource(jobs), 'status.failed', 0) > 0);
+  const latestJobActive = (jobs) => (jobs && _.get(getLatest(jobs, 'metadata.creationTimestamp'), 'status.active', 0) > 0);
+  const latestJobFailed = (jobs) => (jobs && _.get(getLatest(jobs, 'metadata.creationTimestamp'), 'status.failed', 0) > 0);
 
   let status = 'pending';
   if (latestJobActive(uninstall)) {
@@ -79,7 +79,7 @@ export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) 
     } else if (!clusterJoined) {
       status = 'pendingimport';
       if (csrs && csrs.length) {
-        status = !_.get(getLatestResource(csrs), 'status.certificate')
+        status = !_.get(getLatest(csrs, 'metadata.creationTimestamp'), 'status.certificate')
           ? 'needsapproval' : 'pending';
       }
     } else {
@@ -810,5 +810,47 @@ export default class ClusterModel extends KubeModel {
     };
 
     return new Promise(poll);
+  }
+
+  async getClusterAddons(args = {}) {
+    const { namespace } = args;
+    const clusterManagementAddons = await this.kubeConnector.get('/apis/addon.open-cluster-management.io/v1alpha1/clustermanagementaddons')
+      .catch((err) => {
+        logger.error(err);
+        throw err;
+      });
+    let managedClusterAddons = await this.kubeConnector.get(`/apis/addon.open-cluster-management.io/v1alpha1/namespaces/${namespace}/managedclusteraddons`)
+      .catch((err) => {
+        logger.error(err);
+        throw err;
+      });
+
+    managedClusterAddons = managedClusterAddons.items.map((addon) => {
+      const { metadata, status: { addOnResource, conditions } } = addon;
+      const status = getLatest(conditions, 'lastTransitionTime');
+      const matchedCMA = clusterManagementAddons.items.find((cma) => _.get(cma, 'spec.addOnConfigCRD', '') === `${addOnResource.resource}.${addOnResource.group}`) || {};
+      const description = _.get(matchedCMA, 'spec.description', '');
+      return { metadata, status, addOnResource: { ...addOnResource, description } };
+    });
+
+    // Check for ClusterManagementAddons that are not configured for this cluster
+    // If not enabled construct an object to send back to the UI
+    clusterManagementAddons.items.forEach((cma) => {
+      const addOnConfigCRD = _.get(cma, 'spec.addOnConfigCRD', '');
+      const hasAddon = !!managedClusterAddons.find(({ addOnResource: { resource, group } }) => `${resource}.${group}` === addOnConfigCRD);
+      if (!hasAddon) {
+        const resource = addOnConfigCRD.slice(0, addOnConfigCRD.indexOf('.'));
+        const group = addOnConfigCRD.slice(addOnConfigCRD.indexOf('.'));
+        const addOnObj = {
+          metadata: { name: cma.metadata.name, namespace },
+          addOnResource: {
+            name: '', group, resource, description: _.get(cma, 'spec.description', ''),
+          },
+          status: { type: 'Disabled' },
+        };
+        managedClusterAddons.push(addOnObj);
+      }
+    });
+    return managedClusterAddons;
   }
 }
