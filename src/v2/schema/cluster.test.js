@@ -99,6 +99,39 @@ describe('Cluster Resolver', () => {
         done();
       });
   }));
+
+  test('Correctly Resolves ClusterAddon Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          clusterAddons(name: "hub-cluster", namespace: "hub-cluster") {
+            metadata {
+              name
+              namespace
+            }
+            addOnResource {
+              name
+              group
+              resource
+              description
+            }
+            status {
+              message
+              reason
+              status
+              type
+            }
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
 });
 
 describe('Cluster Mutation', () => {

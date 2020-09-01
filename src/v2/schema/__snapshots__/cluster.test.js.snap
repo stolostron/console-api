@@ -486,6 +486,51 @@ Object {
 }
 `;
 
+exports[`Cluster Resolver Correctly Resolves ClusterAddon Query 1`] = `
+Object {
+  "data": Object {
+    "clusterAddons": Array [
+      Object {
+        "addOnResource": Object {
+          "description": "This is the tooltip for Observability",
+          "group": "agent.open-cluster-management.io",
+          "name": "observability",
+          "resource": "observability",
+        },
+        "metadata": Object {
+          "name": "observability-addon",
+          "namespace": "hub-cluster",
+        },
+        "status": Object {
+          "message": "addon is not ready",
+          "reason": "AddOnNotReady",
+          "status": "False",
+          "type": "Degraded",
+        },
+      },
+      Object {
+        "addOnResource": Object {
+          "description": "application manager",
+          "group": "agent.open-cluster-management.io",
+          "name": "test-cluster",
+          "resource": "klusterletaddonconfigs",
+        },
+        "metadata": Object {
+          "name": "open-cluster-management-addon-application-manager",
+          "namespace": "hub-cluster",
+        },
+        "status": Object {
+          "message": "addon is not ready",
+          "reason": "AddOnNotReady",
+          "status": "False",
+          "type": "Available",
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`Cluster Resolver Correctly Resolves ClusterImageSet Query 1`] = `
 Object {
   "data": Object {
