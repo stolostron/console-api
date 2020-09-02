@@ -16,6 +16,12 @@ const mockResponse = {
         reason: 'RBAC: allowed by ClusterRoleBinding "oidc-admin-binding" of ClusterRole "cluster-admin" to User "https://127.0.0.1:9443/oidc/endpoint/OP#admin"',
       },
     },
+    spec: {
+      resourceAttributes: {
+        verb:'delete',
+        resource: 'pods',
+      },
+    }
   },
 };
 
