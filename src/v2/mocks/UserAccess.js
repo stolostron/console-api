@@ -18,10 +18,10 @@ const mockResponse = {
     },
     spec: {
       resourceAttributes: {
-        verb:'delete',
+        verb: 'delete',
         resource: 'pods',
       },
-    }
+    },
   },
 };
 
