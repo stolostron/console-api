@@ -16,65 +16,6 @@ const mockResponse = {
       apiVersion: 'addon.open-cluster-management.io/v1alpha1',
       kind: 'ManagedClusterAddOn',
       metadata: {
-        creationTimestamp: '2020-09-01T00:30:54Z',
-        generation: 1,
-        managedFields: [
-          {
-            apiVersion: 'addon.open-cluster-management.io/v1alpha1',
-            fieldsType: 'FieldsV1',
-            fieldsV1: {
-              'f:spec': {},
-              'f:status': {
-                '.': {},
-                'f:addOnResource': {
-                  '.': {},
-                  'f:group': {},
-                  'f:name': {},
-                  'f:resource': {},
-                },
-                'f:conditions': {},
-              },
-            },
-            manager: 'Mozilla',
-            operation: 'Update',
-            time: '2020-09-01T00:30:54Z',
-          },
-        ],
-        name: 'observability-addon',
-        namespace: 'hub-cluster',
-        resourceVersion: '5907098',
-        selfLink: '/apis/addon.open-cluster-management.io/v1alpha1/namespaces/hub-cluster/managedclusteraddons/observability-addon',
-        uid: '1c3d3d4a-4782-4441-a2d7-ed83482cdc86',
-      },
-      spec: {},
-      status: {
-        addOnResource: {
-          group: 'agent.open-cluster-management.io',
-          name: 'observability',
-          resource: 'observability',
-        },
-        conditions: [
-          {
-            lastTransitionTime: '2020-08-31T14:55:25Z',
-            message: 'manifestwork applying',
-            reason: 'ManifestWorkApplying',
-            status: 'True',
-            type: 'Progressing',
-          },
-          {
-            lastTransitionTime: '2020-08-31T14:58:25Z',
-            message: 'addon is not ready',
-            reason: 'AddOnNotReady',
-            status: 'False',
-            type: 'Degraded',
-          },
-        ],
-      },
-    },
-    {
-      apiVersion: 'addon.open-cluster-management.io/v1alpha1',
-      kind: 'ManagedClusterAddOn',
-      metadata: {
         creationTimestamp: '2020-08-31T17:51:07Z',
         generation: 2,
         managedFields: [
