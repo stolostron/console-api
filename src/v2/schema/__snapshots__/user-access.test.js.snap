@@ -4,10 +4,12 @@ exports[`User Access Resolver Correctly Resolves User Access Query 1`] = `
 Object {
   "data": Object {
     "userAccess": Object {
+      "resource": "pods",
       "userAccess": Object {
         "allowed": true,
         "reason": "RBAC: allowed by ClusterRoleBinding \\"oidc-admin-binding\\" of ClusterRole \\"cluster-admin\\" to User \\"https://127.0.0.1:9443/oidc/endpoint/OP#admin\\"",
       },
+      "verb": "delete",
     },
   },
 }

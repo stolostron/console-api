@@ -577,7 +577,7 @@ export default class GenericModel extends KubeModel {
     if (response.status === 'Failure' || response.code >= 400) {
       throw new Error(`Get User Access Failed [${response.code}] - ${response.message}`);
     }
-    return response.status;
+    return { ...response.status, ...response.spec.resourceAttributes };
   }
 
   async userAccessAnyNamespaces({
