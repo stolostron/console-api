@@ -65,7 +65,7 @@ type Query {
 
   # Get policies.
   policies(name: String, namespace: String, clusterName: String): [Policy]
- 
+
   # Get secrets
   secrets(namespace: String): [Secret]
 
