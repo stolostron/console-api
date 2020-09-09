@@ -492,31 +492,103 @@ Object {
     "clusterAddons": Array [
       Object {
         "addOnResource": Object {
-          "description": "application manager",
+          "description": "Processes events and other requests to managed resources.",
           "group": "agent.open-cluster-management.io",
-          "name": "test-cluster",
+          "name": "han-test",
           "resource": "klusterletaddonconfigs",
         },
         "metadata": Object {
-          "name": "open-cluster-management-addon-application-manager",
-          "namespace": "hub-cluster",
+          "name": "application-manager",
+          "namespace": "han-test",
         },
         "status": Object {
-          "message": "addon is not ready",
-          "reason": "AddOnNotReady",
-          "status": "False",
+          "message": "Addon is available",
+          "reason": "AddonAvailable",
+          "status": "True",
           "type": "Available",
         },
       },
       Object {
         "addOnResource": Object {
-          "description": "This is the tooltip for Observability",
-          "group": ".agent.open-cluster-management.io",
-          "name": "",
-          "resource": "observability",
+          "description": "Monitors certificate expiration based on distributed policies.",
+          "group": "agent.open-cluster-management.io",
+          "name": "han-test",
+          "resource": "klusterletaddonconfigs",
         },
         "metadata": Object {
-          "name": "observability-addon",
+          "name": "cert-policy-controller",
+          "namespace": "han-test",
+        },
+        "status": Object {
+          "message": "Addon is available",
+          "reason": "AddonAvailable",
+          "status": "True",
+          "type": "Available",
+        },
+      },
+      Object {
+        "addOnResource": Object {
+          "description": "Distributes configured policies and monitors Kubernetes-based policies.",
+          "group": "agent.open-cluster-management.io",
+          "name": "han-test",
+          "resource": "klusterletaddonconfigs",
+        },
+        "metadata": Object {
+          "name": "policy-controller",
+          "namespace": "han-test",
+        },
+        "status": Object {
+          "message": "Addon is available",
+          "reason": "AddonAvailable",
+          "status": "True",
+          "type": "Available",
+        },
+      },
+      Object {
+        "addOnResource": Object {
+          "description": "Collects cluster data to be indexed by search components on the hub cluster.",
+          "group": "agent.open-cluster-management.io",
+          "name": "han-test",
+          "resource": "klusterletaddonconfigs",
+        },
+        "metadata": Object {
+          "name": "search-collector",
+          "namespace": "han-test",
+        },
+        "status": Object {
+          "message": null,
+          "reason": null,
+          "status": null,
+          "type": "Progressing",
+        },
+      },
+      Object {
+        "addOnResource": Object {
+          "description": "Component that handles endpoint work requests and managed cluster status.",
+          "group": "agent.open-cluster-management.io",
+          "name": "han-test",
+          "resource": "klusterletaddonconfigs",
+        },
+        "metadata": Object {
+          "name": "work-manager",
+          "namespace": "han-test",
+        },
+        "status": Object {
+          "message": "Addon is available",
+          "reason": "AddonAvailable",
+          "status": "True",
+          "type": "Available",
+        },
+      },
+      Object {
+        "addOnResource": Object {
+          "description": "Monitors identity controls based on distributed policies.",
+          "group": ".agent.open-cluster-management.io",
+          "name": "",
+          "resource": "klusterletaddonconfigs",
+        },
+        "metadata": Object {
+          "name": "iam-policy-controller",
           "namespace": "hub-cluster",
         },
         "status": Object {
