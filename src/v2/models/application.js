@@ -653,4 +653,15 @@ export default class ApplicationModel extends KubeModel {
     const namespaces = await this.kubeConnector.getNamespaceResources({ });
     return _.filter(namespaces, (ns) => !_.get(ns, 'metadata.name', '').startsWith('openshift') && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management'));
   }
+
+  async getSecrets(namespace) {
+    const secrets = await this.kubeConnector.getResources((ns) => `/api/v1/namespaces/${ns}/secrets`, { namespaces: [namespace] }).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+    return secrets.map((secret) => ({
+      name: _.get(secret, 'metadata.name', 'unknown'),
+      namespace: _.get(secret, 'metadata.name', 'unknown'),
+    }));
+  }
 }
