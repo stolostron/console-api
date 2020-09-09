@@ -826,25 +826,43 @@ export default class ClusterModel extends KubeModel {
       });
 
     managedClusterAddons = managedClusterAddons.items.map((addon) => {
-      const { metadata, status: { addOnResource, conditions } } = addon;
-      const status = getLatest(conditions, 'lastTransitionTime');
-      const matchedCMA = clusterManagementAddons.items.find((cma) => _.get(cma, 'spec.addOnConfigCRD', '') === `${addOnResource.resource}.${addOnResource.group}`) || {};
-      const description = _.get(matchedCMA, 'spec.description', '');
-      return { metadata, status, addOnResource: { ...addOnResource, description } };
+      const { metadata, status: { conditions, relatedObjects } } = addon;
+      const crd = _.get(relatedObjects, '[0]', {});
+
+      // Order of precedence:
+      // degraded=true
+      // progressing=true
+      // available=true
+      // all conditions are false = progressing
+      // available=false = unavailable
+      // default = unknown
+      const isDegraded = conditions.find(({ type, status }) => type === 'Degraded' && status === 'True') || false;
+      const isProgressing = conditions.find(({ type, status }) => type === 'Progressing' && status === 'True') || false;
+      const isAvailable = conditions.find(({ type, status }) => type === 'Available' && status === 'True') || false;
+      const allFalseCondition = conditions.every(({ status }) => status !== 'True') ? { type: 'Progressing' } : false;
+      const isNotAvailable = conditions.find(({ type, status }) => type === 'Available' && status === 'False') || false;
+      if (isNotAvailable) {
+        isNotAvailable.type = 'Unavailable';
+      }
+      const status = isDegraded || isProgressing || isAvailable || allFalseCondition || isNotAvailable || { type: 'Unknown' };
+      const matchedCMA = clusterManagementAddons.items.find((cma) => _.get(cma, 'metadata.name', '') === metadata.name) || {};
+      const description = _.get(matchedCMA, 'spec.addOnMeta.description', '');
+      return { metadata, status, addOnResource: { ...crd, description } };
     });
 
     // Check for ClusterManagementAddons that are not configured for this cluster
     // If not enabled construct an object to send back to the UI
     clusterManagementAddons.items.forEach((cma) => {
-      const addOnConfigCRD = _.get(cma, 'spec.addOnConfigCRD', '');
-      const hasAddon = !!managedClusterAddons.find(({ addOnResource: { resource, group } }) => `${resource}.${group}` === addOnConfigCRD);
+      const addOnConfigCRD = _.get(cma, 'spec.addOnConfiguration.crdName', '');
+      const addOnName = _.get(cma, 'metadata.name', '');
+      const hasAddon = !!managedClusterAddons.find(({ metadata }) => metadata.name === addOnName);
       if (!hasAddon) {
         const resource = addOnConfigCRD.slice(0, addOnConfigCRD.indexOf('.'));
         const group = addOnConfigCRD.slice(addOnConfigCRD.indexOf('.'));
         const addOnObj = {
           metadata: { name: cma.metadata.name, namespace },
           addOnResource: {
-            name: '', group, resource, description: _.get(cma, 'spec.description', ''),
+            name: '', group, resource, description: _.get(cma, 'spec.addOnMeta.description', ''),
           },
           status: { type: 'Disabled' },
         };
