@@ -53,7 +53,7 @@ export function responseHasError(response) {
   return code < 200 || code >= 300;
 }
 
-export function getLatestResource(items) {
+export function getLatest(items, key) {
   if (items.length === 0) {
     return undefined;
   }
@@ -62,7 +62,7 @@ export function getLatestResource(items) {
   }
 
   return items.reduce((a, b) => {
-    const [timeA, timeB] = [a, b].map((x) => new Date(_.get(x, 'metadata.creationTimestamp', '')));
+    const [timeA, timeB] = [a, b].map((x) => new Date(_.get(x, key, '')));
     return timeA > timeB ? a : b;
   });
 }

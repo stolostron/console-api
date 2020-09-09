@@ -19,6 +19,8 @@ export default function createMockHttp() {
     managedClusterInfosByName: require('./ManagedClusterInfosByName.js').default,
     clusters: require('./ManagedClusterList').default,
     clusterImageSets: require('./ClusterImageSets').default,
+    managedClusterAddons: require('./ManagedClusterAddons').default,
+    clusterManagementAddons: require('./ClusterManagementAddons').default,
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
@@ -154,6 +156,10 @@ export default function createMockHttp() {
         return state.logs.mockLogsResponse;
       case params.url.includes('namespaces/hub-cluster/managedclusterinfos'):
         return { body: state.managedClusterInfosByName['hub-cluster'] };
+      case params.url.includes('/apis/addon.open-cluster-management.io/v1alpha1/namespaces/hub-cluster/managedclusteraddons'):
+        return { body: state.managedClusterAddons };
+      case params.url.includes('/apis/addon.open-cluster-management.io/v1alpha1/clustermanagementaddons'):
+        return { body: state.clusterManagementAddons };
       case params.url.includes('namespaces/new-cluster/managedclusterinfos'):
         return { body: state.managedClusterInfosByName['new-cluster'] };
       case params.url.includes('namespaces/managed-cluster/managedclusterinfos'):

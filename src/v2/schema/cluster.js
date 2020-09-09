@@ -42,6 +42,26 @@ type ClusterImageSet {
   platformBmc: String
   platformVmware: String
 }
+
+type ClusterAddon {
+  addOnResource: AddOnResource
+  metadata: Metadata
+  status: AddOnStatus
+}
+
+type AddOnResource {
+  name: String
+  group: String
+  resource: String
+  description: String
+}
+
+type AddOnStatus {
+  message: String
+  reason: String
+  status: String
+  type: String
+}
 `;
 
 export const resolver = {
@@ -49,6 +69,7 @@ export const resolver = {
     cluster: (parent, args, { clusterModel }) => clusterModel.getSingleCluster(args),
     clusters: (parent, args, { clusterModel }) => clusterModel.getClusters(args),
     clusterImageSets: (parent, args, { clusterModel }) => clusterModel.getClusterImageSets(),
+    clusterAddons: (parent, args, { clusterModel }) => clusterModel.getClusterAddons(args),
   },
   Mutation: {
     createCluster: async (parent, args, { clusterModel, bareMetalAssetModel }) => {
