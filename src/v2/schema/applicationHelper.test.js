@@ -732,8 +732,8 @@ describe('processDeployables', () => {
   });
 });
 
-describe('addSubscriptionCharts ', () => {
-  it('addSubscriptionCharts ', () => {
+describe('addSubscriptionCharts', () => {
+  it('addSubscriptionCharts', () => {
     const parentId = 'member--clusters--possiblereptile, braveman, sharingpenguin, relievedox';
     const appNamespace = 'open-cluster-management';
     const channelInfo = 'gb-app-latest-ns/guestbook-app-latest';
