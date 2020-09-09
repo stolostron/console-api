@@ -661,7 +661,7 @@ export default class ApplicationModel extends KubeModel {
     });
     return secrets.map((secret) => ({
       name: _.get(secret, 'metadata.name', 'unknown'),
-      data: _.get(secret, 'data', null),
+      namespace: _.get(secret, 'metadata.name', 'unknown'),
     }));
   }
 }

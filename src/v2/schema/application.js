@@ -50,7 +50,7 @@ type Subject {
 
 type Secret {
   name: String
-  data: JSON
+  namespace: String
 }
 
 
