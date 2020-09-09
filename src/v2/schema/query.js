@@ -65,6 +65,9 @@ type Query {
 
   # Get policies.
   policies(name: String, namespace: String, clusterName: String): [Policy]
+ 
+  # Get secrets
+  secrets(namespace: String): [Secret]
 
   # Get all subscription resources. Optionally, specify name and namespace to filter results.
   subscriptions(name: String, namespace: String): [Subscription]
