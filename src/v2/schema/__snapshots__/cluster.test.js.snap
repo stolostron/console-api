@@ -492,7 +492,7 @@ Object {
     "clusterAddons": Array [
       Object {
         "addOnResource": Object {
-          "description": "Processes events and other requests to managed resources.",
+          "description": "application-manager description",
           "group": "agent.open-cluster-management.io",
           "name": "han-test",
           "resource": "klusterletaddonconfigs",
@@ -510,7 +510,7 @@ Object {
       },
       Object {
         "addOnResource": Object {
-          "description": "Monitors certificate expiration based on distributed policies.",
+          "description": "cert-policy-controller description",
           "group": "agent.open-cluster-management.io",
           "name": "han-test",
           "resource": "klusterletaddonconfigs",
@@ -528,7 +528,7 @@ Object {
       },
       Object {
         "addOnResource": Object {
-          "description": "Distributes configured policies and monitors Kubernetes-based policies.",
+          "description": "policy-controller description",
           "group": "agent.open-cluster-management.io",
           "name": "han-test",
           "resource": "klusterletaddonconfigs",
@@ -546,7 +546,7 @@ Object {
       },
       Object {
         "addOnResource": Object {
-          "description": "Collects cluster data to be indexed by search components on the hub cluster.",
+          "description": "search-collector description",
           "group": "agent.open-cluster-management.io",
           "name": "han-test",
           "resource": "klusterletaddonconfigs",
@@ -564,7 +564,7 @@ Object {
       },
       Object {
         "addOnResource": Object {
-          "description": "Component that handles endpoint work requests and managed cluster status.",
+          "description": "work-manager description",
           "group": "agent.open-cluster-management.io",
           "name": "han-test",
           "resource": "klusterletaddonconfigs",

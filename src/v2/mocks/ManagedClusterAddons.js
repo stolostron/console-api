@@ -44,7 +44,7 @@ const mockResponse = {
     spec: {},
     status: {
       addOnConfiguration: { crName: '', crdName: '' },
-      addOnMeta: { description: '', displayName: '' },
+      addOnMeta: { description: 'application-manager description', displayName: '' },
       conditions: [{
         lastTransitionTime: '2020-09-09T18:15:53Z', message: 'Applied ManifestWork', reason: 'ManifestWorkApplied', status: 'False', type: 'Progressing',
       }, {
@@ -91,7 +91,7 @@ const mockResponse = {
     spec: {},
     status: {
       addOnConfiguration: { crName: '', crdName: '' },
-      addOnMeta: { description: '', displayName: '' },
+      addOnMeta: { description: 'cert-policy-controller description', displayName: '' },
       conditions: [{
         lastTransitionTime: '2020-09-09T18:15:53Z', message: 'Applied ManifestWork', reason: 'ManifestWorkApplied', status: 'False', type: 'Progressing',
       }, {
@@ -138,7 +138,7 @@ const mockResponse = {
     spec: {},
     status: {
       addOnConfiguration: { crName: '', crdName: '' },
-      addOnMeta: { description: '', displayName: '' },
+      addOnMeta: { description: 'policy-controller description', displayName: '' },
       conditions: [{
         lastTransitionTime: '2020-09-09T18:15:51Z', message: 'Applied ManifestWork', reason: 'ManifestWorkApplied', status: 'False', type: 'Progressing',
       }, {
@@ -185,7 +185,7 @@ const mockResponse = {
     spec: {},
     status: {
       addOnConfiguration: { crName: '', crdName: '' },
-      addOnMeta: { description: '', displayName: '' },
+      addOnMeta: { description: 'search-collector description', displayName: '' },
       conditions: [{
         lastTransitionTime: '2020-09-09T19:01:51Z', message: 'Applied ManifestWork', reason: 'ManifestWorkApplied', status: 'False', type: 'Progressing',
       }, {
@@ -232,7 +232,7 @@ const mockResponse = {
     spec: {},
     status: {
       addOnConfiguration: { crName: '', crdName: '' },
-      addOnMeta: { description: '', displayName: '' },
+      addOnMeta: { description: 'work-manager description', displayName: '' },
       conditions: [{
         lastTransitionTime: '2020-09-09T18:15:50Z', message: 'Applied ManifestWork', reason: 'ManifestWorkApplied', status: 'False', type: 'Progressing',
       }, {
