@@ -825,6 +825,18 @@ export default class ClusterModel extends KubeModel {
         throw err;
       });
 
+    if (responseHasError(clusterManagementAddons) && clusterManagementAddons.code !== 403) {
+      const { details, code, message } = clusterManagementAddons;
+      throw new Error(`Error fetching ${details.kind}: ${code} - ${message}`);
+    }
+    if (responseHasError(managedClusterAddons)) {
+      const { details, code, message } = managedClusterAddons;
+      throw new Error(`Error fetching ${details.kind}: ${code} - ${message}`);
+    }
+
+    clusterManagementAddons.items = clusterManagementAddons.items || [];
+    managedClusterAddons.items = managedClusterAddons.items || [];
+
     managedClusterAddons = managedClusterAddons.items.map((addon) => {
       const { metadata, status: { conditions, relatedObjects } } = addon;
       const crd = _.get(relatedObjects, '[0]', {});
