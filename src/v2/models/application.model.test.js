@@ -110,7 +110,7 @@ describe('getChannelName', () => {
 });
 
 describe('getSubscriptionsDeployables', () => {
-  it('should match getSubscriptionsDeployables ', () => {
+  it('should match getSubscriptionsDeployables', () => {
     const allSubscriptions = [
       {
         apiVersion: 'apps.open-cluster-management.io/v1',
@@ -230,7 +230,7 @@ describe('getSubscriptionsDeployables one chunck', () => {
 });
 
 describe('getSubscriptionsDeployables more than 20 deployables', () => {
-  it('should match getSubscriptionsDeployables ', () => {
+  it('should match getSubscriptionsDeployables', () => {
     const allSubscriptions = [
       {
         apiVersion: 'apps.open-cluster-management.io/v1',
@@ -551,7 +551,7 @@ describe('buildDeployablesMap', () => {
   });
 });
 
-describe('filterByName ', () => {
+describe('filterByName', () => {
   it('filterByNameName', () => {
     const names = ['aaa', 'bbb'];
     const items = [
@@ -579,7 +579,7 @@ describe('filterByName ', () => {
   });
 });
 
-describe('filterByNameNamespace ', () => {
+describe('filterByNameNamespace', () => {
   it('filterByNameNamespace', () => {
     const names = ['aaa', 'bbb'];
     const items = [
