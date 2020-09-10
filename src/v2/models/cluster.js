@@ -825,8 +825,17 @@ export default class ClusterModel extends KubeModel {
         throw err;
       });
 
+    if (responseHasError(clusterManagementAddons) && clusterManagementAddons.code !== 403) {
+      const { details, code, message } = clusterManagementAddons;
+      throw new Error(`Error fetching ${details.kind}: ${code} - ${message}`);
+    }
+    if (responseHasError(managedClusterAddons)) {
+      const { details, code, message } = managedClusterAddons;
+      throw new Error(`Error fetching ${details.kind}: ${code} - ${message}`);
+    }
+
     managedClusterAddons = managedClusterAddons.items.map((addon) => {
-      const { metadata, status: { conditions, relatedObjects } } = addon;
+      const { metadata, status: { conditions, relatedObjects, addOnMeta } } = addon;
       const crd = _.get(relatedObjects, '[0]', {});
 
       // Order of precedence:
@@ -845,30 +854,32 @@ export default class ClusterModel extends KubeModel {
         isNotAvailable.type = 'Unavailable';
       }
       const status = isDegraded || isProgressing || isAvailable || allFalseCondition || isNotAvailable || { type: 'Unknown' };
-      const matchedCMA = clusterManagementAddons.items.find((cma) => _.get(cma, 'metadata.name', '') === metadata.name) || {};
-      const description = _.get(matchedCMA, 'spec.addOnMeta.description', '');
+      const description = _.get(addOnMeta, 'description', '');
       return { metadata, status, addOnResource: { ...crd, description } };
     });
 
     // Check for ClusterManagementAddons that are not configured for this cluster
     // If not enabled construct an object to send back to the UI
-    clusterManagementAddons.items.forEach((cma) => {
-      const addOnConfigCRD = _.get(cma, 'spec.addOnConfiguration.crdName', '');
-      const addOnName = _.get(cma, 'metadata.name', '');
-      const hasAddon = !!managedClusterAddons.find(({ metadata }) => metadata.name === addOnName);
-      if (!hasAddon) {
-        const resource = addOnConfigCRD.slice(0, addOnConfigCRD.indexOf('.'));
-        const group = addOnConfigCRD.slice(addOnConfigCRD.indexOf('.'));
-        const addOnObj = {
-          metadata: { name: cma.metadata.name, namespace },
-          addOnResource: {
-            name: '', group, resource, description: _.get(cma, 'spec.addOnMeta.description', ''),
-          },
-          status: { type: 'Disabled' },
-        };
-        managedClusterAddons.push(addOnObj);
-      }
-    });
+    if (clusterManagementAddons.items) {
+      clusterManagementAddons.items.forEach((cma) => {
+        const addOnConfigCRD = _.get(cma, 'spec.addOnConfiguration.crdName', '');
+        const addOnName = _.get(cma, 'metadata.name', '');
+        const hasAddon = !!managedClusterAddons.find(({ metadata }) => metadata.name === addOnName);
+        if (!hasAddon) {
+          const resource = addOnConfigCRD.slice(0, addOnConfigCRD.indexOf('.'));
+          const group = addOnConfigCRD.slice(addOnConfigCRD.indexOf('.'));
+          const addOnObj = {
+            metadata: { name: cma.metadata.name, namespace },
+            addOnResource: {
+              name: '', group, resource, description: _.get(cma, 'spec.addOnMeta.description', ''),
+            },
+            status: { type: 'Disabled' },
+          };
+          managedClusterAddons.push(addOnObj);
+        }
+      });
+    }
+
     return managedClusterAddons;
   }
 }

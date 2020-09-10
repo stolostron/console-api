@@ -659,10 +659,10 @@ export default class ApplicationModel extends KubeModel {
       logger.error(err);
       throw err;
     });
-    return secrets.filter((secret) => secret.metadata && _.get(secret, 'data.host')  && _.get(secret, 'data.token'))
-    .map((secret) => ({
-      name: _.get(secret, 'metadata.name', 'unknown'),
-      namespace: _.get(secret, 'metadata.name', 'unknown'),
-    }));
+    return secrets.filter((secret) => secret.metadata && _.get(secret, 'data.host') && _.get(secret, 'data.token'))
+      .map((secret) => ({
+        name: _.get(secret, 'metadata.name', 'unknown'),
+        namespace: _.get(secret, 'metadata.name', 'unknown'),
+      }));
   }
 }
