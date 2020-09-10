@@ -838,7 +838,7 @@ export default class ClusterModel extends KubeModel {
     managedClusterAddons.items = managedClusterAddons.items || [];
 
     managedClusterAddons = managedClusterAddons.items.map((addon) => {
-      const { metadata, status: { conditions, relatedObjects } } = addon;
+      const { metadata, status: { conditions, relatedObjects, addOnMeta } } = addon;
       const crd = _.get(relatedObjects, '[0]', {});
 
       // Order of precedence:
@@ -857,8 +857,7 @@ export default class ClusterModel extends KubeModel {
         isNotAvailable.type = 'Unavailable';
       }
       const status = isDegraded || isProgressing || isAvailable || allFalseCondition || isNotAvailable || { type: 'Unknown' };
-      const matchedCMA = clusterManagementAddons.items.find((cma) => _.get(cma, 'metadata.name', '') === metadata.name) || {};
-      const description = _.get(matchedCMA, 'spec.addOnMeta.description', '');
+      const description = _.get(addOnMeta, 'description', '');
       return { metadata, status, addOnResource: { ...crd, description } };
     });
 
