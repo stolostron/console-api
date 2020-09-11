@@ -43,7 +43,7 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
     nodes.push({
       name,
       namespace,
-      type: 'rules',
+      type: 'placements',
       id: ruleId,
       uid: ruleId,
       specs: { isDesign: true, raw: rule },
@@ -51,7 +51,7 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
     links.push({
       from: { uid: parentId },
       to: { uid: ruleId },
-      type: 'uses',
+      type: 'rules',
       specs: { isDesign: true },
     });
   });
@@ -618,8 +618,8 @@ async function getApplicationElements(application, clusterModel) {
       delete subscription.deployables;
     });
 
-  // if application has deployables
-  // (unsubscribed--possibly a template)
+    // if application has deployables
+    // (unsubscribed--possibly a template)
   } else if (application.deployables) {
     application.deployables.forEach((deployable) => {
       ({ name, namespace } = _.get(deployable, 'metadata'));
