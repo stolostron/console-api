@@ -11,6 +11,7 @@
 import _ from 'lodash';
 
 const templateKind = 'spec.template.kind';
+const localClusterName = 'local-cluster'
 
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
@@ -93,10 +94,18 @@ export const addClusters = (
 };
 
 const getClusterName = (nodeId) => {
-  const startPos = nodeId.indexOf('--clusters--') + 12;
-  const endPos = nodeId.indexOf('--', startPos);
+  if (nodeId === undefined) {
+    return ''
+  }
+  const clusterIndex = nodeId.indexOf('--clusters--')
+  if (clusterIndex !== -1) {
+    const startPos = nodeId.indexOf('--clusters--') + 12
+    const endPos = nodeId.indexOf('--', startPos)
+    return nodeId.slice(startPos, endPos)
+  }
 
-  return nodeId.slice(startPos, endPos);
+  //node must be deployed locally on hub, such as ansible jobs
+  return localClusterName
 };
 
 export const createReplicaChild = (parentObject, template, links, nodes) => {
@@ -530,8 +539,8 @@ async function getApplicationElements(application, clusterModel) {
   });
 
   // get clusters labels
-  const clusters = await clusterModel.getAllClusters();
-
+  let clusters = await clusterModel.getAllClusters();
+  
   // if application has subscriptions
   let memberId;
   let parentId;
@@ -553,6 +562,22 @@ async function getApplicationElements(application, clusterModel) {
             });
           }
         });
+      }
+
+      //check for local placement subscription and add local cluster to list of clusters
+      if(_.get(subscription, 'spec.placement.local', '') === true
+         && subscription.rules
+         && _.includes(clusters, localClusterName) === false) {
+        
+        const localCluster = {
+          metadata: {
+            name : localClusterName,
+            namespace: localClusterName
+          }
+
+        }
+        clusters = _.concat(clusters, localCluster)
+        ruleDecisionMap[localClusterName] = localClusterName
       }
 
       const ruleClusterNames = Object.keys(ruleDecisionMap);
