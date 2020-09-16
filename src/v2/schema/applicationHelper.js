@@ -538,7 +538,6 @@ async function getApplicationElements(application, clusterModel) {
 
   // get clusters labels
   let clusters = await clusterModel.getAllClusters();
-  
   // if application has subscriptions
   let memberId;
   let parentId;
@@ -561,8 +560,7 @@ async function getApplicationElements(application, clusterModel) {
           }
         });
       }
-
-      //check for local placement subscription and add local cluster to list of clusters
+      
       if (_.get(subscription, 'spec.placement.local', '') === true && subscription.rules && _.includes(clusters, localClusterName) === false) {       
         const localCluster = {
           metadata: {
