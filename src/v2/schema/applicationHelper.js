@@ -560,11 +560,10 @@ async function getApplicationElements(application, clusterModel) {
           }
         });
       }
-      
-      if (_.get(subscription, 'spec.placement.local', '') === true && subscription.rules && _.includes(clusters, localClusterName) === false) {       
+      if (_.get(subscription, 'spec.placement.local', '') === true && subscription.rules && _.includes(clusters, localClusterName) === false) {      
         const localCluster = {
           metadata: {
-            name : localClusterName,
+            name: localClusterName,
             namespace: localClusterName
           }
         };
