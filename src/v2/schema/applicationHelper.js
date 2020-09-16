@@ -104,7 +104,7 @@ const getClusterName = (nodeId) => {
     return nodeId.slice(startPos, endPos);
   }
 
-  //node must be deployed locally on hub, such as ansible jobs
+  //node must be deployed locally on hub, such as ansible jobs 
   return localClusterName;
 };
 
