@@ -103,8 +103,6 @@ const getClusterName = (nodeId) => {
     const endPos = nodeId.indexOf('--', startPos);
     return nodeId.slice(startPos, endPos);
   }
-
-  //node must be deployed locally on hub, such as ansible jobs 
   return localClusterName;
 };
 
@@ -565,19 +563,15 @@ async function getApplicationElements(application, clusterModel) {
       }
 
       //check for local placement subscription and add local cluster to list of clusters
-      if(_.get(subscription, 'spec.placement.local', '') === true
-         && subscription.rules
-         && _.includes(clusters, localClusterName) === false) {
-        
+      if (_.get(subscription, 'spec.placement.local', '') === true && subscription.rules && _.includes(clusters, localClusterName) === false) {       
         const localCluster = {
           metadata: {
             name : localClusterName,
             namespace: localClusterName
           }
-
-        }
-        clusters = _.concat(clusters, localCluster)
-        ruleDecisionMap[localClusterName] = localClusterName
+        };
+        clusters = _.concat(clusters, localCluster);
+        ruleDecisionMap[localClusterName] = localClusterName;
       }
 
       const ruleClusterNames = Object.keys(ruleDecisionMap);
