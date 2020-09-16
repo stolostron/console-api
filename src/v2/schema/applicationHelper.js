@@ -11,7 +11,7 @@
 import _ from 'lodash';
 
 const templateKind = 'spec.template.kind';
-const localClusterName = 'local-cluster'
+const localClusterName = 'local-cluster';
 
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
@@ -95,17 +95,17 @@ export const addClusters = (
 
 const getClusterName = (nodeId) => {
   if (nodeId === undefined) {
-    return ''
+    return '';
   }
-  const clusterIndex = nodeId.indexOf('--clusters--')
+  const clusterIndex = nodeId.indexOf('--clusters--');
   if (clusterIndex !== -1) {
-    const startPos = nodeId.indexOf('--clusters--') + 12
-    const endPos = nodeId.indexOf('--', startPos)
-    return nodeId.slice(startPos, endPos)
+    const startPos = nodeId.indexOf('--clusters--') + 12;
+    const endPos = nodeId.indexOf('--', startPos);
+    return nodeId.slice(startPos, endPos);
   }
 
   //node must be deployed locally on hub, such as ansible jobs
-  return localClusterName
+  return localClusterName;
 };
 
 export const createReplicaChild = (parentObject, template, links, nodes) => {
