@@ -13,9 +13,25 @@ import _ from 'lodash';
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 
+export const isPrePostHookDeployable = (subscription, name, namespace) => {
+
+  const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
+  const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
+
+  const objectIdentity = `${namespace}/${name}`;
+  if(_.indexOf(preHooks, objectIdentity) !== -1) {   
+    return 'pre-hook';
+  }
+  if(_.indexOf(postHooks, objectIdentity) !== -1) {
+    return 'post-hook';
+  }
+
+  return null;
+};
+
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
-  const subscriptionId = `member--subscription--${namespace}--${name}`; 
+  const subscriptionId = `member--subscription--${namespace}--${name}`;
   const rule = _.get(subscription, 'rules[0]');
   nodes.push({
     name,
@@ -162,8 +178,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription
-) => {
+  subscriptionStatusMap, names, appNamespace, subscription,) => {
 
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
@@ -437,22 +452,6 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   });
   return deployablesList;
 };
-
-export const isPrePostHookDeployable = (subscription, name, namespace) => {
-
-  const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
-  const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
-
-  const objectIdentity = `${namespace}/${name}`;
-  if(_.indexOf(preHooks, objectIdentity) !== -1) {   
-    return 'pre-hook';
-  }
-  if(_.indexOf(postHooks, objectIdentity) !== -1) {
-    return 'post-hook';
-  }
-
-  return null;
-}
 
 export const createDeployableObject = (subscription, name, namespace, type, specData, parentId, nodes, links, linkName) => {
 
