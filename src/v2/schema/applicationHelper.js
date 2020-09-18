@@ -13,6 +13,7 @@ import _ from 'lodash';
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 
+
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
 
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
