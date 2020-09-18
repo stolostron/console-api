@@ -13,6 +13,19 @@ import _ from 'lodash';
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 
+export const isPrePostHookDeployable = (subscription, name, namespace) => {
+  const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
+  const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
+  const objectIdentity = `${namespace}/${name}`;
+  if (_.indexOf(preHooks, objectIdentity) !== -1) {
+    return 'pre-hook';
+  }
+  if (_.indexOf(postHooks, objectIdentity) !== -1) {
+    return 'post-hook';
+  }
+  return null;
+};
+
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
@@ -52,7 +65,7 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
     links.push({
       from: { uid: parentId },
       to: { uid: ruleId },
-      type: 'rules',
+      type: '',
       specs: { isDesign: true },
     });
   });
@@ -162,10 +175,14 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace,
-) => {
+  subscriptionStatusMap, names, appNamespace, subscription,) => {
+
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
+  let linkType = isPrePostHookDeployable(subscription, name, namespace)
+  if(linkType === null) {
+    linkType = '';
+  }
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
   // installs these K8 objects
@@ -208,11 +225,21 @@ export const addSubscriptionDeployable = (
   };
 
   nodes.push(topoObject);
-  links.push({
-    from: { uid: parentId },
-    to: { uid: memberId },
-    type: '',
-  });
+  if (linkType === 'pre-hook') {
+    const subscriptionUid = `member--subscription--${_.get(subscription, 'metadata.namespace','')}--${_.get(subscription, 'metadata.name','')}`;
+    links.push({
+      from: { uid: memberId },
+      to: { uid: subscriptionUid },
+      type: linkType,
+    });    
+  }
+  else {
+    links.push({
+      from: { uid: parentId },
+      to: { uid: memberId },
+      type: linkType,
+    });
+  }
 
   // create subobject replica subobject, if this object defines a replicas
   createReplicaChild(topoObject, template, links, nodes);
@@ -223,13 +250,13 @@ export const addSubscriptionDeployable = (
 // Route, Ingress, StatefulSet
 export const processServiceOwner = (
   clusterId, routes, links, nodes,
-  subscriptionStatusMap, names, namespace,
+  subscriptionStatusMap, names, namespace, subscription
 ) => {
   const servicesMap = {};
   routes.forEach((deployable) => {
     const topoObject = addSubscriptionDeployable(
       clusterId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace,
+      subscriptionStatusMap, names, namespace, subscription
     );
 
     // get service info and map it to the object id
@@ -266,7 +293,7 @@ export const processServiceOwner = (
 
 export const processServices = (
   clusterId, services, links, nodes,
-  subscriptionStatusMap, names, namespace, servicesMap,
+  subscriptionStatusMap, names, namespace, servicesMap,subscription
 ) => {
   services.forEach((deployable) => {
     const serviceName = _.get(deployable, 'spec.template.metadata.name', '');
@@ -277,14 +304,14 @@ export const processServices = (
 
     addSubscriptionDeployable(
       parentId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace,
+      subscriptionStatusMap, names, namespace, subscription
     );
   });
 };
 
 export const processDeployables = (
   deployables,
-  clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+  clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription
 ) => {
   const routes = _.filter(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
@@ -294,7 +321,7 @@ export const processDeployables = (
   // process route and ingress first
   const serviceMap = processServiceOwner(
     clusterId, routes, links, nodes,
-    subscriptionStatusMap, names, namespace,
+    subscriptionStatusMap, names, namespace,subscription
   );
 
   const services = _.filter(deployables, (obj) => {
@@ -305,7 +332,7 @@ export const processDeployables = (
   // then service
   processServices(
     clusterId, services, links, nodes,
-    subscriptionStatusMap, names, namespace, serviceMap,
+    subscriptionStatusMap, names, namespace, serviceMap, subscription
   );
 
   // then the rest
@@ -317,7 +344,7 @@ export const processDeployables = (
   other.forEach((deployable) => {
     addSubscriptionDeployable(
       clusterId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace,
+      subscriptionStatusMap, names, namespace, subscription
     );
   });
 };
@@ -423,16 +450,61 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   return deployablesList;
 };
 
+export const createDeployableObject = (subscription, name, namespace, type, specData, parentId, nodes, links, linkName) => {
+  let linkType = isPrePostHookDeployable(subscription, name, namespace);
+  if (linkType === null) {
+    linkType = linkName;
+  }
+  const objId = `member--deployable--${parentId}--${type.toLowerCase()}--${name}`;
+  const newObject = {
+    id: objId,
+    uid: objId,
+    name: name,
+    namespace: namespace,
+    type: type.toLowerCase(),
+    specs: {
+      isDesign: false,
+      raw: {
+        kind: type,
+        metadata: {
+          name: name,
+          namespace: namespace,
+        },
+        spec: specData,
+      },
+    },
+
+  };
+  nodes.push(newObject);
+  if (linkType === 'pre-hook') {
+    const subscriptionUid = `member--subscription--${_.get(subscription, 'metadata.namespace','')}--${_.get(subscription, 'metadata.name','')}`;
+    links.push({
+      from: { uid: objId },
+      to: { uid: subscriptionUid },
+      type: linkType,
+    });
+  } else {
+    links.push({
+      from: { uid: parentId },
+      to: { uid: objId },
+      type: linkType,
+    });
+  }
+
+  return newObject;
+
+}
+
 export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
   nodes, links, names, appNamespace, channelInfo, subscriptionName,
-  topoAnnotation,
+  topoAnnotation, subscription
 ) => {
   if (topoAnnotation) {
     const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo);
     processDeployables(
       deployablesFromTopo,
-      parentId, links, nodes, subscriptionStatusMap, names, appNamespace,
+      parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription
     );
     return nodes;
   }
@@ -468,33 +540,7 @@ export const addSubscriptionCharts = (
             const keyStr = `${objectName}-${objectType}`;
 
             if (!packagedObjects[keyStr]) {
-              const objId = `member--deployable--${parentId}--${objectType.toLowerCase()}--${objectName}`;
-
-              const chartObject = {
-                id: objId,
-                uid: objId,
-                name: objectName,
-                namespace: appNamespace,
-                type: objectType.toLowerCase(),
-                specs: {
-                  isDesign: false,
-                  raw: {
-                    kind: objectType,
-                    metadata: {
-                      name: objectName,
-                      namespace: appNamespace,
-                    },
-                    spec: _.get(packageItem[packageItemKey], 'resourceStatus'),
-                  },
-                },
-
-              };
-              nodes.push(chartObject);
-              links.push({
-                from: { uid: parentId },
-                to: { uid: objId },
-                type: 'package',
-              });
+              const chartObject = createDeployableObject(subscription, objectName, appNamespace, objectType, _.get(packageItem[packageItemKey], 'resourceStatus'), parentId, nodes, links, '')
               // create subobject replica subobject, if this object defines a replicas
               createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
 
@@ -611,14 +657,14 @@ async function getApplicationElements(application, clusterModel) {
 
             processDeployables(
               subscription.deployables,
-              clusterId, links, nodes, subscriptionStatusMap, names, namespace,
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace,subscription
             );
           }
 
           if (topoAnnotation) {
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
+              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
             );
           }
         });
@@ -628,7 +674,7 @@ async function getApplicationElements(application, clusterModel) {
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
           parentId, subscriptionStatusMap, nodes,
-          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation,
+          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
         );
       }
       delete subscription.deployables;
