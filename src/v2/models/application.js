@@ -498,7 +498,14 @@ export default class ApplicationModel extends KubeModel {
         || _.get(app, 'metadata.annotations["app.ibm.com/subscriptions/deployables"]');
       if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
-        const allSubscriptions = await this.getApplicationResources(subscriptionNames, 'subscriptions', 'Subscription');
+        // filter local hub subscription
+        const filteredSubscriptions = [];
+        subscriptionNames.forEach((subscriptionName) => {
+          if (!(_.endsWith(subscriptionName, '-local') && _.indexOf(subscriptionNames, _.replace(subscriptionName, '-local', '')) !== -1)) {
+            filteredSubscriptions.push(subscriptionName);
+          }
+        });
+        const allSubscriptions = await this.getApplicationResources(filteredSubscriptions, 'subscriptions', 'Subscription');
 
         // get deployables from the subscription annotation
         const { subscriptions, allowAllChannel } = getSubscriptionsDeployables(allSubscriptions);
