@@ -12,6 +12,8 @@ import _ from 'lodash';
 
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
+const metadataName = 'metadata.name';
+const metadataNamespace = 'metadata.namespace';
 
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
@@ -80,7 +82,7 @@ export const addClusters = (
   const clusterId = `member--clusters--${cns}`;
   if (!createdClusterElements.has(clusterId)) {
     const filteredClusters = clusters.filter((cluster) => {
-      const cname = _.get(cluster, 'metadata.name');
+      const cname = _.get(cluster, metadataName);
       return cname && clusterNames.includes(cname);
     });
     nodes.push({
@@ -226,12 +228,12 @@ export const addSubscriptionDeployable = (
 
   nodes.push(topoObject);
   if (linkType === 'pre-hook') {
-    const subscriptionUid = `member--subscription--${_.get(subscription, 'metadata.namespace','')}--${_.get(subscription, 'metadata.name','')}`;
+    const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
     links.push({
       from: { uid: memberId },
       to: { uid: subscriptionUid },
       type: linkType,
-    });    
+    });
   }
   else {
     links.push({
@@ -477,7 +479,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   };
   nodes.push(newObject);
   if (linkType === 'pre-hook') {
-    const subscriptionUid = `member--subscription--${_.get(subscription, 'metadata.namespace','')}--${_.get(subscription, 'metadata.name','')}`;
+    const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
     links.push({
       from: { uid: objId },
       to: { uid: subscriptionUid },
@@ -536,11 +538,10 @@ export const addSubscriptionCharts = (
           if (splitIndex !== -1) {
             objectName = objectInfo.substring(splitIndex + 1);
             objectType = objectInfo.substring(0, splitIndex);
-
             const keyStr = `${objectName}-${objectType}`;
-
             if (!packagedObjects[keyStr]) {
-              const chartObject = createDeployableObject(subscription, objectName, appNamespace, objectType, _.get(packageItem[packageItemKey], 'resourceStatus'), parentId, nodes, links, '')
+              const resStatus = _.get(packageItem[packageItemKey], 'resourceStatus');
+              const chartObject = createDeployableObject(subscription, objectName, appNamespace, objectType, resStatus, parentId, nodes, links, '');
               // create subobject replica subobject, if this object defines a replicas
               createReplicaChild(chartObject, chartObject.specs.raw, links, nodes);
 
