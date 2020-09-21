@@ -177,14 +177,14 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription,) => {
+  subscriptionStatusMap, names, appNamespace, subscription) => {
 
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
-  let linkType = isPrePostHookDeployable(subscription, name, namespace)
+  let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if(linkType === null) {
     linkType = '';
-  }
+  };
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
   // installs these K8 objects
@@ -196,7 +196,7 @@ export const addSubscriptionDeployable = (
         deployStatuses.push(status);
       }
     });
-  }
+  };
 
   const parentNode = nodes.find((n) => n.id === parentId);
   const parentObject = parentNode
