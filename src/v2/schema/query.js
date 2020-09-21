@@ -148,6 +148,9 @@ type Mutation {
   # Updates the labels of a Kubernetes resource.
   updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
+  # Updates an Application.
+  updateApplication(application: [JSON]!): JSON
+
   # Delete helm release on specific cluster. Used by catalog.
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
