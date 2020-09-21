@@ -177,11 +177,11 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription,) => {
+  subscriptionStatusMap, names, appNamespace, subscription) => {
 
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
-  let linkType = isPrePostHookDeployable(subscription, name, namespace)
+  let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if(linkType === null) {
     linkType = '';
   }
@@ -227,11 +227,17 @@ export const addSubscriptionDeployable = (
   };
 
   nodes.push(topoObject);
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
   if (linkType === 'pre-hook') {
-    const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
     links.push({
       from: { uid: memberId },
       to: { uid: subscriptionUid },
+      type: linkType,
+    });
+  } else if (linkType === 'post-hook') {
+    links.push({
+      from: { uid: subscriptionUid },
+      to: { uid:  memberId},
       type: linkType,
     });
   }
@@ -401,7 +407,7 @@ export const removeHelmReleaseName = (name, releaseName) => {
   return result;
 };
 
-export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo) => {
+export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription) => {
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
@@ -409,44 +415,55 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
 
-    if (deployableData.length === 6 && deployableData[0] === 'helmchart') { // process only helm charts
-      const deployableTypeLower = _.toLower(deployableData[2]);
-      const dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+    if (deployableData.length === 6) {
+      let dName = deployableData[4];
 
-      const namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
-      const deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
-      const version = 'apps.open-cluster-management.io/v1';
-      const hasReplica = deployableData[5] !== '0';
-      const deployable = {
-        apiVersion: version,
-        kind: 'Deployable',
-        metadata: {
-          namespace,
-          name: deployableName,
-          selfLink: `/apis/${version}/namespaces/${deployableData[3]}/deployables/${dName}-${deployableTypeLower}`,
-        },
-        spec: {
-          template: {
-            apiVersion: 'apps/v1',
-            kind: deployableData[2],
-            metadata: {
-              namespace,
-              name: dName,
-            },
-            spec: {
+      let namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
+      let deployableName = deployableData[4];
+      const deployableTypeLower = _.toLower(deployableData[2]);
+
+      const isHook = isPrePostHookDeployable(subscription, dName, namespace)
+      // process only helm charts and hooks
+      if(deployableData[0] === 'helmchart' || isHook) {
+
+        if(!isHook) {
+          dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+          namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
+          deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
+        }
+        const version = 'apps.open-cluster-management.io/v1';
+        const hasReplica = deployableData[5] !== '0';
+        const deployable = {
+          apiVersion: version,
+          kind: 'Deployable',
+          metadata: {
+            namespace,
+            name: deployableName,
+            selfLink: `/apis/${version}/namespaces/${deployableData[3]}/deployables/${dName}-${deployableTypeLower}`,
+          },
+          spec: {
+            template: {
+              apiVersion: 'apps/v1',
+              kind: deployableData[2],
+              metadata: {
+                namespace,
+                name: dName,
+              },
+              spec: {
+              },
             },
           },
-        },
-      };
+        };
 
-      if (hasReplica) {
-        deployable.spec.template.spec.replicas = _.parseInt(deployableData[5]);
-      }
+        if (hasReplica) {
+          deployable.spec.template.spec.replicas = _.parseInt(deployableData[5]);
+        }
 
-      if (deployableTypeLower === 'helmrelease') {
-        deployable.spec.template.spec.channel = channelInfo;
+        if (deployableTypeLower === 'helmrelease') {
+          deployable.spec.template.spec.channel = channelInfo;
+        }
+        deployablesList.push(deployable);
       }
-      deployablesList.push(deployable);
     }
   });
   return deployablesList;
@@ -478,11 +495,17 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
 
   };
   nodes.push(newObject);
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
   if (linkType === 'pre-hook') {
-    const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
     links.push({
       from: { uid: objId },
       to: { uid: subscriptionUid },
+      type: linkType,
+    });
+  } else if (linkType === 'post-hook') {
+    links.push({
+      from: { uid: subscriptionUid },
+      to: { uid: objId},
       type: linkType,
     });
   } else {
@@ -503,7 +526,7 @@ export const addSubscriptionCharts = (
   topoAnnotation, subscription
 ) => {
   if (topoAnnotation) {
-    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo);
+    const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription);
     processDeployables(
       deployablesFromTopo,
       parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription
