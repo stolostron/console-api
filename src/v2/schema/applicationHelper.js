@@ -184,7 +184,7 @@ export const addSubscriptionDeployable = (
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if(linkType === null) {
     linkType = '';
-  };
+  }
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
   // installs these K8 objects
@@ -196,7 +196,7 @@ export const addSubscriptionDeployable = (
         deployStatuses.push(status);
       }
     });
-  };
+  }
 
   const parentNode = nodes.find((n) => n.id === parentId);
   const parentObject = parentNode
@@ -415,8 +415,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
 
-    if (deployableData.length === 6) { 
-
+    if (deployableData.length === 6) {
       let dName = deployableData[4];
 
       let namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
@@ -424,16 +423,14 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       const deployableTypeLower = _.toLower(deployableData[2]);
 
       const isHook = isPrePostHookDeployable(subscription, dName, namespace)
- 
       // process only helm charts and hooks
       if(deployableData[0] === 'helmchart' || isHook) {
 
         if(!isHook) {
           dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
-          deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;   
-        }
-      
+          deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
+        }     
         const version = 'apps.open-cluster-management.io/v1';
         const hasReplica = deployableData[5] !== '0';
         const deployable = {
