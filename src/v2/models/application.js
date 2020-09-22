@@ -221,7 +221,27 @@ export default class ApplicationModel extends KubeModel {
   // ///////////// CREATE APPLICATION ////////////////
 
   async createApplication(args) {
-    let { application: resources } = args;
+    const { application } = args;
+    const response = await this.mutateApplication(application, true);
+    return response;
+  }
+
+  // ///////////// UPDATE APPLICATION ////////////////
+  // ///////////// UPDATE APPLICATION ////////////////
+  // ///////////// UPDATE APPLICATION ////////////////
+
+  async updateApplication(args) {
+    const { application } = args;
+    const response = await this.mutateApplication(application, false);
+    return response;
+  }
+
+  // ///////////// UPDATE APPLICATION ////////////////
+  // ///////////// UPDATE APPLICATION ////////////////
+  // ///////////// UPDATE APPLICATION ////////////////
+
+  async mutateApplication(application, isCreate) {
+    let resources = application;
     const created = [];
     const updated = [];
     const errors = [];
@@ -291,19 +311,21 @@ export default class ApplicationModel extends KubeModel {
       return { errors };
     }
 
-    // try to create all resouces EXCEPT ClusterDeployment
-    // we don't want to create ClusterDeployment until all the other resources successfully created
-    // because we check if the ClusterDeployment exists in this namespace
+    // if isCreate, try to create all resouces EXCEPT Application
+    // we don't want to create Application until all the other resources successfully created/updated
+    // if update, update the application too
     let applicationResource;
     let applicationRequestPath;
-    resources = resources.filter((resource, index) => {
-      if (resource.kind === 'Application') {
-        applicationResource = resource;
-        ([applicationRequestPath] = requestPaths.splice(index, 1));
-        return false;
-      }
-      return true;
-    });
+    if (isCreate) {
+      resources = resources.filter((resource, index) => {
+        if (resource.kind === 'Application') {
+          applicationResource = resource;
+          ([applicationRequestPath] = requestPaths.splice(index, 1));
+          return false;
+        }
+        return true;
+      });
+    }
 
     // if there's a namespace, try to create it
     if (namespaces.length === 0) {
@@ -380,8 +402,8 @@ export default class ApplicationModel extends KubeModel {
       });
     }
 
-    if (errors.length === 0) {
-      // last but not least, if everything else deployed, deploy Application
+    // if isCreate and everything else created/updated, deploy Application
+    if (isCreate && errors.length === 0) {
       const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
         .catch((err) => ({
           status: 'Failure',

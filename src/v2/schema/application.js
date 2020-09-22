@@ -65,5 +65,6 @@ export const resolver = {
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args),
+    updateApplication: (root, args, { applicationModel }) => applicationModel.updateApplication(args),
   },
 };
