@@ -529,7 +529,7 @@ export const addSubscriptionCharts = (
     const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription);
     processDeployables(
       deployablesFromTopo,
-      parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription
+      parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription,
     );
     return nodes;
   }
@@ -681,14 +681,14 @@ async function getApplicationElements(application, clusterModel) {
 
             processDeployables(
               subscription.deployables,
-              clusterId, links, nodes, subscriptionStatusMap, names, namespace,subscription
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription,
             );
           }
 
           if (topoAnnotation) {
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
+              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
             );
           }
         });
@@ -698,7 +698,7 @@ async function getApplicationElements(application, clusterModel) {
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
           parentId, subscriptionStatusMap, nodes,
-          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
+          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
         );
       }
       delete subscription.deployables;
