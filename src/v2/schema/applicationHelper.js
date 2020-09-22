@@ -518,7 +518,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
 
   return newObject;
 
-}
+};
 
 export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
