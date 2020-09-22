@@ -177,14 +177,14 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentIdInit, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription) => {
-
+  subscriptionStatusMap, names, appNamespace, subscription
+) => {
   // deployable shape
   const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
   let parentId = parentIdInit;
   const { name, namespace } = _.get(deployable, 'metadata');
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
-  if(linkType === null) {
+  if (linkType === null) {
     linkType = '';
   } else {
     parentId = subscriptionUid;
@@ -240,7 +240,7 @@ export const addSubscriptionDeployable = (
   } else if (linkType === 'post-hook') {
     links.push({
       from: { uid: subscriptionUid },
-      to: { uid:  memberId},
+      to: { uid: memberId},
       type: linkType,
     });
   }
