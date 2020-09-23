@@ -14,16 +14,19 @@ const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 const metadataName = 'metadata.name';
 const metadataNamespace = 'metadata.namespace';
+const preHookType = 'pre-hook';
+const postHookType = 'post-hook';
+
 
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
   const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
   const objectIdentity = `${namespace}/${name}`;
   if (_.indexOf(preHooks, objectIdentity) !== -1) {
-    return 'pre-hook';
+    return preHookType;
   }
   if (_.indexOf(postHooks, objectIdentity) !== -1) {
-    return 'post-hook';
+    return postHookType;
   }
   return null;
 };
@@ -188,6 +191,13 @@ export const addSubscriptionDeployable = (
     linkType = '';
   } else {
     parentId = subscriptionUid;
+    const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
+    hookList.forEach(hook => {
+      if(_.get(hook, 'metadata.name', '') === name && _.get(hook, 'metadata.namespace', '') === namespace) {
+        deployable.spec.template.spec = hook.status;
+        return;
+      }
+    }); 
   }
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -231,13 +241,13 @@ export const addSubscriptionDeployable = (
   };
 
   nodes.push(topoObject);
-  if (linkType === 'pre-hook') {
+  if (linkType === preHookType) {
     links.push({
       from: { uid: memberId },
       to: { uid: subscriptionUid },
       type: linkType,
     });
-  } else if (linkType === 'post-hook') {
+  } else if (linkType === postHookType) {
     links.push({
       from: { uid: subscriptionUid },
       to: { uid: memberId },
@@ -479,7 +489,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   }
   let parentId = parentIdInit;
   const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  if (linkType === 'pre-hook' || linkType === 'post-hook') {
+  if (linkType === preHookType || linkType === postHookType) {
     parentId = subscriptionUid;
   }
   const objId = `member--deployable--${parentId}--${type.toLowerCase()}--${name}`;
@@ -503,7 +513,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
 
   };
   nodes.push(newObject);
-  if (linkType === 'pre-hook') {
+  if (linkType === preHookType) {
     links.push({
       from: { uid: objId },
       to: { uid: parentId },
