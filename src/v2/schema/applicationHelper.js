@@ -17,7 +17,6 @@ const metadataNamespace = 'metadata.namespace';
 const preHookType = 'pre-hook';
 const postHookType = 'post-hook';
 
-
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
   const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
@@ -192,12 +191,11 @@ export const addSubscriptionDeployable = (
   } else {
     parentId = subscriptionUid;
     const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
-    hookList.forEach(hook => {
-      if(_.get(hook, 'metadata.name', '') === name && _.get(hook, 'metadata.namespace', '') === namespace) {
+    hookList.forEach((hook) => {
+      if (_.get(hook, 'metadata.name', '') === name && _.get(hook, 'metadata.namespace', '') === namespace) {
         deployable.spec.template.spec = hook.status;
-        return;
       }
-    }); 
+    });
   }
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -253,8 +251,7 @@ export const addSubscriptionDeployable = (
       to: { uid: memberId },
       type: linkType,
     });
-  }
-  else {
+  } else {
     links.push({
       from: { uid: parentId },
       to: { uid: memberId },
@@ -438,7 +435,6 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       const isHook = isPrePostHookDeployable(subscription, dName, namespace);
       // process only helm charts and hooks
       if (deployableData[0] === 'helmchart' || isHook) {
-
         if (!isHook) {
           dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];

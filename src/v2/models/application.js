@@ -241,12 +241,12 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
         }
       });
   });
-  return { 
-    deployableMap, 
-    channelsMap, 
-    rulesMap, 
-    preHooksMap, 
-    postHooksMap
+  return {
+    deployableMap,
+    channelsMap,
+    rulesMap,
+    preHooksMap,
+    postHooksMap,
   };
 };
 
@@ -644,14 +644,14 @@ export default class ApplicationModel extends KubeModel {
         values.forEach(({ deployableName, subscription }) => {
           if (name === deployableName) {
             if (isPreHooks) {
-              if(!subscription.prehooks) {
-                subscription.prehooks = []
+              if (!subscription.prehooks) {
+                subscription.prehooks = [];
               }
               subscription.prehooks.push(deployable);
             } else {
-              if(!subscription.posthooks) {
-                subscription.posthooks = []
-              }              
+              if (!subscription.posthooks) {
+                subscription.posthooks = [];
+              }
               subscription.posthooks.push(deployable);
             }
           }
