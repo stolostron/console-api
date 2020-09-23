@@ -32,10 +32,11 @@ function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
   const rule = _.get(subscription, 'rules[0]');
+  const blocked = _.get(subscription, 'spec.timewindow.windowtype');
   nodes.push({
     name,
     namespace,
-    type: 'subscription',
+    type: blocked ? 'subscriptionblocked' : 'subscription',
     id: subscriptionId,
     uid: subscriptionId,
     specs: {
@@ -177,12 +178,12 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 
 export const addSubscriptionDeployable = (
   parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription) => {
-
+  subscriptionStatusMap, names, appNamespace, subscription,
+) => {
   // deployable shape
   const { name, namespace } = _.get(deployable, 'metadata');
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
-  if(linkType === null) {
+  if (linkType === null) {
     linkType = '';
   }
 
@@ -227,7 +228,7 @@ export const addSubscriptionDeployable = (
   };
 
   nodes.push(topoObject);
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
   if (linkType === 'pre-hook') {
     links.push({
       from: { uid: memberId },
@@ -237,11 +238,10 @@ export const addSubscriptionDeployable = (
   } else if (linkType === 'post-hook') {
     links.push({
       from: { uid: subscriptionUid },
-      to: { uid:  memberId},
+      to: { uid: memberId },
       type: linkType,
     });
-  }
-  else {
+  } else {
     links.push({
       from: { uid: parentId },
       to: { uid: memberId },
@@ -258,13 +258,13 @@ export const addSubscriptionDeployable = (
 // Route, Ingress, StatefulSet
 export const processServiceOwner = (
   clusterId, routes, links, nodes,
-  subscriptionStatusMap, names, namespace, subscription
+  subscriptionStatusMap, names, namespace, subscription,
 ) => {
   const servicesMap = {};
   routes.forEach((deployable) => {
     const topoObject = addSubscriptionDeployable(
       clusterId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace, subscription
+      subscriptionStatusMap, names, namespace, subscription,
     );
 
     // get service info and map it to the object id
@@ -301,7 +301,7 @@ export const processServiceOwner = (
 
 export const processServices = (
   clusterId, services, links, nodes,
-  subscriptionStatusMap, names, namespace, servicesMap,subscription
+  subscriptionStatusMap, names, namespace, servicesMap, subscription,
 ) => {
   services.forEach((deployable) => {
     const serviceName = _.get(deployable, 'spec.template.metadata.name', '');
@@ -312,14 +312,14 @@ export const processServices = (
 
     addSubscriptionDeployable(
       parentId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace, subscription
+      subscriptionStatusMap, names, namespace, subscription,
     );
   });
 };
 
 export const processDeployables = (
   deployables,
-  clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription
+  clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription,
 ) => {
   const routes = _.filter(deployables, (obj) => {
     const kind = _.get(obj, templateKind, '');
@@ -329,7 +329,7 @@ export const processDeployables = (
   // process route and ingress first
   const serviceMap = processServiceOwner(
     clusterId, routes, links, nodes,
-    subscriptionStatusMap, names, namespace,subscription
+    subscriptionStatusMap, names, namespace, subscription,
   );
 
   const services = _.filter(deployables, (obj) => {
@@ -340,7 +340,7 @@ export const processDeployables = (
   // then service
   processServices(
     clusterId, services, links, nodes,
-    subscriptionStatusMap, names, namespace, serviceMap, subscription
+    subscriptionStatusMap, names, namespace, serviceMap, subscription,
   );
 
   // then the rest
@@ -352,7 +352,7 @@ export const processDeployables = (
   other.forEach((deployable) => {
     addSubscriptionDeployable(
       clusterId, deployable, links, nodes,
-      subscriptionStatusMap, names, namespace, subscription
+      subscriptionStatusMap, names, namespace, subscription,
     );
   });
 };
@@ -422,11 +422,10 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       let deployableName = deployableData[4];
       const deployableTypeLower = _.toLower(deployableData[2]);
 
-      const isHook = isPrePostHookDeployable(subscription, dName, namespace)
+      const isHook = isPrePostHookDeployable(subscription, dName, namespace);
       // process only helm charts and hooks
-      if(deployableData[0] === 'helmchart' || isHook) {
-
-        if(!isHook) {
+      if (deployableData[0] === 'helmchart' || isHook) {
+        if (!isHook) {
           dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
           deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
@@ -478,16 +477,16 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   const newObject = {
     id: objId,
     uid: objId,
-    name: name,
-    namespace: namespace,
+    name,
+    namespace,
     type: type.toLowerCase(),
     specs: {
       isDesign: false,
       raw: {
         kind: type,
         metadata: {
-          name: name,
-          namespace: namespace,
+          name,
+          namespace,
         },
         spec: specData,
       },
@@ -495,7 +494,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
 
   };
   nodes.push(newObject);
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace,'')}--${_.get(subscription, metadataName,'')}`;
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
   if (linkType === 'pre-hook') {
     links.push({
       from: { uid: objId },
@@ -505,7 +504,7 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   } else if (linkType === 'post-hook') {
     links.push({
       from: { uid: subscriptionUid },
-      to: { uid: objId},
+      to: { uid: objId },
       type: linkType,
     });
   } else {
@@ -517,19 +516,18 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   }
 
   return newObject;
-
-}
+};
 
 export const addSubscriptionCharts = (
   parentId, subscriptionStatusMap,
   nodes, links, names, appNamespace, channelInfo, subscriptionName,
-  topoAnnotation, subscription
+  topoAnnotation, subscription,
 ) => {
   if (topoAnnotation) {
     const deployablesFromTopo = getSubscriptionPackageInfo(topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription);
     processDeployables(
       deployablesFromTopo,
-      parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription
+      parentId, links, nodes, subscriptionStatusMap, names, appNamespace, subscription,
     );
     return nodes;
   }
@@ -681,14 +679,14 @@ async function getApplicationElements(application, clusterModel) {
 
             processDeployables(
               subscription.deployables,
-              clusterId, links, nodes, subscriptionStatusMap, names, namespace,subscription
+              clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription,
             );
           }
 
           if (topoAnnotation) {
             addSubscriptionCharts(
               clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
+              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
             );
           }
         });
@@ -698,7 +696,7 @@ async function getApplicationElements(application, clusterModel) {
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
         addSubscriptionCharts(
           parentId, subscriptionStatusMap, nodes,
-          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation,subscription
+          links, null, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
         );
       }
       delete subscription.deployables;
