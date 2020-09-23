@@ -190,7 +190,7 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
     const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
     postHooks.forEach((value) => {
       const [deployableNamespace, deployableName] = value.split('/');
-      if (deployableNamespace, deployableName) {
+      if (deployableNamespace && deployableName) {
         arr = postHooksMap[deployableNamespace];
         if (!arr) {
           postHooksMap[deployableNamespace] = [];
@@ -198,13 +198,13 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
         }
         arr.push({ deployableName, subscription });
       }
-    });      
-    
+    });
+
     // get pre hooks
     const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
     preHooks.forEach((value) => {
       const [deployableNamespace, deployableName] = value.split('/');
-      if (deployableNamespace, deployableName) {
+      if (deployableNamespace && deployableName) {
         arr = preHooksMap[deployableNamespace];
         if (!arr) {
           preHooksMap[deployableNamespace] = [];
@@ -212,7 +212,7 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
         }
         arr.push({ deployableName, subscription });
       }
-    });         
+    });
 
     // ditto for channels
     const [chnNamespace, chnName] = _.get(subscription, 'spec.channel', '').split('/');
@@ -239,9 +239,15 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
           arr.push({ ruleName, subscription });
           subscription.rules = [];
         }
-      });      
+      });
   });
-  return { deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap };
+  return { 
+    deployableMap, 
+    channelsMap, 
+    rulesMap, 
+    preHooksMap, 
+    postHooksMap
+  };
 };
 
 export default class ApplicationModel extends KubeModel {
