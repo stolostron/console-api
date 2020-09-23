@@ -403,6 +403,10 @@ describe('buildDeployablesMap', () => {
         {
           lastUpdateTime: '2020-06-01T10:42:30Z',
           phase: 'Propagated',
+          ansiblejobs: {
+            prehookjobshistory: ['default/prehook-test-1-9750056'],
+            posthookjobshistory: ['default/posthook-test-1-9750056'],
+          },
           statuses: {},
         },
         deployablePaths:
@@ -443,9 +447,11 @@ describe('buildDeployablesMap', () => {
               status: {
                 lastUpdateTime: '2020-06-01T10:42:30Z',
                 phase: 'Propagated',
-                statuses: {
-
+                ansiblejobs: {
+                  prehookjobshistory: ['default/prehook-test-1-9750056'],
+                  posthookjobshistory: ['default/posthook-test-1-9750056'],
                 },
+                statuses: {},
               },
               deployables: [
 
@@ -484,9 +490,11 @@ describe('buildDeployablesMap', () => {
               status: {
                 lastUpdateTime: '2020-06-01T10:42:30Z',
                 phase: 'Propagated',
-                statuses: {
-
+                ansiblejobs: {
+                  prehookjobshistory: ['default/prehook-test-1-9750056'],
+                  posthookjobshistory: ['default/posthook-test-1-9750056'],
                 },
+                statuses: {},
               },
               deployables: [
 
@@ -529,9 +537,11 @@ describe('buildDeployablesMap', () => {
               status: {
                 lastUpdateTime: '2020-06-01T10:42:30Z',
                 phase: 'Propagated',
-                statuses: {
-
+                ansiblejobs: {
+                  prehookjobshistory: ['default/prehook-test-1-9750056'],
+                  posthookjobshistory: ['default/posthook-test-1-9750056'],
                 },
+                statuses: {},
               },
               deployables: [
 
@@ -546,6 +556,94 @@ describe('buildDeployablesMap', () => {
       rulesMap: {
 
       },
+      preHooksMap: {
+        default: [
+          {
+            deployableName: 'prehook-test-1-9750056',
+            subscription:       {
+              apiVersion: 'apps.open-cluster-management.io/v1',
+              kind: 'Subscription',
+              metadata:
+              {
+                annotations: {},
+                creationTimestamp: '2020-05-12T19:41:20Z',
+                generation: 2,
+                labels: {},
+                name: 'cassandra-app-subscription',
+                namespace: 'default',
+                resourceVersion: '55436209',
+                selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+                uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+              },
+              spec:
+              {
+                channel: 'cassandra-ch/cassandra-channel',
+                placement: {},
+              },
+              status:
+              {
+                lastUpdateTime: '2020-06-01T10:42:30Z',
+                phase: 'Propagated',
+                ansiblejobs: {
+                  prehookjobshistory: ['default/prehook-test-1-9750056'],
+                  posthookjobshistory: ['default/posthook-test-1-9750056'],
+                },
+                statuses: {},
+              },
+              deployables: [
+
+              ],
+              channels: [
+
+              ],
+            },
+          }
+        ]
+      }, 
+      postHooksMap: {
+        default: [
+          {
+            deployableName: 'posthook-test-1-9750056',
+            subscription:       {
+              apiVersion: 'apps.open-cluster-management.io/v1',
+              kind: 'Subscription',
+              metadata:
+              {
+                annotations: {},
+                creationTimestamp: '2020-05-12T19:41:20Z',
+                generation: 2,
+                labels: {},
+                name: 'cassandra-app-subscription',
+                namespace: 'default',
+                resourceVersion: '55436209',
+                selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+                uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+              },
+              spec:
+              {
+                channel: 'cassandra-ch/cassandra-channel',
+                placement: {},
+              },
+              status:
+              {
+                lastUpdateTime: '2020-06-01T10:42:30Z',
+                phase: 'Propagated',
+                ansiblejobs: {
+                  prehookjobshistory: ['default/prehook-test-1-9750056'],
+                  posthookjobshistory: ['default/posthook-test-1-9750056'],
+                },
+                statuses: {},
+              },
+              deployables: [
+
+              ],
+              channels: [
+
+              ],
+            },
+          }
+        ]
+      },           
     };
     expect(buildDeployablesMap(subscriptions, [])).toEqual(result);
   });

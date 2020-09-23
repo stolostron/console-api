@@ -14,16 +14,18 @@ const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 const metadataName = 'metadata.name';
 const metadataNamespace = 'metadata.namespace';
+const preHookType = 'pre-hook';
+const postHookType = 'post-hook';
 
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
   const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
   const objectIdentity = `${namespace}/${name}`;
   if (_.indexOf(preHooks, objectIdentity) !== -1) {
-    return 'pre-hook';
+    return preHookType;
   }
   if (_.indexOf(postHooks, objectIdentity) !== -1) {
-    return 'post-hook';
+    return postHookType;
   }
   return null;
 };
@@ -177,14 +179,24 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 };
 
 export const addSubscriptionDeployable = (
-  parentId, deployable, links, nodes,
+  parentIdInit, deployable, links, nodes,
   subscriptionStatusMap, names, appNamespace, subscription,
 ) => {
   // deployable shape
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
+  let parentId = parentIdInit;
   const { name, namespace } = _.get(deployable, 'metadata');
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if (linkType === null) {
     linkType = '';
+  } else {
+    parentId = subscriptionUid;
+    const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
+    hookList.forEach((hook) => {
+      if (_.get(hook, metadataName, '') === name && _.get(hook, metadataNamespace, '') === namespace) {
+        deployable.spec.template.spec = hook.status;
+      }
+    });
   }
 
   const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
@@ -228,14 +240,13 @@ export const addSubscriptionDeployable = (
   };
 
   nodes.push(topoObject);
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  if (linkType === 'pre-hook') {
+  if (linkType === preHookType) {
     links.push({
       from: { uid: memberId },
       to: { uid: subscriptionUid },
       type: linkType,
     });
-  } else if (linkType === 'post-hook') {
+  } else if (linkType === postHookType) {
     links.push({
       from: { uid: subscriptionUid },
       to: { uid: memberId },
@@ -468,10 +479,15 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   return deployablesList;
 };
 
-export const createDeployableObject = (subscription, name, namespace, type, specData, parentId, nodes, links, linkName) => {
+export const createDeployableObject = (subscription, name, namespace, type, specData, parentIdInit, nodes, links, linkName) => {
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if (linkType === null) {
     linkType = linkName;
+  }
+  let parentId = parentIdInit;
+  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
+  if (linkType === preHookType || linkType === postHookType) {
+    parentId = subscriptionUid;
   }
   const objId = `member--deployable--${parentId}--${type.toLowerCase()}--${name}`;
   const newObject = {
@@ -494,28 +510,21 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
 
   };
   nodes.push(newObject);
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  if (linkType === 'pre-hook') {
+  if (linkType === preHookType) {
     links.push({
       from: { uid: objId },
-      to: { uid: subscriptionUid },
-      type: linkType,
-    });
-  } else if (linkType === 'post-hook') {
-    links.push({
-      from: { uid: subscriptionUid },
-      to: { uid: objId },
-      type: linkType,
-    });
-  } else {
-    links.push({
-      from: { uid: parentId },
-      to: { uid: objId },
+      to: { uid: parentId },
       type: linkType,
     });
   }
+  links.push({
+    from: { uid: parentId },
+    to: { uid: objId },
+    type: linkType,
+  });
 
   return newObject;
+
 };
 
 export const addSubscriptionCharts = (
@@ -614,7 +623,7 @@ async function getApplicationElements(application, clusterModel) {
     const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
       const subscriptionChannel = _.get(subscription, 'spec.channel');
-      const subscriptionName = _.get(subscription, 'metadata.name', '');
+      const subscriptionName = _.get(subscription, metadataName, '');
       const topoAnnotation = _.get(subscription, 'metadata.annotations', {})['apps.open-cluster-management.io/topo'];
       // get cluster placement if any
       const ruleDecisionMap = {};

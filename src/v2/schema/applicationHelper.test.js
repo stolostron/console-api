@@ -57,7 +57,7 @@ describe('createDeployableObject', () => {
   };
 
   it('createDeployableObject', () => {
-    const result = {"id": "member--deployable--parentId--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service", "name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns", "specs": {"isDesign": false, "raw": {"kind": "AnsibleJob", "metadata": {"name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns"}, "spec": {}}}, "type": "ansiblejob", "uid": "member--deployable--parentId--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service"};
+    const result = {"id": "member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service", "name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns", "specs": {"isDesign": false, "raw": {"kind": "AnsibleJob", "metadata": {"name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns"}, "spec": {}}}, "type": "ansiblejob", "uid": "member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service"};
     expect(createDeployableObject(subscription, 'cassandra-app-subscription-cassandra-cassandra-service', 'cassandra-app-ns', 'AnsibleJob', {}, 'parentId', [], [], 'hook')).toEqual(result);
   });
 

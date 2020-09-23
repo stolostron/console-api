@@ -163,6 +163,8 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   const rulesMap = {};
   const deployableMap = {};
   const channelsMap = {};
+  const postHooksMap = {};
+  const preHooksMap = {};
   let arr = null;
 
   subscriptions.forEach((subscription) => {
@@ -183,6 +185,34 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
       });
       delete subscription.deployablePaths;
     }
+
+    // get post hooks
+    const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
+    postHooks.forEach((value) => {
+      const [deployableNamespace, deployableName] = value.split('/');
+      if (deployableNamespace && deployableName) {
+        arr = postHooksMap[deployableNamespace];
+        if (!arr) {
+          postHooksMap[deployableNamespace] = [];
+          arr = postHooksMap[deployableNamespace];
+        }
+        arr.push({ deployableName, subscription });
+      }
+    });
+
+    // get pre hooks
+    const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
+    preHooks.forEach((value) => {
+      const [deployableNamespace, deployableName] = value.split('/');
+      if (deployableNamespace && deployableName) {
+        arr = preHooksMap[deployableNamespace];
+        if (!arr) {
+          preHooksMap[deployableNamespace] = [];
+          arr = preHooksMap[deployableNamespace];
+        }
+        arr.push({ deployableName, subscription });
+      }
+    });
 
     // ditto for channels
     const [chnNamespace, chnName] = _.get(subscription, 'spec.channel', '').split('/');
@@ -211,8 +241,13 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
         }
       });
   });
-
-  return { deployableMap, channelsMap, rulesMap };
+  return {
+    deployableMap,
+    channelsMap,
+    rulesMap,
+    preHooksMap,
+    postHooksMap,
+  };
 };
 
 export default class ApplicationModel extends KubeModel {
@@ -545,9 +580,11 @@ export default class ApplicationModel extends KubeModel {
         );
         // get all requested subscriptions
         const selectedSubscription = subscr;
-        const { deployableMap, channelsMap, rulesMap } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
+        const { deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
         // now fetch them
         await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
+        await this.getAppHooks(preHooksMap, true);
+        await this.getAppHooks(postHooksMap, false);
         await this.getAppRules(rulesMap);
         if (includeChannels) {
           await this.getAppChannels(channelsMap);
@@ -581,6 +618,42 @@ export default class ApplicationModel extends KubeModel {
         values.forEach(({ deployableName, subscription }) => {
           if (name === deployableName) {
             subscription.deployables.push(deployable);
+          }
+        });
+      });
+    });
+    return Promise.all(requests);
+  }
+
+  async getAppHooks(hooks, isPreHooks) {
+    const requests = Object.entries(hooks).map(async ([namespace, values]) => {
+      // get all ansible hooks in this namespace
+      let response;
+      try {
+        response = await this.kubeConnector.getResources(
+          (ns) => `/apis/tower.ansible.com/v1alpha1/namespaces/${ns}/ansiblejobs`,
+          { kind: 'AnsibleJob', namespaces: [namespace] },
+        ) || [];
+      } catch (err) {
+        logger.error(err);
+        throw err;
+      }
+      // stuff responses into subscriptions that requested them
+      response.forEach((deployable) => {
+        const name = _.get(deployable, 'metadata.name');
+        values.forEach(({ deployableName, subscription }) => {
+          if (name === deployableName) {
+            if (isPreHooks) {
+              if (!subscription.prehooks) {
+                subscription.prehooks = [];
+              }
+              subscription.prehooks.push(deployable);
+            } else {
+              if (!subscription.posthooks) {
+                subscription.posthooks = [];
+              }
+              subscription.posthooks.push(deployable);
+            }
           }
         });
       });
