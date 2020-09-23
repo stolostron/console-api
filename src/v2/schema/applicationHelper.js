@@ -34,10 +34,11 @@ function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
   const rule = _.get(subscription, 'rules[0]');
+  const blocked = _.get(subscription, 'spec.timewindow.windowtype');
   nodes.push({
     name,
     namespace,
-    type: 'subscription',
+    type: blocked ? 'subscriptionblocked' : 'subscription',
     id: subscriptionId,
     uid: subscriptionId,
     specs: {
@@ -492,16 +493,16 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
   const newObject = {
     id: objId,
     uid: objId,
-    name: name,
-    namespace: namespace,
+    name,
+    namespace,
     type: type.toLowerCase(),
     specs: {
       isDesign: false,
       raw: {
         kind: type,
         metadata: {
-          name: name,
-          namespace: namespace,
+          name,
+          namespace,
         },
         spec: specData,
       },
