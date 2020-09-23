@@ -34,11 +34,10 @@ function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
   const subscriptionId = `member--subscription--${namespace}--${name}`;
   const rule = _.get(subscription, 'rules[0]');
-  const blocked = _.get(subscription, 'spec.timewindow.windowtype');
   nodes.push({
     name,
     namespace,
-    type: blocked ? 'subscriptionblocked' : 'subscription',
+    type: 'subscription',
     id: subscriptionId,
     uid: subscriptionId,
     specs: {
