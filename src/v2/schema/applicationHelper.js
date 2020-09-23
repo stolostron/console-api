@@ -193,7 +193,7 @@ export const addSubscriptionDeployable = (
     parentId = subscriptionUid;
     const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
     hookList.forEach((hook) => {
-      if (_.get(hook, 'metadata.name', '') === name && _.get(hook, 'metadata.namespace', '') === namespace) {
+      if (_.get(hook, metadataName, '') === name && _.get(hook, metadataNamespace, '') === namespace) {
         deployable.spec.template.spec = hook.status;
       }
     });
@@ -623,7 +623,7 @@ async function getApplicationElements(application, clusterModel) {
     const createdClusterElements = new Set();
     application.subscriptions.forEach((subscription) => {
       const subscriptionChannel = _.get(subscription, 'spec.channel');
-      const subscriptionName = _.get(subscription, 'metadata.name', '');
+      const subscriptionName = _.get(subscription, metadataName, '');
       const topoAnnotation = _.get(subscription, 'metadata.annotations', {})['apps.open-cluster-management.io/topo'];
       // get cluster placement if any
       const ruleDecisionMap = {};
