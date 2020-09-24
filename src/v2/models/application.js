@@ -13,6 +13,7 @@ import KubeModel from './kube';
 import { responseHasError } from '../lib/utils';
 import logger from '../lib/logger';
 
+export const ALL_SUBSCRIPTIONS = '__ALL__/SUBSCRIPTIONS__';
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
 const DEPLOYABLES = 'metadata.annotations["apps.open-cluster-management.io/deployables"]';
 const NAMESPACE = 'metadata.namespace';
@@ -573,14 +574,17 @@ export default class ApplicationModel extends KubeModel {
         model.channels = [];
         model.subscriptions = [];
 
-        // get all the channels ad find selected subscription from selected channel
+        // get all the channels and find selected subscription from selected channel
         const subscr = getAllChannels(
           subscriptions, model.channels,
           selectedChannel, allowAllChannel,
         );
+
         // get all requested subscriptions
-        const selectedSubscription = subscr;
-        const { deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
+        const selectedSubscription = selectedChannel === ALL_SUBSCRIPTIONS ? allSubscriptions : subscr;
+        const {
+          deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap,
+        } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
         // now fetch them
         await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
         await this.getAppHooks(preHooksMap, true);

@@ -9,6 +9,7 @@
  ****************************************************************************** */
 
 import { gql } from 'apollo-server-express';
+import { ALL_SUBSCRIPTIONS } from '../models/application';
 
 export const typeDef = gql`
 type Application implements K8sObject {
@@ -59,7 +60,7 @@ type Secret {
 /* eslint-disable max-len */
 export const resolver = {
   Query: {
-    application: (root, args, { applicationModel }) => applicationModel.getApplication(args.name, args.namespace, null, true),
+    application: (root, args, { applicationModel }) => applicationModel.getApplication(args.name, args.namespace, ALL_SUBSCRIPTIONS, true),
     applicationNamespaces: (parent, args, { applicationModel }) => applicationModel.getApplicationNamespace(args.namespace),
     secrets: (root, args, { applicationModel }) => applicationModel.getSecrets(args.namespace),
   },
