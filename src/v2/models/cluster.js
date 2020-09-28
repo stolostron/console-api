@@ -121,7 +121,6 @@ function mapData({
   certificateSigningRequestList,
   uninstallJobList,
   installJobList,
-  forbiddenManagedClusters,
 }) {
   const managedClusterMap = mapResources(managedClusters, 'ManagedCluster');
   const clusterDeploymentMap = mapResources(clusterDeployments, 'ClusterDeployment');
