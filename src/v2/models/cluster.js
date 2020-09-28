@@ -57,14 +57,14 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   return status;
 }
 
-export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
+export function getStatus(cluster, csrs, clusterDeployment, uninstall, install, managedClusterInfo) {
   const clusterDeploymentStatus = clusterDeployment
     ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
     : '';
 
-  if (cluster) {
+  if (cluster || managedClusterInfo) {
     let status;
-    const clusterConditions = _.get(cluster, 'status.conditions') || [];
+    const clusterConditions = _.get(cluster, 'status.conditions') || _.get(managedClusterInfo, 'raw.status.conditions') || [];
     const checkForCondition = (condition) => _.get(
       clusterConditions.find((c) => c.type === condition),
       'status',
@@ -90,7 +90,7 @@ export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) 
     // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster,
     // so this is the case is the cluster is being detached but not destroyed)
     if ((status === 'detaching' || !clusterJoined) && (clusterDeploymentStatus && clusterDeploymentStatus !== 'detached')) {
-      return clusterDeploymentStatus;
+      status = clusterDeploymentStatus;
     }
     return status;
   }
@@ -121,6 +121,7 @@ function mapData({
   certificateSigningRequestList,
   uninstallJobList,
   installJobList,
+  forbiddenManagedClusters,
 }) {
   const managedClusterMap = mapResources(managedClusters, 'ManagedCluster');
   const clusterDeploymentMap = mapResources(clusterDeployments, 'ClusterDeployment');
@@ -177,6 +178,9 @@ function getBaseCluster(mappedData, cluster) {
   if (!metadata.namespace) {
     metadata.namespace = _.get(managedClusterInfo || clusterDeployment, 'metadata.namespace') || metadata.name;
   }
+  if (!metadata.labels) {
+    metadata.labels = _.get(managedClusterInfo, 'metadata.labels', '');
+  }
 
   const clusterip = _.get(managedClusterInfo, 'raw.spec.masterEndpoint');
 
@@ -221,6 +225,7 @@ function findMatchedStatus(data) {
       _.get(clusterDeployment, 'raw'),
       uninstallJobList,
       installJobList,
+      managedClusterInfo,
     );
     _.merge(cluster, {
       nodes,
@@ -572,6 +577,7 @@ export default class ClusterModel extends KubeModel {
         : this.kubeConnector.getResources(
           namespaceQueryFunction,
           { namespaces: this.clusterNamespaces },
+          true,
         ))).catch((err) => {
         logger.error(err);
         throw err;
@@ -614,6 +620,11 @@ export default class ClusterModel extends KubeModel {
         (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${INSTALL_LABEL_SELECTOR(ns)}`,
       ),
     ]);
+
+    // const forbiddenManagedClusters = [];
+    // managedClusters.forEach((mc) => {
+    //   if (mc.code === 403) forbiddenManagedClusters.push(_.get(mc, 'details.name', ''));
+    // });
 
     return {
       managedClusters,
@@ -668,6 +679,7 @@ export default class ClusterModel extends KubeModel {
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
+
     const [result] = findMatchedStatus({
       managedClusters: [managedCluster],
       clusterDeployments: [clusterDeployment],
