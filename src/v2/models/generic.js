@@ -442,9 +442,10 @@ export default class GenericModel extends KubeModel {
         this.kubeConnector.delete(`${routePrefix}/${cluster}/managedclusteractions/${response.metadata.name}`)
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
-      const reason = _.get(result, 'status.reason');
-      if (reason) {
-        throw new Error(`Failed to Update ${name}: ${reason}`);
+      const reason = _.get(result, 'status.conditions[0].reason');
+      if (reason && reason !== 'ActionDone') {
+        const message = _.get(result, 'status.conditions[0].message');
+        throw new Error(`Failed to Update ${name}. ${reason}. ${message}.`);
       } else {
         return _.get(result, 'metadata.name');
       }
@@ -522,7 +523,7 @@ export default class GenericModel extends KubeModel {
           .catch((e) => logger.error(`Error deleting work ${response.metadata.name}`, e.message));
       }
       const reason = _.get(result, 'status.conditions[0].reason');
-      if (reason) {
+      if (reason && reason !== 'ActionDone') {
         const message = _.get(result, 'status.conditions[0].message');
         throw new Error(`Failed to Delete ${name}. ${reason}. ${message}.`);
       } else {

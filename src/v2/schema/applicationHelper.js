@@ -521,7 +521,6 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
     to: { uid: objId },
     type: linkType,
   });
-
   return newObject;
 };
 
