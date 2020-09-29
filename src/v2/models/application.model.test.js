@@ -560,7 +560,7 @@ describe('buildDeployablesMap', () => {
         default: [
           {
             deployableName: 'prehook-test-1-9750056',
-            subscription:       {
+            subscription: {
               apiVersion: 'apps.open-cluster-management.io/v1',
               kind: 'Subscription',
               metadata:
@@ -597,14 +597,14 @@ describe('buildDeployablesMap', () => {
 
               ],
             },
-          }
-        ]
-      }, 
+          },
+        ],
+      },
       postHooksMap: {
         default: [
           {
             deployableName: 'posthook-test-1-9750056',
-            subscription:       {
+            subscription: {
               apiVersion: 'apps.open-cluster-management.io/v1',
               kind: 'Subscription',
               metadata:
@@ -641,9 +641,9 @@ describe('buildDeployablesMap', () => {
 
               ],
             },
-          }
-        ]
-      },           
+          },
+        ],
+      },
     };
     expect(buildDeployablesMap(subscriptions, [])).toEqual(result);
   });

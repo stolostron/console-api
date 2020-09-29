@@ -22,9 +22,8 @@ import getApplicationElements, {
   removeReleaseGeneratedSuffix,
   removeHelmReleaseName,
   isPrePostHookDeployable,
-  createDeployableObject
+  createDeployableObject,
 } from './applicationHelper';
-
 
 describe('createDeployableObject', () => {
   const subscription = {
@@ -44,24 +43,39 @@ describe('createDeployableObject', () => {
     status: {
       ansiblejobs: {
         prehookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset'],
-        posthookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service']
+        posthookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service'],
       },
       lastUpdateTime: '2020-09-18T18:20:03Z',
       phase: 'Propagated',
-      statuses: { fxiang: {}, 'kcormier-cluster': [{}] }
+      statuses: { fxiang: {}, 'kcormier-cluster': [{}] },
     },
     deployablePaths: [
       'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service',
-      'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset'
-    ]
+      'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset',
+    ],
   };
 
   it('createDeployableObject', () => {
-    const result = {"id": "member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service", "name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns", "specs": {"isDesign": false, "raw": {"kind": "AnsibleJob", "metadata": {"name": "cassandra-app-subscription-cassandra-cassandra-service", "namespace": "cassandra-app-ns"}, "spec": {}}}, "type": "ansiblejob", "uid": "member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service"};
+    const result = {
+      id: 'member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service',
+      name: 'cassandra-app-subscription-cassandra-cassandra-service',
+      namespace: 'cassandra-app-ns',
+      specs: {
+        isDesign: false,
+        raw: {
+          kind: 'AnsibleJob',
+          metadata: {
+            name: 'cassandra-app-subscription-cassandra-cassandra-service',
+            namespace: 'cassandra-app-ns',
+          },
+          spec: {},
+        },
+      },
+      type: 'ansiblejob',
+      uid: 'member--deployable--member--subscription--cassandra-app-ns--cassandra-app-subscription--ansiblejob--cassandra-app-subscription-cassandra-cassandra-service',
+    };
     expect(createDeployableObject(subscription, 'cassandra-app-subscription-cassandra-cassandra-service', 'cassandra-app-ns', 'AnsibleJob', {}, 'parentId', [], [], 'hook')).toEqual(result);
   });
-
-
 });
 
 describe('isPrePostHookDeployable', () => {
@@ -82,16 +96,16 @@ describe('isPrePostHookDeployable', () => {
     status: {
       ansiblejobs: {
         prehookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset'],
-        posthookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service']
+        posthookjobshistory: ['cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service'],
       },
       lastUpdateTime: '2020-09-18T18:20:03Z',
       phase: 'Propagated',
-      statuses: { fxiang: {}, 'kcormier-cluster': [{}] }
+      statuses: { fxiang: {}, 'kcormier-cluster': [{}] },
     },
     deployablePaths: [
       'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-service',
-      'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset'
-    ]
+      'cassandra-app-ns/cassandra-app-subscription-cassandra-cassandra-statefulset',
+    ],
   };
 
   it('post hook', () => {
@@ -106,10 +120,8 @@ describe('isPrePostHookDeployable', () => {
 
   it('no match', () => {
     expect(isPrePostHookDeployable(subscription, 'cassandra-app-subscription-cassandra-cassandra-service1', 'cassandra-app-ns')).toEqual(null);
-  }); 
-
+  });
 });
-
 
 describe('applicationHelper', () => {
   it('should match snapshot with subscription', () => {
@@ -756,7 +768,7 @@ describe('processServices', () => {
 
     expect(processServices(
       parentId, deployables, [], [],
-      subscriptionStatusMap, names, appNamespace, servicesMap,null
+      subscriptionStatusMap, names, appNamespace, servicesMap, null,
     )).toEqual(undefined);
   });
 });
