@@ -559,7 +559,7 @@ export default class ApplicationModel extends KubeModel {
         // filter local hub subscription
         const filteredSubscriptions = [];
         subscriptionNames.forEach((subscriptionName) => {
-          if (!(_.endsWith(subscriptionName, '-local') && _.indexOf(subscriptionNames, _.replace(subscriptionName, '-local', '')) !== -1)) {
+          if (!(_.endsWith(subscriptionName, '-local') && _.indexOf(subscriptionNames, _.trimEnd(subscriptionName, '-local')) !== -1)) {
             filteredSubscriptions.push(subscriptionName);
           }
         });
