@@ -576,7 +576,6 @@ export default class ClusterModel extends KubeModel {
         : this.kubeConnector.getResources(
           namespaceQueryFunction,
           { namespaces: this.clusterNamespaces },
-          true,
         ))).catch((err) => {
         logger.error(err);
         throw err;
@@ -619,11 +618,6 @@ export default class ClusterModel extends KubeModel {
         (ns) => `/apis/batch/v1/namespaces/${ns}/jobs?${INSTALL_LABEL_SELECTOR(ns)}`,
       ),
     ]);
-
-    // const forbiddenManagedClusters = [];
-    // managedClusters.forEach((mc) => {
-    //   if (mc.code === 403) forbiddenManagedClusters.push(_.get(mc, 'details.name', ''));
-    // });
 
     return {
       managedClusters,
@@ -678,7 +672,6 @@ export default class ClusterModel extends KubeModel {
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
-
     const [result] = findMatchedStatus({
       managedClusters: [managedCluster],
       clusterDeployments: [clusterDeployment],
