@@ -178,18 +178,16 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
 };
 
 export const addSubscriptionDeployable = (
-  parentIdInit, deployable, links, nodes,
+  parentId, deployable, links, nodes,
   subscriptionStatusMap, names, appNamespace, subscription,
 ) => {
   // deployable shape
   const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  let parentId = parentIdInit;
   const { name, namespace } = _.get(deployable, 'metadata');
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if (linkType === null) {
     linkType = '';
   } else {
-    parentId = subscriptionUid;
     const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
     hookList.forEach((hook) => {
       if (_.get(hook, metadataName, '') === name && _.get(hook, metadataNamespace, '') === namespace) {
@@ -258,7 +256,6 @@ export const addSubscriptionDeployable = (
       type: linkType,
     });
   }
-
   // create subobject replica subobject, if this object defines a replicas
   createReplicaChild(topoObject, template, links, nodes);
 
@@ -478,15 +475,10 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   return deployablesList;
 };
 
-export const createDeployableObject = (subscription, name, namespace, type, specData, parentIdInit, nodes, links, linkName) => {
+export const createDeployableObject = (subscription, name, namespace, type, specData, parentId, nodes, links, linkName) => {
   let linkType = isPrePostHookDeployable(subscription, name, namespace);
   if (linkType === null) {
     linkType = linkName;
-  }
-  let parentId = parentIdInit;
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  if (linkType === preHookType || linkType === postHookType) {
-    parentId = subscriptionUid;
   }
   const objId = `member--deployable--${parentId}--${type.toLowerCase()}--${name}`;
   const newObject = {
@@ -515,12 +507,13 @@ export const createDeployableObject = (subscription, name, namespace, type, spec
       to: { uid: parentId },
       type: linkType,
     });
+  } else {
+    links.push({
+      from: { uid: parentId },
+      to: { uid: objId },
+      type: linkType,
+    });
   }
-  links.push({
-    from: { uid: parentId },
-    to: { uid: objId },
-    type: linkType,
-  });
   return newObject;
 };
 
