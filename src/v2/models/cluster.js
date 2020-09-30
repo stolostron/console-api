@@ -177,6 +177,9 @@ function getBaseCluster(mappedData, cluster) {
   if (!metadata.namespace) {
     metadata.namespace = _.get(managedClusterInfo || clusterDeployment, 'metadata.namespace') || metadata.name;
   }
+  if (!metadata.labels) {
+    metadata.labels = _.get(managedClusterInfo, 'metadata.labels', '');
+  }
 
   const clusterip = _.get(managedClusterInfo, 'raw.spec.masterEndpoint');
 
@@ -216,7 +219,7 @@ function findMatchedStatus(data) {
     const nodes = nodeCount > 0 ? nodeCount : null;
     const k8sVersion = _.get(managedClusterInfo, 'raw.status.version', '-');
     const status = getStatus(
-      _.get(managedCluster, 'raw'),
+      _.get(managedCluster || managedClusterInfo, 'raw'),
       certificateSigningRequestList,
       _.get(clusterDeployment, 'raw'),
       uninstallJobList,
