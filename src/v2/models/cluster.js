@@ -57,14 +57,14 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
   return status;
 }
 
-export function getStatus(cluster, csrs, clusterDeployment, uninstall, install, managedClusterInfo) {
+export function getStatus(cluster, csrs, clusterDeployment, uninstall, install) {
   const clusterDeploymentStatus = clusterDeployment
     ? getClusterDeploymentStatus(clusterDeployment, uninstall, install)
     : '';
 
-  if (cluster || managedClusterInfo) {
+  if (cluster) {
     let status;
-    const clusterConditions = _.get(cluster, 'status.conditions') || _.get(managedClusterInfo, 'raw.status.conditions') || [];
+    const clusterConditions = _.get(cluster, 'status.conditions') || [];
     const checkForCondition = (condition) => _.get(
       clusterConditions.find((c) => c.type === condition),
       'status',
@@ -90,7 +90,7 @@ export function getStatus(cluster, csrs, clusterDeployment, uninstall, install, 
     // as long as it is not 'detached' (which is the ready state when there is no attached ManagedCluster,
     // so this is the case is the cluster is being detached but not destroyed)
     if ((status === 'detaching' || !clusterJoined) && (clusterDeploymentStatus && clusterDeploymentStatus !== 'detached')) {
-      status = clusterDeploymentStatus;
+      return clusterDeploymentStatus;
     }
     return status;
   }
@@ -219,12 +219,11 @@ function findMatchedStatus(data) {
     const nodes = nodeCount > 0 ? nodeCount : null;
     const k8sVersion = _.get(managedClusterInfo, 'raw.status.version', '-');
     const status = getStatus(
-      _.get(managedCluster, 'raw'),
+      _.get(managedCluster || managedClusterInfo, 'raw'),
       certificateSigningRequestList,
       _.get(clusterDeployment, 'raw'),
       uninstallJobList,
       installJobList,
-      managedClusterInfo,
     );
     _.merge(cluster, {
       nodes,
