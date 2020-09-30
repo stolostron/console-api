@@ -79,8 +79,9 @@ export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
 ) => {
-  // create element if not already created
-  const cns = clusterNames.join(', ');
+  // create element if not already created'
+  const sortedClusterNames = _.sortBy(clusterNames);
+  const cns = sortedClusterNames.join(', ');
   const clusterId = `member--clusters--${cns}`;
   if (!createdClusterElements.has(clusterId)) {
     const filteredClusters = clusters.filter((cluster) => {
@@ -96,7 +97,7 @@ export const addClusters = (
       specs: {
         cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
         clusters: filteredClusters,
-        clusterNames,
+        sortedClusterNames,
       },
     });
     createdClusterElements.add(clusterId);
