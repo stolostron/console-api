@@ -671,6 +671,11 @@ export default class ClusterModel extends KubeModel {
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${UNINSTALL_LABEL_SELECTOR(name)}`),
       listQuery(`/apis/batch/v1/namespaces/${name}/jobs?${INSTALL_LABEL_SELECTOR(name)}`),
     ]);
+
+    if ((responseHasError(managedCluster) || responseHasError(managedClusterInfo)) && responseHasError(clusterDeployment)) {
+      return [];
+    }
+
     const [result] = findMatchedStatus({
       managedClusters: [managedCluster],
       clusterDeployments: [clusterDeployment],
