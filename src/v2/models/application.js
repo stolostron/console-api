@@ -258,7 +258,7 @@ export default class ApplicationModel extends KubeModel {
 
   async createApplication(args) {
     const { application } = args;
-    const response = await this.mutateApplication(application, true);
+    const response = await this.mutateApplication(application);
     return response;
   }
 
@@ -268,7 +268,8 @@ export default class ApplicationModel extends KubeModel {
 
   async updateApplication(args) {
     const { application } = args;
-    const response = await this.mutateApplication(application, false);
+    const deleteLinks = application.pop();
+    const response = await this.mutateApplication(application, deleteLinks);
     return response;
   }
 
@@ -276,7 +277,7 @@ export default class ApplicationModel extends KubeModel {
   // ///////////// UPDATE APPLICATION ////////////////
   // ///////////// UPDATE APPLICATION ////////////////
 
-  async mutateApplication(application, isCreate) {
+  async mutateApplication(application, deleteLinks) {
     let resources = application;
     const created = [];
     const updated = [];
@@ -352,7 +353,7 @@ export default class ApplicationModel extends KubeModel {
     // if update, update the application too
     let applicationResource;
     let applicationRequestPath;
-    if (isCreate) {
+    if (!deleteLinks) {
       resources = resources.filter((resource, index) => {
         if (resource.kind === 'Application') {
           applicationResource = resource;
@@ -438,14 +439,25 @@ export default class ApplicationModel extends KubeModel {
       });
     }
 
-    // if isCreate and everything else created/updated, deploy Application
-    if (isCreate && errors.length === 0) {
-      const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
-        .catch((err) => ({
-          status: 'Failure',
-          message: err.message,
-        }));
-      checkAndCollectError(deployment);
+    // if everything else created/updated
+    if (errors.length === 0) {
+      // if update, delete any removed resources
+      if (deleteLinks) {
+        const destroyResponses = await Promise.all(Object.values(deleteLinks)[0].map((link) => this.kubeConnector.delete(link)))
+          .catch((err) => ({
+            status: 'Failure',
+            message: err.message,
+          }));
+        checkAndCollectError(destroyResponses);
+      } else {
+        // if create, create the application
+        const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
+          .catch((err) => ({
+            status: 'Failure',
+            message: err.message,
+          }));
+        checkAndCollectError(deployment);
+      }
     }
 
     return {
