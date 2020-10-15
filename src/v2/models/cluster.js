@@ -843,7 +843,7 @@ export default class ClusterModel extends KubeModel {
     }
 
     managedClusterAddons = managedClusterAddons.items.map((addon) => {
-      const { metadata, status: { conditions, relatedObjects, addOnMeta } } = addon;
+      const { metadata, status: { conditions = [], relatedObjects, addOnMeta } = {} } = addon;
       const crd = _.get(relatedObjects, '[0]', {});
 
       // Order of precedence:
