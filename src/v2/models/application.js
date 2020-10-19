@@ -400,6 +400,7 @@ export default class ApplicationModel extends KubeModel {
       }
       if (item.code === 409) {
         // filter out "already existing" errors
+        _.unset(resources[index], 'metadata.selfLink');
         updates.push({
           requestPath: requestPaths[index],
           resource: resources[index],
@@ -443,7 +444,9 @@ export default class ApplicationModel extends KubeModel {
     if (errors.length === 0) {
       // if update, delete any removed resources
       if (deleteLinks) {
-        const destroyResponses = await Promise.all(Object.values(deleteLinks)[0].map((link) => this.kubeConnector.delete(link)))
+        const destroyResponses = await Promise.all(Object.values(deleteLinks)[0]
+          .filter((link) => link.indexOf('/placementrules/') === -1)
+          .map((link) => this.kubeConnector.delete(link)))
           .catch((err) => ({
             status: 'Failure',
             message: err.message,
