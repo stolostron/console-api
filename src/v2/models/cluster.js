@@ -39,8 +39,6 @@ function getCPUPercentage(usage, capacity) {
 }
 
 function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
-  const conditions = _.get(clusterDeployment, 'status.clusterVersionStatus.conditions');
-  const conditionIndex = _.findIndex(conditions, (c) => c.type === 'Available');
   const latestJobActive = (jobs) => (jobs && _.get(getLatest(jobs, 'metadata.creationTimestamp'), 'status.active', 0) > 0);
   const latestJobFailed = (jobs) => (jobs && _.get(getLatest(jobs, 'metadata.creationTimestamp'), 'status.failed', 0) > 0);
 
@@ -51,7 +49,7 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
     status = 'creating';
   } else if (latestJobFailed(install) || latestJobFailed(uninstall)) {
     status = 'provisionfailed';
-  } else if (conditionIndex >= 0 && conditions[conditionIndex].status === 'True') {
+  } else if (_.get(clusterDeployment, 'status.installedTimestamp')) {
     status = 'detached';
   }
   return status;
