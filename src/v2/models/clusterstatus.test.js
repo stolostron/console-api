@@ -15,18 +15,7 @@ const DETACHING_MANAGED_CLUSTER = {
 };
 
 const DETACHED_CLUSTER_DEPLOYMENT = {
-  status:
-  {
-    clusterVersionStatus:
-    {
-      conditions: [
-        {
-          status: 'True',
-          type: 'Available',
-        },
-      ],
-    },
-  },
+  status: { installedTimestamp: YESTERDAY }
 };
 
 const job = (when, status) => ({
