@@ -49,7 +49,7 @@ function getClusterDeploymentStatus(clusterDeployment, uninstall, install) {
     status = 'creating';
   } else if (latestJobFailed(install) || latestJobFailed(uninstall)) {
     status = 'provisionfailed';
-  } else if (_.get(clusterDeployment, 'status.installedTimestamp')) {
+  } else if (_.get(clusterDeployment, 'spec.installed')) {
     status = 'detached';
   }
   return status;
