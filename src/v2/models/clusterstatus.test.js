@@ -15,7 +15,7 @@ const DETACHING_MANAGED_CLUSTER = {
 };
 
 const DETACHED_CLUSTER_DEPLOYMENT = {
-  status: { installedTimestamp: YESTERDAY },
+  spec: { installed: true },
 };
 
 const job = (when, status) => ({
