@@ -107,11 +107,15 @@ export default class ChannelModel extends KubeModel {
         namespace: channel.metadata.namespace,
         type: (spec && spec.type) || '', // HelmRepo or ObjectBucket
         objectPath: (spec && spec.pathname) || '',
-        secret: (spec && spec.secretRef && spec.secretRef.name) || '',
+        secretRef: (spec && spec.secretRef && spec.secretRef.name) || '',
         raw: channel,
         gates: (spec && spec.gates) || {},
         sourceNamespaces: (spec && spec.sourceNamespaces) || {},
       };
     });
+  }
+
+  async resolveChannelSecret(channel) {
+    return channel.secretRef ? this.kubeConnector.get(`/api/v1/namespaces/${channel.namespace}/secrets/${channel.secretRef}`) : null;
   }
 }

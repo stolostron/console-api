@@ -22,6 +22,7 @@ type Channel implements K8sObject {
   #Defines the required credentials to access channel. The secret should sit inside the channel namespace.
   secretRef: String
   configRef: String
+  secret: JSON
   metadata: Metadata
   raw: JSON
   selector: JSON
@@ -35,6 +36,9 @@ type Channel implements K8sObject {
 export const resolver = {
   Query: {
     channels: (root, args, { channelModel }) => channelModel.getChannels(args.name, args.namespace),
+  },
+  Channel: {
+    secret: (root, args, { channelModel }) => channelModel.resolveChannelSecret(root),
   },
   Mutation: {
     createChannel: (root, args, { channelModel }) => channelModel.createChannel(args.resources),
