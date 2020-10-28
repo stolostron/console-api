@@ -9,6 +9,8 @@
  ****************************************************************************** */
 
 import _ from 'lodash';
+import atob from 'atob';
+import GitHub from 'github-api';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -113,5 +115,55 @@ export default class ChannelModel extends KubeModel {
         sourceNamespaces: (spec && spec.sourceNamespaces) || {},
       };
     });
+  }
+
+  async getGitChannelCredentials({
+    namespace, secretRef, user, accessToken,
+  }) {
+    return namespace && secretRef
+      ? this.kubeConnector.get(`/api/v1/namespaces/${namespace}/secrets/${secretRef}`)
+        .then((response) => (
+          {
+            user: atob(_.get(response, 'data.user', '')),
+            accessToken: atob(_.get(response, 'data.accessToken', '')),
+          }
+        ))
+        .catch((err) => {
+          logger.error(err);
+          throw err;
+        })
+      : Promise.resolve({ user, accessToken });
+  }
+
+  async getGitConnection(args) {
+    const { gitUrl } = args;
+    return this.getGitChannelCredentials(args)
+      .then(({ user, accessToken }) => {
+        const githubOptions = user && accessToken ? { username: user, password: accessToken, auth: 'basic' } : {};
+        const gitHub = new GitHub(githubOptions);
+        // get the url path, then remove first / and .git
+        const url = new URL(gitUrl);
+        const gitApiPath = url.pathname.substring(1).replace('.git', '');
+        return gitHub.getRepo(gitApiPath);
+      });
+  }
+
+  async getGitChannelBranches(args) {
+    return this.getGitConnection(args)
+      .then((gitRepo) => (
+        gitRepo.listBranches().then((result) => (
+          result.data ? result.data.map((branch) => branch.name) : []
+        ))
+      ));
+  }
+
+  async getGitChannelPaths(args) {
+    const { branch, path = '' } = args;
+    return this.getGitConnection(args)
+      .then((gitRepo) => (
+        gitRepo.getContents(branch, path, false).then((result) => (
+          result.data ? result.data.filter((item) => item.type === 'dir').map((item) => item.name) : []
+        ))
+      ));
   }
 }

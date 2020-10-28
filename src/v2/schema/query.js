@@ -20,6 +20,12 @@ type Query {
   # Get all channel resources. Optionally, specify name and namespace to filter results.
   channels(name: String, namespace: String): [Channel]
 
+  # Get all branches for a Git channel
+  gitChannelBranches(gitUrl: String!, namespace: String, secretRef: String, user: String, accessToken: String): [String]
+
+  # Get all paths for a Git channel
+  gitChannelPaths(gitUrl: String!, branch: String!, path: String, namespace: String, secretRef: String, user: String, accessToken: String): [String]
+
   # Get a cluster resource.
   cluster(name: String, namespace: String): [Cluster]
 
