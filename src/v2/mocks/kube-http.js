@@ -15,6 +15,7 @@ import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
+    channels: require('./ChannelList'),
     clustersByName: require('./ManagedClusterByName').default,
     managedClusterInfosByName: require('./ManagedClusterInfosByName.js').default,
     clusters: require('./ManagedClusterList').default,
@@ -132,6 +133,12 @@ export default function createMockHttp() {
         return state.apps.mockDeleteAppResponse;
       case params.url.includes('default/applications'):
         return state.apps.mockAppsResponse;
+      case params.url.includes('default/channels'):
+        return state.channels.mockChannelsResponse;
+      case params.url.includes('kube-system/channels'):
+        return { body: { items: [] } };
+      case params.url.includes('ggithubcom-kevinfcormier-sample-repo-ns/secrets/ggithubcom-kevinfcormier-sample-repo-auth'):
+        return state.channels.mockChannelSecretResponse;
       case params.url.includes('kube-system/application'):
         return { body: { items: [] } };
       case params.url.endsWith('/placementbindings/gbapp-gbapp'):
