@@ -107,7 +107,7 @@ export default class ChannelModel extends KubeModel {
         namespace: channel.metadata.namespace,
         type: (spec && spec.type) || '', // HelmRepo or ObjectBucket
         objectPath: (spec && spec.pathname) || '',
-        secret: (spec && spec.secretRef && spec.secretRef.name) || '',
+        secretRef: (spec && spec.secretRef && spec.secretRef.name) || '',
         raw: channel,
         gates: (spec && spec.gates) || {},
         sourceNamespaces: (spec && spec.sourceNamespaces) || {},
