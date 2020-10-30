@@ -282,6 +282,7 @@ export default class ApplicationModel extends KubeModel {
     const created = [];
     const updated = [];
     const errors = [];
+    const isEdit = !!deleteLinks;
 
     const checkAndCollectError = (response) => {
       if (response.code >= 400 || response.status === 'Failure' || response.message) {
@@ -348,21 +349,17 @@ export default class ApplicationModel extends KubeModel {
       return { errors };
     }
 
-    // if isCreate, try to create all resouces EXCEPT Application
-    // we don't want to create Application until all the other resources successfully created/updated
-    // if update, update the application too
+    // create/modify the Application last
     let applicationResource;
     let applicationRequestPath;
-    if (!deleteLinks) {
-      resources = resources.filter((resource, index) => {
-        if (resource.kind === 'Application') {
-          applicationResource = resource;
-          ([applicationRequestPath] = requestPaths.splice(index, 1));
-          return false;
-        }
-        return true;
-      });
-    }
+    resources = resources.filter((resource, index) => {
+      if (resource.kind === 'Application') {
+        applicationResource = resource;
+        ([applicationRequestPath] = requestPaths.splice(index, 1));
+        return false;
+      }
+      return true;
+    });
 
     // if there's a namespace, try to create it
     if (namespaces.length === 0) {
@@ -442,8 +439,9 @@ export default class ApplicationModel extends KubeModel {
 
     // if everything else created/updated
     if (errors.length === 0) {
-      // if update, delete any removed resources
-      if (deleteLinks) {
+      // if update
+      if (isEdit) {
+        // delete any removed resources except placement rules
         const destroyResponses = await Promise.all(Object.values(deleteLinks)[0]
           .filter((link) => link.indexOf('/placementrules/') === -1)
           .map((link) => this.kubeConnector.delete(link)))
@@ -452,6 +450,8 @@ export default class ApplicationModel extends KubeModel {
             message: err.message,
           }));
         checkAndCollectError(destroyResponses);
+
+        // don't update application--constantly changing
       } else {
         // if create, create the application
         const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
