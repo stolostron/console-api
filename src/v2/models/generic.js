@@ -367,7 +367,7 @@ export default class GenericModel extends KubeModel {
         return resourceResult;
       }
 
-      return [{ message: 'Unable to load resource data - Check to make sure the cluster hosting this resource is online' }];
+      return [{ message: 'Unable to load resource data. Verify that the cluster hosting this resource is online.' }];
     }
     return _.get(resourceResponse, 'status.result');
   }
