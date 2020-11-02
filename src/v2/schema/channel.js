@@ -35,6 +35,8 @@ type Channel implements K8sObject {
 export const resolver = {
   Query: {
     channels: (root, args, { channelModel }) => channelModel.getChannels(args.name, args.namespace),
+    gitChannelBranches: (root, args, { channelModel }) => channelModel.getGitChannelBranches(args),
+    gitChannelPaths: (root, args, { channelModel }) => channelModel.getGitChannelPaths(args),
   },
   Mutation: {
     createChannel: (root, args, { channelModel }) => channelModel.createChannel(args.resources),

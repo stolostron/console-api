@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Channel Resolver Correctly Resolves Channels Query 1`] = `
+Object {
+  "data": Object {
+    "channels": Array [
+      Object {
+        "metadata": Object {
+          "creationTimestamp": "2020-10-22T14:47:17Z",
+          "labels": null,
+          "name": "ggithubcom-fxiang1-app-samples",
+          "namespace": "ggithubcom-fxiang1-app-samples-ns",
+          "resourceVersion": "423984",
+          "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/ggithubcom-fxiang1-app-samples-ns/channels/ggithubcom-fxiang1-app-samples",
+          "uid": "af6dd93d-e545-4376-8d12-0c28277f0bd4",
+        },
+        "objectPath": "https://github.com/fxiang1/app-samples.git",
+        "raw": Object {
+          "apiVersion": "apps.open-cluster-management.io/v1",
+          "kind": "Channel",
+          "metadata": Object {
+            "annotations": Object {
+              "open-cluster-management.io/user-group": "c3lzdGVtOmNsdXN0ZXItYWRtaW5zLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "open-cluster-management.io/user-identity": "a3ViZTphZG1pbg==",
+            },
+            "creationTimestamp": "2020-10-22T14:47:17Z",
+            "generation": 1,
+            "name": "ggithubcom-fxiang1-app-samples",
+            "namespace": "ggithubcom-fxiang1-app-samples-ns",
+            "resourceVersion": "423984",
+            "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/ggithubcom-fxiang1-app-samples-ns/channels/ggithubcom-fxiang1-app-samples",
+            "uid": "af6dd93d-e545-4376-8d12-0c28277f0bd4",
+          },
+          "spec": Object {
+            "pathname": "https://github.com/fxiang1/app-samples.git",
+            "type": "Git",
+          },
+        },
+        "secretRef": "",
+        "type": "Git",
+      },
+      Object {
+        "metadata": Object {
+          "creationTimestamp": "2020-10-27T20:56:21Z",
+          "labels": null,
+          "name": "ggithubcom-kevinfcormier-sample-repo",
+          "namespace": "ggithubcom-kevinfcormier-sample-repo-ns",
+          "resourceVersion": "5456091",
+          "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/ggithubcom-kevinfcormier-sample-repo-ns/channels/ggithubcom-kevinfcormier-sample-repo",
+          "uid": "5d3ee038-b441-49ef-bf9a-30d30af13ab1",
+        },
+        "objectPath": "https://github.com/KevinFCormier/sample-repo.git",
+        "raw": Object {
+          "apiVersion": "apps.open-cluster-management.io/v1",
+          "kind": "Channel",
+          "metadata": Object {
+            "annotations": Object {
+              "open-cluster-management.io/user-group": "c3lzdGVtOmNsdXN0ZXItYWRtaW5zLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "open-cluster-management.io/user-identity": "a3ViZTphZG1pbg==",
+            },
+            "creationTimestamp": "2020-10-27T20:56:21Z",
+            "generation": 1,
+            "name": "ggithubcom-kevinfcormier-sample-repo",
+            "namespace": "ggithubcom-kevinfcormier-sample-repo-ns",
+            "resourceVersion": "5456091",
+            "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/ggithubcom-kevinfcormier-sample-repo-ns/channels/ggithubcom-kevinfcormier-sample-repo",
+            "uid": "5d3ee038-b441-49ef-bf9a-30d30af13ab1",
+          },
+          "spec": Object {
+            "pathname": "https://github.com/KevinFCormier/sample-repo.git",
+            "secretRef": Object {
+              "name": "ggithubcom-kevinfcormier-sample-repo-auth",
+            },
+            "type": "Git",
+          },
+        },
+        "secretRef": "ggithubcom-kevinfcormier-sample-repo-auth",
+        "type": "Git",
+      },
+      Object {
+        "metadata": Object {
+          "creationTimestamp": "2020-10-22T14:47:17Z",
+          "labels": null,
+          "name": "hkubernetes-chartsstoragegoogleapiscom",
+          "namespace": "hkubernetes-chartsstoragegoogleapiscom-ns",
+          "resourceVersion": "423993",
+          "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/hkubernetes-chartsstoragegoogleapiscom-ns/channels/hkubernetes-chartsstoragegoogleapiscom",
+          "uid": "592a18c7-8409-4708-a025-12fb58524812",
+        },
+        "objectPath": "https://kubernetes-charts.storage.googleapis.com",
+        "raw": Object {
+          "apiVersion": "apps.open-cluster-management.io/v1",
+          "kind": "Channel",
+          "metadata": Object {
+            "annotations": Object {
+              "open-cluster-management.io/user-group": "c3lzdGVtOmNsdXN0ZXItYWRtaW5zLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "open-cluster-management.io/user-identity": "a3ViZTphZG1pbg==",
+            },
+            "creationTimestamp": "2020-10-22T14:47:17Z",
+            "generation": 1,
+            "name": "hkubernetes-chartsstoragegoogleapiscom",
+            "namespace": "hkubernetes-chartsstoragegoogleapiscom-ns",
+            "resourceVersion": "423993",
+            "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/hkubernetes-chartsstoragegoogleapiscom-ns/channels/hkubernetes-chartsstoragegoogleapiscom",
+            "uid": "592a18c7-8409-4708-a025-12fb58524812",
+          },
+          "spec": Object {
+            "pathname": "https://kubernetes-charts.storage.googleapis.com",
+            "type": "HelmRepo",
+          },
+        },
+        "secretRef": "",
+        "type": "HelmRepo",
+      },
+      Object {
+        "metadata": Object {
+          "creationTimestamp": "2020-10-27T16:20:49Z",
+          "labels": null,
+          "name": "oec2-dummy-dev1",
+          "namespace": "oec2-dummy-dev1-ns",
+          "resourceVersion": "5262671",
+          "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/oec2-dummy-dev1-ns/channels/oec2-dummy-dev1",
+          "uid": "7b41db1b-6dd2-4f0a-8235-0d9cb8688491",
+        },
+        "objectPath": "http://ec2-dummy/dev1",
+        "raw": Object {
+          "apiVersion": "apps.open-cluster-management.io/v1",
+          "kind": "Channel",
+          "metadata": Object {
+            "annotations": Object {
+              "open-cluster-management.io/user-group": "c3lzdGVtOmNsdXN0ZXItYWRtaW5zLHN5c3RlbTphdXRoZW50aWNhdGVk",
+              "open-cluster-management.io/user-identity": "a3ViZTphZG1pbg==",
+            },
+            "creationTimestamp": "2020-10-27T16:20:49Z",
+            "generation": 1,
+            "name": "oec2-dummy-dev1",
+            "namespace": "oec2-dummy-dev1-ns",
+            "resourceVersion": "5262671",
+            "selfLink": "/apis/apps.open-cluster-management.io/v1/namespaces/oec2-dummy-dev1-ns/channels/oec2-dummy-dev1",
+            "uid": "7b41db1b-6dd2-4f0a-8235-0d9cb8688491",
+          },
+          "spec": Object {
+            "pathname": "http://ec2-dummy/dev1",
+            "type": "ObjectBucket",
+          },
+        },
+        "secretRef": "",
+        "type": "ObjectBucket",
+      },
+    ],
+  },
+}
+`;
