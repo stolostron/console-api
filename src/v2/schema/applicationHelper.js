@@ -78,7 +78,7 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
 export const getLocalClusterElement = (createdClusterElements) => {
   let localClusterElement;
   createdClusterElements.forEach((element) => {
-    if (element.indexOf('local-cluster') > -1) {
+    if (element.indexOf(localClusterName) > -1) {
       localClusterElement = element;
     }
   });
@@ -94,7 +94,7 @@ export const addClusters = (
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
   let clusterId = `member--clusters--${cns}`;
-  const localClusterElement = clusterNames.length === 1 && clusterNames[0] === 'local-cluster'
+  const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;
   if (!createdClusterElements.has(clusterId) && !localClusterElement) {
     const filteredClusters = clusters.filter((cluster) => {
