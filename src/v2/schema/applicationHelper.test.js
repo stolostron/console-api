@@ -23,6 +23,7 @@ import getApplicationElements, {
   removeHelmReleaseName,
   isPrePostHookDeployable,
   createDeployableObject,
+  getLocalClusterElement,
 } from './applicationHelper';
 
 describe('createDeployableObject', () => {
@@ -1308,5 +1309,19 @@ describe('removeReleaseGeneratedSuffix remove suffix', () => {
 describe('removeHelmReleaseName test resource with only release name as the name', () => {
   it('removeHelmReleaseName test resource with only release name as the name', () => {
     expect(removeHelmReleaseName('nginx-ingress-66f46', 'nginx-ingress-66f46')).toEqual('nginx-ingress');
+  });
+});
+
+describe('getLocalClusterElement cluster element exists', () => {
+  it('should get the local cluster element', () => {
+    const createdClusterElements = new Set(['member--clusters--cluster1, cluster2, local-cluster']);
+    expect(getLocalClusterElement(createdClusterElements)).toEqual('member--clusters--cluster1, cluster2, local-cluster');
+  });
+});
+
+describe('getLocalClusterElement cluster element does not exists', () => {
+  it('should not get the local cluster element', () => {
+    const createdClusterElements = new Set(['member--clusters--cluster1, cluster2']);
+    expect(getLocalClusterElement(createdClusterElements)).toEqual(undefined);
   });
 });

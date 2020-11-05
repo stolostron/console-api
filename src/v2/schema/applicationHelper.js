@@ -75,6 +75,17 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
   });
 }
 
+export const getLocalClusterElement = (createdClusterElements) => {
+  let localClusterElement;
+  createdClusterElements.forEach((element) => {
+    if (element.indexOf(localClusterName) > -1) {
+      localClusterElement = element;
+    }
+  });
+
+  return localClusterElement;
+};
+
 export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
@@ -82,8 +93,10 @@ export const addClusters = (
   // create element if not already created'
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
-  const clusterId = `member--clusters--${cns}`;
-  if (!createdClusterElements.has(clusterId)) {
+  let clusterId = `member--clusters--${cns}`;
+  const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
+    ? getLocalClusterElement(createdClusterElements) : undefined;
+  if (!createdClusterElements.has(clusterId) && !localClusterElement) {
     const filteredClusters = clusters.filter((cluster) => {
       const cname = _.get(cluster, metadataName);
       return cname && clusterNames.includes(cname);
@@ -101,6 +114,9 @@ export const addClusters = (
       },
     });
     createdClusterElements.add(clusterId);
+  }
+  if (localClusterElement) {
+    clusterId = localClusterElement;
   }
   links.push({
     from: { uid: parentId },
