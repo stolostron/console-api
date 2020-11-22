@@ -11,6 +11,7 @@
 
 import getApplicationElements, {
   createReplicaChild,
+  createIngressRouteChild,
   createGenericPackageObject,
   addSubscriptionCharts,
   addSubscriptionDeployable,
@@ -209,6 +210,77 @@ describe('createReplicaChild', () => {
       uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--replicaset--redis-slave',
     };
     expect(createReplicaChild(parentObject, template, [], [])).toEqual(result);
+  });
+});
+
+describe('createIngressRouteChild', () => {
+  it('creates a Route object and links it to Ingress', () => {
+    const parentObject = {
+      id: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--ingress--nginx-virtual-placement',
+      uid: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--ingress--nginx-virtual-placement',
+      name: 'nginx-virtual-placement',
+      namespace: 'open-cluster-management',
+      type: 'ingress',
+      specs:
+      {
+        isDesign: false,
+        raw: {
+          kind: 'Ingress',
+          metadata: {
+            name: 'nginx-virtual-placement',
+            namespace: 'open-cluster-management',
+          },
+          spec: { rules: [
+            {
+              host: "a.b.c"
+            }
+
+          ] 
+        },
+        },
+      },
+    };
+    const template = {
+      kind: 'Ingress',
+      metadata: { name: 'nginx-virtual-placement', namespace: 'open-cluster-management' },
+      spec: { rules: [
+        {
+          host: "a.b.c"
+        }
+      ] 
+    },
+    };
+
+    const result = {
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--route--nginx-virtual-placement',
+      name: 'nginx-virtual-placement',
+      namespace: 'open-cluster-management',
+      specs: {
+        isDesign: false,
+        parent: {
+          parentId: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--ingress--nginx-virtual-placement',
+          parentName: 'nginx-virtual-placement',
+          parentType: 'ingress',
+        },
+        raw: {
+          kind: 'Route',
+          metadata: {
+            name: 'nginx-virtual-placement',
+            namespace: 'open-cluster-management',
+          },
+          spec: {
+            rules: [
+              {
+                host: "a.b.c"
+              }
+            ] 
+          }         
+        },
+      },
+      type: 'route',
+      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--route--nginx-virtual-placement',
+    };
+    expect(createIngressRouteChild(parentObject, template, [], [])).toEqual(result);
   });
 });
 
