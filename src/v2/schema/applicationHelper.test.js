@@ -230,25 +230,27 @@ describe('createIngressRouteChild', () => {
             name: 'nginx-virtual-placement',
             namespace: 'open-cluster-management',
           },
-          spec: { rules: [
-            {
-              host: "a.b.c"
-            }
-
-          ] 
-        },
+          spec:
+          {
+            rules: [
+              {
+                host: 'a.b.c',
+              },
+            ],
+          },
         },
       },
     };
     const template = {
       kind: 'Ingress',
       metadata: { name: 'nginx-virtual-placement', namespace: 'open-cluster-management' },
-      spec: { rules: [
-        {
-          host: "a.b.c"
-        }
-      ] 
-    },
+      spec: {
+        rules: [
+          {
+            host: 'a.b.c',
+          },
+        ],
+      },
     };
 
     const result = {
@@ -271,10 +273,10 @@ describe('createIngressRouteChild', () => {
           spec: {
             rules: [
               {
-                host: "a.b.c"
-              }
-            ] 
-          }         
+                host: 'a.b.c',
+              },
+            ],
+          },
         },
       },
       type: 'route',
