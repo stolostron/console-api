@@ -140,33 +140,13 @@ const getClusterName = (nodeId) => {
   return localClusterName;
 };
 
-export const createReplicaChild = (parentObject, template, links, nodes) => {
-  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
-    return null; // no replica
-  }
+const createChildNode = (parentObject, type, rawData, links, nodes) => {
   const parentType = _.get(parentObject, 'type', '');
-  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
-    // create only for deploymentconfig and deployment types
-    return null;
-  }
-
-  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
   const { name, namespace } = parentObject;
 
   const parentId = parentObject.id;
   const memberId = `member--member--deployable--member--clusters--${getClusterName(parentId)}--${type}--${name}`;
 
-  const rawData = {
-    kind: type,
-    metadata: {
-      name,
-      namespace,
-    },
-    spec: {
-      desired: _.get(template, 'spec.replicas', 0),
-      template: { ..._.get(template, 'spec.template', {}) },
-    },
-  };
   const deployableObj = {
     name,
     namespace,
@@ -192,6 +172,52 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
   });
 
   return deployableObj;
+};
+
+export const createReplicaChild = (parentObject, template, links, nodes) => {
+  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
+    return null; // no replica
+  }
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
+    // create only for deploymentconfig and deployment types
+    return null;
+  }
+  const { name, namespace } = parentObject;
+  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
+  const rawData = {
+    kind: type,
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      desired: _.get(template, 'spec.replicas', 0),
+      template: { ..._.get(template, 'spec.template', {}) },
+    },
+  };
+  return createChildNode(parentObject, type, rawData, links, nodes);
+};
+
+export const createIngressRouteChild = (parentObject, template, links, nodes) => {
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'ingress') {
+    return null; // not an ingress object
+  }
+  const { name, namespace } = parentObject;
+  const type = 'route';
+
+  const rawData = {
+    kind: 'Route',
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      rules: _.get(template, 'spec.rules', []),
+    },
+  };
+  return createChildNode(parentObject, type, rawData, links, nodes);
 };
 
 export const addSubscriptionDeployable = (
@@ -273,8 +299,10 @@ export const addSubscriptionDeployable = (
       type: linkType,
     });
   }
-  // create subobject replica subobject, if this object defines a replicas
+  // create replica subobject, if this object defines a replicas
   createReplicaChild(topoObject, template, links, nodes);
+  // create route subobject, if this object is an ingress
+  createIngressRouteChild(topoObject, template, links, nodes);
 
   return topoObject;
 };
