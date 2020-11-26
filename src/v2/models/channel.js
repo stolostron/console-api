@@ -148,13 +148,18 @@ export default class ChannelModel extends KubeModel {
       });
   }
 
+  handleGitError = (err) => {
+    throw Error(err.response.statusText);
+  }
+
   async getGitChannelBranches(args) {
     return this.getGitConnection(args)
       .then((gitRepo) => (
         gitRepo.listBranches().then((result) => (
           result.data ? result.data.map((branch) => branch.name) : []
         ))
-      ));
+      ))
+      .catch(this.handleGitError);
   }
 
   async getGitChannelPaths(args) {
@@ -164,6 +169,7 @@ export default class ChannelModel extends KubeModel {
         gitRepo.getContents(branch, path, false).then((result) => (
           result.data ? result.data.filter((item) => item.type === 'dir').map((item) => item.name) : []
         ))
-      ));
+      ))
+      .catch(this.handleGitError);
   }
 }
