@@ -161,9 +161,8 @@ export const getAllChannels = (subscriptions, channels, selectedChannel, allowAl
   } else if (!selectedSubscription) {
     selectedSubscription = [subscriptions[0]];
   }
-
   // renders all subscriptions when selected all subscriptions 
-  if (allowAllChannel & selectedChannel === '__ALL__/__ALL__//__ALL__/__ALL__') {
+  if (allowAllChannel && selectedChannel === '__ALL__/__ALL__//__ALL__/__ALL__') {
     selectedSubscription = subscriptions;
   }
   return selectedSubscription;
