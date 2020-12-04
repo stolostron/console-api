@@ -153,9 +153,18 @@ export const getAllChannels = (subscriptions, channels, selectedChannel, allowAl
   if (allowAllChannel) {
     if (channels.length > 1) {
       channels.unshift(EVERYTHING_CHANNEL);
+      // set default selectedSubscription when topology first render
+      if(!selectedSubscription){
+        selectedSubscription = [subscriptions[0]];
+      }
     }
   } else if (!selectedSubscription) {
     selectedSubscription = [subscriptions[0]];
+  }
+
+  // renders all subscriptions when selected all subscriptions 
+  if(allowAllChannel & selectedChannel === "__ALL__/__ALL__//__ALL__/__ALL__"){
+    selectedSubscription = subscriptions
   }
   return selectedSubscription;
 };
