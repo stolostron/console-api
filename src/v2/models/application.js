@@ -368,7 +368,7 @@ export default class ApplicationModel extends KubeModel {
     }
 
     const existingNamespaces = await this.kubeConnector.get('/api/v1/namespaces');
-    checkAndCollectError(existingNamespaces)
+    checkAndCollectError(existingNamespaces);
     if (errors.length !== 0) {
       return { errors };
     }
