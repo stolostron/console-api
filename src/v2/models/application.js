@@ -369,7 +369,10 @@ export default class ApplicationModel extends KubeModel {
 
     const existingNamespaces = await this.kubeConnector.get('/api/v1/namespaces');
     const namespaceResponses = await Promise.all(namespaces.map((ns) => {
-      const namespaceExists = existingNamespaces.items.find((existingNamespace) => existingNamespace.metadata.name === ns);
+      let namespaceExists = false;
+      if (existingNamespaces && existingNamespaces.items) {
+        namespaceExists = existingNamespaces.items.find((existingNamespace) => existingNamespace.metadata.name === ns);
+      }
       return !namespaceExists ? this.createNamespace(ns) : undefined;
     }));
 
