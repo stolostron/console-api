@@ -313,7 +313,7 @@ describe('getAllChannels allow all channels', () => {
     }];
 
     const selectedChannel = '__ALL__/__ALL__//__ALL__/__ALL__';
-    expect(getAllChannels(subscriptions, [], selectedChannel, true)).toEqual(null);
+    expect(getAllChannels(subscriptions, [], selectedChannel, true)).toEqual(subscriptions);
   });
 });
 
