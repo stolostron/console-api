@@ -604,6 +604,8 @@ export default class ApplicationModel extends KubeModel {
         // what subscriptions does user want to see
         model.channels = [];
         model.subscriptions = [];
+        model.allSubscriptions = allSubscriptions;
+        model.allChannels = [];
 
         // get all the channels and find selected subscription from selected channel
         const subscr = getAllChannels(
@@ -621,6 +623,8 @@ export default class ApplicationModel extends KubeModel {
         await this.getAppHooks(preHooksMap, true);
         await this.getAppHooks(postHooksMap, false);
         await this.getAppRules(rulesMap);
+        // get all channels
+        await this.getAllAppChannels(model.allChannels, allSubscriptions);
         if (includeChannels) {
           await this.getAppChannels(channelsMap);
         }
@@ -714,6 +718,37 @@ export default class ApplicationModel extends KubeModel {
         });
       });
     });
+    return Promise.all(requests);
+  }
+
+  // get all channels for all subscriptions
+  // this is used to build the subscription cards information
+  async getAllAppChannels(appAllChannels, allSubscriptions) {
+    let requests;
+    try {
+      // get all channels information
+      const channelsMap = {};
+      allSubscriptions.forEach((subscription) => {
+        const chnlData = _.get(subscription, 'spec.channel', '').split('/');
+        if (chnlData.length === 2) {
+          // eslint-disable-next-line prefer-destructuring
+          channelsMap[chnlData[0]] = chnlData[1];
+        }
+      });
+      requests = Object.entries(channelsMap).map(async ([channelNS, channelName]) => {
+        const response = await this.kubeConnector.getResources(
+          (ns) => `/apis/apps.open-cluster-management.io/v1/namespaces/${ns}/channels/${channelName}`,
+          { kind: 'Channel', namespaces: [channelNS] },
+        ) || [];
+        // stuff response into appAllChannels
+        response.forEach((channel) => {
+          appAllChannels.push(channel);
+        });
+      });
+    } catch (err) {
+      logger.error(err);
+      throw err;
+    }
     return Promise.all(requests);
   }
 
