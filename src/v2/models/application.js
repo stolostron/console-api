@@ -115,8 +115,10 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
   // if a subscription has lots and lots of deployables, break into smaller subscriptions
   let allowAllChannel = true;
   const subscriptions = [];
+  let allDeployablePaths = 0;
   allSubscriptions.forEach((subscription) => {
     const deployablePaths = _.get(subscription, DEPLOYABLES, '').split(',').sort();
+    allDeployablePaths += deployablePaths.length
 
     if (deployablePaths.length > 20) {
       const chunks = _.chunk(deployablePaths, 16);
@@ -129,11 +131,14 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
       chunks.forEach((chuck) => {
         subscriptions.push({ ...subscription, deployablePaths: chuck, isChucked: true });
       });
-      allowAllChannel = false;
     } else {
       subscriptions.push({ ...subscription, deployablePaths });
     }
   });
+  // hide all subscription option
+  if (allDeployablePaths > 100){
+    allowAllChannel = false;
+  }
 
   return { subscriptions, allowAllChannel };
 };
