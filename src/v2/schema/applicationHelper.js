@@ -644,6 +644,8 @@ async function getApplicationElements(application, clusterModel) {
       isDesign: true,
       raw: application.app,
       activeChannel: application.activeChannel,
+      allSubscriptions: application.allSubscriptions ? application.allSubscriptions : [],
+      allChannels: application.allChannels ? application.allChannels : [],
       channels: application.channels,
     },
   });
