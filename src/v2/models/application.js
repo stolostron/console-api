@@ -118,7 +118,7 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
   let allDeployablePaths = 0;
   allSubscriptions.forEach((subscription) => {
     const deployablePaths = _.get(subscription, DEPLOYABLES, '').split(',').sort();
-    allDeployablePaths += deployablePaths.length
+    allDeployablePaths += deployablePaths.length;
 
     if (deployablePaths.length > 20) {
       const chunks = _.chunk(deployablePaths, 16);
@@ -136,7 +136,7 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
     }
   });
   // hide all subscription option
-  if (allDeployablePaths > 100){
+  if (allDeployablePaths > 100) {
     allowAllChannel = false;
   }
 
