@@ -191,7 +191,7 @@ describe('getSubscriptionsDeployables one chunck', () => {
       }];
 
     const result = {
-      allowAllChannel: false,
+      allowAllChannel: true,
       subscriptions: [{
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: ['/default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget', '1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '3', '4'],
@@ -229,7 +229,7 @@ describe('getSubscriptionsDeployables one chunck', () => {
   });
 });
 
-describe('getSubscriptionsDeployables more than 20 deployables', () => {
+describe('getSubscriptionsDeployables more than 20 but smaller than 100 deployables', () => {
   it('should match getSubscriptionsDeployables', () => {
     const allSubscriptions = [
       {
