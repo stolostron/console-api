@@ -606,6 +606,7 @@ export default class ApplicationModel extends KubeModel {
         model.subscriptions = [];
         model.allSubscriptions = allSubscriptions;
         model.allChannels = [];
+        model.allClusters = [];
 
         // get all the channels and find selected subscription from selected channel
         const subscr = getAllChannels(
@@ -622,7 +623,7 @@ export default class ApplicationModel extends KubeModel {
         await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
         await this.getAppHooks(preHooksMap, true);
         await this.getAppHooks(postHooksMap, false);
-        await this.getAppRules(rulesMap);
+        await this.getAppRules(rulesMap, model.allClusters);
         // get all channels
         await this.getAllAppChannels(model.allChannels, allSubscriptions);
         if (includeChannels) {
@@ -752,7 +753,7 @@ export default class ApplicationModel extends KubeModel {
     return Promise.all(requests);
   }
 
-  async getAppRules(rulesMap) {
+  async getAppRules(rulesMap, allClusters) {
     let requests;
     try {
       requests = Object.entries(rulesMap).map(async ([namespace, values]) => {
@@ -764,6 +765,14 @@ export default class ApplicationModel extends KubeModel {
 
         // stuff responses into subscriptions that requested them
         response.forEach((rule) => {
+          const clusters = _.get(rule, 'status.decisions', []);
+          clusters.forEach((cluster) => {
+            // get cluster name
+            const clusterName = _.get(cluster, 'clusterName');
+            if (clusterName && allClusters.indexOf(clusterName) === -1) {
+              allClusters.push(clusterName);
+            }
+          });
           const name = _.get(rule, 'metadata.name');
           values.forEach(({ ruleName, subscription }) => {
             if (name === ruleName) {
