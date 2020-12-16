@@ -39,6 +39,7 @@ export const mockAppsResponse = {
             'apps.open-cluster-management.io/dashboard': 'https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
             'apps.open-cluster-management.io/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
             'apps.open-cluster-management.io/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
+            'apps.open-cluster-management.io/subscriptions':"default/gbapp-gbapp-subscription-1",
           },
         },
         spec: {
@@ -96,6 +97,7 @@ export const mockSingleAppResponse = {
         'apps.open-cluster-management.io/dashboard': 'https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus',
         'apps.open-cluster-management.io/deployables': 'gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave',
         'apps.open-cluster-management.io/placementbindings': 'gbapp-gbapp,gbapp-gbapp-redismaster',
+        'apps.open-cluster-management.io/subscriptions':"default/gbapp-gbapp-subscription-1",
       },
     },
     spec: {

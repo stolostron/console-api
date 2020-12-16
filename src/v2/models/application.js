@@ -22,7 +22,7 @@ export const filterByName = (names, items) => items.filter((item) => names.find(
 
 export const filterByNameNamespace = (names, items) => items.filter(({ metadata }) => names.find((name) => {
   const path = name.split('/');
-  return path[1] === metadata.name && path[0] === metadata.namespace;
+  return metadata && path.length === 2 && path[1] === metadata.name && path[0] === metadata.namespace;
 }));
 
 const longestCommonSubstring = (str1, str2) => {
@@ -791,7 +791,7 @@ export default class ApplicationModel extends KubeModel {
       logger.error(err);
       throw err;
     }
-
+    
     return filterByNameNamespace(names, response);
   }
 
