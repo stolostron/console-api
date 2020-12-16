@@ -791,7 +791,7 @@ export default class ApplicationModel extends KubeModel {
       logger.error(err);
       throw err;
     }
-    
+
     return filterByNameNamespace(names, response);
   }
 
