@@ -14,6 +14,8 @@ Object {
           "name": "gbapp-gbapp-v2",
           "namespace": "gbapp-gbapp-v2",
           "specs": Object {
+            "allChannels": Array [],
+            "allSubscriptions": Array [],
             "isDesign": true,
             "raw": Object {
               "apiVersion": "mcm.ibm.com/v1alpha1",
