@@ -700,7 +700,6 @@ describe('filterByNameNamespace', () => {
       },
     ];
 
-    const result = [{ metadata: { namespace: 'aaa' } }, { metadata: { namespace: 'aaa' } }];
-    expect(filterByNameNamespace(names, items)).toEqual(result);
+    expect(filterByNameNamespace(names, items)).toEqual([]);
   });
 });

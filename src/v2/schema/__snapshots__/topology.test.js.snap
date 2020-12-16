@@ -14,6 +14,9 @@ Object {
           "name": "gbapp-gbapp-v2",
           "namespace": "gbapp-gbapp-v2",
           "specs": Object {
+            "allChannels": Array [],
+            "allSubscriptions": Array [],
+            "channels": Array [],
             "isDesign": true,
             "raw": Object {
               "apiVersion": "mcm.ibm.com/v1alpha1",
@@ -24,6 +27,7 @@ Object {
                   "apps.open-cluster-management.io/dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
                   "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
                   "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
+                  "apps.open-cluster-management.io/subscriptions": "default/gbapp-gbapp-subscription-1",
                   "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
                   "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
                 },
