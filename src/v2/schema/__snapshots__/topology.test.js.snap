@@ -15,7 +15,10 @@ Object {
           "namespace": "gbapp-gbapp-v2",
           "specs": Object {
             "allChannels": Array [],
-            "allClusters": Array [],
+            "allClusters": Object {
+              "isLocal": false,
+              "remoteCount": 0,
+            },
             "allSubscriptions": Array [],
             "channels": Array [],
             "isDesign": true,

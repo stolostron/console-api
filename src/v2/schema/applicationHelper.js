@@ -633,6 +633,7 @@ async function getApplicationElements(application, clusterModel) {
   let name;
   let namespace;
   ({ name, namespace } = application);
+  const allAppClusters = application.allClusters ? application.allClusters : [];
   const appId = `application--${name}`;
   nodes.push({
     name,
@@ -646,7 +647,10 @@ async function getApplicationElements(application, clusterModel) {
       activeChannel: application.activeChannel,
       allSubscriptions: application.allSubscriptions ? application.allSubscriptions : [],
       allChannels: application.allChannels ? application.allChannels : [],
-      allClusters: application.allClusters ? application.allClusters : [],
+      allClusters: {
+        isLocal: allAppClusters.indexOf(localClusterName) !== -1,
+        remoteCount: allAppClusters.indexOf('local-cluster') !== -1 ? allAppClusters.length - 1 : allAppClusters.length,
+      },
       channels: application.channels,
     },
   });
