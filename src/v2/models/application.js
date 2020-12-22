@@ -332,7 +332,8 @@ export default class ApplicationModel extends KubeModel {
     // filter out Namespace resources that don't belong to App, Channel, Subscription
     // if a namespace belongs to app, etc, we create them all at once
     // if a namespace is independant, we create it separately (might be a secret, etc)
-    resources = resources.filter(({ kind, metadata = {} }) => kind !== 'Namespace' || !namespaces.has(metadata.name));
+    // ignore reqource path with no apiVersion, such as deleteLinks
+    resources = resources.filter(({ kind, metadata = {} }) => kind !== undefined && (kind !== 'Namespace' || !namespaces.has(metadata.name)));
     namespaces = Array.from(namespaces);
 
     // get resource end point for each resource
