@@ -81,7 +81,7 @@ const apolloServer = new ApolloServer({
 
     return {
       req,
-      applicationModel: new ApplicationModel({ kubeConnector }),
+      applicationModel: new ApplicationModel({ kubeConnector, updateUserNamespaces }),
       channelModel: new ChannelModel({ kubeConnector }),
       subscriptionModel: new SubscriptionModel({ kubeConnector }),
       placementRuleModel: new PlacementRuleModel({ kubeConnector }),
