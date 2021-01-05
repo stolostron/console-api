@@ -523,6 +523,8 @@ export default class ApplicationModel extends KubeModel {
       if (response.code === 409) {
         response = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}`);
       }
+    } else {
+      this.updateUserNamespaces(response);
     }
     return response;
   }
