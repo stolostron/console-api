@@ -287,12 +287,14 @@ export default class KubeConnector {
       body.spec.scope.updateIntervalSeconds = updateInterval; // default is 30 secs
     }
     // Create ManagedClusterView
-    const managedClusterViewResponse = await this.post(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews`, body);
+    const apiPath = `/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews`;
+    const managedClusterViewResponse = await this.post(apiPath, body);
     if (_.get(managedClusterViewResponse, 'status.conditions[0].status') === 'False' || managedClusterViewResponse.code >= 400) {
       throw new Error(`Create ManagedClusterView Failed [${managedClusterViewResponse.code}] - ${managedClusterViewResponse.message}`);
     }
     // Poll ManagedClusterView until success or failure
-    const { cancel, promise: pollPromise } = this.pollView(_.get(managedClusterViewResponse, 'metadata.selfLink'));
+    const managedClusterViewName = _.get(managedClusterViewResponse, 'metadata.name');
+    const { cancel, promise: pollPromise } = this.pollView(`${apiPath}/${managedClusterViewName}`);
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
       if (result && deleteAfterUse) {
