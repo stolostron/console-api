@@ -43,10 +43,6 @@ type Query {
   bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]
   bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
 
-  # Get Nodes and node info
-  nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  node(namespace: String, name: String): [Node]
-
   # Get Compliance/Policy info
   compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from OCM. Use policies instead.")
 
@@ -71,9 +67,6 @@ type Query {
 
   # Get placement rules.
   placementrules (name: String, namespace: String): [PlacementRule]
-
-  # Get policies.
-  policies(name: String, namespace: String, clusterName: String): [Policy]
 
   # Get secrets
   secrets(namespace: String): [Secret]
@@ -110,13 +103,6 @@ type Query {
   topology(filter: TopologyFilter): Topology
 
   getAutomatedImportStatus(namespace: String, name: String): JSON
-
-  # DEPRECATED QUERIES
-  namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pod(name: String, namespace: String, clusterName: String): [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pvsClaims: [PVsClaims] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
 }
 
 # Multicloud Manager Mutations

@@ -29,7 +29,6 @@ import PlacementRuleModel from './models/placementrule';
 import ClusterModel, { CLUSTER_NAMESPACE_LABEL } from './models/cluster';
 import GenericModel from './models/generic';
 import ComplianceModel from './models/compliance';
-import ResourceViewModel from './models/resourceview';
 import SFModel from './models/findings';
 import ConnectionModel from './models/connection';
 
@@ -88,7 +87,6 @@ const apolloServer = new ApolloServer({
       clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
       genericModel: new GenericModel({ kubeConnector }),
       complianceModel: new ComplianceModel({ kubeConnector }),
-      resourceViewModel: new ResourceViewModel({ kubeConnector }),
       sfModel: new SFModel({ kubeConnector, req }),
       connectionModel: new ConnectionModel({ kubeConnector }),
       bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),

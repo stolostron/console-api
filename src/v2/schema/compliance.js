@@ -79,6 +79,36 @@ type CompliancePolicy implements K8sObject {
   message: String
 }
 
+type PolicyTemplates {
+  apiVersion: String
+  complianceType: String
+  compliant: String
+  status: String
+  lastTransition: String
+  name: String
+  kind: String
+  validity: String
+  raw: JSON
+}
+
+type PolicyRules {
+  apiGroups: [String]
+  complianceType: String
+  resources: [String]
+  ruleUID: String
+  templateType: String
+  verbs: [String]
+}
+
+type Violations {
+  cluster: String
+  message: String
+  name: String
+  reason: String
+  selector: JSON
+  status: String
+}
+
 `;
 
 export const resolver = {

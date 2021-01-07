@@ -358,23 +358,6 @@ export default class ComplianceModel {
     return placementBindings;
   }
 
-  async getPolicies(name, namespace, clusterName) {
-    // if policy name specified
-    if (name !== undefined) {
-      const response = await this.kubeConnector.resourceViewQuery('policy', clusterName, name, namespace, null, false).catch(() => null);
-      const results = _.get(response, 'status.results');
-      if (results) {
-        const item = _.get(results, `${clusterName}`, {});
-        if (item) {
-          const result = [];
-          item.items.forEach((policy) => result.push({ ...policy, raw: policy }));
-          return result;
-        }
-      }
-    }
-    return [];
-  }
-
   static resolvePolicyDetails(parent) {
     return {
       exclude_namespace: _.get(parent, 'spec.namespaces.exclude', ['*']),
