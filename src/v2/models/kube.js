@@ -27,20 +27,18 @@ export default class Kube {
       const { apiVersion, kind } = resource;
       const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
-        return (async () => {
-          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
-            logger.error(err);
-            throw err;
-          });
-          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
-          const namespace = _.get(resource, 'metadata.namespace');
-          const { name, namespaced } = resourceType;
-          if (namespaced && !namespace) {
-            return null;
-          }
-          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
-          return requestPath;
-        })();
+        const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
+          logger.error(err);
+          throw err;
+        });
+        const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
+        const namespace = _.get(resource, 'metadata.namespace');
+        const { name, namespaced } = resourceType;
+        if (namespaced && !namespace) {
+          return null;
+        }
+        const namespaceSegments = namespaced ? `namespaces/${namespace}/` : '';
+        return `${apiPath}/${namespaceSegments}${name}`;
       }
     }
     return undefined;
