@@ -427,21 +427,22 @@ export default class ApplicationModel extends KubeModel {
 
     // if the only errors were "already existing", patch those resources
     if (errors.length === 0 && updates.length > 0) {
-      // get the selfLinks of the existing resources
-      const existing = await Promise.all(updates.map(({ requestPath, resource }) => {
+      // Update the existing resources
+      const replaced = await Promise.all(updates.map(({ requestPath, resource }) => {
         const name = _.get(resource, 'metadata.name');
-        return this.kubeConnector.get(`${requestPath}/${name}`);
-      }));
-
-      // then update the resources
-      const replaced = await Promise.all(updates.map(({ resource }, index) => {
-        const selfLink = _.get(existing, `[${index}].metadata.selfLink`);
-        const resourceVersion = _.get(existing, `[${index}].metadata.resourceVersion`);
-        _.set(resource, 'metadata.resourceVersion', resourceVersion);
-        const requestBody = {
-          body: resource,
-        };
-        return this.kubeConnector.put(`${selfLink}`, requestBody);
+        const path = `${requestPath}/${name}`;
+        return this.kubeConnector.get(path)
+          .then((existing) => {
+            const resourceVersion = _.get(existing, 'metadata.resourceVersion');
+            _.set(resource, 'metadata.resourceVersion', resourceVersion);
+            const requestBody = {
+              body: resource,
+            };
+            return this.kubeConnector.put(path, requestBody);
+          }).catch((err) => {
+            logger.error(err);
+            throw err;
+          });
       }));
 
       // report any errors
