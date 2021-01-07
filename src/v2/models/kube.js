@@ -8,12 +8,41 @@
  * Copyright (c) 2020 Red Hat, Inc.
  ****************************************************************************** */
 
+import _ from 'lodash';
 import { isRequired } from '../lib/utils';
+import logger from '../lib/logger';
 
 // Abstract class for models that communicate with the kubernetes api
 export default class Kube {
   constructor({ kubeConnector = isRequired('kubeConnector'), updateUserNamespaces }) {
     this.kubeConnector = kubeConnector;
     this.updateUserNamespaces = updateUserNamespaces;
+  }
+
+  async getResourceEndPoint(resource) {
+    // dynamically get resource endpoint from kebernetes API
+    // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
+    const k8sPaths = await this.kubeConnector.getK8sPaths();
+    if (k8sPaths) {
+      const { apiVersion, kind } = resource;
+      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      if (apiPath) {
+        return (async () => {
+          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
+            logger.error(err);
+            throw err;
+          });
+          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
+          const namespace = _.get(resource, 'metadata.namespace');
+          const { name, namespaced } = resourceType;
+          if (namespaced && !namespace) {
+            return null;
+          }
+          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
+          return requestPath;
+        })();
+      }
+    }
+    return undefined;
   }
 }

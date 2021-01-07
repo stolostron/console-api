@@ -310,4 +310,14 @@ export default class KubeConnector {
     this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews/${managedClusterViewName}`)
       .catch((e) => logger.error(`Error deleting managed cluster view ${managedClusterViewName}`, e.message));
   }
+
+  async getK8sPaths() {
+    if (!this.k8sPaths) {
+      this.k8sPaths = this.get('/').catch((err) => {
+        logger.error(err);
+        throw err;
+      });
+    }
+    return this.k8sPaths;
+  }
 }
