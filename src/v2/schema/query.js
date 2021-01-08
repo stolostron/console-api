@@ -147,7 +147,7 @@ type Mutation {
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
   # Delete any Kubernetes resource via selfLink
-  deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
+  deleteResource(selfLink: String, apiVersion: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
 
   # Delete a ManagedClusterView resource
   deleteManagedClusterView(managedClusterNamespace: String, managedClusterViewName: String): JSON

@@ -362,7 +362,7 @@ export default class GenericModel extends KubeModel {
 
   async deleteResource(args) {
     const {
-      selfLink, name, namespace, cluster, kind, childResources,
+      apiVersion, selfLink, name, namespace, cluster, kind, childResources,
     } = args;
     if (childResources) {
       const errors = this.deleteChildResource(childResources);
@@ -371,16 +371,18 @@ export default class GenericModel extends KubeModel {
       }
     }
 
-    // If deleting resource on local cluster use selfLink
-    if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined) && selfLink && selfLink !== '') {
-      const response = await this.kubeConnector.delete(selfLink, {});
+    const path = selfLink && selfLink !== '' ? selfLink : `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+
+    // Local cluster case
+    if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined)) {
+      const response = await this.kubeConnector.delete(path, {});
       if (response.status === 'Failure' || response.code >= 400) {
         throw new Error(`Failed to delete the requested resource [${response.code}] - ${response.message}`);
       }
       return response;
     }
 
-    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
+    const apiGroup = getApiGroupFromSelfLink(path, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
@@ -411,7 +413,8 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
+    const apiPath = `${routePrefix}/${cluster}/managedclusteractions`;
+    const response = await this.kubeConnector.post(apiPath, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -419,7 +422,8 @@ export default class GenericModel extends KubeModel {
         message: response.message,
       }];
     }
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink));
+    const managedClusterViewName = _.get(response, 'metadata.name');
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(`${apiPath}/${managedClusterViewName}`);
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
