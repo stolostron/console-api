@@ -450,7 +450,7 @@ export default class GenericModel extends KubeModel {
       return [];
     }
 
-    const result = await Promise.all(resources.map((resource) => this.kubeConnector.delete(resource.selfLink)
+    const result = await Promise.all(resources.map((resource) => this.deleteResource(resource)
       .catch((err) => ({
         status: 'Failure',
         message: err.message,
