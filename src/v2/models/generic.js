@@ -372,14 +372,13 @@ export default class GenericModel extends KubeModel {
     }
 
     const path = selfLink && selfLink !== '' ? selfLink : `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
-
     // Local cluster case
     if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined)) {
-      const response = await this.kubeConnector.delete(path, {});
-      if (response.status === 'Failure' || response.code >= 400) {
-        throw new Error(`Failed to delete the requested resource [${response.code}] - ${response.message}`);
+      const localResponse = await this.kubeConnector.delete(path, {});
+      if (localResponse.status === 'Failure' || localResponse.code >= 400) {
+        throw new Error(`Failed to delete the requested resource [${localResponse.code}] - ${localResponse.message}`);
       }
-      return response;
+      return localResponse;
     }
 
     const apiGroup = getApiGroupFromSelfLink(path, kind);
