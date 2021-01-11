@@ -768,18 +768,18 @@ export default class ApplicationModel extends KubeModel {
 
         // stuff responses into subscriptions that requested them
         response.forEach((rule) => {
-          const clusters = _.get(rule, 'status.decisions', []);
-          clusters.forEach((cluster) => {
-            // get cluster name
-            const clusterName = _.get(cluster, 'clusterName');
-            if (clusterName && allClusters.indexOf(clusterName) === -1) {
-              allClusters.push(clusterName);
-            }
-          });
           const name = _.get(rule, 'metadata.name');
           values.forEach(({ ruleName, subscription }) => {
             if (name === ruleName) {
               subscription.rules.push(rule);
+              const clusters = _.get(rule, 'status.decisions', []);
+              clusters.forEach((cluster) => {
+                // get cluster name
+                const clusterName = _.get(cluster, 'clusterName');
+                if (clusterName && allClusters.indexOf(clusterName) === -1) {
+                  allClusters.push(clusterName);
+                }
+              });
             }
           });
         });
