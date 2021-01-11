@@ -20,7 +20,7 @@ export default class Kube {
   }
 
   async getResourceEndPoint(resource) {
-    // dynamically get resource endpoint from kebernetes API
+    // dynamically get resource endpoint from kubernetes API
     // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
     const k8sPaths = await this.kubeConnector.getK8sPaths();
     if (k8sPaths) {
@@ -31,10 +31,13 @@ export default class Kube {
           logger.error(err);
           throw err;
         });
-        const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
+        const lowerKind = kind.toLowerCase();
+        const matchesKind = (value) => value.toLowerCase() === lowerKind;
+        const resourceType = k8sResourceList.resources.find((item) => (matchesKind(item.kind) || matchesKind(item.name) || matchesKind(item.singularName))
+          && item.name.indexOf('/') < 0);
         const namespace = _.get(resource, 'metadata.namespace');
-        const { name, namespaced } = resourceType;
-        if (namespaced && !namespace) {
+        const { name, namespaced } = resourceType || {};
+        if (!name || (namespaced && !namespace)) {
           return null;
         }
         const namespaceSegments = namespaced ? `namespaces/${namespace}/` : '';
