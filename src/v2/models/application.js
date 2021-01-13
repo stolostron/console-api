@@ -511,14 +511,10 @@ export default class ApplicationModel extends KubeModel {
   }
 
   async createNamespace(namespace) {
-    const body = {
-      apiVersion: 'v1',
-      kind: 'Namespace',
-      metadata: {
-        name: namespace,
-      },
-    };
-    let response = await this.kubeConnector.post('/api/v1/namespaces', body);
+    let response = await this.kubeConnector.post('/apis/project.openshift.io/v1/projectrequests', { metadata: { name: namespace } }).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
     if (responseHasError(response)) {
       if (response.code === 409) {
         response = await this.kubeConnector.get(`/api/v1/namespaces/${namespace}`);
