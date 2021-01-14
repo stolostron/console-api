@@ -23,7 +23,8 @@ function getApiGroupFromPath(path, kind) {
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
   const pathData = path.split('/');
   // eslint-disable-next-line
-  // When splitting the path, the item at pathData[3] is either the api version (if the resource has an apiGroup namespaced or not), resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
+  // When splitting the path, the item at pathData[3] is either the api version (if the resource has an apiGroup namespaced or not),
+  // resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
   // knowing this we grab the apiGroup if pathData[3] is not the kind or 'namespaces'
   if (pathData[3] !== kind && pathData[3] !== 'namespaces') {
     // eslint-disable-next-line prefer-destructuring
@@ -272,11 +273,11 @@ export default class GenericModel extends KubeModel {
     const path = `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
 
     if (cluster === 'local-cluster') {
-      const response = await this.kubeConnector.put(path, requestBody);
-      if (response.message) {
-        throw new Error(`${response.code} - ${response.message}`);
+      const localResponse = await this.kubeConnector.put(path, requestBody);
+      if (localResponse.message) {
+        throw new Error(`${localResponse.code} - ${localResponse.message}`);
       }
-      return response;
+      return localResponse;
     }
     const apiGroup = getApiGroupFromPath(path, kind);
     // Else If updating resource on remote cluster use an Action Type Work
