@@ -50,7 +50,7 @@ describe('Generic Resources', () => {
       .send({
         query: `
         {
-          updateResource(selfLink: "/api/v1/namespaces/kube-system/klusterlets/platform-auth-service", namespace: "kube-system", kind: "klusterlets", name: "platform-auto-service", cluster: "layne-remote", body: {apiVersion: "v1", kind: "Klusterlets", metadata: {creationTimestamp: "2019-04-16T01:40:57Z", labels: {app: "platform-auth-service", chart: "auth-idp-99.99.99", heritage: "Tiller", release: "auth-idp"}, name: "platform-auth-service", namespace: "kube-system", resourceVersion: "6278503", selfLink: "/api/v1/namespaces/kube-system/klusterlets/platform-auth-service", uid: "ae97cf94-5fe8-11e9-bfe4-00000a150993"}, subsets: [{addresses: [{ip: "10.1.137.67", nodeName: "10.21.9.147", targetRef: {kind: "Pod", name: "auth-idp-4hj22", namespace: "kube-system", resourceVersion: "6278502", uid: "ae9d0d17-5fe8-11e9-bfe4-00000a150993"}}], ports: [{name: "p3100", port: 3100, protocol: "TCP"}, {name: "p9443", port: 9443, protocol: "TCP"}]}]})
+          updateResource(selfLink: "/api/v1/namespaces/kube-system/secrets/platform-auth-service", namespace: "kube-system", kind: "Secret", name: "platform-auto-service", cluster: "layne-remote", body: {apiVersion: "v1", kind: "Secret", metadata: {creationTimestamp: "2019-04-16T01:40:57Z", name: "platform-auth-service", namespace: "kube-system", resourceVersion: "6278503", selfLink: "/api/v1/namespaces/kube-system/secret/platform-auth-service", uid: "ae97cf94-5fe8-11e9-bfe4-00000a150993"}, })
         }
         `,
       })
@@ -153,7 +153,7 @@ describe('Generic Resources', () => {
       .send({
         query: `
         mutation {
-          updateResourceLabels(resourceType:"HCMCompliance",namespace:"my-remote-cluster-1", name:"my-remote-cluster-1-xz", body:{cloud:"IBMs"}, selfLink:"/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/my-remote-cluster-1/compliances/compliance-xz", resourcePath:"/metadata/spec")
+          updateResourceLabels(resourceType:"HCMCompliance",kind:"Compliance",apiVersion:"compliance.mcm.ibm.com/v1alpha1",namespace:"my-remote-cluster-1", name:"compliance-xz", body:{cloud:"IBMs"}, selfLink:"/apis/compliance.mcm.ibm.com/v1alpha1/namespaces/my-remote-cluster-1/compliances/compliance-xz", resourcePath:"/metadata/spec")
         }
       `,
       })

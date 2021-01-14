@@ -25,7 +25,7 @@ export default class Kube {
     const k8sPaths = await this.kubeConnector.getK8sPaths();
     if (k8sPaths) {
       const { apiVersion, kind } = resource;
-      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
+      const apiPath = k8sPaths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
           logger.error(err);

@@ -320,6 +320,6 @@ export default class KubeConnector {
         throw err;
       });
     }
-    return this.k8sPaths;
+    return (await this.k8sPaths).paths;
   }
 }

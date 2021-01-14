@@ -135,10 +135,10 @@ type Mutation {
   editCloudConnection(body: JSON, namespace: String!, name: String!) : JSON
 
   # Updates Kubernetes resources in any managed cluster.
-  updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
+  updateResource(resourceType: String!, apiVersion: String, kind:String, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
   # Updates the labels of a Kubernetes resource.
-  updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
+  updateResourceLabels(resourceType: String!, apiVersion:String, kind:String, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
   # Updates an Application.
   updateApplication(application: [JSON]!): JSON
