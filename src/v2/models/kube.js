@@ -19,12 +19,10 @@ export default class Kube {
     this.updateUserNamespaces = updateUserNamespaces;
   }
 
-  async getResourceEndPoint(resource) {
-    // dynamically get resource endpoint from kubernetes API
-    // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
+  async getResourceInfo({ apiVersion, kind }) {
+    // dynamically get resource information from kubernetes API
     const k8sPaths = await this.kubeConnector.getK8sPaths();
     if (k8sPaths) {
-      const { apiVersion, kind } = resource;
       const apiPath = k8sPaths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
       if (apiPath) {
         const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
@@ -35,14 +33,22 @@ export default class Kube {
         const matchesKind = (value) => value.toLowerCase() === lowerKind;
         const resourceType = k8sResourceList.resources.find((item) => (matchesKind(item.kind) || matchesKind(item.name) || matchesKind(item.singularName))
           && item.name.indexOf('/') < 0);
-        const namespace = _.get(resource, 'metadata.namespace');
-        const { name, namespaced } = resourceType || {};
-        if (!name || (namespaced && !namespace)) {
-          return null;
-        }
-        const namespaceSegments = namespaced ? `namespaces/${namespace}/` : '';
-        return `${apiPath}/${namespaceSegments}${name}`;
+        return [apiPath, resourceType];
       }
+    }
+    return [undefined, undefined];
+  }
+
+  async getResourceEndPoint({ apiVersion, kind, ...resource }) {
+    const [apiPath, resourceType] = await this.getResourceInfo({ apiVersion, kind });
+    if (apiPath) {
+      const namespace = _.get(resource, 'metadata.namespace');
+      const { name, namespaced } = resourceType || {};
+      if (!name || (namespaced && !namespace)) {
+        return null;
+      }
+      const namespaceSegments = namespaced ? `namespaces/${namespace}/` : '';
+      return `${apiPath}/${namespaceSegments}${name}`;
     }
     return undefined;
   }

@@ -82,7 +82,7 @@ type Query {
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
 
   # Resolves if the current user is authorized to access a given resource.
-  userAccess(resource: String!, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
+  userAccess(resource: String, kind: String, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
 
   # Resolves if the current user is authorized to access a given resource.
   userAccessAnyNamespaces(resource: String!, action: String!, apiGroup: String, name: String, version: String): JSON

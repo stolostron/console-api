@@ -18,7 +18,14 @@ const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
 const authApiVersion = 'authorization.k8s.io/v1';
 const selfSubjectAccessReviewLink = '/apis/authorization.k8s.io/v1/selfsubjectaccessreviews';
 
-function getApiGroupFromPath(path, kind) {
+function getGroupFromApiVersion(apiVersion) {
+  return apiVersion.indexOf('/') >= 0 ? apiVersion.split('/')[0] : '';
+}
+
+function getApiGroupFromApiVersionOrPath(apiVersion, path, kind) {
+  if (apiVersion) {
+    return getGroupFromApiVersion(apiVersion);
+  }
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
   const pathData = path.split('/');
@@ -226,7 +233,7 @@ export default class GenericModel extends KubeModel {
       throw err;
     });
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
-      const apiGroup = getApiGroupFromPath(path);
+      const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
       const response = await this.kubeConnector.managedClusterViewQuery(
         cluster,
         apiGroup,
@@ -279,7 +286,7 @@ export default class GenericModel extends KubeModel {
       }
       return localResponse;
     }
-    const apiGroup = getApiGroupFromPath(path, kind);
+    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
     let workName = `update-resource-${this.kubeConnector.uid()}`;
@@ -361,7 +368,7 @@ export default class GenericModel extends KubeModel {
       return localResponse;
     }
 
-    const apiGroup = getApiGroupFromPath(path, kind);
+    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
@@ -445,15 +452,19 @@ export default class GenericModel extends KubeModel {
   }
 
   async userAccess({
-    resource, action, namespace = '', apiGroup = '*', name = '', version = '*',
+    resource, kind, action, namespace = '', apiGroup = '*', name = '', version = '*',
   }) {
+    let computedResource;
+    if (!resource) {
+      computedResource = (await this.getResourceInfo({ apiVersion: `${apiGroup}/${version}`, kind }))[1].name;
+    }
     const body = {
       apiVersion: authApiVersion,
       kind: 'SelfSubjectAccessReview',
       spec: {
         resourceAttributes: {
           verb: action,
-          resource,
+          resource: resource || computedResource,
           namespace,
           group: apiGroup,
           name,
