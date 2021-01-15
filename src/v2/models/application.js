@@ -9,9 +9,9 @@
  ****************************************************************************** */
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
-import KubeModel from './kube';
 import { responseHasError } from '../lib/utils';
 import logger from '../lib/logger';
+import GenericModel from './generic';
 
 export const ALL_SUBSCRIPTIONS = '__ALL__/SUBSCRIPTIONS__';
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
@@ -264,7 +264,7 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   };
 };
 
-export default class ApplicationModel extends KubeModel {
+export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -460,8 +460,8 @@ export default class ApplicationModel extends KubeModel {
       if (isEdit) {
         // delete any removed resources except placement rules
         const destroyResponses = await Promise.all(Object.values(deleteLinks)[0]
-          .filter((link) => link.indexOf('/placementrules/') === -1)
-          .map((link) => this.kubeConnector.delete(link)))
+          .filter((link) => link.kind !== 'PlacementRule' && (!link.selfLink || link.selfLink.indexOf('/placementrules/') === -1))
+          .map((link) => this.deleteResource(link)))
           .catch((err) => ({
             status: 'Failure',
             message: err.message,
