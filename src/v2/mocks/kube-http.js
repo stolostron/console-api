@@ -26,6 +26,8 @@ export default function createMockHttp() {
     apiList: {
       mockResponse: require('./APIList').mockResponse,
       apiPath: require('./APIList').apiPath,
+      mcmApiPath: require('./APIList').mcmApiPath,
+      complianceApiPath: require('./APIList').complianceApiPath,
       ocmClusterApiPath: require('./APIList').ocmClusterApiPath,
       ocmAgentApiPath: require('./APIList').ocmAgentApiPath,
     },
@@ -117,12 +119,16 @@ export default function createMockHttp() {
       }
     }
     switch (true) {
+      case params.url.endsWith('/api/v1'):
+        return state.apiList.apiPath;
       case params.url.endsWith('/apis/cluster.open-cluster-management.io/v1'):
         return state.apiList.ocmClusterApiPath;
       case params.url.endsWith('/apis/agent.open-cluster-management.io/v1'):
         return state.apiList.ocmAgentApiPath;
       case params.url.endsWith('/apis/mcm.ibm.com/v1alpha1'):
-        return state.apiList.apiPath;
+        return state.apiList.mcmApiPath;
+      case params.url.endsWith('/apis/compliance.mcm.ibm.com/v1alpha1'):
+        return state.apiList.complianceApiPath;
       case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.body, 'metadata.name') === 'aws':
         return state.connectionApi.editCloudConnection;
       case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.body, 'metadata.name') === 'google':
@@ -217,7 +223,7 @@ export default function createMockHttp() {
         return state.genericResourceList.getResourceMock;
       case params.url.includes('/api/v1/namespaces/klusterlet'):
         return state.genericResourceList.updateResourceLocalMock;
-      case params.url.includes('test-path-to-update-work'):
+      case params.url.includes('secrets/platform-auth-service'):
         return state.genericResourceList.mockedUpdatePollResponse;
       case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
         return state.connectionApi.getCloudConnectionSecrets;
@@ -245,6 +251,8 @@ export default function createMockHttp() {
         return state.bareMetalAssetPatchedSecret;
       case params.url.includes('/apis/project.openshift.io/v1/projects'):
         return state.project;
+      case params.url.includes('layne-remote/managedclusteractions'):
+        return state.genericResourceList.mockedUpdatePollResponse;
       default:
         return state.apiList.mockResponse;
     }

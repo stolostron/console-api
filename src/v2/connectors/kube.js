@@ -16,10 +16,6 @@ import { isRequired } from '../lib/utils';
 import config from '../../../config';
 import requestLib from '../lib/request';
 
-function selectNamespace(namespaces) {
-  return namespaces.find((ns) => ns === 'default') || namespaces[0];
-}
-
 export default class KubeConnector {
   constructor({
     token = 'Bearer localdev',
@@ -35,7 +31,6 @@ export default class KubeConnector {
     this.namespaces = namespaces;
     this.pollInterval = pollInterval;
     this.pollTimeout = pollTimeout;
-    this.resourceViewNamespace = selectNamespace(namespaces);
     this.token = token;
     this.uid = uid;
   }
@@ -163,51 +158,6 @@ export default class KubeConnector {
     return _.flatten(await Promise.all(requests));
   }
 
-  /* eslint-disable max-len */
-  async createResourceView(resourceType, clusterName, resourceName, resourceNamespace, apiGroup, summaryOnly) {
-    const name = `${resourceType}-${this.uid()}`.substr(0, 63);
-    const body = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'ResourceView',
-      metadata: {
-        labels: {
-          name,
-        },
-        name,
-      },
-      spec: {
-        summaryOnly: !!summaryOnly,
-        scope: {
-          resource: resourceType,
-        },
-      },
-    };
-
-    if (Array.isArray(clusterName)) {
-      body.spec.clusterSelector = {
-        matchExpressions: [
-          { key: 'name', operator: 'In', values: clusterName },
-        ],
-      };
-    } else if (clusterName) {
-      body.spec.clusterSelector = {
-        matchLabels: {
-          name: clusterName,
-        },
-      };
-
-      if (resourceName) {
-        body.spec.scope = {
-          resource: `${resourceType}${apiGroup ? `.${apiGroup}` : ''}`,
-          resourceName,
-          namespace: resourceNamespace || null,
-        };
-      }
-    }
-
-    return this.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.resourceViewNamespace}/resourceviews`, body);
-  }
-
   timeout() {
     return new Promise((r, reject) => setTimeout(reject, this.pollTimeout, new Error('Manager request timed out')));
   }
@@ -260,27 +210,6 @@ export default class KubeConnector {
     });
 
     return { cancel, promise };
-  }
-
-  async resourceViewQuery(resourceType, clusterName, name, namespace, apiGroup, summaryOnly) {
-    const resource = await this.createResourceView(resourceType, clusterName, name, namespace, apiGroup, summaryOnly);
-    if (resource.status === 'Failure' || resource.code >= 400) {
-      throw new Error(`Create Resource View Failed [${resource.code}] - ${resource.message}`);
-    }
-    const { cancel, promise: pollPromise } = this.pollView(_.get(resource, 'metadata.selfLink'));
-
-    try {
-      const result = await Promise.race([pollPromise, this.timeout()]);
-      if (result) {
-        this.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.resourceViewNamespace}/resourceviews/${resource.metadata.name}`)
-          .catch((e) => logger.error(`Error deleting resourceviews ${resource.metadata.name}`, e.message));
-      }
-      return result;
-    } catch (e) {
-      logger.error(`Resource View Query Error for ${resourceType}`, e.message);
-      cancel();
-      throw e;
-    }
   }
 
   /**
@@ -358,12 +287,14 @@ export default class KubeConnector {
       body.spec.scope.updateIntervalSeconds = updateInterval; // default is 30 secs
     }
     // Create ManagedClusterView
-    const managedClusterViewResponse = await this.post(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews`, body);
+    const apiPath = `/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews`;
+    const managedClusterViewResponse = await this.post(apiPath, body);
     if (_.get(managedClusterViewResponse, 'status.conditions[0].status') === 'False' || managedClusterViewResponse.code >= 400) {
       throw new Error(`Create ManagedClusterView Failed [${managedClusterViewResponse.code}] - ${managedClusterViewResponse.message}`);
     }
     // Poll ManagedClusterView until success or failure
-    const { cancel, promise: pollPromise } = this.pollView(_.get(managedClusterViewResponse, 'metadata.selfLink'));
+    const managedClusterViewName = _.get(managedClusterViewResponse, 'metadata.name');
+    const { cancel, promise: pollPromise } = this.pollView(`${apiPath}/${managedClusterViewName}`);
     try {
       const result = await Promise.race([pollPromise, this.timeout()]);
       if (result && deleteAfterUse) {
@@ -380,5 +311,15 @@ export default class KubeConnector {
   async deleteManagedClusterView(managedClusterNamespace, managedClusterViewName) {
     this.delete(`/apis/view.open-cluster-management.io/v1beta1/namespaces/${managedClusterNamespace}/managedclusterviews/${managedClusterViewName}`)
       .catch((e) => logger.error(`Error deleting managed cluster view ${managedClusterViewName}`, e.message));
+  }
+
+  async getK8sPaths() {
+    if (!this.k8sPaths) {
+      this.k8sPaths = this.get('/').catch((err) => {
+        logger.error(err);
+        throw err;
+      });
+    }
+    return (await this.k8sPaths).paths;
   }
 }

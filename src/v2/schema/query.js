@@ -43,10 +43,6 @@ type Query {
   bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]
   bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
 
-  # Get Nodes and node info
-  nodes: [Node] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  node(namespace: String, name: String): [Node]
-
   # Get Compliance/Policy info
   compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from OCM. Use policies instead.")
 
@@ -72,9 +68,6 @@ type Query {
   # Get placement rules.
   placementrules (name: String, namespace: String): [PlacementRule]
 
-  # Get policies.
-  policies(name: String, namespace: String, clusterName: String): [Policy]
-
   # Get secrets
   secrets(namespace: String): [Secret]
 
@@ -89,7 +82,7 @@ type Query {
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
 
   # Resolves if the current user is authorized to access a given resource.
-  userAccess(resource: String!, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
+  userAccess(resource: String, kind: String, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
 
   # Resolves if the current user is authorized to access a given resource.
   userAccessAnyNamespaces(resource: String!, action: String!, apiGroup: String, name: String, version: String): JSON
@@ -110,13 +103,6 @@ type Query {
   topology(filter: TopologyFilter): Topology
 
   getAutomatedImportStatus(namespace: String, name: String): JSON
-
-  # DEPRECATED QUERIES
-  namespaces: [Namespace] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pod(name: String, namespace: String, clusterName: String): [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pods: [Pod] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pvs: [PVs] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
-  pvsClaims: [PVsClaims] @deprecated(reason: "Use search, search has been moved to search-api. Will remove this query in 4.1")
 }
 
 # Multicloud Manager Mutations
@@ -149,10 +135,10 @@ type Mutation {
   editCloudConnection(body: JSON, namespace: String!, name: String!) : JSON
 
   # Updates Kubernetes resources in any managed cluster.
-  updateResource(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
+  updateResource(resourceType: String!, apiVersion: String, kind:String, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
   # Updates the labels of a Kubernetes resource.
-  updateResourceLabels(resourceType: String!, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
+  updateResourceLabels(resourceType: String!, apiVersion:String, kind:String, namespace: String!, name: String!, body: JSON, selfLink: String, resourcePath: String): JSON
 
   # Updates an Application.
   updateApplication(application: [JSON]!): JSON
@@ -161,7 +147,7 @@ type Mutation {
   deleteHelm(name: String!, namespace: String!, cluster: String!): JSON
 
   # Delete any Kubernetes resource via selfLink
-  deleteResource(selfLink: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
+  deleteResource(selfLink: String, apiVersion: String, name: String, namespace: String, cluster: String, kind: String, childResources: JSON): JSON
 
   # Delete a ManagedClusterView resource
   deleteManagedClusterView(managedClusterNamespace: String, managedClusterViewName: String): JSON

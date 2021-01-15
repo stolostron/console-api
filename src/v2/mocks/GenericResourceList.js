@@ -401,6 +401,7 @@ export const updateResourceLocalMock = {
 export const mockedUpdateWorkResponse = {
   body: {
     metadata: {
+      name: 'update-resource-1',
       selfLink: '/path/to/resourceview/test-path-to-update-work',
     },
   },

@@ -21,11 +21,6 @@ import * as filter from './filter';
 import * as overview from './overview';
 import * as occurrence from './occurrence';
 import * as json from './json';
-import * as namespace from './namespace';
-import * as node from './node';
-import * as pod from './pod';
-import * as policy from './policy';
-import * as pvs from './pvs';
 import * as genericResources from './generic-resources';
 import * as query from './query';
 import * as topology from './topology';
@@ -45,11 +40,6 @@ const modules = [
   overview,
   occurrence,
   json,
-  namespace,
-  node,
-  pod,
-  policy,
-  pvs,
   query,
   genericResources,
   topology,

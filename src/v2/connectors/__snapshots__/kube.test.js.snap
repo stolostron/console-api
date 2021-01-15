@@ -65,47 +65,6 @@ Object {
 }
 `;
 
-exports[`KubeConnector CreateWorkset submits correct arguments and returns selfLink 1`] = `
-Array [
-  Object {
-    "headers": Object {
-      "Authorization": "Bearer localdev",
-    },
-    "json": Object {
-      "apiVersion": "mcm.ibm.com/v1alpha1",
-      "kind": "ResourceView",
-      "metadata": Object {
-        "labels": Object {
-          "name": "pods-1234",
-        },
-        "name": "pods-1234",
-      },
-      "spec": Object {
-        "clusterSelector": Object {
-          "matchLabels": Object {
-            "name": "default",
-          },
-        },
-        "scope": Object {
-          "resource": "pods",
-        },
-        "summaryOnly": false,
-      },
-    },
-    "method": "POST",
-    "url": "kubernetes/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews",
-  },
-]
-`;
-
-exports[`KubeConnector CreateWorkset submits correct arguments and returns selfLink 2`] = `
-Object {
-  "metadata": Object {
-    "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/resourceviews/test-set",
-  },
-}
-`;
-
 exports[`KubeConnector Get calls httpLib with correct arguments 1`] = `
 Array [
   Object {
@@ -145,32 +104,3 @@ Array [
   },
 ]
 `;
-
-exports[`KubeConnector WorksetResourceQuery creates and polls workset api 1`] = `
-Object {
-  "status": Object {
-    "conditions": Array [
-      Object {
-        "lastUpdateTime": "2018-08-15T18:44:41Z",
-        "type": "Completed",
-      },
-    ],
-    "results": Object {
-      "mycluster.icp": Object {
-        "apiVersion": "v1",
-        "items": Array [
-          [Function],
-        ],
-        "kind": "PodList",
-        "metadata": Array [
-          [Function],
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`KubeConnector WorksetResourceQuery throws if createWorkset fails 1`] = `[Error: Create Resource View Failed [401] - Unauthorized]`;
-
-exports[`KubeConnector WorksetResourceQuery throws on timeout 1`] = `[Error: Manager request timed out]`;

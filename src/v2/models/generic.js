@@ -15,51 +15,32 @@ import logger from '../lib/logger';
 
 const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
 const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
-const metadataSelfLink = 'metadata.selfLink';
 const authApiVersion = 'authorization.k8s.io/v1';
 const selfSubjectAccessReviewLink = '/apis/authorization.k8s.io/v1/selfsubjectaccessreviews';
 
-function getApiGroupFromSelfLink(selfLink, kind) {
+function getGroupFromApiVersion(apiVersion) {
+  return apiVersion.indexOf('/') >= 0 ? apiVersion.split('/')[0] : '';
+}
+
+function getApiGroupFromApiVersionOrPath(apiVersion, path, kind) {
+  if (apiVersion) {
+    return getGroupFromApiVersion(apiVersion);
+  }
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
-  const selfLinkData = selfLink.split('/');
+  const pathData = path.split('/');
   // eslint-disable-next-line
-  // When splitting the selfLink, the item at selfLinkData[3] is either the api version (if the resource has an apiGroup namespaced or not), resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
-  // knowing this we grab the apiGroup if selfLinkData[3] is not the kind or 'namespaces'
-  if (selfLinkData[3] !== kind && selfLinkData[3] !== 'namespaces') {
+  // When splitting the path, the item at pathData[3] is either the api version (if the resource has an apiGroup namespaced or not),
+  // resource kind (if the resource is non-namespaced AND doesn’t have an apiGroup) or namespaces (if the resource is namespaced AND doesn’t have an apiGroup).
+  // knowing this we grab the apiGroup if pathData[3] is not the kind or 'namespaces'
+  if (pathData[3] !== kind && pathData[3] !== 'namespaces') {
     // eslint-disable-next-line prefer-destructuring
-    apiGroup = selfLinkData[2];
+    apiGroup = pathData[2];
   }
   return apiGroup;
 }
 
 export default class GenericModel extends KubeModel {
-  async getResourceEndPoint(resource, k8sPaths) {
-    // dynamically get resource endpoint from kebernetes API
-    // ie.https://ec2-54-84-124-218.compute-1.amazonaws.com:8443/kubernetes/
-    if (k8sPaths) {
-      const { apiVersion, kind } = resource;
-      const apiPath = k8sPaths.paths.find((path) => path.match(`/[0-9a-zA-z]*/?${apiVersion}`));
-      if (apiPath) {
-        return (async () => {
-          const k8sResourceList = await this.kubeConnector.get(`${apiPath}`).catch((err) => {
-            logger.error(err);
-            throw err;
-          });
-          const resourceType = k8sResourceList.resources.find((item) => item.kind === kind);
-          const namespace = _.get(resource, 'metadata.namespace');
-          const { name, namespaced } = resourceType;
-          if (namespaced && !namespace) {
-            return null;
-          }
-          const requestPath = `${apiPath}/${namespaced ? `namespaces/${namespace}/` : ''}${name}`;
-          return requestPath;
-        })();
-      }
-    }
-    return undefined;
-  }
-
   async createResources(args) {
     const { resources, clusterInfo } = args;
     if (clusterInfo) {
@@ -96,12 +77,8 @@ export default class GenericModel extends KubeModel {
       return responseArr;
     }
 
-    const k8sPaths = await this.kubeConnector.get('/').catch((err) => {
-      logger.error(err);
-      throw err;
-    });
     // get resource end point for each resource
-    const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource, k8sPaths)));
+    const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource)));
     if (requestPaths.length === 0 || requestPaths.includes(undefined)) {
       if (requestPaths.length > 0) {
         const resourceIndex = requestPaths.indexOf(undefined);
@@ -149,11 +126,8 @@ export default class GenericModel extends KubeModel {
         }
      }]
     */
-    let endpointURL = '';
-    let resourceName = '';
-    let response;
     const {
-      name, resourceType, body, resourcePath, selfLink,
+      apiVersion, kind, namespace, name, body, resourcePath,
     } = args;
     const requestBody = {
       body: [
@@ -164,26 +138,12 @@ export default class GenericModel extends KubeModel {
         },
       ],
     };
-    if (!selfLink) {
-      switch (resourceType) {
-        case 'HCMCluster':
-          endpointURL = 'cluster.open-cluster-management.io';
-          resourceName = 'managedclusters';
-          break;
-        default:
-          throw new Error('OCM ERROR cannot find matched resource type');
-      }
-      response = await this.kubeConnector.patch(`/apis/${endpointURL}/v1/${resourceName}/${name}`, requestBody).catch((err) => {
-        logger.error(err);
-        throw err;
-      });
-    } else {
-      // will use selfLink by default
-      response = await this.kubeConnector.patch(`${selfLink}`, requestBody).catch((err) => {
-        logger.error(err);
-        throw err;
-      });
-    }
+    const path = `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+    const response = await this.kubeConnector.patch(path, requestBody).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+
     if (response && (response.code || response.message)) {
       throw new Error(`${response.code} - ${response.message}`);
     }
@@ -209,100 +169,23 @@ export default class GenericModel extends KubeModel {
       },
      }
     */
-    let endpointURL = '';
-    let resourceName = '';
-    let response;
     const {
-      namespace, name, resourceType, body, selfLink,
+      body,
     } = args;
+    const {
+      apiVersion, kind, metadata: { namespace, name },
+    } = body;
     const requestBody = {
       body,
     };
 
-    if (!selfLink) {
-      switch (resourceType) {
-        case 'HCMCompliance':
-          endpointURL = 'compliance.mcm.ibm.com';
-          resourceName = 'compliances';
-          break;
-        default:
-          throw new Error('OCM ERROR cannot find matched resource type');
-      }
-      response = await this.kubeConnector.put(`/apis/${endpointURL}/v1alpha1/namespaces/${namespace}/${resourceName}/${name}`, requestBody);
-    } else {
-      // will use selfLink by default
-      response = await this.kubeConnector.put(`${selfLink}`, requestBody);
-    }
+    const path = `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+    const response = await this.kubeConnector.put(path, requestBody);
+
     if (response && (response.code || response.message)) {
       throw new Error(`${response.code} - ${response.message}`);
     }
     return response;
-  }
-
-  async resourceAction(resourceType, actionType, resourceName, resourceNamespace, clusterName) {
-    let name = `workset-${resourceType}-${this.kubeConnector.uid()}`;
-    name = name.substring(0, 63);
-    const body = {
-      apiVersion: 'mcm.ibm.com/v1alpha1',
-      kind: 'WorkSet',
-      metadata: {
-        name,
-      },
-      spec: {
-        clusterSelector: {
-          matchLabels: {
-            name: clusterName,
-          },
-        },
-        template: {
-          spec: {
-            type: 'Action',
-            actionType,
-          },
-        },
-      },
-    };
-    if (resourceType === 'helm') {
-      body.spec.template.spec.helm = {
-        releaseName: resourceName,
-        namespace: resourceNamespace,
-      };
-    } else {
-      body.spec.template.spec.kube = {
-        resource: resourceType,
-        name: resourceName,
-        namespace: resourceNamespace,
-      };
-    }
-
-    const response = await this.kubeConnector.post(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets`, body);
-    if (response.status === 'Failure' || response.code >= 400) {
-      throw new Error(`Create Resource Action Failed [${response.code}] - ${response.message}`);
-    }
-
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink)).catch((err) => {
-      logger.error(err);
-      throw err;
-    });
-
-    try {
-      const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
-      logger.debug('result:', result);
-      if (result) {
-        this.kubeConnector.delete(`/apis/mcm.ibm.com/v1alpha1/namespaces/${this.kubeConnector.resourceViewNamespace}/worksets/${response.metadata.name}`)
-          .catch((e) => logger.error(`Error deleting workset ${response.metadata.name}`, e.message));
-      }
-      const reason = _.get(result, 'status.reason');
-      if (reason) {
-        throw new Error(`Failed to delete ${resourceName}: ${reason}`);
-      } else {
-        return _.get(result, 'metadata.name');
-      }
-    } catch (e) {
-      logger.error('Resource Action Error:', e.message);
-      cancel();
-      throw e;
-    }
   }
 
   async getLogs(containerName, podName, podNamespace, clusterName) {
@@ -323,6 +206,7 @@ export default class GenericModel extends KubeModel {
   // Remote resources are queried using ManagedClusterView
   async getResource(args) {
     const {
+      apiVersion,
       selfLink,
       cluster = '',
       kind,
@@ -331,8 +215,9 @@ export default class GenericModel extends KubeModel {
       updateInterval,
       deleteAfterUse = true,
     } = args;
-    if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
-      return this.kubeConnector.get(selfLink).catch((err) => {
+    const path = selfLink || `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+    if (cluster === 'local-cluster') {
+      return this.kubeConnector.get(path).catch((err) => {
         logger.error(err);
         throw err;
       });
@@ -348,7 +233,7 @@ export default class GenericModel extends KubeModel {
       throw err;
     });
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
-      const apiGroup = getApiGroupFromSelfLink(selfLink);
+      const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
       const response = await this.kubeConnector.managedClusterViewQuery(
         cluster,
         apiGroup,
@@ -385,18 +270,23 @@ export default class GenericModel extends KubeModel {
 
   async updateResource(args) {
     const {
-      selfLink, namespace, kind, name, body, cluster,
+      body, cluster,
     } = args;
     const requestBody = { body };
-    // If updating resource on local cluster use selfLink
-    if (cluster === 'local-cluster' && selfLink && selfLink !== '') {
-      const response = await this.kubeConnector.put(selfLink, requestBody);
-      if (response.message) {
-        throw new Error(`${response.code} - ${response.message}`);
+
+    const {
+      apiVersion, kind, metadata: { name, namespace },
+    } = body;
+    const path = `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+
+    if (cluster === 'local-cluster') {
+      const localResponse = await this.kubeConnector.put(path, requestBody);
+      if (localResponse.message) {
+        throw new Error(`${localResponse.code} - ${localResponse.message}`);
       }
-      return response;
+      return localResponse;
     }
-    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
+    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
     let workName = `update-resource-${this.kubeConnector.uid()}`;
@@ -426,7 +316,8 @@ export default class GenericModel extends KubeModel {
         },
       },
     };
-    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
+    const actionPath = `${routePrefix}/${cluster}/managedclusteractions`;
+    const response = await this.kubeConnector.post(actionPath, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -434,7 +325,7 @@ export default class GenericModel extends KubeModel {
         message: response.message,
       }];
     }
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink));
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(`${actionPath}/${workName}`);
 
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
@@ -458,7 +349,7 @@ export default class GenericModel extends KubeModel {
 
   async deleteResource(args) {
     const {
-      selfLink, name, namespace, cluster, kind, childResources,
+      apiVersion, selfLink, name, namespace, cluster, kind, childResources,
     } = args;
     if (childResources) {
       const errors = this.deleteChildResource(childResources);
@@ -467,16 +358,17 @@ export default class GenericModel extends KubeModel {
       }
     }
 
-    // If deleting resource on local cluster use selfLink
-    if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined) && selfLink && selfLink !== '') {
-      const response = await this.kubeConnector.delete(selfLink, {});
-      if (response.status === 'Failure' || response.code >= 400) {
-        throw new Error(`Failed to delete the requested resource [${response.code}] - ${response.message}`);
+    const path = selfLink || `${await this.getResourceEndPoint({ apiVersion, kind, metadata: { namespace } })}/${name}`;
+    // Local cluster case
+    if ((cluster === '' || cluster === 'local-cluster' || cluster === undefined)) {
+      const localResponse = await this.kubeConnector.delete(path, {});
+      if (localResponse.status === 'Failure' || localResponse.code >= 400) {
+        throw new Error(`Failed to delete the requested resource [${localResponse.code}] - ${localResponse.message}`);
       }
-      return response;
+      return localResponse;
     }
 
-    const apiGroup = getApiGroupFromSelfLink(selfLink, kind);
+    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
@@ -507,7 +399,8 @@ export default class GenericModel extends KubeModel {
       },
     };
 
-    const response = await this.kubeConnector.post(`${routePrefix}/${cluster}/managedclusteractions`, jsonBody);
+    const apiPath = `${routePrefix}/${cluster}/managedclusteractions`;
+    const response = await this.kubeConnector.post(apiPath, jsonBody);
     if (response.code || response.message) {
       logger.error(`OCM ERROR ${response.code} - ${response.message}`);
       return [{
@@ -515,7 +408,8 @@ export default class GenericModel extends KubeModel {
         message: response.message,
       }];
     }
-    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(_.get(response, metadataSelfLink));
+    const managedClusterViewName = _.get(response, 'metadata.name');
+    const { cancel, promise: pollPromise } = this.kubeConnector.pollView(`${apiPath}/${managedClusterViewName}`);
     try {
       const result = await Promise.race([pollPromise, this.kubeConnector.timeout()]);
       if (result) {
@@ -542,7 +436,7 @@ export default class GenericModel extends KubeModel {
       return [];
     }
 
-    const result = await Promise.all(resources.map((resource) => this.kubeConnector.delete(resource.selfLink)
+    const result = await Promise.all(resources.map((resource) => this.deleteResource(resource)
       .catch((err) => ({
         status: 'Failure',
         message: err.message,
@@ -558,15 +452,19 @@ export default class GenericModel extends KubeModel {
   }
 
   async userAccess({
-    resource, action, namespace = '', apiGroup = '*', name = '', version = '*',
+    resource, kind, action, namespace = '', apiGroup = '*', name = '', version = '*',
   }) {
+    let computedResource;
+    if (!resource) {
+      computedResource = (await this.getResourceInfo({ apiVersion: `${apiGroup}/${version}`, kind }))[1].name;
+    }
     const body = {
       apiVersion: authApiVersion,
       kind: 'SelfSubjectAccessReview',
       spec: {
         resourceAttributes: {
           verb: action,
-          resource,
+          resource: resource || computedResource,
           namespace,
           group: apiGroup,
           name,
