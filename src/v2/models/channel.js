@@ -140,8 +140,7 @@ export default class ChannelModel extends KubeModel {
       .then(({ accessToken }) => {
         const authBaseUrl = 'https://api.github.com';
         const authOptions = accessToken ? { baseUrl: authBaseUrl, auth: accessToken } : { baseUrl: authBaseUrl, auth: '' };
-        const octokit = new Octokit(authOptions);
-        return octokit;
+        return new Octokit(authOptions);
       })
       .catch(this.handleGitError);
   }
