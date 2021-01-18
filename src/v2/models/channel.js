@@ -10,7 +10,7 @@
 
 import _ from 'lodash';
 import atob from 'atob';
-import GitHub from 'github-api';
+import { Octokit } from '@octokit/rest';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -136,40 +136,61 @@ export default class ChannelModel extends KubeModel {
   }
 
   async getGitConnection(args) {
-    const { gitUrl } = args;
     return this.getGitChannelCredentials(args)
-      .then(({ user, accessToken }) => {
-        const githubOptions = user && accessToken ? { username: user, password: accessToken, auth: 'basic' } : {};
-        const gitHub = new GitHub(githubOptions);
-        // get the url path, then remove first / and .git
-        const url = new URL(gitUrl);
-        const gitApiPath = url.pathname.substring(1).replace('.git', '');
-        return gitHub.getRepo(gitApiPath);
-      });
+      .then(({ accessToken }) => {
+        const authBaseUrl = 'https://api.github.com';
+        const authOptions = accessToken ? { baseUrl: authBaseUrl, auth: accessToken } : { baseUrl: authBaseUrl, auth: '' };
+        return new Octokit(authOptions);
+      })
+      .catch(this.handleGitError);
   }
 
   handleGitError = (err) => {
-    throw Error(err.response.statusText);
+    throw Error(err);
+  }
+
+  getGitConnectionInfo = (args) => {
+    const { gitUrl } = args;
+    const gitApiPath = new URL(gitUrl).pathname.substring(1).replace('.git', '').split('/');
+    const gitOwner = gitApiPath.length > 0 ? gitApiPath[0] : '';
+    const gitRepo = gitApiPath.length > 1 ? gitApiPath[1] : '';
+
+    return {
+      owner: gitOwner,
+      repo: gitRepo,
+    };
   }
 
   async getGitChannelBranches(args) {
+    const connectionInfo = this.getGitConnectionInfo(args);
     return this.getGitConnection(args)
-      .then((gitRepo) => (
-        gitRepo.listBranches().then((result) => (
-          result.data ? result.data.map((branch) => branch.name) : []
-        ))
+      .then((octokit) => (
+        octokit.repos.listBranches(connectionInfo)
+          .then(({ data }) => (
+            data ? data.map((branch) => branch.name) : []
+          ))
       ))
       .catch(this.handleGitError);
   }
 
   async getGitChannelPaths(args) {
-    const { branch, path = '' } = args;
+    const connectionInfo = this.getGitConnectionInfo(args);
+    const { branch } = args;
     return this.getGitConnection(args)
-      .then((gitRepo) => (
-        gitRepo.getContents(branch, path, false).then((result) => (
-          result.data ? result.data.filter((item) => item.type === 'dir').map((item) => item.name) : []
-        ))
-      ))
+      .then((octokit) => (
+        octokit.repos.getBranch({
+          ...connectionInfo,
+          branch,
+        }))
+        .then(({ data }) => (
+          data.commit && data.commit.sha && octokit.git.getTree({
+            ...connectionInfo,
+            tree_sha: data.commit.sha,
+            recursive: true, // show all folders recursively
+          })
+            .then(({ data: result }) => (
+              result.tree ? result.tree.filter((item) => item.type === 'tree').map((item) => item.path) : []
+            )))))
       .catch(this.handleGitError);
   }
 }
