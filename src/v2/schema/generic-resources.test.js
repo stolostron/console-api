@@ -252,4 +252,20 @@ describe('Generic Resources', () => {
         done();
       });
   }));
+
+  test('Correctly Resolves Pod log query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          logs(containerName: "search-api", podName:"search-prod-28a0e-search-api-66cf776db5-7bzfh", podNamespace:"open-cluster-management", clusterName:"cluster1")
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
 });
