@@ -3,84 +3,24 @@
 exports[`Topology Resolver Correctly Resolves Topology Query 1`] = `
 Object {
   "data": Object {
-    "topology": Object {
-      "relationships": Array [],
-      "resources": Array [
+    "topology": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+      },
+      "locations": Array [
         Object {
-          "cluster": null,
-          "clusterName": null,
-          "id": "application--gbapp-gbapp-v2",
-          "labels": null,
-          "name": "gbapp-gbapp-v2",
-          "namespace": "gbapp-gbapp-v2",
-          "specs": Object {
-            "allChannels": Array [],
-            "allClusters": Object {
-              "isLocal": false,
-              "remoteCount": 0,
-            },
-            "allSubscriptions": Array [],
-            "channels": Array [],
-            "isDesign": true,
-            "raw": Object {
-              "apiVersion": "mcm.ibm.com/v1alpha1",
-              "kind": "Application",
-              "metadata": Object {
-                "annotations": Object {
-                  "apps.open-cluster-management.io/applicationrelationships": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
-                  "apps.open-cluster-management.io/dashboard": "https://9.42.82.240:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-                  "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
-                  "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
-                  "apps.open-cluster-management.io/subscriptions": "default/gbapp-gbapp-subscription-1",
-                  "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-                  "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-                },
-                "creationTimestamp": "2018-11-12T18:48:14Z",
-                "labels": Object {
-                  "app": "gbapp",
-                  "chart": "gbapp-0.1.0",
-                  "heritage": "Tiller",
-                  "name": "gbapp-gbapp",
-                  "release": "gbapp",
-                },
-                "name": "gbapp-gbapp",
-                "namespace": "default",
-                "resourceVersion": "281",
-                "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-                "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
-              },
-              "spec": Object {
-                "componentKinds": Array [
-                  Object {
-                    "group": "core",
-                    "kind": "Pods",
-                  },
-                ],
-                "descriptor": Object {},
-                "selector": Object {
-                  "matchExpressions": Array [
-                    Object {
-                      "key": "app",
-                      "operator": "In",
-                      "values": Array [
-                        "gbapp",
-                        "gbf",
-                        "gbrm",
-                        "gbrs",
-                      ],
-                    },
-                  ],
-                },
-              },
-              "status": Object {},
-            },
-          },
-          "topology": null,
-          "type": "application",
-          "uid": "application--gbapp-gbapp-v2",
+          "column": 11,
+          "line": 3,
         },
       ],
+      "message": "Cannot read property 'deployablePaths' of undefined",
+      "path": Array [
+        "topology",
+      ],
     },
-  },
+  ],
 }
 `;

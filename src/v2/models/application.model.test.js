@@ -141,7 +141,7 @@ describe('getSubscriptionsDeployables', () => {
       }];
 
     const result = {
-      allowAllChannel: true,
+      allowAllChannel: false,
       subscriptions: [{
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: [''],
@@ -191,7 +191,7 @@ describe('getSubscriptionsDeployables one chunck', () => {
       }];
 
     const result = {
-      allowAllChannel: true,
+      allowAllChannel: false,
       subscriptions: [{
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: ['/default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget', '1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '3', '4'],
@@ -260,11 +260,50 @@ describe('getSubscriptionsDeployables more than 20 but smaller than 100 deployab
        phase: 'Propagated',
        statuses: {},
      },
+      },
+      {
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        kind: 'Subscription',
+        metadata:
+     {
+       annotations: {
+         'apps.open-cluster-management.io/deployables': 'default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget',
+       },
+       creationTimestamp: '2020-05-12T19:41:20Z',
+       generation: 2,
+       labels: {},
+       name: 'cassandra-app-subscription',
+       namespace: 'default',
+       resourceVersion: '55436209',
+       selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription',
+       uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+     },
+        spec:
+     {
+       channel: 'cassandra-ch/cassandra-channel',
+       placement: {},
+     },
+        status:
+     {
+       lastUpdateTime: '2020-06-01T10:42:30Z',
+       phase: 'Propagated',
+       statuses: {},
+     },
       }];
 
     const result = {
       allowAllChannel: true,
       subscriptions: [{
+        apiVersion: 'apps.open-cluster-management.io/v1',
+        deployablePaths: ['default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget'],
+        kind: 'Subscription',
+        metadata: {
+          annotations: { 'apps.open-cluster-management.io/deployables': 'default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget' }, creationTimestamp: '2020-05-12T19:41:20Z', generation: 2, labels: {}, name: 'cassandra-app-subscription', namespace: 'default', resourceVersion: '55436209', selfLink: '/apis/apps.open-cluster-management.io/v1/namespaces/default/subscriptions/cassandra-app-subscription', uid: '64511c0d-8ec5-4257-a318-79e8d04ad7ff',
+        },
+        spec: { channel: 'cassandra-ch/cassandra-channel', placement: {} },
+        status: { lastUpdateTime: '2020-06-01T10:42:30Z', phase: 'Propagated', statuses: {} },
+      },
+      {
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: ['default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget'],
         kind: 'Subscription',
