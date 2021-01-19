@@ -13,6 +13,7 @@ export const typeDef = '';
 export const resolver = {
   Query: {
     getResource: (parent, args, { genericModel }) => genericModel.getResource(args),
+    logs: (parent, args, { genericModel }) => genericModel.getLogs(args.containerName, args.podName, args.podNamespace, args.clusterName),
     updateResource: (parent, args, { genericModel }) => genericModel.updateResource(args),
   },
   Mutation: {
