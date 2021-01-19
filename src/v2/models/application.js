@@ -136,7 +136,7 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
     }
   });
   // hide all subscription option
-  if (allDeployablePaths > 100) {
+  if (allDeployablePaths > 100 || allSubscriptions.length <= 1) {
     allowAllChannel = false;
   }
 
