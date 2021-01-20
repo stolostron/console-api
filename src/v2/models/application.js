@@ -136,7 +136,7 @@ export const getSubscriptionsDeployables = (allSubscriptions) => {
     }
   });
   // hide all subscription option
-  if (allDeployablePaths > 100) {
+  if (allDeployablePaths > 100 || allSubscriptions.length <= 1) {
     allowAllChannel = false;
   }
 
@@ -160,11 +160,11 @@ export const getAllChannels = (subscriptions, channels, selectedChannel, allowAl
       channels.unshift(EVERYTHING_CHANNEL);
       // set default selectedSubscription when topology first render
       if (!selectedSubscription) {
-        selectedSubscription = [subscriptions[0]];
+        selectedSubscription = subscriptions.length > 0 ? [subscriptions[0]] : null;
       }
     }
   } else if (!selectedSubscription) {
-    selectedSubscription = [subscriptions[0]];
+    selectedSubscription = subscriptions.length > 0 ? [subscriptions[0]] : null;
   }
   // renders all subscriptions when selected all subscriptions
   if (allowAllChannel && selectedChannel === '__ALL__/__ALL__//__ALL__/__ALL__') {
