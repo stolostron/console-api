@@ -229,7 +229,6 @@ describe('getSubscriptionsDeployables one chunck', () => {
   });
 });
 
-
 describe('getSubscriptionsDeployables more than 100 deployables', () => {
   it('should match getSubscriptionsDeployables one chunck', () => {
     const allSubscriptions = [
@@ -261,7 +260,7 @@ describe('getSubscriptionsDeployables more than 100 deployables', () => {
        phase: 'Propagated',
        statuses: {},
      },
-      },{
+      }, {
         apiVersion: 'apps.open-cluster-management.io/v1',
         kind: 'Subscription',
         metadata:
@@ -289,7 +288,7 @@ describe('getSubscriptionsDeployables more than 100 deployables', () => {
        phase: 'Propagated',
        statuses: {},
      },
-      },{
+      }, {
         apiVersion: 'apps.open-cluster-management.io/v1',
         kind: 'Subscription',
         metadata:
@@ -351,7 +350,7 @@ describe('getSubscriptionsDeployables more than 100 deployables', () => {
         },
         spec: { channel: 'cassandra-ch/cassandra-channel', placement: {} },
         status: { lastUpdateTime: '2020-06-01T10:42:30Z', phase: 'Propagated', statuses: {} },
-      },{
+      }, {
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: ['/default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget', '1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '3', '4'],
         isChucked: true,
@@ -381,7 +380,7 @@ describe('getSubscriptionsDeployables more than 100 deployables', () => {
         },
         spec: { channel: 'cassandra-ch/cassandra-channel', placement: {} },
         status: { lastUpdateTime: '2020-06-01T10:42:30Z', phase: 'Propagated', statuses: {} },
-      },{
+      }, {
         apiVersion: 'apps.open-cluster-management.io/v1',
         deployablePaths: ['/default/guestbook-app-staging-cockroachdb-cockroachdb-budget-poddisruptionbudget', '1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '3', '4'],
         isChucked: true,
