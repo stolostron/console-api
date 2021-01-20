@@ -164,7 +164,7 @@ export const getAllChannels = (subscriptions, channels, selectedChannel, allowAl
       }
     }
   } else if (!selectedSubscription) {
-    selectedSubscription = subscriptions.length > 0 ? [subscriptions[0]]: null;
+    selectedSubscription = subscriptions.length > 0 ? [subscriptions[0]] : null;
   }
   // renders all subscriptions when selected all subscriptions
   if (allowAllChannel && selectedChannel === '__ALL__/__ALL__//__ALL__/__ALL__') {
@@ -184,8 +184,6 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   subscriptions.forEach((subscription) => {
     modelSubscriptions.push(subscription);
     // build up map of what deployables to get for a bulk fetch
-    console.log('buildDeployablesMap !!!!!', subscription)
-
     if (subscription.deployablePaths) {
       subscription.deployablePaths.forEach((deployablePath) => {
         if (deployablePath && deployablePath.split('/').length > 0) {
@@ -591,7 +589,7 @@ export default class ApplicationModel extends GenericModel {
           subscriptions, model.channels,
           selectedChannel, allowAllChannel,
         );
-        
+
         // get all requested subscriptions
         const selectedSubscription = selectedChannel === ALL_SUBSCRIPTIONS ? allSubscriptions : subscr;
         const {
