@@ -318,6 +318,15 @@ describe('getSubscriptionsDeployables more than 20 but smaller than 100 deployab
   });
 });
 
+describe('getAllChannels no subscriptions', () => {
+  it('getAllChannels without any subscription', () => {
+    const subscriptions = [];
+
+    const selectedChannel = '__ALL__/__ALL__//__ALL__/__ALL__';
+    expect(getAllChannels(subscriptions, [], selectedChannel, true)).toEqual(subscriptions);
+  });
+});
+
 describe('getAllChannels allow all channels', () => {
   it('getAllChannels allowAllChannel', () => {
     const subscriptions = [{
@@ -411,7 +420,7 @@ describe('getAllChannels no subs', () => {
     const subscriptions = [];
 
     const selectedChannel = '__ALL__/__ALL__//__ALL__/__ALL__';
-    expect(getAllChannels(subscriptions, [], selectedChannel, false)).toEqual([undefined]);
+    expect(getAllChannels(subscriptions, [], selectedChannel, false)).toEqual(null);
   });
 });
 
