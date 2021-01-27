@@ -16,6 +16,7 @@ const metadataName = 'metadata.name';
 const metadataNamespace = 'metadata.namespace';
 const preHookType = 'pre-hook';
 const postHookType = 'post-hook';
+const specTemplate = 'spec.template';
 
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
@@ -189,7 +190,7 @@ export const createControllerRevisionChild = (parentObject, template, links, nod
       namespace,
     },
     spec: {
-      template: { ..._.get(template, 'spec.template', {}) },
+      template: { ..._.get(template, specTemplate, {}) },
     },
   };
   return createChildNode(parentObject, 'controllerrevision', rawData, links, nodes);
@@ -214,7 +215,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     },
     spec: {
       desired: _.get(template, 'spec.replicas', 0),
-      template: { ..._.get(template, 'spec.template', {}) },
+      template: { ..._.get(template, specTemplate, {}) },
     },
   };
   return createChildNode(parentObject, type, rawData, links, nodes);
@@ -280,7 +281,7 @@ export const addSubscriptionDeployable = (
       parentType: parentNode.type,
     } : undefined;
 
-  const template = _.get(deployable, 'spec.template', { metadata: {} });
+  const template = _.get(deployable, specTemplate, { metadata: {} });
   let { kind = 'container' } = template;
   const { metadata: { name: k8Name } } = template;
   kind = kind.toLowerCase();
