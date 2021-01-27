@@ -193,7 +193,7 @@ export const createControllerRevisionChild = (parentObject, template, links, nod
     },
   };
   return createChildNode(parentObject, 'controllerrevision', rawData, links, nodes);
-}
+};
 
 export const createReplicaChild = (parentObject, template, links, nodes) => {
   if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
