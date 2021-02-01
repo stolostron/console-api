@@ -543,6 +543,13 @@ export default class ApplicationModel extends GenericModel {
         (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
         { namespaces: [namespace] },
       );
+
+      if(apps.length == 0) {
+        apps = await this.kubeConnector.getResources(
+          (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications/${name}`,
+          { namespaces: [namespace] },
+        );
+      }
     } catch (err) {
       logger.error(err);
       throw err;

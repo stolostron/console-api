@@ -625,6 +625,76 @@ export const addSubscriptionCharts = (
   return nodes;
 };
 
+async function buildArgoApplication(application, name, namespace, nodes, links) {
+  console.log('buildArgoApplication', application)
+
+  const appId = `application--${name}`;
+  nodes.push({
+    name,
+    namespace,
+    type: 'application',
+    id: appId,
+    uid: appId,
+    specs: {
+      isDesign: true,
+      raw: application.app,
+      activeChannel: application.activeChannel,
+      allSubscriptions: [],
+      allChannels: [],
+      allClusters: {
+        isLocal: false,
+        remoteCount: 1,
+      },
+      channels: application.channels,
+    },
+  });
+
+  const serverApi = _.get(application, 'app.spec.destination.server', '')
+  const serverURI = new URL(serverApi)
+  const clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+  console.log('serverURI', serverURI)
+  //create cluster node
+  const clusterId = addClusters(
+    appId, new Set(), null,
+    [clusterName], [{metadata: {name: clusterName, namespace: clusterName}, status: "ok"}], links, nodes,
+  )
+
+  console.log('clusterId !!!', clusterId)
+
+  const resources = _.get(application, 'app.status.resources', [])
+
+  resources.forEach((deployable) => {
+    const { name, namespace, kind } = deployable;
+    const type = kind.toLowerCase();
+    //memberId = `member--deployable--${name}`;
+
+    const memberId = `member--member--deployable--member--clusters--${getClusterName(clusterId)}--${type}--${name}`;
+
+    const deployableObj = {
+      name,
+      namespace,
+      type,
+      id: memberId,
+      uid: memberId,
+      specs: {
+        isDesign: false,
+        raw: deployable,
+        parent: {
+          clusterId,
+        },
+      },
+    };
+  
+    nodes.push(deployableObj);
+    links.push({
+      from: { uid: clusterId },
+      to: { uid: memberId },
+      type: '',
+    });    
+  });  
+
+}
+
 async function getApplicationElements(application, clusterModel) {
   const links = [];
   const nodes = [];
@@ -633,6 +703,14 @@ async function getApplicationElements(application, clusterModel) {
   let name;
   let namespace;
   ({ name, namespace } = application);
+
+  console.log('GET APP ELEMENTS', application)
+
+  if(_.get(application, 'app.apiVersion') == 'argoproj.io/v1alpha1') {
+    buildArgoApplication(application, name, namespace, nodes, links);
+    return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
+  }
+
   const allAppClusters = application.allClusters ? application.allClusters : [];
   const appId = `application--${name}`;
   nodes.push({
