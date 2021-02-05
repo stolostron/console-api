@@ -398,7 +398,13 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
       uid: memberId,
       specs: {
         isDesign: false,
-        raw: deployable,
+        raw: {
+          metadata: {
+            name,
+            namespace
+          },
+          ...deployable
+        },
         parent: {
           clusterId,
         },
