@@ -93,6 +93,8 @@ export const addClusters = (
   // create element if not already created'
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
+  console.log('addClusters !!!!!', cns)
+  
   let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;
@@ -128,6 +130,7 @@ export const addClusters = (
 };
 
 const getClusterName = (nodeId) => {
+  console.log('getClusterName', nodeId)
   if (nodeId === undefined) {
     return '';
   }
@@ -135,8 +138,11 @@ const getClusterName = (nodeId) => {
   if (clusterIndex !== -1) {
     const startPos = nodeId.indexOf('--clusters--') + 12;
     const endPos = nodeId.indexOf('--', startPos);
-    return nodeId.slice(startPos, endPos);
+console.log('end pos is ', endPos)
+    console.log('WILL GET ', nodeId.slice(startPos, endPos > 0 ? endPos : nodeId.length))
+    return nodeId.slice(startPos, endPos > 0 ? endPos : nodeId.length);
   }
+  console.log('RETURN LOCAL', localClusterName)
   return localClusterName;
 };
 
@@ -651,15 +657,20 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
 
   const serverApi = _.get(application, 'app.spec.destination.server', '')
   const serverURI = new URL(serverApi)
-  const clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+  let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
   console.log('serverURI', serverURI)
+  if(clusterName === 'default') {
+    //mark this as default cluster
+    clusterName = localClusterName
+  }
+  console.log('clusterName !!!!!', clusterName)
   //create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
     [clusterName], [{metadata: {name: clusterName, namespace: clusterName}, status: "ok"}], links, nodes,
   )
 
-  console.log('clusterId !!!', clusterId)
+  console.log('clusterId !!!', clusterId, getClusterName(clusterId))
 
   const resources = _.get(application, 'app.status.resources', [])
 
@@ -668,7 +679,7 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
     const type = kind.toLowerCase();
     //memberId = `member--deployable--${name}`;
 
-    const memberId = `member--member--deployable--member--clusters--${getClusterName(clusterId)}--${type}--${name}`;
+    const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${namespace}--${name}`;
 
     const deployableObj = {
       name,

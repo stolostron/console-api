@@ -549,6 +549,8 @@ export default class ApplicationModel extends GenericModel {
           (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications/${name}`,
           { namespaces: [namespace] },
         );
+
+        console.log('APPS', apps)
       }
     } catch (err) {
       logger.error(err);
