@@ -372,23 +372,31 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
     //mark this as default cluster
     clusterName = localClusterName
   }
-  console.log('clusterName !!!!!', clusterName)
   //create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
     [clusterName], [{metadata: {name: clusterName, namespace: clusterName}, status: "ok"}], links, nodes,
   )
-
-  console.log('clusterId !!!', clusterId, getClusterName(clusterId))
-
   const resources = _.get(application, 'app.status.resources', [])
 
   resources.forEach((deployable) => {
-    const { name, namespace, kind } = deployable;
+    const { name, namespace, kind, version, group } = deployable;
     const type = kind.toLowerCase();
-    //memberId = `member--deployable--${name}`;
 
     const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${namespace}--${name}`;
+
+    let raw = {
+      metadata: {
+        name,
+        namespace
+      },
+      ...deployable
+    }
+
+    const apiVersion = version ? (group ? `${group}/${version}` : version) : null;
+    if(apiVersion) {
+      raw.apiVersion = apiVersion
+    }
 
     const deployableObj = {
       name,
@@ -398,13 +406,7 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
       uid: memberId,
       specs: {
         isDesign: false,
-        raw: {
-          metadata: {
-            name,
-            namespace
-          },
-          ...deployable
-        },
+        raw,
         parent: {
           clusterId,
         },
