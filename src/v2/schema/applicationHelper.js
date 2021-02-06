@@ -9,6 +9,7 @@
  ****************************************************************************** */
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
+import logger from '../lib/logger';
 
 import {
   isPrePostHookDeployable,
@@ -341,8 +342,6 @@ export const addSubscriptionCharts = (
 };
 
 async function buildArgoApplication(application, name, namespace, nodes, links) {
-  console.log('buildArgoApplication', application)
-
   const appId = `application--${name}`;
   nodes.push({
     name,
@@ -364,18 +363,31 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
     },
   });
 
-  const serverApi = _.get(application, 'app.spec.destination.server', '')
-  const serverURI = new URL(serverApi)
-  let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
-  console.log('serverURI', serverURI)
-  if(clusterName === 'default') {
-    //mark this as default cluster
-    clusterName = localClusterName
-  }
+  const clusters = []
+  const clusterNames = []
+  const serverDestinations = _.get(application, 'app.spec.destinations', []);
+  serverDestinations.forEach(destination => {
+    try {
+      const serverApi = _.get(destination, 'server', 'http://unknown')
+      const serverURI = new URL(serverApi)
+      let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+      //console.log('serverURI', serverURI)
+      if(clusterName === 'default') {
+        //mark this as default cluster
+        clusterName = localClusterName
+      }    
+      clusterNames.push(clusterName);
+      clusters.push({metadata: {name: clusterName, namespace: clusterName}, status: "ok"});
+    }
+     catch (err) {
+      logger.error(err);
+    }
+
+  })
   //create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
-    [clusterName], [{metadata: {name: clusterName, namespace: clusterName}, status: "ok"}], links, nodes,
+    _.uniq(clusterNames), _.uniqBy(clusters, 'metadata.name'), links, nodes,
   )
   const resources = _.get(application, 'app.status.resources', [])
 
@@ -439,13 +451,14 @@ async function getApplicationElements(application, clusterModel) {
   let namespace;
   ({ name, namespace } = application);
 
-  console.log('GET APP ELEMENTS', application)
+  //console.log('GET APP ELEMENTS', application)
 
   if(_.get(application, 'app.apiVersion') == 'argoproj.io/v1alpha1') {
     buildArgoApplication(application, name, namespace, nodes, links);
     return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
   }
 
+  // create application node
   const allAppClusters = application.allClusters ? application.allClusters : [];
   const appId = `application--${name}`;
   nodes.push({

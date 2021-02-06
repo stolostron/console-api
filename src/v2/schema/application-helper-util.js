@@ -31,7 +31,6 @@ export const isPrePostHookDeployable = (subscription, name, namespace) => {
 };
 
 export const getClusterName = (nodeId) => {
-  console.log('getClusterName', nodeId)
   if (nodeId === undefined) {
     return '';
   }
@@ -39,11 +38,8 @@ export const getClusterName = (nodeId) => {
   if (clusterIndex !== -1) {
     const startPos = nodeId.indexOf('--clusters--') + 12;
     const endPos = nodeId.indexOf('--', startPos);
-console.log('end pos is ', endPos)
-    console.log('WILL GET ', nodeId.slice(startPos, endPos > 0 ? endPos : nodeId.length))
     return nodeId.slice(startPos, endPos > 0 ? endPos : nodeId.length);
   }
-  console.log('RETURN LOCAL', localClusterName)
   return localClusterName;
 };
 
@@ -98,7 +94,7 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     return null; // no replica
   }
   */
-  console.log('createReplicaChild', parentObject, template, JSON.stringify(parentObject))
+  //console.log('createReplicaChild', parentObject, template, JSON.stringify(parentObject))
 
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
@@ -200,7 +196,6 @@ export const addClusters = (
   // create element if not already created'
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
-  console.log('addClusters !!!!!', cns)
   
   let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName

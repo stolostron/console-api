@@ -545,12 +545,28 @@ export default class ApplicationModel extends GenericModel {
       );
 
       if(apps.length == 0) {
+        //get all argo apps in this namespace
         apps = await this.kubeConnector.getResources(
-          (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications/${name}`,
+          (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
           { namespaces: [namespace] },
         );
 
-        console.log('APPS', apps)
+        const applicationSet = apps[0];
+        //this is where we keep all destinations
+        const destinations = [];
+        _.set(applicationSet, 'spec.destinations', destinations);
+
+        if(apps.length > 1) {
+          //get targets from all apps and put them to the first app
+          //this will behave as the application set, containing all info used to build the topology
+          apps.forEach(app => {
+            const appDestination = _.get(app, 'spec.destination')
+            if(appDestination) {
+              destinations.push(appDestination)
+            }
+          })
+        }
+
       }
     } catch (err) {
       logger.error(err);
