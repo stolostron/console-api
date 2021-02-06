@@ -342,29 +342,9 @@ export const addSubscriptionCharts = (
 };
 
 async function buildArgoApplication(application, name, namespace, nodes, links) {
-  const appId = `application--${name}`;
-  nodes.push({
-    name,
-    namespace,
-    type: 'application',
-    id: appId,
-    uid: appId,
-    specs: {
-      isDesign: true,
-      raw: application.app,
-      activeChannel: application.activeChannel,
-      allSubscriptions: [],
-      allChannels: [],
-      allClusters: {
-        isLocal: false,
-        remoteCount: 1,
-      },
-      channels: application.channels,
-    },
-  });
 
   const clusters = []
-  const clusterNames = []
+  let clusterNames = []
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
   serverDestinations.forEach(destination => {
     try {
@@ -384,10 +364,33 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
     }
 
   })
+  clusterNames = _.uniq(clusterNames)
+
+  const appId = `application--${name}`;
+  nodes.push({
+    name,
+    namespace,
+    type: 'application',
+    id: appId,
+    uid: appId,
+    specs: {
+      isDesign: true,
+      raw: application.app,
+      activeChannel: application.activeChannel,
+      allSubscriptions: [],
+      allChannels: [],
+      allClusters: {
+        isLocal: clusterNames.includes(localClusterName),
+        remoteCount: clusterNames.includes(localClusterName) ? clusterNames.length -1 : clusterNames.length,
+      },
+      channels: application.channels,
+    },
+  });
+
   //create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
-    _.uniq(clusterNames), _.uniqBy(clusters, 'metadata.name'), links, nodes,
+    clusterNames, _.uniqBy(clusters, 'metadata.name'), links, nodes,
   )
   const resources = _.get(application, 'app.status.resources', [])
 
