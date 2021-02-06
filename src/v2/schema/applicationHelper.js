@@ -357,7 +357,7 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
         clusterName = localClusterName
       }    
       clusterNames.push(clusterName);
-      clusters.push({metadata: {name: clusterName, namespace: clusterName}, status: "ok"});
+      clusters.push({metadata: {name: clusterName, namespace: clusterName}, destination, status: "ok"});
     }
      catch (err) {
       logger.error(err);
