@@ -336,11 +336,10 @@ export const addSubscriptionCharts = (
   if (!foundDeployables) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
   }
-
   return nodes;
 };
 
-async function buildArgoApplication(application, name, namespace, nodes, links) {
+async function buildArgoApplication(application, appName, appNamespace, nodes, links) {
   const clusters = [];
   let clusterNames = [];
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
@@ -349,7 +348,6 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
       const serverApi = _.get(destination, 'server', 'http://unknown');
       const serverURI = new URL(serverApi);
       let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
-      // console.log('serverURI', serverURI)
       if (clusterName === 'default') {
         // mark this as default cluster
         clusterName = localClusterName;
@@ -362,10 +360,10 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
   });
   clusterNames = _.uniq(clusterNames);
 
-  const appId = `application--${name}`;
+  const appId = `application--${appName}`;
   nodes.push({
-    name,
-    namespace,
+    appName,
+    appNamespace,
     type: 'application',
     id: appId,
     uid: appId,
@@ -412,8 +410,10 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
       ...deployable,
     };
 
-    const apiGroup = group ? `${group}/${version}` : version;
-    const apiVersion = version ? apiGroup : null;
+    let apiVersion = null;
+    if (version) {
+      apiVersion = group ? `${group}/${version}` : version;
+    }
     if (apiVersion) {
       raw.apiVersion = apiVersion;
     }
@@ -456,8 +456,6 @@ async function getApplicationElements(application, clusterModel) {
   let name;
   let namespace;
   ({ name, namespace } = application);
-
-  // console.log('GET APP ELEMENTS', application)
 
   if (_.get(application, 'app.apiVersion').indexOf('argoproj.io') > -1) {
     buildArgoApplication(application, name, namespace, nodes, links);

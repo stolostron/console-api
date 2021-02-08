@@ -93,8 +93,6 @@ export const createReplicaChild = (parentObject, template, links, nodes) => {
     return null; // no replica
   }
 
-  // console.log('createReplicaChild', parentObject, template, JSON.stringify(parentObject))
-
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
     // create only for deploymentconfig and deployment types
@@ -192,10 +190,9 @@ export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
 ) => {
-  // create element if not already created'
+  // create element if not already created
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
-
   let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;

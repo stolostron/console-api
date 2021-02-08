@@ -19,14 +19,14 @@ import getApplicationElements, {
 } from './applicationHelper';
 
 import {
+  removeReleaseGeneratedSuffix,
+  isPrePostHookDeployable,
   createReplicaChild,
   createIngressRouteChild,
   createGenericPackageObject,
+  removeHelmReleaseName,
   addSubscriptionDeployable,
   addClusters,
-  removeReleaseGeneratedSuffix,
-  removeHelmReleaseName,
-  isPrePostHookDeployable,
   getLocalClusterElement,
 } from './application-helper-util';
 
