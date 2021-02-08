@@ -19,14 +19,13 @@ import {
   createGenericPackageObject,
   removeHelmReleaseName,
   addSubscriptionDeployable,
-  addClusters
-} from './application-helper-util'
+  addClusters,
+} from './application-helper-util';
 
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 const metadataName = 'metadata.name';
 const preHookType = 'pre-hook';
-
 
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
@@ -342,29 +341,26 @@ export const addSubscriptionCharts = (
 };
 
 async function buildArgoApplication(application, name, namespace, nodes, links) {
-
-  const clusters = []
-  let clusterNames = []
+  const clusters = [];
+  let clusterNames = [];
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
-  serverDestinations.forEach(destination => {
+  serverDestinations.forEach((destination) => {
     try {
-      const serverApi = _.get(destination, 'server', 'http://unknown')
-      const serverURI = new URL(serverApi)
+      const serverApi = _.get(destination, 'server', 'http://unknown');
+      const serverURI = new URL(serverApi);
       let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
-      //console.log('serverURI', serverURI)
-      if(clusterName === 'default') {
-        //mark this as default cluster
-        clusterName = localClusterName
-      }    
+      // console.log('serverURI', serverURI)
+      if (clusterName === 'default') {
+        // mark this as default cluster
+        clusterName = localClusterName;
+      }
       clusterNames.push(clusterName);
-      clusters.push({metadata: {name: clusterName, namespace: clusterName}, destination, status: "ok"});
-    }
-     catch (err) {
+      clusters.push({ metadata: { name: clusterName, namespace: clusterName }, destination, status: 'ok' });
+    } catch (err) {
       logger.error(err);
     }
-
-  })
-  clusterNames = _.uniq(clusterNames)
+  });
+  clusterNames = _.uniq(clusterNames);
 
   const appId = `application--${name}`;
   nodes.push({
@@ -374,6 +370,7 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
     id: appId,
     uid: appId,
     specs: {
+      apps: { ...application.app.spec.apps },
       isDesign: true,
       raw: application.app,
       activeChannel: application.activeChannel,
@@ -381,41 +378,49 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
       allChannels: [],
       allClusters: {
         isLocal: clusterNames.includes(localClusterName),
-        remoteCount: clusterNames.includes(localClusterName) ? clusterNames.length -1 : clusterNames.length,
+        remoteCount: clusterNames.includes(localClusterName) ? clusterNames.length - 1 : clusterNames.length,
       },
       channels: application.channels,
     },
   });
 
-  //create cluster node
+  delete application.app.spec.apps;
+  // create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
     clusterNames, _.uniqBy(clusters, 'metadata.name'), links, nodes,
-  )
-  const resources = _.get(application, 'app.status.resources', [])
+  );
+  const resources = _.get(application, 'app.status.resources', []);
 
   resources.forEach((deployable) => {
-    const { name, namespace, kind, version, group } = deployable;
+    const {
+      name: deployableName,
+      namespace: deployableNamespace,
+      kind,
+      version,
+      group,
+    } = deployable;
     const type = kind.toLowerCase();
 
-    const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${namespace}--${name}`;
+    const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${deployableNamespace}--${deployableName}`;
 
-    let raw = {
+    const raw = {
       metadata: {
-        name,
-        namespace
+        deployableName,
+        deployableNamespace,
       },
-      ...deployable
-    }
+      ...deployable,
+    };
 
-    const apiVersion = version ? (group ? `${group}/${version}` : version) : null;
-    if(apiVersion) {
-      raw.apiVersion = apiVersion
+    const apiGroup = group ? `${group}/${version}` : version;
+    const apiVersion = version ? apiGroup : null;
+    if (apiVersion) {
+      raw.apiVersion = apiVersion;
     }
 
     const deployableObj = {
-      name,
-      namespace,
+      deployableName,
+      deployableNamespace,
       type,
       id: memberId,
       uid: memberId,
@@ -427,22 +432,20 @@ async function buildArgoApplication(application, name, namespace, nodes, links) 
         },
       },
     };
-  
+
     nodes.push(deployableObj);
     links.push({
       from: { uid: clusterId },
       to: { uid: memberId },
       type: '',
-    });  
-    
-    const template = { metadata: {} }
+    });
+
+    const template = { metadata: {} };
     // create replica subobject, if this object defines a replicas
     createReplicaChild(deployableObj, template, links, nodes);
     // create route subobject, if this object is an ingress
     createIngressRouteChild(deployableObj, template, links, nodes);
-    
-  });  
-
+  });
 }
 
 async function getApplicationElements(application, clusterModel) {
@@ -454,9 +457,9 @@ async function getApplicationElements(application, clusterModel) {
   let namespace;
   ({ name, namespace } = application);
 
-  //console.log('GET APP ELEMENTS', application)
+  // console.log('GET APP ELEMENTS', application)
 
-  if(_.get(application, 'app.apiVersion') == 'argoproj.io/v1alpha1') {
+  if (_.get(application, 'app.apiVersion').indexOf('argoproj.io') > -1) {
     buildArgoApplication(application, name, namespace, nodes, links);
     return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
   }

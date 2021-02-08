@@ -538,35 +538,47 @@ export default class ApplicationModel extends GenericModel {
     // get application
     let model = null;
     let apps;
+    let applicationSet;
     try {
       apps = await this.kubeConnector.getResources(
         (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
         { namespaces: [namespace] },
       );
 
-      if(apps.length == 0) {
-        //get all argo apps in this namespace
+      if (apps.length === 0) {
+        // get all argo apps in this namespace
         apps = await this.kubeConnector.getResources(
           (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
           { namespaces: [namespace] },
         );
 
-        const applicationSet = apps[0];
-        //this is where we keep all destinations
+        applicationSet = apps.find((appItem) => appItem.metadata.name === name && appItem.metadata.namespace === namespace);
+
+        // array for grouping similar apps
+        const appGroup = [];
+        _.set(applicationSet, 'spec.apps', appGroup);
+        // this is where we keep all destinations
         const destinations = [];
         _.set(applicationSet, 'spec.destinations', destinations);
 
-        if(apps.length > 1) {
-          //get targets from all apps and put them to the first app
-          //this will behave as the application set, containing all info used to build the topology
-          apps.forEach(app => {
-            const appDestination = _.get(app, 'spec.destination')
-            if(appDestination) {
-              destinations.push(appDestination)
+        if (apps.length > 1) {
+          // get targets from all apps and put them to the first app
+          // this will behave as the application set, containing all info used to build the topology
+          // provide application group of apps with the same repo
+          apps.forEach((app) => {
+            const appDestination = _.get(app, 'spec.destination');
+            if (appDestination) {
+              destinations.push(appDestination);
             }
-          })
+            if (app.metadata.name !== name) {
+              const appRepo = _.get(app, 'spec.source.repoURL');
+              const appRepoPath = _.get(app, 'spec.source.path');
+              if (appRepo === applicationSet.spec.source.repoURL && appRepoPath === applicationSet.spec.source.path) {
+                appGroup.push(app);
+              }
+            }
+          });
         }
-
       }
     } catch (err) {
       logger.error(err);
@@ -574,12 +586,16 @@ export default class ApplicationModel extends GenericModel {
     }
 
     if (apps.length > 0) {
-      const app = apps[0];
+      const app = !applicationSet ? apps[0] : applicationSet;
 
       // get its associated resources
       model = {
         name, namespace, app, metadata: app.metadata,
       };
+
+      if (app.apiVersion.indexOf('argoproj.io') > -1) {
+        return model;
+      }
 
       // get subscriptions to channels (pipelines)
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]')

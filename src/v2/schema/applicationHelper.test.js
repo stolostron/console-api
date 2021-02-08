@@ -10,22 +10,25 @@
  ****************************************************************************** */
 
 import getApplicationElements, {
-  createReplicaChild,
-  createIngressRouteChild,
-  createGenericPackageObject,
   addSubscriptionCharts,
-  addSubscriptionDeployable,
-  addClusters,
   processServiceOwner,
   processServices,
   processDeployables,
   getSubscriptionPackageInfo,
+  createDeployableObject,
+} from './applicationHelper';
+
+import {
+  createReplicaChild,
+  createIngressRouteChild,
+  createGenericPackageObject,
+  addSubscriptionDeployable,
+  addClusters,
   removeReleaseGeneratedSuffix,
   removeHelmReleaseName,
   isPrePostHookDeployable,
-  createDeployableObject,
   getLocalClusterElement,
-} from './applicationHelper';
+} from './application-helper-util';
 
 describe('createDeployableObject', () => {
   const subscription = {
