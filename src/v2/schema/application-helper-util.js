@@ -16,7 +16,6 @@ const metadataNamespace = 'metadata.namespace';
 const preHookType = 'pre-hook';
 const postHookType = 'post-hook';
 
-
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
   const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
@@ -89,13 +88,6 @@ export const createChildNode = (parentObject, type, rawData, links, nodes) => {
 };
 
 export const createReplicaChild = (parentObject, template, links, nodes) => {
-  /* why do we need this ?
-  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
-    return null; // no replica
-  }
-  */
-  //console.log('createReplicaChild', parentObject, template, JSON.stringify(parentObject))
-
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
     // create only for deploymentconfig and deployment types
@@ -188,15 +180,14 @@ export const removeHelmReleaseName = (name, releaseName) => {
   return result;
 };
 
-//add cluster node to RHCAM application
+// add cluster node to RHCAM application
 export const addClusters = (
   parentId, createdClusterElements, subscription,
   clusterNames, clusters, links, nodes,
 ) => {
-  // create element if not already created'
+  // create element if not already created
   const sortedClusterNames = _.sortBy(clusterNames);
   const cns = sortedClusterNames.join(', ');
-  
   let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;
