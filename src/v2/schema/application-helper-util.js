@@ -123,7 +123,7 @@ export const createReplicaChild = (parentObject, template, links, nodes, isArgoA
     },
     spec: {
       desired: _.get(template, 'spec.replicas', 0),
-      template: { ..._.get(template, 'spec.template', {}) },
+      template: { ..._.get(template, specTemplate, {}) },
     },
   };
   return createChildNode(parentObject, type, rawData, links, nodes);
@@ -281,7 +281,7 @@ export const addSubscriptionDeployable = (
       parentType: parentNode.type,
     } : undefined;
 
-  const template = _.get(deployable, 'spec.template', { metadata: {} });
+  const template = _.get(deployable, specTemplate, { metadata: {} });
   let { kind = 'container' } = template;
   const { metadata: { name: k8Name } } = template;
   kind = kind.toLowerCase();

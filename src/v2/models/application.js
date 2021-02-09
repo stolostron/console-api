@@ -264,6 +264,12 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   };
 };
 
+export const evaluateSingleAnd = (operand1, operand2) => operand1 && operand2;
+
+export const evaluateDoubleAnd = (operand1, operand2, operand3) => operand1 && operand2 && operand3;
+
+export const evaluateSingleOr = (operand1, operand2) => operand1 || operand2;
+
 export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -552,7 +558,7 @@ export default class ApplicationModel extends GenericModel {
           { namespaces: [namespace] },
         );
 
-        applicationSet = apps.find((appItem) => appItem.metadata.name === name && appItem.metadata.namespace === namespace);
+        applicationSet = apps.find((appItem) => evaluateSingleAnd(appItem.metadata.name === name, appItem.metadata.namespace === namespace));
 
         if (!applicationSet) {
           return model;
@@ -573,12 +579,12 @@ export default class ApplicationModel extends GenericModel {
             if (appDestination) {
               destinations.push(appDestination);
             }
-            if (app.metadata.name !== name) {
-              const appRepo = _.get(app, 'spec.source.repoURL');
-              const appRepoPath = _.get(app, 'spec.source.path');
-              if (appRepo === applicationSet.spec.source.repoURL && appRepoPath === applicationSet.spec.source.path) {
-                appGroup.push(app);
-              }
+            const appRepo = _.get(app, 'spec.source.repoURL');
+            const appRepoPath = _.get(app, 'spec.source.path');
+            if (evaluateDoubleAnd(app.metadata.name !== name,
+              appRepo === applicationSet.spec.source.repoURL,
+              appRepoPath === applicationSet.spec.source.path)) {
+              appGroup.push(app);
             }
           });
         }
@@ -601,16 +607,14 @@ export default class ApplicationModel extends GenericModel {
       }
 
       // get subscriptions to channels (pipelines)
-      let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]')
-        || _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]');
-      let deployableNames = _.get(app, DEPLOYABLES)
-        || _.get(app, 'metadata.annotations["app.ibm.com/subscriptions/deployables"]');
-      if (subscriptionNames && subscriptionNames.length > 0) {
+      let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]');
+      let deployableNames = _.get(app, DEPLOYABLES);
+      if (evaluateSingleAnd(subscriptionNames, subscriptionNames.length > 0)) {
         subscriptionNames = subscriptionNames.split(',');
         // filter local hub subscription
         const filteredSubscriptions = [];
         subscriptionNames.forEach((subscriptionName) => {
-          if (!(_.endsWith(subscriptionName, '-local') && _.indexOf(subscriptionNames, _.trimEnd(subscriptionName, '-local')) !== -1)) {
+          if (!(evaluateSingleAnd(_.endsWith(subscriptionName, '-local'), _.indexOf(subscriptionNames, _.trimEnd(subscriptionName, '-local')) !== -1))) {
             filteredSubscriptions.push(subscriptionName);
           }
         });
@@ -638,7 +642,7 @@ export default class ApplicationModel extends GenericModel {
         const selectedSubscription = selectedChannel === ALL_SUBSCRIPTIONS ? allSubscriptions : subscr;
         const {
           deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap,
-        } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
+        } = buildDeployablesMap(evaluateSingleOr(selectedSubscription, subscriptions), model.subscriptions);
         // now fetch them
         await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
         await this.getAppHooks(preHooksMap, true);
@@ -649,7 +653,7 @@ export default class ApplicationModel extends GenericModel {
         if (includeChannels) {
           await this.getAppChannels(channelsMap);
         }
-      } else if (deployableNames && deployableNames.length > 0) {
+      } else if (evaluateSingleAnd(deployableNames, deployableNames.length > 0)) {
         deployableNames = deployableNames.split(',');
         model.deployables = await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
         await this.getPlacementRules(model.deployables);
