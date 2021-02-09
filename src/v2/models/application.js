@@ -554,6 +554,9 @@ export default class ApplicationModel extends GenericModel {
 
         applicationSet = apps.find((appItem) => appItem.metadata.name === name && appItem.metadata.namespace === namespace);
 
+        if (!applicationSet) {
+          return model;
+        }
         // array for grouping similar apps
         const appGroup = [];
         _.set(applicationSet, 'spec.apps', appGroup);
