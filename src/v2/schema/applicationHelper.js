@@ -345,12 +345,18 @@ async function buildArgoApplication(application, appName, appNamespace, nodes, l
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
   serverDestinations.forEach((destination) => {
     try {
-      const serverApi = _.get(destination, 'server', 'http://unknown');
-      const serverURI = new URL(serverApi);
-      let clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
-      if (clusterName === 'default') {
-        // mark this as default cluster
-        clusterName = localClusterName;
+      let clusterName;
+      const serverApi = _.get(destination, 'server');
+      if (serverApi) {
+        const serverURI = new URL(serverApi);
+        clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+        if (clusterName === 'default') {
+          // mark this as default cluster
+          clusterName = localClusterName;
+        }
+      } else {
+        // target destination was set using the name property
+        clusterName = _.get(destination, 'name', 'unknonwn');
       }
       clusterNames.push(clusterName);
       clusters.push({ metadata: { name: clusterName, namespace: clusterName }, destination, status: 'ok' });
@@ -378,6 +384,7 @@ async function buildArgoApplication(application, appName, appNamespace, nodes, l
         isLocal: clusterNames.includes(localClusterName),
         remoteCount: clusterNames.includes(localClusterName) ? clusterNames.length - 1 : clusterNames.length,
       },
+      clusterNames,
       channels: application.channels,
     },
   });
