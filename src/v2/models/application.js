@@ -593,9 +593,9 @@ export default class ApplicationModel extends GenericModel {
         name, namespace, app, metadata: app.metadata,
       };
 
-      /*if (app.apiVersion.indexOf('argoproj.io') > -1) {
+      if (app.apiVersion.indexOf('argoproj.io') > -1) {
         return model;
-      }*/
+      }
 
       // get subscriptions to channels (pipelines)
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]')

@@ -442,7 +442,7 @@ async function buildArgoApplication(application, appName, appNamespace, nodes, l
 
     const template = { metadata: {} };
     // create replica subobject, if this object defines a replicas
-    createReplicaChild(deployableObj, template, links, nodes);
+    createReplicaChild(deployableObj, template, links, nodes, true);
     // create route subobject, if this object is an ingress
     createIngressRouteChild(deployableObj, template, links, nodes);
   });
