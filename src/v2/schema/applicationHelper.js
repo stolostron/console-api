@@ -404,8 +404,8 @@ async function buildArgoApplication(application, appName, appNamespace, nodes, l
 
     const raw = {
       metadata: {
-        deployableName,
-        deployableNamespace,
+        name: deployableName,
+        namespace: deployableNamespace,
       },
       ...deployable,
     };
@@ -419,8 +419,8 @@ async function buildArgoApplication(application, appName, appNamespace, nodes, l
     }
 
     const deployableObj = {
-      deployableName,
-      deployableNamespace,
+      name: deployableName,
+      namespace: deployableNamespace,
       type,
       id: memberId,
       uid: memberId,

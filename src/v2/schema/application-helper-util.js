@@ -15,6 +15,7 @@ const metadataName = 'metadata.name';
 const metadataNamespace = 'metadata.namespace';
 const preHookType = 'pre-hook';
 const postHookType = 'post-hook';
+const specTemplate = 'spec.template';
 
 export const isPrePostHookDeployable = (subscription, name, namespace) => {
   const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
@@ -87,11 +88,31 @@ export const createChildNode = (parentObject, type, rawData, links, nodes) => {
   return deployableObj;
 };
 
-export const createReplicaChild = (parentObject, template, links, nodes) => {
-
-  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
-    return null; // no replica
+export const createControllerRevisionChild = (parentObject, template, links, nodes) => {
+  const parentType = _.get(parentObject, 'type', '');
+  if (parentType !== 'daemonset' && parentType !== 'statefulset') {
+    // create only for daemonset or statefulset types
+    return null;
   }
+
+  const { name, namespace } = parentObject;
+  const rawData = {
+    kind: 'controllerrevision',
+    metadata: {
+      name,
+      namespace,
+    },
+    spec: {
+      template: { ..._.get(template, specTemplate, {}) },
+    },
+  };
+  return createChildNode(parentObject, 'controllerrevision', rawData, links, nodes);
+};
+
+export const createReplicaChild = (parentObject, template, links, nodes) => {
+  /*if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
+    return null; // no replica
+  }*/
 
   const parentType = _.get(parentObject, 'type', '');
   if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
@@ -308,6 +329,8 @@ export const addSubscriptionDeployable = (
   }
   // create replica subobject, if this object defines a replicas
   createReplicaChild(topoObject, template, links, nodes);
+  // create controllerrevision subobject, if this object is a daemonset
+  createControllerRevisionChild(topoObject, template, links, nodes);
   // create route subobject, if this object is an ingress
   createIngressRouteChild(topoObject, template, links, nodes);
 

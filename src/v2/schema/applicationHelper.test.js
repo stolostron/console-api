@@ -28,6 +28,7 @@ import {
   addSubscriptionDeployable,
   addClusters,
   getLocalClusterElement,
+  createControllerRevisionChild,
 } from './application-helper-util';
 
 describe('createDeployableObject', () => {
@@ -1400,5 +1401,67 @@ describe('getLocalClusterElement cluster element does not exists', () => {
   it('should not get the local cluster element', () => {
     const createdClusterElements = new Set(['member--clusters--cluster1, cluster2']);
     expect(getLocalClusterElement(createdClusterElements)).toEqual(undefined);
+  });
+});
+
+describe('createControllerRevisionChild', () => {
+  it('createControllerRevisionChild', () => {
+    const parentObject = {
+      id: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--daemonset--redis-slave',
+      uid: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--daemonset--redis-slave',
+      name: 'redis-slave',
+      namespace: 'open-cluster-management',
+      type: 'daemonset',
+      specs:
+      {
+        isDesign: false,
+        raw: {
+          kind: 'Daemonset',
+          metadata: {
+            name: 'redis-master',
+            namespace: 'open-cluster-management',
+          },
+          spec: { replicas: 3 },
+        },
+      },
+    };
+    const template = {
+      kind: 'Daemonset',
+      metadata: { name: 'redis-slave', namespace: 'open-cluster-management' },
+      spec: {
+        availableReplicas: 2,
+        observedGeneration: 2,
+        readyReplicas: 2,
+        replicas: 2,
+        updatedReplicas: 2,
+      },
+    };
+
+    const result = {
+      id: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--controllerrevision--redis-slave',
+      name: 'redis-slave',
+      namespace: 'open-cluster-management',
+      specs: {
+        isDesign: false,
+        parent: {
+          parentId: 'member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--daemonset--redis-slave',
+          parentName: 'redis-slave',
+          parentType: 'daemonset',
+        },
+        raw: {
+          kind: 'controllerrevision',
+          metadata: {
+            name: 'redis-slave',
+            namespace: 'open-cluster-management',
+          },
+          spec: {
+            template: {},
+          },
+        },
+      },
+      type: 'controllerrevision',
+      uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--controllerrevision--redis-slave',
+    };
+    expect(createControllerRevisionChild(parentObject, template, [], [])).toEqual(result);
   });
 });
