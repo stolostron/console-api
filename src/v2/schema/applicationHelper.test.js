@@ -16,6 +16,7 @@ import getApplicationElements, {
   processDeployables,
   getSubscriptionPackageInfo,
   createDeployableObject,
+  buildArgoApplication,
 } from './applicationHelper';
 
 import {
@@ -1463,5 +1464,530 @@ describe('createControllerRevisionChild', () => {
       uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--controllerrevision--redis-slave',
     };
     expect(createControllerRevisionChild(parentObject, template, [], [])).toEqual(result);
+  });
+});
+
+describe('buildArgoApplication', () => {
+  it('should build model for an Argo app', () => {
+    const application = {
+      name: 'helloworld-local',
+      namespace: 'argocd',
+      app: {
+        apiVersion: 'argoproj.io/v1alpha1',
+        kind: 'Application',
+        metadata: {
+          annotations: {},
+          creationTimestamp: '2021-02-10T02:15:57Z',
+          generation: 144,
+          name: 'helloworld-local',
+          namespace: 'argocd',
+          resourceVersion: '431915',
+          selfLink: '/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/helloworld-local',
+          uid: '873de4eb-8c34-4135-a8f1-713c4a240019',
+        },
+        spec: {
+          destination: {
+            namespace: 'argo-helloworld',
+            server: 'https://kubernetes.default.svc',
+          },
+          project: 'default',
+          source: {
+            path: 'helloworld',
+            repoURL: 'https://github.com/fxiang1/app-samples',
+            targetRevision: 'HEAD',
+          },
+          syncPolicy: {
+            automated: {
+              selfHeal: true,
+            },
+          },
+          apps: [
+            {
+              apiVersion: 'argoproj.io/v1alpha1',
+              kind: 'Application',
+              metadata: {
+                annotations: {},
+                creationTimestamp: '2021-02-10T02:15:57Z',
+                generation: 181,
+                name: 'helloworld-remote',
+                namespace: 'argocd',
+                resourceVersion: '429742',
+                selfLink: '/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/helloworld-remote',
+                uid: '9cd659e1-11cd-4dd5-9920-b4413e0cab23',
+              },
+              spec: {
+                destination: {
+                  namespace: 'argo-helloworld',
+                  server: 'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443',
+                },
+                project: 'default',
+                source: {
+                  path: 'helloworld',
+                  repoURL: 'https://github.com/fxiang1/app-samples',
+                  targetRevision: 'HEAD',
+                },
+                syncPolicy: {
+                  automated: {
+                    selfHeal: true,
+                  },
+                },
+              },
+              status: {
+                conditions: [
+                  {
+                    lastTransitionTime: '2021-02-10T16:55:35Z',
+                    message: 'Get \'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443/version?timeout=32s\': dial tcp 34.239.89.204:6443: i/o timeout',
+                    type: 'ComparisonError',
+                  },
+                  {
+                    lastTransitionTime: '2021-02-10T16:55:35Z',
+                    message: 'Get \'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443/version?timeout=32s\': dial tcp 34.239.89.204:6443: i/o timeout',
+                    type: 'ComparisonError',
+                  },
+                ],
+                health: {
+                  status: 'Healthy',
+                },
+                history: [
+                  {
+                    deployStartedAt: '2021-02-09T12:21:57Z',
+                    deployedAt: '2021-02-09T12:22:00Z',
+                    id: 0,
+                    revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                ],
+                operationState: {
+                  finishedAt: '2021-02-10T02:32:02Z',
+                  message: 'successfully synced (all tasks run)',
+                  operation: {
+                    initiatedBy: {
+                      automated: true,
+                    },
+                    retry: {
+                      limit: 5,
+                    },
+                    sync: {
+                      resources: [
+                        {
+                          group: 'apps',
+                          kind: 'Deployment',
+                          name: 'helloworld-app-deploy',
+                        },
+                        {
+                          group: 'route.openshift.io',
+                          kind: 'Route',
+                          name: 'helloworld-app-route',
+                        },
+                        {
+                          kind: 'Service',
+                          name: 'helloworld-app-svc',
+                        },
+                      ],
+                      revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    },
+                  },
+                  phase: 'Succeeded',
+                  startedAt: '2021-02-10T02:31:58Z',
+                  syncResult: {
+                    resources: [
+                      {
+                        group: '',
+                        hookPhase: 'Running',
+                        kind: 'Service',
+                        message: 'service/helloworld-app-svc created',
+                        name: 'helloworld-app-svc',
+                        namespace: 'argo-helloworld',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                      {
+                        group: 'apps',
+                        hookPhase: 'Running',
+                        kind: 'Deployment',
+                        message: 'deployment.apps/helloworld-app-deploy created',
+                        name: 'helloworld-app-deploy',
+                        namespace: 'argo-helloworld',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                      {
+                        group: 'route.openshift.io',
+                        hookPhase: 'Running',
+                        kind: 'Route',
+                        message: 'route.route.openshift.io/helloworld-app-route created',
+                        name: 'helloworld-app-route',
+                        namespace: 'argo-helloworld',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                    ],
+                    revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                },
+                reconciledAt: '2021-02-10T16:56:05Z',
+                summary: {
+                },
+                sync: {
+                  comparedTo: {
+                    destination: {
+                      namespace: 'argo-helloworld',
+                      server: 'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443',
+                    },
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                  status: 'Unknown',
+                },
+              },
+            },
+            {
+              apiVersion: 'argoproj.io/v1alpha1',
+              kind: 'Application',
+              metadata: {
+                annotations: {},
+                creationTimestamp: '2021-02-10T02:15:57Z',
+                generation: 306,
+                name: 'helloworld2-remote',
+                namespace: 'argocd',
+                resourceVersion: '432399',
+                selfLink: '/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/helloworld2-remote',
+                uid: '560bade8-b2f3-4d4e-a6d6-dfb3e527a6bd',
+              },
+              spec: {
+                destination: {
+                  name: 'ui-dev-remote',
+                  namespace: 'argo-helloworld2',
+                },
+                project: 'default',
+                source: {
+                  path: 'helloworld',
+                  repoURL: 'https://github.com/fxiang1/app-samples',
+                  targetRevision: 'HEAD',
+                },
+                syncPolicy: {
+                  automated: {
+                    selfHeal: true,
+                  },
+                },
+              },
+              status: {
+                conditions: [
+                  {
+                    lastTransitionTime: '2021-02-10T16:58:35Z',
+                    message: 'Get \'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443/version?timeout=32s\': dial tcp 35.175.165.175:6443: i/o timeout',
+                    type: 'ComparisonError',
+                  },
+                  {
+                    lastTransitionTime: '2021-02-10T16:58:35Z',
+                    message: 'Get \'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443/version?timeout=32s\': dial tcp 35.175.165.175:6443: i/o timeout',
+                    type: 'ComparisonError',
+                  },
+                ],
+                health: {
+                  status: 'Healthy',
+                },
+                history: [
+                  {
+                    deployStartedAt: '2021-02-09T14:42:20Z',
+                    deployedAt: '2021-02-09T14:47:43Z',
+                    id: 0,
+                    revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                ],
+                operationState: {
+                  finishedAt: '2021-02-10T02:16:07Z',
+                  message: 'successfully synced (all tasks run)',
+                  operation: {
+                    initiatedBy: {
+                      automated: true,
+                    },
+                    retry: {
+                      limit: 5,
+                    },
+                    sync: {
+                      resources: [
+                        {
+                          group: 'apps',
+                          kind: 'Deployment',
+                          name: 'helloworld-app-deploy',
+                        },
+                        {
+                          group: 'route.openshift.io',
+                          kind: 'Route',
+                          name: 'helloworld-app-route',
+                        },
+                        {
+                          kind: 'Service',
+                          name: 'helloworld-app-svc',
+                        },
+                      ],
+                      revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    },
+                  },
+                  phase: 'Succeeded',
+                  startedAt: '2021-02-10T02:16:04Z',
+                  syncResult: {
+                    resources: [
+                      {
+                        group: '',
+                        hookPhase: 'Running',
+                        kind: 'Service',
+                        message: 'service/helloworld-app-svc created',
+                        name: 'helloworld-app-svc',
+                        namespace: 'argo-helloworld2',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                      {
+                        group: 'apps',
+                        hookPhase: 'Running',
+                        kind: 'Deployment',
+                        message: 'deployment.apps/helloworld-app-deploy created',
+                        name: 'helloworld-app-deploy',
+                        namespace: 'argo-helloworld2',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                      {
+                        group: 'route.openshift.io',
+                        hookPhase: 'Running',
+                        kind: 'Route',
+                        message: 'route.route.openshift.io/helloworld-app-route created',
+                        name: 'helloworld-app-route',
+                        namespace: 'argo-helloworld2',
+                        status: 'Synced',
+                        syncPhase: 'Sync',
+                        version: 'v1',
+                      },
+                    ],
+                    revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                },
+                reconciledAt: '2021-02-10T16:59:05Z',
+                summary: {
+                },
+                sync: {
+                  comparedTo: {
+                    destination: {
+                      name: 'ui-dev-remote',
+                      namespace: 'argo-helloworld2',
+                    },
+                    source: {
+                      path: 'helloworld',
+                      repoURL: 'https://github.com/fxiang1/app-samples',
+                      targetRevision: 'HEAD',
+                    },
+                  },
+                  status: 'Unknown',
+                },
+              },
+            },
+          ],
+          destinations: [
+            {
+              namespace: 'argo-helloworld',
+              server: 'https://kubernetes.default.svc',
+            },
+            {
+              namespace: 'argo-helloworld',
+              server: 'https://api.app-aws-4615-zhl45.dev06.red-chesterfield.com:6443',
+            },
+            {
+              name: 'ui-dev-remote',
+              namespace: 'argo-helloworld2',
+            },
+            {
+              name: 'ui-dev-remote',
+              namespace: 'argo-redis',
+            },
+          ],
+        },
+        status: {
+          health: {
+            status: 'Healthy',
+          },
+          history: [
+            {
+              deployStartedAt: '2021-02-09T01:22:19Z',
+              deployedAt: '2021-02-09T01:22:31Z',
+              id: 0,
+              revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+              source: {
+                path: 'helloworld',
+                repoURL: 'https://github.com/fxiang1/app-samples',
+                targetRevision: 'HEAD',
+              },
+            },
+            {
+              deployStartedAt: '2021-02-10T02:32:20Z',
+              deployedAt: '2021-02-10T02:32:31Z',
+              id: 1,
+              revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+              source: {
+                path: 'helloworld',
+                repoURL: 'https://github.com/fxiang1/app-samples',
+                targetRevision: 'HEAD',
+              },
+            },
+          ],
+          operationState: {
+            finishedAt: '2021-02-10T02:32:31Z',
+            message: 'successfully synced (all tasks run)',
+            operation: {
+              initiatedBy: {
+                username: 'admin',
+              },
+              retry: {
+              },
+              sync: {
+                revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+                syncStrategy: {
+                  hook: {
+                  },
+                },
+              },
+            },
+            phase: 'Succeeded',
+            startedAt: '2021-02-10T02:32:20Z',
+            syncResult: {
+              resources: [
+                {
+                  group: '',
+                  hookPhase: 'Running',
+                  kind: 'Service',
+                  message: 'service/helloworld-app-svc created',
+                  name: 'helloworld-app-svc',
+                  namespace: 'argo-helloworld',
+                  status: 'Synced',
+                  syncPhase: 'Sync',
+                  version: 'v1',
+                },
+                {
+                  group: 'apps',
+                  hookPhase: 'Running',
+                  kind: 'Deployment',
+                  message: 'deployment.apps/helloworld-app-deploy created',
+                  name: 'helloworld-app-deploy',
+                  namespace: 'argo-helloworld',
+                  status: 'Synced',
+                  syncPhase: 'Sync',
+                  version: 'v1',
+                },
+                {
+                  group: 'route.openshift.io',
+                  hookPhase: 'Running',
+                  kind: 'Route',
+                  message: 'route.route.openshift.io/helloworld-app-route created',
+                  name: 'helloworld-app-route',
+                  namespace: 'argo-helloworld',
+                  status: 'Synced',
+                  syncPhase: 'Sync',
+                  version: 'v1',
+                },
+              ],
+              revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+              source: {
+                path: 'helloworld',
+                repoURL: 'https://github.com/fxiang1/app-samples',
+                targetRevision: 'HEAD',
+              },
+            },
+          },
+          reconciledAt: '2021-02-10T16:58:35Z',
+          resources: [
+            {
+              health: {
+                status: 'Healthy',
+              },
+              kind: 'Service',
+              name: 'helloworld-app-svc',
+              namespace: 'argo-helloworld',
+              status: 'Synced',
+              version: 'v1',
+            },
+            {
+              group: 'apps',
+              health: {
+                status: 'Healthy',
+              },
+              kind: 'Deployment',
+              name: 'helloworld-app-deploy',
+              namespace: 'argo-helloworld',
+              status: 'Synced',
+              version: 'v1',
+            },
+            {
+              group: 'route.openshift.io',
+              kind: 'Route',
+              name: 'helloworld-app-route',
+              namespace: 'argo-helloworld',
+              status: 'Synced',
+              version: 'v1',
+            },
+          ],
+          sourceType: 'Directory',
+          summary: {
+            images: [
+              'quay.io/fxiang1/helloworld:0.0.1',
+            ],
+          },
+          sync: {
+            comparedTo: {
+              destination: {
+                namespace: 'argo-helloworld',
+                server: 'https://kubernetes.default.svc',
+              },
+              source: {
+                path: 'helloworld',
+                repoURL: 'https://github.com/fxiang1/app-samples',
+                targetRevision: 'HEAD',
+              },
+            },
+            revision: 'a614b060d89affac3742288f6abe71e9449f9b26',
+            status: 'Synced',
+          },
+        },
+      },
+      metadata: {
+        annotations: {},
+        creationTimestamp: '2021-02-10T02:15:57Z',
+        generation: 144,
+        name: 'helloworld-local',
+        namespace: 'argocd',
+        resourceVersion: '431915',
+        selfLink: '/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/helloworld-local',
+        uid: '873de4eb-8c34-4135-a8f1-713c4a240019',
+      },
+    };
+
+    expect(buildArgoApplication(application, application.name, application.namespace, [], [])).toEqual(undefined);
   });
 });

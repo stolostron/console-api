@@ -270,6 +270,13 @@ export const evaluateDoubleAnd = (operand1, operand2, operand3) => operand1 && o
 
 export const evaluateSingleOr = (operand1, operand2) => operand1 || operand2;
 
+export const evaluateTernaryExpression = (condition, returnVal1, returnVal2) => {
+  if (condition) {
+    return returnVal1;
+  }
+  return returnVal2;
+};
+
 export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -595,7 +602,7 @@ export default class ApplicationModel extends GenericModel {
     }
 
     if (apps.length > 0) {
-      const app = !applicationSet ? apps[0] : applicationSet;
+      const app = evaluateTernaryExpression(!!applicationSet, apps[0], applicationSet);
 
       // get its associated resources
       model = {
@@ -639,7 +646,7 @@ export default class ApplicationModel extends GenericModel {
         );
 
         // get all requested subscriptions
-        const selectedSubscription = selectedChannel === ALL_SUBSCRIPTIONS ? allSubscriptions : subscr;
+        const selectedSubscription = evaluateTernaryExpression(selectedChannel === ALL_SUBSCRIPTIONS, allSubscriptions, subscr);
         const {
           deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap,
         } = buildDeployablesMap(evaluateSingleOr(selectedSubscription, subscriptions), model.subscriptions);

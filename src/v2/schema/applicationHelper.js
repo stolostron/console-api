@@ -339,7 +339,7 @@ export const addSubscriptionCharts = (
   return nodes;
 };
 
-async function buildArgoApplication(application, appName, appNamespace, nodes, links) {
+export function buildArgoApplication(application, appName, appNamespace, nodes, links) {
   const clusters = [];
   let clusterNames = [];
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
