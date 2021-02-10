@@ -602,7 +602,7 @@ export default class ApplicationModel extends GenericModel {
     }
 
     if (apps.length > 0) {
-      const app = evaluateTernaryExpression(!!applicationSet, apps[0], applicationSet);
+      const app = evaluateTernaryExpression(!applicationSet, apps[0], applicationSet);
 
       // get its associated resources
       model = {
