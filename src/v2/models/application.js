@@ -277,6 +277,65 @@ export const evaluateTernaryExpression = (condition, returnVal1, returnVal2) => 
   return returnVal2;
 };
 
+export const getUniqueArgoNamespaces = (apps) => {
+  const namespaces = new Set();
+
+  apps.forEach((app) => {
+    if (!namespaces.has(app.metadata.namespace)) {
+      namespaces.add(app.metadata.namespace);
+    }
+  });
+
+  return namespaces;
+};
+
+export const getArgoServerRoutes = (routes) => {
+  const argoServerRoutes = {};
+
+  routes.forEach((route) => {
+    const toKind = _.get(route, 'spec.to.kind');
+    const toName = _.get(route, 'spec.to.name');
+    if (toKind === 'Service' && toName === 'argocd-server') {
+      const routeNamespace = _.get(route, 'metadata.namespace');
+      const routeHost = _.get(route, 'spec.host');
+      const routeTargetPort = _.get(route, 'spec.port.targetPort');
+      argoServerRoutes[routeNamespace] = `${routeTargetPort}://${routeHost}`;
+    }
+  });
+
+  return argoServerRoutes;
+};
+
+export const populateApplicationSet = (applicationSet, apps, name, argoServerRoutes) => {
+  // array for grouping similar apps
+  const appGroup = [];
+  _.set(applicationSet, 'spec.apps', appGroup);
+  // this is where we keep all destinations
+  const destinations = [];
+  _.set(applicationSet, 'spec.destinations', destinations);
+  _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications/${name}`);
+
+  if (apps.length > 1) {
+    // get targets from all apps and put them to the first app
+    // this will behave as the application set, containing all info used to build the topology
+    // provide application group of apps with the same repo
+    apps.forEach((app) => {
+      _.set(app, 'spec.appURL', `${argoServerRoutes[app.metadata.namespace]}/applications/${app.metadata.name}`);
+      const appDestination = _.get(app, 'spec.destination');
+      if (appDestination) {
+        destinations.push(appDestination);
+      }
+      const appRepo = _.get(app, 'spec.source.repoURL');
+      const appRepoPath = _.get(app, 'spec.source.path');
+      if (evaluateDoubleAnd(app.metadata.name !== name,
+        appRepo === applicationSet.spec.source.repoURL,
+        appRepoPath === applicationSet.spec.source.path)) {
+        appGroup.push(app);
+      }
+    });
+  }
+};
+
 export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -570,31 +629,16 @@ export default class ApplicationModel extends GenericModel {
         if (!applicationSet) {
           return model;
         }
-        // array for grouping similar apps
-        const appGroup = [];
-        _.set(applicationSet, 'spec.apps', appGroup);
-        // this is where we keep all destinations
-        const destinations = [];
-        _.set(applicationSet, 'spec.destinations', destinations);
+        const argoNamespaces = getUniqueArgoNamespaces(apps);
 
-        if (apps.length > 1) {
-          // get targets from all apps and put them to the first app
-          // this will behave as the application set, containing all info used to build the topology
-          // provide application group of apps with the same repo
-          apps.forEach((app) => {
-            const appDestination = _.get(app, 'spec.destination');
-            if (appDestination) {
-              destinations.push(appDestination);
-            }
-            const appRepo = _.get(app, 'spec.source.repoURL');
-            const appRepoPath = _.get(app, 'spec.source.path');
-            if (evaluateDoubleAnd(app.metadata.name !== name,
-              appRepo === applicationSet.spec.source.repoURL,
-              appRepoPath === applicationSet.spec.source.path)) {
-              appGroup.push(app);
-            }
-          });
-        }
+        const routes = await this.kubeConnector.getResources(
+          (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
+          { namespaces: Array.from(argoNamespaces) },
+        );
+
+        const argoServerRoutes = getArgoServerRoutes(routes);
+
+        populateApplicationSet(applicationSet, apps, name, argoServerRoutes);
       }
     } catch (err) {
       logger.error(err);
