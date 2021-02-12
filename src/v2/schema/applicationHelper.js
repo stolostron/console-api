@@ -374,7 +374,7 @@ export function buildArgoApplication(application, appName, appNamespace, nodes, 
     id: appId,
     uid: appId,
     specs: {
-      apps: { ...application.app.spec.apps },
+      apps: [...application.app.spec.apps],
       isDesign: true,
       raw: application.app,
       activeChannel: application.activeChannel,
