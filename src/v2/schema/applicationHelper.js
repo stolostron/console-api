@@ -9,27 +9,23 @@
  ****************************************************************************** */
 /* eslint no-param-reassign: "error" */
 import _ from 'lodash';
+import logger from '../lib/logger';
+
+import {
+  isPrePostHookDeployable,
+  getClusterName,
+  createReplicaChild,
+  createIngressRouteChild,
+  createGenericPackageObject,
+  removeHelmReleaseName,
+  addSubscriptionDeployable,
+  addClusters,
+} from './application-helper-util';
 
 const templateKind = 'spec.template.kind';
 const localClusterName = 'local-cluster';
 const metadataName = 'metadata.name';
-const metadataNamespace = 'metadata.namespace';
 const preHookType = 'pre-hook';
-const postHookType = 'post-hook';
-const specTemplate = 'spec.template';
-
-export const isPrePostHookDeployable = (subscription, name, namespace) => {
-  const preHooks = _.get(subscription, 'status.ansiblejobs.prehookjobshistory', []);
-  const postHooks = _.get(subscription, 'status.ansiblejobs.posthookjobshistory', []);
-  const objectIdentity = `${namespace}/${name}`;
-  if (_.indexOf(preHooks, objectIdentity) !== -1) {
-    return preHookType;
-  }
-  if (_.indexOf(postHooks, objectIdentity) !== -1) {
-    return postHookType;
-  }
-  return null;
-};
 
 function addSubscription(appId, subscription, isPlaced, links, nodes) {
   const { metadata: { namespace, name } } = subscription;
@@ -75,261 +71,6 @@ function addSubscriptionRules(parentId, subscription, links, nodes) {
     });
   });
 }
-
-export const getLocalClusterElement = (createdClusterElements) => {
-  let localClusterElement;
-  createdClusterElements.forEach((element) => {
-    if (element.indexOf(localClusterName) > -1) {
-      localClusterElement = element;
-    }
-  });
-
-  return localClusterElement;
-};
-
-export const addClusters = (
-  parentId, createdClusterElements, subscription,
-  clusterNames, clusters, links, nodes,
-) => {
-  // create element if not already created'
-  const sortedClusterNames = _.sortBy(clusterNames);
-  const cns = sortedClusterNames.join(', ');
-  let clusterId = `member--clusters--${cns}`;
-  const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
-    ? getLocalClusterElement(createdClusterElements) : undefined;
-  if (!createdClusterElements.has(clusterId) && !localClusterElement) {
-    const filteredClusters = clusters.filter((cluster) => {
-      const cname = _.get(cluster, metadataName);
-      return cname && clusterNames.includes(cname);
-    });
-    nodes.push({
-      name: cns,
-      namespace: '',
-      type: 'cluster',
-      id: clusterId,
-      uid: clusterId,
-      specs: {
-        cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
-        clusters: filteredClusters,
-        sortedClusterNames,
-      },
-    });
-    createdClusterElements.add(clusterId);
-  }
-  if (localClusterElement) {
-    clusterId = localClusterElement;
-  }
-  links.push({
-    from: { uid: parentId },
-    to: { uid: clusterId },
-    type: '',
-    specs: { isDesign: true },
-  });
-  return clusterId;
-};
-
-const getClusterName = (nodeId) => {
-  if (nodeId === undefined) {
-    return '';
-  }
-  const clusterIndex = nodeId.indexOf('--clusters--');
-  if (clusterIndex !== -1) {
-    const startPos = nodeId.indexOf('--clusters--') + 12;
-    const endPos = nodeId.indexOf('--', startPos);
-    return nodeId.slice(startPos, endPos);
-  }
-  return localClusterName;
-};
-
-const createChildNode = (parentObject, type, rawData, links, nodes) => {
-  const parentType = _.get(parentObject, 'type', '');
-  const { name, namespace } = parentObject;
-
-  const parentId = parentObject.id;
-  const memberId = `member--member--deployable--member--clusters--${getClusterName(parentId)}--${type}--${name}`;
-
-  const deployableObj = {
-    name,
-    namespace,
-    type,
-    id: memberId,
-    uid: memberId,
-    specs: {
-      isDesign: false,
-      raw: rawData,
-      parent: {
-        parentId,
-        parentName: name,
-        parentType,
-      },
-    },
-  };
-
-  nodes.push(deployableObj);
-  links.push({
-    from: { uid: parentId },
-    to: { uid: memberId },
-    type: '',
-  });
-
-  return deployableObj;
-};
-
-export const createControllerRevisionChild = (parentObject, template, links, nodes) => {
-  const parentType = _.get(parentObject, 'type', '');
-  if (parentType !== 'daemonset' && parentType !== 'statefulset') {
-    // create only for daemonset or statefulset types
-    return null;
-  }
-
-  const { name, namespace } = parentObject;
-  const rawData = {
-    kind: 'controllerrevision',
-    metadata: {
-      name,
-      namespace,
-    },
-    spec: {
-      template: { ..._.get(template, specTemplate, {}) },
-    },
-  };
-  return createChildNode(parentObject, 'controllerrevision', rawData, links, nodes);
-};
-
-export const createReplicaChild = (parentObject, template, links, nodes) => {
-  if (!_.get(parentObject, 'specs.raw.spec.replicas')) {
-    return null; // no replica
-  }
-  const parentType = _.get(parentObject, 'type', '');
-  if (parentType !== 'deploymentconfig' && parentType !== 'deployment') {
-    // create only for deploymentconfig and deployment types
-    return null;
-  }
-  const { name, namespace } = parentObject;
-  const type = parentType === 'deploymentconfig' ? 'replicationcontroller' : 'replicaset';
-  const rawData = {
-    kind: type,
-    metadata: {
-      name,
-      namespace,
-    },
-    spec: {
-      desired: _.get(template, 'spec.replicas', 0),
-      template: { ..._.get(template, specTemplate, {}) },
-    },
-  };
-  return createChildNode(parentObject, type, rawData, links, nodes);
-};
-
-export const createIngressRouteChild = (parentObject, template, links, nodes) => {
-  const parentType = _.get(parentObject, 'type', '');
-  if (parentType !== 'ingress') {
-    return null; // not an ingress object
-  }
-  const { name, namespace } = parentObject;
-  const type = 'route';
-
-  const rawData = {
-    kind: 'Route',
-    metadata: {
-      name,
-      namespace,
-    },
-    spec: {
-      rules: _.get(template, 'spec.rules', []),
-    },
-  };
-  return createChildNode(parentObject, type, rawData, links, nodes);
-};
-
-export const addSubscriptionDeployable = (
-  parentId, deployable, links, nodes,
-  subscriptionStatusMap, names, appNamespace, subscription,
-) => {
-  // deployable shape
-  const subscriptionUid = `member--subscription--${_.get(subscription, metadataNamespace, '')}--${_.get(subscription, metadataName, '')}`;
-  const { name, namespace } = _.get(deployable, 'metadata');
-  let linkType = isPrePostHookDeployable(subscription, name, namespace);
-  if (linkType === null) {
-    linkType = '';
-  } else {
-    const hookList = linkType === preHookType ? _.get(subscription, 'prehooks', []) : _.get(subscription, 'posthooks', []);
-    hookList.forEach((hook) => {
-      if (_.get(hook, metadataName, '') === name && _.get(hook, metadataNamespace, '') === namespace) {
-        deployable.spec.template.spec = hook.status;
-      }
-    });
-  }
-
-  const deployableId = `member--deployable--${parentId}--${namespace}--${name}`;
-  // installs these K8 objects
-  const deployStatuses = [];
-  if (names) {
-    names.forEach((cname) => {
-      const status = _.get(subscriptionStatusMap, `${cname}.${name}`);
-      if (status) {
-        deployStatuses.push(status);
-      }
-    });
-  }
-
-  const parentNode = nodes.find((n) => n.id === parentId);
-  const parentObject = parentNode
-    ? {
-      parentId,
-      parentName: parentNode.name,
-      parentType: parentNode.type,
-    } : undefined;
-
-  const template = _.get(deployable, specTemplate, { metadata: {} });
-  let { kind = 'container' } = template;
-  const { metadata: { name: k8Name } } = template;
-  kind = kind.toLowerCase();
-  const memberId = `member--${deployableId}--${kind}--${k8Name}`;
-
-  const topoObject = {
-    name: k8Name,
-    namespace: appNamespace,
-    type: kind,
-    id: memberId,
-    uid: memberId,
-    specs: {
-      raw: template,
-      deployStatuses,
-      isDesign: false,
-      parent: parentObject,
-    },
-  };
-
-  nodes.push(topoObject);
-  if (linkType === preHookType) {
-    links.push({
-      from: { uid: memberId },
-      to: { uid: subscriptionUid },
-      type: linkType,
-    });
-  } else if (linkType === postHookType) {
-    links.push({
-      from: { uid: subscriptionUid },
-      to: { uid: memberId },
-      type: linkType,
-    });
-  } else {
-    links.push({
-      from: { uid: parentId },
-      to: { uid: memberId },
-      type: linkType,
-    });
-  }
-  // create replica subobject, if this object defines a replicas
-  createReplicaChild(topoObject, template, links, nodes);
-  // create controllerrevision subobject, if this object is a daemonset
-  createControllerRevisionChild(topoObject, template, links, nodes);
-  // create route subobject, if this object is an ingress
-  createIngressRouteChild(topoObject, template, links, nodes);
-
-  return topoObject;
-};
 
 // Route, Ingress, StatefulSet
 export const processServiceOwner = (
@@ -431,56 +172,6 @@ export const processDeployables = (
       subscriptionStatusMap, names, namespace, subscription,
     );
   });
-};
-
-export const createGenericPackageObject = (
-  parentId, appNamespace,
-  nodes, links, subscriptionName,
-) => {
-  const packageName = `Package-${subscriptionName}`;
-  const memberId = `member--package--${packageName}`;
-
-  const packageObj = {
-    name: packageName,
-    namespace: appNamespace,
-    type: 'package',
-    id: memberId,
-    uid: memberId,
-    specs: {
-      raw: {
-        kind: 'Package',
-        metadata: {
-          name: packageName,
-          namespace: appNamespace,
-        },
-        isDesign: false,
-      },
-    },
-  };
-
-  nodes.push(packageObj);
-  links.push({
-    from: { uid: parentId },
-    to: { uid: memberId },
-    type: '',
-  });
-
-  return packageObj;
-};
-
-export const removeReleaseGeneratedSuffix = (name) => name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
-
-// remove the release name from the deployable name
-export const removeHelmReleaseName = (name, releaseName) => {
-  const trimmedReleaseName = _.trimEnd(releaseName, '-');
-  let result = _.replace(name, `${trimmedReleaseName}-`, '');
-  result = _.replace(result, `${trimmedReleaseName}`, '');
-
-  // resource name only contains release name, return without the generated suffix
-  if (result.length === 0) {
-    return removeReleaseGeneratedSuffix(name);
-  }
-  return result;
 };
 
 export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription) => {
@@ -645,9 +336,124 @@ export const addSubscriptionCharts = (
   if (!foundDeployables) {
     createGenericPackageObject(parentId, appNamespace, nodes, links, subscriptionName);
   }
-
   return nodes;
 };
+
+export function buildArgoApplication(application, appName, appNamespace, nodes, links) {
+  const clusters = [];
+  let clusterNames = [];
+  const serverDestinations = _.get(application, 'app.spec.destinations', []);
+  serverDestinations.forEach((destination) => {
+    try {
+      let clusterName;
+      const serverApi = _.get(destination, 'server');
+      if (serverApi) {
+        const serverURI = new URL(serverApi);
+        clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+        if (clusterName === 'default') {
+          // mark this as default cluster
+          clusterName = localClusterName;
+        }
+      } else {
+        // target destination was set using the name property
+        clusterName = _.get(destination, 'name', 'unknonwn');
+      }
+      clusterNames.push(clusterName);
+      clusters.push({ metadata: { name: clusterName, namespace: clusterName }, destination, status: 'ok' });
+    } catch (err) {
+      logger.error(err);
+    }
+  });
+  clusterNames = _.uniq(clusterNames);
+
+  const appId = `application--${appName}`;
+  nodes.push({
+    appName,
+    appNamespace,
+    type: 'application',
+    id: appId,
+    uid: appId,
+    specs: {
+      apps: [...application.app.spec.apps],
+      isDesign: true,
+      raw: application.app,
+      activeChannel: application.activeChannel,
+      allSubscriptions: [],
+      allChannels: [],
+      allClusters: {
+        isLocal: clusterNames.includes(localClusterName),
+        remoteCount: clusterNames.includes(localClusterName) ? clusterNames.length - 1 : clusterNames.length,
+      },
+      clusterNames,
+      channels: application.channels,
+    },
+  });
+
+  delete application.app.spec.apps;
+  // create cluster node
+  const clusterId = addClusters(
+    appId, new Set(), null,
+    clusterNames, _.uniqBy(clusters, 'metadata.name'), links, nodes,
+  );
+  const resources = _.get(application, 'app.status.resources', []);
+
+  resources.forEach((deployable) => {
+    const {
+      name: deployableName,
+      namespace: deployableNamespace,
+      kind,
+      version,
+      group,
+    } = deployable;
+    const type = kind.toLowerCase();
+
+    const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${deployableNamespace}--${deployableName}`;
+
+    const raw = {
+      metadata: {
+        name: deployableName,
+        namespace: deployableNamespace,
+      },
+      ...deployable,
+    };
+
+    let apiVersion = null;
+    if (version) {
+      apiVersion = group ? `${group}/${version}` : version;
+    }
+    if (apiVersion) {
+      raw.apiVersion = apiVersion;
+    }
+
+    const deployableObj = {
+      name: deployableName,
+      namespace: deployableNamespace,
+      type,
+      id: memberId,
+      uid: memberId,
+      specs: {
+        isDesign: false,
+        raw,
+        parent: {
+          clusterId,
+        },
+      },
+    };
+
+    nodes.push(deployableObj);
+    links.push({
+      from: { uid: clusterId },
+      to: { uid: memberId },
+      type: '',
+    });
+
+    const template = { metadata: {} };
+    // create replica subobject, if this object defines a replicas
+    createReplicaChild(deployableObj, template, links, nodes, true);
+    // create route subobject, if this object is an ingress
+    createIngressRouteChild(deployableObj, template, links, nodes);
+  });
+}
 
 async function getApplicationElements(application, clusterModel) {
   const links = [];
@@ -657,6 +463,13 @@ async function getApplicationElements(application, clusterModel) {
   let name;
   let namespace;
   ({ name, namespace } = application);
+
+  if (_.get(application, 'app.apiVersion').indexOf('argoproj.io') > -1) {
+    buildArgoApplication(application, name, namespace, nodes, links);
+    return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
+  }
+
+  // create application node
   const allAppClusters = application.allClusters ? application.allClusters : [];
   const appId = `application--${name}`;
   nodes.push({

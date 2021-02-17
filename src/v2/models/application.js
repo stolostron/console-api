@@ -264,6 +264,78 @@ export const buildDeployablesMap = (subscriptions, modelSubscriptions) => {
   };
 };
 
+export const evaluateSingleAnd = (operand1, operand2) => operand1 && operand2;
+
+export const evaluateDoubleAnd = (operand1, operand2, operand3) => operand1 && operand2 && operand3;
+
+export const evaluateSingleOr = (operand1, operand2) => operand1 || operand2;
+
+export const evaluateTernaryExpression = (condition, returnVal1, returnVal2) => {
+  if (condition) {
+    return returnVal1;
+  }
+  return returnVal2;
+};
+
+export const getUniqueArgoNamespaces = (apps) => {
+  const namespaces = new Set();
+
+  apps.forEach((app) => {
+    if (!namespaces.has(app.metadata.namespace)) {
+      namespaces.add(app.metadata.namespace);
+    }
+  });
+
+  return namespaces;
+};
+
+export const getArgoServerRoutes = (routes) => {
+  const argoServerRoutes = {};
+
+  routes.forEach((route) => {
+    const toKind = _.get(route, 'spec.to.kind');
+    const toName = _.get(route, 'spec.to.name');
+    if (toKind === 'Service' && toName === 'argocd-server') {
+      const routeNamespace = _.get(route, 'metadata.namespace');
+      const routeHost = _.get(route, 'spec.host');
+      const routeTargetPort = _.get(route, 'spec.port.targetPort');
+      argoServerRoutes[routeNamespace] = `${routeTargetPort}://${routeHost}`;
+    }
+  });
+
+  return argoServerRoutes;
+};
+
+export const populateApplicationSet = (applicationSet, apps, name, argoServerRoutes) => {
+  // array for grouping similar apps
+  const appGroup = [];
+  _.set(applicationSet, 'spec.apps', appGroup);
+  // this is where we keep all destinations
+  const destinations = [];
+  _.set(applicationSet, 'spec.destinations', destinations);
+  _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications/${name}`);
+
+  if (apps.length > 1) {
+    // get targets from all apps and put them to the first app
+    // this will behave as the application set, containing all info used to build the topology
+    // provide application group of apps with the same repo
+    apps.forEach((app) => {
+      _.set(app, 'spec.appURL', `${argoServerRoutes[app.metadata.namespace]}/applications/${app.metadata.name}`);
+      const appDestination = _.get(app, 'spec.destination');
+      if (appDestination) {
+        destinations.push(appDestination);
+      }
+      const appRepo = _.get(app, 'spec.source.repoURL');
+      const appRepoPath = _.get(app, 'spec.source.path');
+      if (evaluateDoubleAnd(app.metadata.name !== name,
+        appRepo === applicationSet.spec.source.repoURL,
+        appRepoPath === applicationSet.spec.source.path)) {
+        appGroup.push(app);
+      }
+    });
+  }
+};
+
 export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -538,35 +610,62 @@ export default class ApplicationModel extends GenericModel {
     // get application
     let model = null;
     let apps;
+    let applicationSet;
     try {
       apps = await this.kubeConnector.getResources(
         (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
         { namespaces: [namespace] },
       );
+
+      if (apps.length === 0) {
+        // get all argo apps in this namespace
+        apps = await this.kubeConnector.getResources(
+          (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
+          { namespaces: [namespace] },
+        );
+
+        applicationSet = apps.find((appItem) => evaluateSingleAnd(appItem.metadata.name === name, appItem.metadata.namespace === namespace));
+
+        if (!applicationSet) {
+          return model;
+        }
+        const argoNamespaces = getUniqueArgoNamespaces(apps);
+
+        const routes = await this.kubeConnector.getResources(
+          (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
+          { namespaces: Array.from(argoNamespaces) },
+        );
+
+        const argoServerRoutes = getArgoServerRoutes(routes);
+
+        populateApplicationSet(applicationSet, apps, name, argoServerRoutes);
+      }
     } catch (err) {
       logger.error(err);
       throw err;
     }
 
     if (apps.length > 0) {
-      const app = apps[0];
+      const app = evaluateTernaryExpression(!applicationSet, apps[0], applicationSet);
 
       // get its associated resources
       model = {
         name, namespace, app, metadata: app.metadata,
       };
 
+      if (app.apiVersion.indexOf('argoproj.io') > -1) {
+        return model;
+      }
+
       // get subscriptions to channels (pipelines)
-      let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]')
-        || _.get(app, 'metadata.annotations["app.ibm.com/subscriptions"]');
-      let deployableNames = _.get(app, DEPLOYABLES)
-        || _.get(app, 'metadata.annotations["app.ibm.com/subscriptions/deployables"]');
-      if (subscriptionNames && subscriptionNames.length > 0) {
+      let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]');
+      let deployableNames = _.get(app, DEPLOYABLES);
+      if (evaluateSingleAnd(subscriptionNames, subscriptionNames.length > 0)) {
         subscriptionNames = subscriptionNames.split(',');
         // filter local hub subscription
         const filteredSubscriptions = [];
         subscriptionNames.forEach((subscriptionName) => {
-          if (!(_.endsWith(subscriptionName, '-local') && _.indexOf(subscriptionNames, _.trimEnd(subscriptionName, '-local')) !== -1)) {
+          if (!(evaluateSingleAnd(_.endsWith(subscriptionName, '-local'), _.indexOf(subscriptionNames, _.trimEnd(subscriptionName, '-local')) !== -1))) {
             filteredSubscriptions.push(subscriptionName);
           }
         });
@@ -591,10 +690,10 @@ export default class ApplicationModel extends GenericModel {
         );
 
         // get all requested subscriptions
-        const selectedSubscription = selectedChannel === ALL_SUBSCRIPTIONS ? allSubscriptions : subscr;
+        const selectedSubscription = evaluateTernaryExpression(selectedChannel === ALL_SUBSCRIPTIONS, allSubscriptions, subscr);
         const {
           deployableMap, channelsMap, rulesMap, preHooksMap, postHooksMap,
-        } = buildDeployablesMap(selectedSubscription || subscriptions, model.subscriptions);
+        } = buildDeployablesMap(evaluateSingleOr(selectedSubscription, subscriptions), model.subscriptions);
         // now fetch them
         await this.getAppDeployables(deployableMap, namespace, selectedSubscription, subscriptions);
         await this.getAppHooks(preHooksMap, true);
@@ -605,7 +704,7 @@ export default class ApplicationModel extends GenericModel {
         if (includeChannels) {
           await this.getAppChannels(channelsMap);
         }
-      } else if (deployableNames && deployableNames.length > 0) {
+      } else if (evaluateSingleAnd(deployableNames, deployableNames.length > 0)) {
         deployableNames = deployableNames.split(',');
         model.deployables = await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
         await this.getPlacementRules(model.deployables);
