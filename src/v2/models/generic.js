@@ -456,7 +456,12 @@ export default class GenericModel extends KubeModel {
   }) {
     let computedResource;
     if (!resource) {
-      computedResource = (await this.getResourceInfo({ apiVersion: apiGroup === '*' ? version : `${apiGroup}/${version}`, kind }))[1].name;
+      computedResource = (await this.getResourceInfo({
+        apiVersion: (apiGroup === '*' || apiGroup === '')
+          ? version
+          : `${apiGroup}/${version}`,
+        kind,
+      }))[1].name;
     }
     const body = {
       apiVersion: authApiVersion,
