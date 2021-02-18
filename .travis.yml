@@ -28,7 +28,7 @@ env:
 
 branches:
   only:
-    - master
+    - main
     - /^release-[0-9]+\..*$/
 
 stages:
@@ -46,7 +46,7 @@ jobs:
         - make component/build
         - make component/push
         - if [ "$IMAGE_SCAN" != "false" ]; then make security/scans; fi;
-        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+        - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "main" ]; then
           export COMPONENT_NEWTAG="latest";
           make component/tag;
           export COMPONENT_VERSION="latest";
@@ -75,7 +75,7 @@ jobs:
         - make component/test/e2e
     - stage: release-ff
       name: "Push commits to current release branch"
-      if: type = push AND branch =~ /^master$/
+      if: type = push AND branch =~ /^main$/
       script:
         - make
         - make release-ff
