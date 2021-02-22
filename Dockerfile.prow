@@ -2,9 +2,6 @@ FROM registry.access.redhat.com/ubi8/nodejs-14:1 as builder
 USER root
 RUN yum -y remove nodejs-nodemon
 RUN yum -y update
-COPY ./ ./
-RUN npm ci
-USER 1001
 
 ARG VCS_REF
 ARG VCS_URL
@@ -37,13 +34,18 @@ LABEL org.label-schema.vendor="$IMAGE_VENDOR" \
       io.k8s.description="$IMAGE_DESCRIPTION" \
       io.openshift.tags="$IMAGE_OPENSHIFT_TAGS"
 
-#RUN mkdir -p /opt/app-root/console-api
+RUN mkdir -p /opt/app-root/console-api
 WORKDIR /opt/app-root/console-api
 
-COPY build/src /opt/app-root/console-api/build
-COPY build/config /opt/app-root/console-api/config
-COPY node_modules /opt/app-root/console-api/node_modules
-COPY sslcert /opt/app-root/console-api/sslcert
+ENV BABEL_DISABLE_CACHE=1 \
+    NODE_ENV=production \
+    USER_UID=1001
+
+#COPY build/config /opt/app-root/console-api/config
+#COPY node_modules /opt/app-root/console-api/node_modules
+#COPY sslcert /opt/app-root/console-api/sslcert
+
+COPY . /opt/app-root/src/console-api
 
 EXPOSE 4000
 
