@@ -41,10 +41,6 @@ ENV BABEL_DISABLE_CACHE=1 \
     NODE_ENV=production \
     USER_UID=1001
 
-#COPY build/config /opt/app-root/console-api/config
-#COPY node_modules /opt/app-root/console-api/node_modules
-#COPY sslcert /opt/app-root/console-api/sslcert
-
 COPY . /opt/app-root/src/console-api
 
 EXPOSE 4000
