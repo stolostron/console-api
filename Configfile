@@ -29,7 +29,7 @@ IMAGE_NAME_S390X ?= ${IMAGE_REPO}/${IMAGE_NAME}-s390x:${RELEASE_TAG}
 #new additions for the UBI image
 #Variables for redhat required labels
 IMAGE_DISPLAY_NAME=Console API
-IMAGE_MAINTAINER=kcormier@redhat.com
+IMAGE_MAINTAINER=acm-contact@redhat.com
 IMAGE_VENDOR=Red Hat
 IMAGE_VERSION=$(SEMVERSION)
 IMAGE_SUMMARY=$(IMAGE_DESCRIPTION)
