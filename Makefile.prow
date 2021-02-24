@@ -4,9 +4,7 @@
 build:
 	npm run build:production
 
-lint:
-	npm run lint
-
+.PHONY: install
 install:
 	npm ci
 
