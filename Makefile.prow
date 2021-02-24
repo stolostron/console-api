@@ -4,6 +4,12 @@
 build:
 	npm run build:production
 
+lint:
+	npm run lint
+
+install:
+	npm ci
+
 .PHONY: unit-tests
 unit-tests:
 	if [ ! -d "test-output" ]; then \
