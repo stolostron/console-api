@@ -1,1 +1,14 @@
 -include /opt/build-harness/Makefile.prow
+
+.PHONY: build
+build:
+	npm run build:production
+
+.PHONY: unit-tests
+unit-tests:
+ifeq ($(UNIT_TESTS), TRUE)
+	if [ ! -d "test-output" ]; then \
+		mkdir test-output; \
+	fi
+	npm test
+endif
