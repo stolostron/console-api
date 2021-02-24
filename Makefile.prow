@@ -1,18 +1,14 @@
 -include /opt/build-harness/Makefile.prow
 
-.PHONY: copyright-check
-copyright-check:
-	./copyright-check.sh $(TRAVIS_BRANCH)
+.PHONY: build
+build:
+	npm run build:production
 
 lint:
 	npm run lint
 
 install:
 	npm ci
-
-.PHONY: build
-build:
-	npm run build:production
 
 .PHONY: unit-tests
 unit-tests:
