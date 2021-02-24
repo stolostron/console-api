@@ -6,9 +6,7 @@ build:
 
 .PHONY: unit-tests
 unit-tests:
-ifeq ($(UNIT_TESTS), TRUE)
 	if [ ! -d "test-output" ]; then \
 		mkdir test-output; \
 	fi
 	npm test
-endif
