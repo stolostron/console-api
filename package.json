@@ -29,7 +29,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "husky": {
     "hooks": {
-      "pre-push": "make copyright-check && npm run test -- -o && npm run lint"
+      "pre-push": "npm run test -- -o && npm run lint"
     }
   },
   "dependencies": {
