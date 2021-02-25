@@ -1,4 +1,5 @@
 // Copyright (c) 2020 Red Hat, Inc.
+// Copyright Contributors to the Open Cluster Management project
 import { getStatus } from './cluster';
 
 const TODAY = '2020-07-13T14:18:28Z';

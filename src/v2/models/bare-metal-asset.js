@@ -1,4 +1,5 @@
 // Copyright (c) 2020 Red Hat, Inc.
+// Copyright Contributors to the Open Cluster Management project
 import _ from 'lodash';
 import yaml from 'js-yaml';
 import KubeModel from './kube';

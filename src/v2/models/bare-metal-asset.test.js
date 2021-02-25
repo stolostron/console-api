@@ -1,4 +1,5 @@
 // Copyright (c) 2020 Red Hat, Inc.
+// Copyright Contributors to the Open Cluster Management project
 import { transform } from './bare-metal-asset';
 
 const bma1 = {

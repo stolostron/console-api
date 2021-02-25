@@ -1,4 +1,5 @@
 // Copyright (c) 2020 Red Hat, Inc.
+// Copyright Contributors to the Open Cluster Management project
 
 const mockResponse = {
   apiVersion: 'addon.open-cluster-management.io/v1alpha1',
