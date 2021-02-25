@@ -1,6 +1,4 @@
-/** *****************************************************************************
- * Copyright (c) 2020 Red Hat, Inc.
- ****************************************************************************** */
+// Copyright (c) 2020 Red Hat, Inc.
 
 import supertest from 'supertest';
 import server, { GRAPHQL_PATH } from '../index';
