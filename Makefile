@@ -6,7 +6,8 @@
 # Contributors:
 #  IBM Corporation - initial API and implementation
 ###############################################################################
-
+# Copyright (c) 2020 Red Hat, Inc.
+# Copyright Contributors to the Open Cluster Management project
 include Configfile
 
 # Bootstrap (pull) the build harness
@@ -40,11 +41,6 @@ else
 DOCKER_FILE = Dockerfile
 endif
 @echo "using DOCKER_FILE: $(DOCKER_FILE)"
-
-
-.PHONY: copyright-check
-copyright-check:
-	./copyright-check.sh $(TRAVIS_BRANCH)
 
 lint:
 	npm run lint

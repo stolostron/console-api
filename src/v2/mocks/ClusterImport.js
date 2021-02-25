@@ -1,11 +1,9 @@
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable key-spacing */
 /* eslint-disable quote-props */
-/** *****************************************************************************
-* Copyright (c) 2020 Red Hat, Inc.
- ****************************************************************************** */
 
 // Copyright (c) 2020 Red Hat, Inc.
+// Copyright Contributors to the Open Cluster Management project
 
 export const getNamespaceCreationResponse = {
   body: {
