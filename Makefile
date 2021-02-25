@@ -41,11 +41,6 @@ DOCKER_FILE = Dockerfile
 endif
 @echo "using DOCKER_FILE: $(DOCKER_FILE)"
 
-
-.PHONY: copyright-check
-copyright-check:
-	./copyright-check.sh $(TRAVIS_BRANCH)
-
 lint:
 	npm run lint
 
