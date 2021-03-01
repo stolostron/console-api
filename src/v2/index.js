@@ -35,7 +35,6 @@ import createMockKubeHTTP from './mocks/kube-http';
 import schema from './schema';
 import config from '../../config';
 import authMiddleware from './lib/auth-middleware';
-import BareMetalAssetModel from './models/bare-metal-asset';
 
 export const GRAPHQL_PATH = `${config.get('contextPath')}/graphql`;
 export const GRAPHIQL_PATH = `${config.get('contextPath')}/graphiql`;
@@ -86,7 +85,6 @@ const apolloServer = new ApolloServer({
       clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
       genericModel: new GenericModel({ kubeConnector }),
       connectionModel: new ConnectionModel({ kubeConnector }),
-      bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
     };
   },
 });

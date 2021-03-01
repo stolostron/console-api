@@ -27,23 +27,6 @@ type Query {
   # Get all paths for a Git channel
   gitChannelPaths(gitUrl: String!, branch: String!, path: String, namespace: String, secretRef: String, user: String, accessToken: String): [String]
 
-  # Get a cluster resource.
-  cluster(name: String, namespace: String): [Cluster]
-
-  # List all managed clusters.
-  clusters: [Cluster]
-
-  # List all cluster image sets.
-  clusterImageSets: [ClusterImageSet]
-
-  # Get the ManagedClusterAddons
-  clusterAddons(name: String, namespace: String): [ClusterAddon]
-
-  # BareMetalAssests
-  bareMetalAsset(name: String, namespace: String): [BareMetalAsset]
-  bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]
-  bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
-
   # List all cloud connections and orchestrations
   connections: [Connection]
   connectionDetails(name: String, namespace: String): [ConnectionDetail]
@@ -93,8 +76,6 @@ type Query {
 
   # Gets data for the topology diagram.
   topology(filter: TopologyFilter): Topology
-
-  getAutomatedImportStatus(namespace: String, name: String): JSON
 }
 
 # Multicloud Manager Mutations
@@ -143,22 +124,6 @@ type Mutation {
 
   # Delete a ManagedClusterView resource
   deleteManagedClusterView(managedClusterNamespace: String, managedClusterViewName: String): JSON
-
-  # Create remote cluster
-  createCluster(cluster: JSON!) : JSON
-
-  automatedImport(namespace: String, name: String, body: JSON): JSON
-
-  detachCluster(namespace: String!, cluster: String!, destroy: Boolean): JSON
-  updateClusterResource(namespace: String, name: String, body: String): JSON
-
-  # BareMetalAssests
-  createBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
-  updateBareMetalAsset(namespace: String, name: String, bmcAddress: String, username: String, password: String, bootMac: String): JSON
-  deleteBareMetalAssets(bmas: [JSON]): JSON
-
-  # DEPRECATED MUTATIONS
-  createCompliance(resources: [JSON]): JSON  @deprecated(reason: "Compliances are deprecated from MCM. Use policies instead.")
 }
 
 # Common fields for all Kubernetes objects
