@@ -3,7 +3,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=coverage&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=vulnerabilities&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 
-[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Application UI](https://github.com/open-cluster-management/application-ui). It uses Kubernetes APIs to provide APIs that are used for topology, access checks, and generic resource CRUD.
+[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Application console](https://github.com/open-cluster-management/application-ui). It uses Kubernetes APIs to provide APIs that are used for topology, access checks, and generic resource CRUD.
 
 ------
 
@@ -26,7 +26,7 @@ Check the [CONTRIBUTING Doc](CONTRIBUTING.md) for how to contribute to the repo.
 
 ## Getting Started
 
-Console API provides APIs that are used for topology, access checks, and generic resource CRUD in Application UI. This is a guide on how to build and run open-cluster-management console-api.
+Console API provides APIs that are used for topology, access checks, and generic resource CRUD in Application console. This is a guide on how to build and run open-cluster-management console-api.
 
 ## Prerequisites
 
