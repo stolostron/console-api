@@ -11,7 +11,6 @@
 /* eslint-disable global-require */
 
 import _ from 'lodash';
-import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
 
 export default function createMockHttp() {
   const state = {
@@ -50,7 +49,6 @@ export default function createMockHttp() {
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
     clusterImport: require('./ClusterImport'),
-    connectionApi: require('./ConnectionApi'),
     bareMetalAssets: require('./BareMetalAssetList').default,
     bareMetalAsset: require('./BareMetalAssetList').singleAsset,
     bareMetalAssetSecret: require('./BareMetalAssetSecret').default,
@@ -226,8 +224,6 @@ export default function createMockHttp() {
         return state.genericResourceList.updateResourceLocalMock;
       case params.url.includes('secrets/platform-auth-service'):
         return state.genericResourceList.mockedUpdatePollResponse;
-      case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
-        return state.connectionApi.getCloudConnectionSecrets;
       case params.url.includes('v1alpha1/baremetalassets'):
         return state.bareMetalAssets;
       case params.url.includes('/baremetalassets/baremetalasset-worker-0'):

@@ -27,10 +27,6 @@ type Query {
   # Get all paths for a Git channel
   gitChannelPaths(gitUrl: String!, branch: String!, path: String, namespace: String, secretRef: String, user: String, accessToken: String): [String]
 
-  # List all cloud connections and orchestrations
-  connections: [Connection]
-  connectionDetails(name: String, namespace: String): [ConnectionDetail]
-
   # Get any kubernetes resource from any managed cluster.
   getResource(apiVersion: String, kind: String, name: String, namespace: String, cluster: String, selfLink: String, updateInterval: Int, deleteAfterUse: Boolean): JSON
 
@@ -143,29 +139,10 @@ type Metadata {
   status: String
   uid: String
 }
-
-#fields for all API objects
-interface ConnectionObject {
-  metadata: ConnectionMetadata
-}
-
- #Common fields for all API objects
-type ConnectionMetadata {
-  name: String
-  namespace: String
-  provider: String
-  name_namespace: String
-}
 `;
 
 export const resolver = {
   K8sObject: {
-    // eslint-disable-next-line no-underscore-dangle
-    __resolveType() {
-      return null;
-    },
-  },
-  ConnectionObject: {
     // eslint-disable-next-line no-underscore-dangle
     __resolveType() {
       return null;

@@ -22,7 +22,6 @@ import * as genericResources from './generic-resources';
 import * as query from './query';
 import * as topology from './topology';
 import * as userAccess from './user-access';
-import * as connection from './connection';
 import * as userAccessAnyNamespaces from './user-access-any-namespaces';
 
 const modules = [
@@ -36,7 +35,6 @@ const modules = [
   genericResources,
   topology,
   userAccess,
-  connection,
   userAccessAnyNamespaces,
 ];
 
