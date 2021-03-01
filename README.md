@@ -3,11 +3,35 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=coverage&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=vulnerabilities&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 
-[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Console UI](https://github.com/open-cluster-management/console-ui).
+[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Application UI](https://github.com/open-cluster-management/application-ui). It uses Kubernetes APIs to provide APIs that are used for topology, access checks, and generic resource CRUD.
+
+------
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Console API](#console-api)
+  - [Community, discussion, contribution, and support](#community-discussion-contribution-and-support)
+  - [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Community, discussion, contribution, and support
+
+Check the [CONTRIBUTING Doc](CONTRIBUTING.md) for how to contribute to the repo.
+
+------
+
+## Getting Started
+
+Console API provides APIs that are used for topology, access checks, and generic resource CRUD in Application UI. This is a guide on how to build and run open-cluster-management console-api.
 
 ## Prerequisites
 
-- [node.js](https://nodejs.org/) version 12.x
+- [node.js](https://nodejs.org/) version 14.x
 - [nvm](https://github.com/nvm-sh/nvm) (optional)
 
 ## Installation
@@ -47,6 +71,7 @@
    **Development**
 
       ```
+      npm run build
       npm start
       ```
 
