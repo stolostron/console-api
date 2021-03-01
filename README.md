@@ -11,12 +11,12 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-  - [Community, discussion, contribution, and support](#community-discussion-contribution-and-support)
-  - [Getting Started](#getting-started)
-  - [Prerequisite Tools](#prerequisite-tools)
-  - [Building for Development](#building-for-development)
-  - [Running locally with an OKD cluster](#running-locally-with-an-okd-cluster)
-  - [Building a local image](#building-a-local-image)
+- [Community, discussion, contribution, and support](#community-discussion-contribution-and-support)
+- [Getting Started](#getting-started)
+- [Prerequisite Tools](#prerequisite-tools)
+- [Building for Development](#building-for-development)
+- [Running locally with an OKD cluster](#running-locally-with-an-okd-cluster)
+- [Building a local image](#building-a-local-image)
 - [Testing](#testing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -76,7 +76,7 @@ make
 make image-dev
 </pre>
 
-# Testing
+## Testing
 
 The following will run all unit tests.
 
