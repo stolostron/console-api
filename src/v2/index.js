@@ -29,8 +29,6 @@ import SubscriptionModel from './models/subscription';
 import PlacementRuleModel from './models/placementrule';
 import ClusterModel, { CLUSTER_NAMESPACE_LABEL } from './models/cluster';
 import GenericModel from './models/generic';
-import ComplianceModel from './models/compliance';
-import SFModel from './models/findings';
 import ConnectionModel from './models/connection';
 
 import createMockKubeHTTP from './mocks/kube-http';
@@ -87,8 +85,6 @@ const apolloServer = new ApolloServer({
       placementRuleModel: new PlacementRuleModel({ kubeConnector }),
       clusterModel: new ClusterModel({ kubeConnector, clusterNamespaces, updateUserNamespaces }),
       genericModel: new GenericModel({ kubeConnector }),
-      complianceModel: new ComplianceModel({ kubeConnector }),
-      sfModel: new SFModel({ kubeConnector, req }),
       connectionModel: new ConnectionModel({ kubeConnector }),
       bareMetalAssetModel: new BareMetalAssetModel({ kubeConnector }),
     };

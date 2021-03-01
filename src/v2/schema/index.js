@@ -16,11 +16,8 @@ import * as applications from './application';
 import * as channels from './channel';
 import * as subscriptions from './subscription';
 import * as cluster from './cluster';
-import * as compliance from './compliance';
 import * as placementrules from './placementrule';
 import * as filter from './filter';
-import * as overview from './overview';
-import * as occurrence from './occurrence';
 import * as json from './json';
 import * as genericResources from './generic-resources';
 import * as query from './query';
@@ -36,10 +33,7 @@ const modules = [
   subscriptions,
   placementrules,
   cluster,
-  compliance,
   filter,
-  overview,
-  occurrence,
   json,
   query,
   genericResources,

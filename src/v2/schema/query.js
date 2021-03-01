@@ -44,12 +44,6 @@ type Query {
   bareMetalAssets(fetchSecrets: Boolean): [BareMetalAsset]
   bareMetalAssetSubresources(name: String, namespace: String): BareMetalAssetSubresources
 
-  # Get Compliance/Policy info
-  compliances(name: String, namespace: String): [Compliance] @deprecated(reason: "Compliances are deprecated from OCM. Use policies instead.")
-
-  # Security findings
-  occurrences: [Occurrence]
-
   # List all cloud connections and orchestrations
   connections: [Connection]
   connectionDetails(name: String, namespace: String): [ConnectionDetail]
@@ -59,9 +53,6 @@ type Query {
 
   # Retrieves logs for the given container.
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
-
-  # Resolves the data needed to render the overview page.
-  overview(demoMode: Boolean): Overview
 
   # Get placement policies.
   placementPolicies (selector: JSON): [PlacementPolicy]
