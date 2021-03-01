@@ -11,7 +11,6 @@
 /* eslint-disable global-require */
 
 import _ from 'lodash';
-import { CONNECTION_LABEL_SELECTOR } from '../models/connection';
 
 export default function createMockHttp() {
   const state = {
@@ -20,9 +19,6 @@ export default function createMockHttp() {
     clustersByName: require('./ManagedClusterByName').default,
     managedClusterInfosByName: require('./ManagedClusterInfosByName.js').default,
     clusters: require('./ManagedClusterList').default,
-    clusterImageSets: require('./ClusterImageSets').default,
-    managedClusterAddons: require('./ManagedClusterAddons').default,
-    clusterManagementAddons: require('./ClusterManagementAddons').default,
     userAccess: require('./UserAccess').default,
     apiList: {
       mockResponse: require('./APIList').mockResponse,
@@ -33,28 +29,10 @@ export default function createMockHttp() {
       ocmAgentApiPath: require('./APIList').ocmAgentApiPath,
     },
     managedClusterInfos: require('./ManagedClusterInfoList').default,
-    clusterVersions: require('./ClusterVersionsList'),
-    repos: require('./ReposList').default,
-    repoMutations: require('./RepoMutationsList').default,
-    pods: require('./PodList'),
-    pvs: require('./PVsList'),
-    machinePoolsByNamespace: {
-      default: require('./MachinePoolsByNS').default,
-      kubeSystem: require('./MachinePoolsByNS').kubeSystem,
-    },
-    namespace: require('./NamespaceList'),
-    release: require('./RelsList'),
     policies: require('./PolicyList'),
     compliances: require('./ComplianceList'),
-    resourceViews: require('./ResourceView'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
-    clusterImport: require('./ClusterImport'),
-    connectionApi: require('./ConnectionApi'),
-    bareMetalAssets: require('./BareMetalAssetList').default,
-    bareMetalAsset: require('./BareMetalAssetList').singleAsset,
-    bareMetalAssetSecret: require('./BareMetalAssetSecret').default,
-    bareMetalAssetPatchedSecret: require('./BareMetalAssetSecret').patchedSecret,
     project: require('./ProjectList').default,
   };
 
@@ -63,10 +41,6 @@ export default function createMockHttp() {
       switch (true) {
         case params.url.includes('managedclusters/hub-cluster'):
           return { body: { kind: 'Status', code: '401' } };
-        case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools/new-cluster-worker'):
-          return { body: { kind: 'Status', status: 'Not Acceptable', code: '406' } };
-        case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools/managed-cluster-worker'):
-          return { body: { kind: 'Status', status: 'Success' } };
         default:
           return { body: '204' };
       }
@@ -75,48 +49,14 @@ export default function createMockHttp() {
       switch (true) {
         case _.includes(_.get(params.json, 'kind'), 'SelfSubjectAccessReview'):
           return state.userAccess;
-        case _.includes(_.get(params.json, 'metadata.name'), 'pods'):
-          return state.pods.mockResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'namespace'):
-          return state.namespace.mockResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'releases'):
-          return state.release.mockResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'persistentvolumes'):
-          return state.pvs.mockPVsResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'policy'):
-          return state.policies.mockPolicyListResponse;
-        case _.includes(_.get(params.json, 'metadata.name'), 'persistentvolumeclaim'):
-          return state.pvs.mockPVsClaimResourceView;
-        case _.includes(_.get(params.json, 'metadata.name'), 'clusterversions'):
-          return state.clusterVersions.mockClusterVersionsResourceView;
-        case params.url.includes('policies'):
-          return state.policies.mockCreatePolicy;
         case params.url.includes('compliances'):
           return state.compliances.mockCreateCompliance;
         case params.url.includes('applications'):
           return state.apps.mockCreateAppResponse;
         case params.url.includes('layne-remote/managedclusteractions'):
           return state.genericResourceList.mockedUpdateWorkResponse;
-        case params.url.includes('/api/v1/namespaces/default/secrets') && _.get(params.json, 'metadata.name') === 'new-aws':
-          return state.connectionApi.createCloudConnection;
-        case params.url.includes('/api/v1/namespaces/hive/secrets') && _.get(params.json, 'metadata.name') === 'google':
-          return state.connectionApi.createCloudConnectionError;
-        case params.url.includes('/api/v1/namespaces') && (_.get(params.json, 'metadata.name') === 'foo' || _.get(params.json, 'metadata.name') === 'no-yaml'):
-        case params.url.includes('/apis/project.openshift.io/v1/projectrequests') && (_.get(params.json, 'metadata.name') === 'foo' || _.get(params.json, 'metadata.name') === 'no-yaml'):
-          return state.clusterImport.getNamespaceCreationResponse;
-        case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/foo/klusterletaddonconfigs'):
-        case params.url.includes('/apis/agent.open-cluster-management.io/v1/namespaces/no-yaml/klusterletaddonconfigs'):
-          return state.clusterImport.getKlusterletAddonConfigsResponse;
-        case params.url.includes('/apis/cluster.open-cluster-management.io/v1/managedclusters'):
-          return state.clusterImport.getClusterResponse;
-        case params.url.includes('/api/v1/namespaces/fake-cluster/secrets'):
-          return state.bareMetalAssetSecret;
-        case params.url.includes('/fake-cluster/baremetalassets'):
-          return state.bareMetalAsset;
-        case params.url.includes('/secrets/worker-0-bmc-secret'):
-          return state.bareMetalAssetPatchedSecret;
         default:
-          return state.pods;
+          return [];
       }
     }
     switch (true) {
@@ -130,10 +70,6 @@ export default function createMockHttp() {
         return state.apiList.mcmApiPath;
       case params.url.endsWith('/apis/compliance.mcm.ibm.com/v1alpha1'):
         return state.apiList.complianceApiPath;
-      case params.url.includes('/api/v1/namespaces/default/secrets/aws') && _.get(params.body, 'metadata.name') === 'aws':
-        return state.connectionApi.editCloudConnection;
-      case params.url.includes('/api/v1/namespaces/hive/secrets/google') && _.get(params.body, 'metadata.name') === 'google':
-        return state.connectionApi.editCloudConnectionError;
       case params.url.includes('applications/gbapp-gbapp'):
         return state.apps.mockSingleAppResponse;
       case params.url.includes('applications/testapp'):
@@ -152,8 +88,6 @@ export default function createMockHttp() {
         return state.apps.gbappPB;
       case params.url.endsWith('/placementbindings/gbapp-gbapp-redismaster'):
         return state.apps.gbappRedisMasterPB;
-      case params.url.includes('default/placementbindings'):
-        return state.policies.mockPlacementBindingResponse;
       case params.url.includes('/placementbindings'):
         return state.apps.mockAppPlacementBindings;
       case params.url.includes('/applicationrelationships'):
@@ -170,10 +104,6 @@ export default function createMockHttp() {
         return state.logs.mockLogsResponse;
       case params.url.includes('namespaces/hub-cluster/managedclusterinfos'):
         return { body: state.managedClusterInfosByName['hub-cluster'] };
-      case params.url.includes('/apis/addon.open-cluster-management.io/v1alpha1/namespaces/hub-cluster/managedclusteraddons'):
-        return { body: state.managedClusterAddons };
-      case params.url.includes('/apis/addon.open-cluster-management.io/v1alpha1/clustermanagementaddons'):
-        return { body: state.clusterManagementAddons };
       case params.url.includes('namespaces/new-cluster/managedclusterinfos'):
         return { body: state.managedClusterInfosByName['new-cluster'] };
       case params.url.includes('namespaces/managed-cluster/managedclusterinfos'):
@@ -190,34 +120,12 @@ export default function createMockHttp() {
         return { body: { items: [] } };
       case params.url.includes('deployables'):
         return state.apps.mockDeployablesResponse;
-      case params.url.includes('resourceviews/pods'):
-        return state.pods.mockResponse;
-      case params.url.includes('resourceviews/persistentvolumes'):
-        return state.pvs.mockPVsResponse;
-      case params.url.includes('resourceviews/persistentvolumeclaims'):
-        return state.pvs.mockPVsClaimResponse;
-      case params.url.includes('resourceviews/namespace'):
-        return state.namespace.mockResponse;
-      case params.url.includes('resourceviews/release'):
-        return state.release.mockResponse;
-      case params.url.includes('resourceviews/clusterversions'):
-        return state.clusterVersions.mockClusterVersionsResponse;
-      case params.url.includes('default/policies/test-policy'):
-        return state.policies.mockDeleteResponse;
-      case params.url.includes('kube-system/placementpolicies'):
-        return state.policies.mockPlacementPolicyResponse;
-      case params.url.includes('placementpolicies'):
-        return state.apps.mockPlacementPoliciesResponse;
-      case params.url.includes('policies/policy-xz-1'):
-        return state.policies.mockSinglePolicyResponse;
       case params.url.includes('policies'):
         return state.policies.mockPolicyListResponse;
       case params.url.includes('compliances/compliance-xz'):
         return state.compliances.mockDeleteResponse;
       case params.url.includes('compliances'):
         return state.compliances.mockComplianceListResponse;
-      case params.url.includes('resourceviews?fieldSelector'):
-        return state.resourceViews.mockWorksetPollComplete;
       case params.url.includes('clusters'):
         return state.clusters;
       case params.url.includes('/api/v1/namespaces/kube-system/pods/monitoring-prometheus-nodeexporter-n6h9b'):
@@ -226,30 +134,6 @@ export default function createMockHttp() {
         return state.genericResourceList.updateResourceLocalMock;
       case params.url.includes('secrets/platform-auth-service'):
         return state.genericResourceList.mockedUpdatePollResponse;
-      case params.url.includes(`secrets?${CONNECTION_LABEL_SELECTOR}`):
-        return state.connectionApi.getCloudConnectionSecrets;
-      case params.url.includes('v1alpha1/baremetalassets'):
-        return state.bareMetalAssets;
-      case params.url.includes('/baremetalassets/baremetalasset-worker-0'):
-      case params.url.includes('/fake-cluster/baremetalassets'):
-        return state.bareMetalAsset;
-      case params.url.includes('/api/v1/namespaces/foo/secrets/foo-import'):
-        return state.clusterImport.getImportYamlSecret;
-      case params.url.includes('/api/v1/namespaces/no-yaml/secrets/no-yaml-import'):
-        return state.clusterImport.badImportYamlSecret;
-      case params.url.includes('/apis/project.openshift.io/v1/projects/foo'):
-      case params.url.includes('apis/project.openshift.io/v1/projects/no-yaml'):
-      case params.url.includes('/api/v1/namespaces/foo'):
-      case params.url.includes('/api/v1/namespaces/no-yaml'):
-        return state.clusterImport.getNamespaceCreationResponse;
-      case params.url.includes('/apis/hive.openshift.io/v1/clusterimagesets'):
-        return state.clusterImageSets;
-      case params.url.includes('/apis/hive.openshift.io/v1/namespaces/default/machinepools'):
-        return state.machinePoolsByNamespace.default;
-      case params.url.includes('/apis/hive.openshift.io/v1/namespaces/kube-system/machinepools'):
-        return state.machinePoolsByNamespace.kubeSystem;
-      case params.url.includes('/secrets/worker-0-bmc-secret'):
-        return state.bareMetalAssetPatchedSecret;
       case params.url.includes('/apis/project.openshift.io/v1/projects'):
         return state.project;
       case params.url.includes('layne-remote/managedclusteractions'):

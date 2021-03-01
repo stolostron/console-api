@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Occurrences Resolver Correctly Resolves Occurrences Query 1`] = `
-Object {
-  "data": Object {
-    "occurrences": Array [],
-  },
-}
-`;
