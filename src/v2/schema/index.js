@@ -17,6 +17,7 @@ import * as channels from './channel';
 import * as subscriptions from './subscription';
 import * as placementrules from './placementrule';
 import * as filter from './filter';
+import * as overview from './overview';
 import * as json from './json';
 import * as genericResources from './generic-resources';
 import * as query from './query';
@@ -30,6 +31,7 @@ const modules = [
   subscriptions,
   placementrules,
   filter,
+  overview,
   json,
   query,
   genericResources,

@@ -29,6 +29,7 @@ export default function createMockHttp() {
       ocmAgentApiPath: require('./APIList').ocmAgentApiPath,
     },
     managedClusterInfos: require('./ManagedClusterInfoList').default,
+    policies: require('./PolicyList'),
     compliances: require('./ComplianceList'),
     logs: require('./Logs'),
     genericResourceList: require('./GenericResourceList'),
@@ -119,6 +120,8 @@ export default function createMockHttp() {
         return { body: { items: [] } };
       case params.url.includes('deployables'):
         return state.apps.mockDeployablesResponse;
+      case params.url.includes('policies'):
+        return state.policies.mockPolicyListResponse;
       case params.url.includes('compliances/compliance-xz'):
         return state.compliances.mockDeleteResponse;
       case params.url.includes('compliances'):

@@ -33,6 +33,9 @@ type Query {
   # Retrieves logs for the given container.
   logs(containerName: String!, podName: String!, podNamespace: String!, clusterName: String!): String
 
+  # Resolves the data needed to render the overview page.
+  overview(demoMode: Boolean): Overview
+
   # Get placement policies.
   placementPolicies (selector: JSON): [PlacementPolicy]
 
