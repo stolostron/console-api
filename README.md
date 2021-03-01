@@ -11,11 +11,10 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Console API](#console-api)
-  - [Community, discussion, contribution, and support](#community-discussion-contribution-and-support)
-  - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+- [Community, discussion, contribution, and support](#community-discussion-contribution-and-support)
+- [Getting Started](#getting-started)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -71,7 +70,6 @@ Console API provides APIs that are used for topology, access checks, and generic
    **Development**
 
       ```
-      npm run build
       npm start
       ```
 

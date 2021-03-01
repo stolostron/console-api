@@ -49,4 +49,4 @@ npm test
 npm run lint
 ```
 
-Now, you can follow the [getting started guide](./README.md#getting-started) to work with the open-cluster-management application-ui repository.
+Now, you can follow the [getting started guide](./README.md#getting-started) to work with the open-cluster-management console-api repository.
