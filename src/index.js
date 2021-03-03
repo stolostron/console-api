@@ -10,6 +10,7 @@
 // Copyright Contributors to the Open Cluster Management project
 
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 import log4js from 'log4js';
 import config from '../config';
@@ -24,9 +25,18 @@ const CONTEXT_PATH = config.get('contextPath');
 
 const graphQLServer = require('./v2').default;
 
-const privateKey = fs.readFileSync(process.env.serverKey || './sslcert/consoleapi.key', 'utf8');
-const certificate = fs.readFileSync(process.env.serverCert || './sslcert/consoleapi.crt', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+let privateKey;
+let certificate;
+let credentials;
+try {
+  privateKey = fs.readFileSync(process.env.serverKey || './sslcert/consoleapi.key', 'utf8');
+  certificate = fs.readFileSync(process.env.serverCert || './sslcert/consoleapi.crt', 'utf8');
+  credentials = { key: privateKey, cert: certificate };
+} catch (err) {
+  if (process.env.NODE_ENV === 'production') {
+    throw err;
+  }
+}
 
 if (process.env.NODE_ENV === 'development') {
   if (!process.env.API_SERVER_URL) {
@@ -38,13 +48,14 @@ if (process.env.NODE_ENV === 'development') {
   }
 }
 
-let server = https.createServer(credentials, graphQLServer);
+let server = credentials ? https.createServer(credentials, graphQLServer) : http.createServer(graphQLServer);
 
 server.listen(GRAPHQL_PORT, () => {
+  const url = `${credentials ? 'https://' : 'http://'}localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`;
   logger.info(`[pid ${process.pid}] [env ${process.env.NODE_ENV}] [version V2] started.`);
-  logger.info(`Console API is now running on https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
+  logger.info(`Console API is now running on ${url}`);
   if (process.env.NODE_ENV !== 'production') {
-    logger.info(`GraphQL Playground is available at https://localhost:${GRAPHQL_PORT}${CONTEXT_PATH}/graphql`);
+    logger.info(`GraphQL Playground is available at ${url}`);
   }
 });
 

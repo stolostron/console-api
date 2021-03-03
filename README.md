@@ -49,25 +49,31 @@ npm run build:production
 
 ## Running locally with an OKD cluster
 
-1. To run your local `console-api` code against an existing OCM installation, make sure you are logged in using `oc`
+By default the server runs in development mode using **insecure** HTTP connections. To use HTTPS, you must either:
+- set the environment variables `serverKey` and `serverCert` with the full path of the key and certificate files
+- provide a key and certificate in the `./sslcert/consoleapi.key` and `./sslcert/consoleapi.crt` files
 
-2. The following environment variables need to be set
+To run your local `console-api` code against an existing OCM installation:
+
+1. Make sure you are logged in using `oc`
+
+1. The following environment variables need to be set
    <pre>
    export API_SERVER_URL=`oc get infrastructure cluster -o jsonpath={.status.apiServerURL}`
    export SERVICEACCT_TOKEN=`oc whoami -t`
    </pre>
 
-5. Start the server for production
+1. Start the server for production (key and certificate required for HTTPS)
    <pre>
    npm run start:production
    </pre>
 
-6. Start the server for development
+1. Start the server for development
    <pre>
    npm run start
    </pre>
 
-6. Now you can make GraphQL calls to `https://localhost:4000/hcmuiapi/graphql` or use it with a local instance of [Application UI](https://github.com/open-cluster-management/application-ui)
+1. Now you can make GraphQL calls to `http://localhost:4000/hcmuiapi/graphql` or `https://localhost:4000/hcmuiapi/graphql` (depending on whether you are using secure connections) or use it with a local instance of [Application UI](https://github.com/open-cluster-management/application-ui)
 
 ## Building a local image
 <pre>
