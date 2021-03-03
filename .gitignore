@@ -11,3 +11,4 @@ build-harness-extensions
 .history
 .project
 test-report.xml
+sslcert
