@@ -41,7 +41,6 @@ WORKDIR /opt/app-root/console-api
 COPY build/src /opt/app-root/console-api/build
 COPY build/config /opt/app-root/console-api/config
 COPY node_modules /opt/app-root/console-api/node_modules
-COPY sslcert /opt/app-root/console-api/sslcert
 
 EXPOSE 4000
 
