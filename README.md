@@ -79,10 +79,14 @@ To run your local `console-api` code against an existing OCM installation:
 <pre>
 git clone https://github.com/open-cluster-management/console-api.git
 cd console-api
-export GITHUB_USER=&lt;github_user&gt;
-export GITHUB_TOKEN=&lt;github_token&gt;
-make
-make image-dev
+export COMPONENT_DOCKER_REPO=&lt;docker_repo&gt;
+export COMPONENT_NAME=console-api
+export IMAGE_TAG=&lt;image_tag&gt;
+make install
+make build
+make lint
+make prune
+make build-image
 </pre>
 
 ## Testing
