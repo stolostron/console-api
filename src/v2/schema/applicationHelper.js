@@ -179,6 +179,8 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
+  const packageName = _.get(_.get(subscription, 'spec.packageOverrides', [{}])[0], 'packageName');
+  const aliasName = _.get(_.get(subscription, 'spec.packageOverrides', [{}])[0], 'packageAlias');
 
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
@@ -194,7 +196,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       // process only helm charts and hooks
       if (deployableData[0] === 'helmchart' || isHook) {
         if (!isHook) {
-          dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+          dName = removeHelmReleaseName(deployableData[4], deployableData[1], packageName, aliasName);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
           deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
         }

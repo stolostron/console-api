@@ -186,17 +186,18 @@ export const createGenericPackageObject = (
 
 export const removeReleaseGeneratedSuffix = (name) => name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
 
-// remove the release name from the deployable name
-export const removeHelmReleaseName = (name, releaseName) => {
-  const trimmedReleaseName = _.trimEnd(releaseName, '-');
-  let result = _.replace(name, `${trimmedReleaseName}-`, '');
-  result = _.replace(result, `${trimmedReleaseName}`, '');
-
-  // resource name only contains release name, return without the generated suffix
-  if (result.length === 0) {
+// use the package name is name is set using alias
+export const removeHelmReleaseName = (name, releaseName, packageName, aliasName) => {
+  if (!aliasName) {
+    // if no alias name set, the resource name ends with a chart hash, remove that
     return removeReleaseGeneratedSuffix(name);
   }
-  return result;
+
+  if (packageName && aliasName && `${name}-` === releaseName && name === aliasName) {
+    return packageName; // if name matches alias use package name instead
+  }
+
+  return name;
 };
 
 // add cluster node to RHCAM application
