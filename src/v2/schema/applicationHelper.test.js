@@ -1390,6 +1390,18 @@ describe('removeHelmReleaseName test resource with only release name as the name
   });
 });
 
+describe('removeHelmReleaseName test with package alias not matching name', () => {
+  it('returns package name when resource name matches alias', () => {
+    expect(removeHelmReleaseName('apache-alias-name', 'apache-alias-name-', 'apache', 'apache-alias-name')).toEqual('apache');
+  });
+});
+
+describe('removeHelmReleaseName test with package alias matching name', () => {
+  it('removeHelmReleaseName returns name when resource name does not match alias', () => {
+    expect(removeHelmReleaseName('redis-master', 'my-alias-', 'redis', 'my-alias')).toEqual('redis-master');
+  });
+});
+
 describe('getLocalClusterElement cluster element exists', () => {
   it('should get the local cluster element', () => {
     const createdClusterElements = new Set(['member--clusters--cluster1, cluster2, local-cluster']);
