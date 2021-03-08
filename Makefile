@@ -121,3 +121,10 @@ multi-arch:
 	make docker:manifest-tool
 	make docker:multi-arch DOCKER_TAG=$(RELEASE_TAG)
 	make docker:multi-arch DOCKER_TAG=$(SEMVERSION)
+
+.PHONY: build-image
+build-image:
+	@echo "Building $(COMPONENT_DOCKER_REPO)/$(COMPONENT_NAME):$(IMAGE_TAG)"
+	docker build . \
+	-f Dockerfile \
+	-t $(COMPONENT_DOCKER_REPO)/$(COMPONENT_NAME):$(IMAGE_TAG) \
