@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14:1
+FROM registry.access.redhat.com/ubi8/nodejs-12:1
 USER root
 RUN yum -y remove nodejs-nodemon
 RUN yum -y update
