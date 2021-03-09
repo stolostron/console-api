@@ -2,6 +2,7 @@ FROM registry.access.redhat.com/ubi8/nodejs-14:1 as builder
 USER root
 RUN yum -y remove nodejs-nodemon
 RUN yum -y update
+RUN npm ci
 USER 1001
 
 ARG VCS_REF
