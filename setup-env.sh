@@ -17,6 +17,7 @@ SERVICEACCT_TOKEN=$(oc whoami -t)
 API_SERVER_URL=$(oc whoami --show-server)
 
 echo
+echo "Testing..."
 echo '"env": {'
 for variable in SERVICEACCT_TOKEN API_SERVER_URL
 do
