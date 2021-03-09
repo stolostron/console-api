@@ -257,7 +257,7 @@ export const addSubscriptionDeployable = (
     hookList.forEach((hook) => {
       if (_.get(hook, metadataName, '') === name && _.get(hook, metadataNamespace, '') === namespace) {
         deployable.spec.template.spec = hook.status;
-        deployable.spec.template.hookType = linkType
+        deployable.spec.template.hookType = linkType;
       }
     });
   }
