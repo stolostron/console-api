@@ -102,6 +102,6 @@ To run a particular test.
 <pre>
 npm run test -- &lt;test_file&gt;
 
-# for exmaple
+# for example
 npm run test -- application.test.js
 </pre>
