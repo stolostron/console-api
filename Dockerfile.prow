@@ -6,7 +6,6 @@ WORKDIR /opt/app-root/console-api
 COPY . /opt/app-root/console-api/
 RUN yum install git -y
 RUN cd /opt/app-root/console-api/ && npm ci && npm run build:production
-RUN ls -ltra /opt/app-root/console-api/
 
 FROM registry.access.redhat.com/ubi8/nodejs-14:1
 USER root
@@ -20,8 +19,6 @@ ENV BABEL_DISABLE_CACHE=1 \
 COPY --from=builder /opt/app-root/console-api/build/src /opt/app-root/console-api/build
 COPY --from=builder /opt/app-root/console-api/build/config /opt/app-root/console-api/config
 COPY --from=builder /opt/app-root/console-api/node_modules /opt/app-root/console-api/node_modules
-
-RUN ls -ltra /opt/app-root/console-api/
 
 EXPOSE 4000
 ENV NODE_ENV production
