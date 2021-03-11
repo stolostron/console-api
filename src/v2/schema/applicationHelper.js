@@ -470,23 +470,26 @@ export const createGenericPackageObject = (
 
 export const removeReleaseGeneratedSuffix = (name) => name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
 
-// remove the release name from the deployable name
-export const removeHelmReleaseName = (name, releaseName) => {
-  const trimmedReleaseName = _.trimEnd(releaseName, '-');
-  let result = _.replace(name, `${trimmedReleaseName}-`, '');
-  result = _.replace(result, `${trimmedReleaseName}`, '');
-
-  // resource name only contains release name, return without the generated suffix
-  if (result.length === 0) {
+// use the package name if name is set using alias
+export const removeHelmReleaseName = (name, releaseName, packageName, aliasName) => {
+  if (!aliasName) {
+    // if no alias name set, the resource name ends with a chart hash, remove that
     return removeReleaseGeneratedSuffix(name);
   }
-  return result;
+
+  if (packageName && aliasName && `${name}-` === releaseName && name === aliasName) {
+    return packageName; // if name matches alias use package name instead
+  }
+
+  return name;
 };
 
 export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, appNamespace, channelInfo, subscription) => {
   const deployablesList = [];
 
   const deployables = _.split(topoAnnotation, ',');
+  const packageName = _.get(_.get(subscription, 'spec.packageOverrides', [{}])[0], 'packageName');
+  const aliasName = _.get(_.get(subscription, 'spec.packageOverrides', [{}])[0], 'packageAlias');
 
   deployables.forEach((deployableInfo) => {
     const deployableData = _.split(deployableInfo, '/');
@@ -502,7 +505,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       // process only helm charts and hooks
       if (deployableData[0] === 'helmchart' || isHook) {
         if (!isHook) {
-          dName = removeHelmReleaseName(deployableData[4], deployableData[1]);
+          dName = removeHelmReleaseName(deployableData[4], deployableData[1], packageName, aliasName);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
           deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
         }
