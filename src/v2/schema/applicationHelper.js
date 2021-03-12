@@ -410,7 +410,7 @@ export function buildArgoApplication(application, appName, appNamespace, nodes, 
     } = deployable;
     const type = kind.toLowerCase();
 
-    const memberId = `member--clusters--${getClusterName(clusterId)}--${type}--${deployableNamespace}--${deployableName}`;
+    const memberId = `member--member--deployable--member--clusters--${getClusterName(clusterId)}--${type}--${deployableNamespace}--${deployableName}`;
 
     const raw = {
       metadata: {
