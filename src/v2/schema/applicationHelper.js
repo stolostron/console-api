@@ -350,7 +350,7 @@ export function buildArgoApplication(application, appName, appNamespace, nodes, 
     // set to empty string for now, depends on backend to provide argoapi from secrets
     const remoteClusterDestination = '';
     clusterNames.push(cluster);
-    clusters.push({ metadata: { name: cluster, namespace: cluster }, remoteClusterDestination, status: 'ok' })
+    clusters.push({ metadata: { name: cluster, namespace: cluster }, remoteClusterDestination, status: 'ok' });
   } else {
     serverDestinations.forEach((destination) => {
       try {

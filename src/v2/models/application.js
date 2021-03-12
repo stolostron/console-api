@@ -13,7 +13,6 @@ import _ from 'lodash';
 import { responseHasError } from '../lib/utils';
 import logger from '../lib/logger';
 import GenericModel from './generic';
-import ClusterModel from './cluster';
 
 export const ALL_SUBSCRIPTIONS = '__ALL__/SUBSCRIPTIONS__';
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
@@ -608,7 +607,7 @@ export default class ApplicationModel extends GenericModel {
   // ///////////// GET APPLICATION ////////////////
 
   // for topology and editor pages
-  async getApplication(name, namespace, selectedChannel, includeChannels, apiVersion, cluster) {
+  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiVersion = 'argoproj.io/v1alpha1') {
     // get application
     let model = null;
     let apps = [];
@@ -616,14 +615,14 @@ export default class ApplicationModel extends GenericModel {
     try {
       if (cluster) {
         // find Argo app on remote cluster
-        let args = {
-          apiVersion: apiVersion ? apiVersion : 'argoproj.io/v1alpha1',
-          cluster: cluster,
+        const args = {
+          apiVersion,
+          cluster,
           kind: 'application',
-          name: name,
-          namespace: namespace,
+          name,
+          namespace,
         };
-        let result = await this.getResource(args);
+        const result = await this.getResource(args);
         if (!result) {
           return model;
         }
