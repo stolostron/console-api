@@ -316,7 +316,7 @@ export const populateApplicationSet = (applicationSet, apps, name, argoServerRou
   _.set(applicationSet, 'spec.destinations', destinations);
   _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications/${name}`);
 
-  if (apps.length > 1) {
+  if (apps.length > 0) {
     // get targets from all apps and put them to the first app
     // this will behave as the application set, containing all info used to build the topology
     // provide application group of apps with the same repo
@@ -607,16 +607,40 @@ export default class ApplicationModel extends GenericModel {
   // ///////////// GET APPLICATION ////////////////
 
   // for topology and editor pages
-  async getApplication(name, namespace, selectedChannel, includeChannels) {
+  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiVersion) {
     // get application
     let model = null;
-    let apps;
+    let apps = [];
     let applicationSet;
     try {
-      apps = await this.kubeConnector.getResources(
-        (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
-        { namespaces: [namespace] },
-      );
+      if (cluster) {
+        // find Argo app on remote cluster
+        const args = {
+          apiVersion: apiVersion || 'argoproj.io/v1alpha1',
+          cluster,
+          kind: 'application',
+          name,
+          namespace,
+        };
+        const result = await this.getResource(args);
+        if (!result) {
+          return model;
+        }
+
+        apps.push(result);
+
+        applicationSet = result;
+
+        populateApplicationSet(applicationSet, apps, name, []);
+      }
+
+      // Either !apiVersion or indexof is true but not both
+      if ((apiVersion ? apiVersion.indexOf('app.k8s.io') > -1 : !apiVersion) && apps.length === 0) {
+        apps = await this.kubeConnector.getResources(
+          (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+          { namespaces: [namespace] },
+        );
+      }
 
       if (apps.length === 0) {
         // get all argo apps in this namespace

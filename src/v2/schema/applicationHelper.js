@@ -342,31 +342,38 @@ export const addSubscriptionCharts = (
   return nodes;
 };
 
-export function buildArgoApplication(application, appName, appNamespace, nodes, links) {
+export function buildArgoApplication(application, appName, appNamespace, nodes, links, cluster) {
   const clusters = [];
   let clusterNames = [];
   const serverDestinations = _.get(application, 'app.spec.destinations', []);
-  serverDestinations.forEach((destination) => {
-    try {
-      let clusterName;
-      const serverApi = _.get(destination, 'server');
-      if (serverApi) {
-        const serverURI = new URL(serverApi);
-        clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
-        if (clusterName === 'default') {
-          // mark this as default cluster
-          clusterName = localClusterName;
+  if (cluster) {
+    // set to empty string for now, depends on backend to provide argoapi from secrets
+    const remoteClusterDestination = '';
+    clusterNames.push(cluster);
+    clusters.push({ metadata: { name: cluster, namespace: cluster }, remoteClusterDestination, status: 'ok' });
+  } else {
+    serverDestinations.forEach((destination) => {
+      try {
+        let clusterName;
+        const serverApi = _.get(destination, 'server');
+        if (serverApi) {
+          const serverURI = new URL(serverApi);
+          clusterName = serverURI && serverURI.hostname && serverURI.hostname.split('.').length > 1 ? serverURI.hostname.split('.')[1] : 'unkonwn';
+          if (clusterName === 'default') {
+            // mark this as default cluster
+            clusterName = localClusterName;
+          }
+        } else {
+          // target destination was set using the name property
+          clusterName = _.get(destination, 'name', 'unknonwn');
         }
-      } else {
-        // target destination was set using the name property
-        clusterName = _.get(destination, 'name', 'unknonwn');
+        clusterNames.push(clusterName);
+        clusters.push({ metadata: { name: clusterName, namespace: clusterName }, destination, status: 'ok' });
+      } catch (err) {
+        logger.error(err);
       }
-      clusterNames.push(clusterName);
-      clusters.push({ metadata: { name: clusterName, namespace: clusterName }, destination, status: 'ok' });
-    } catch (err) {
-      logger.error(err);
-    }
-  });
+    });
+  }
   clusterNames = _.uniq(clusterNames);
 
   const appId = `application--${appName}`;
@@ -458,7 +465,7 @@ export function buildArgoApplication(application, appName, appNamespace, nodes, 
   });
 }
 
-async function getApplicationElements(application, clusterModel) {
+async function getApplicationElements(application, clusterModel, cluster) {
   const links = [];
   const nodes = [];
 
@@ -468,7 +475,7 @@ async function getApplicationElements(application, clusterModel) {
   ({ name, namespace } = application);
 
   if (_.get(application, 'app.apiVersion').indexOf('argoproj.io') > -1) {
-    buildArgoApplication(application, name, namespace, nodes, links);
+    buildArgoApplication(application, name, namespace, nodes, links, cluster);
     return { resources: _.uniqBy(nodes, 'uid'), relationships: links };
   }
 
