@@ -607,7 +607,7 @@ export default class ApplicationModel extends GenericModel {
   // ///////////// GET APPLICATION ////////////////
 
   // for topology and editor pages
-  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiVersion = 'argoproj.io/v1alpha1') {
+  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiVersion) {
     // get application
     let model = null;
     let apps = [];
@@ -616,7 +616,7 @@ export default class ApplicationModel extends GenericModel {
       if (cluster) {
         // find Argo app on remote cluster
         const args = {
-          apiVersion,
+          apiVersion: apiVersion || 'argoproj.io/v1alpha1',
           cluster,
           kind: 'application',
           name,
