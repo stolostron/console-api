@@ -65,10 +65,16 @@ export const resolver = {
     topology: async (root, { filter }, { clusterModel, applicationModel }) => {
       let resources = [];
       let relationships = [];
-      const { name, namespace, channel } = filter.application[0];
-      const application = await applicationModel.getApplication(name, namespace, channel);
+      const {
+        name,
+        namespace,
+        channel,
+        apiVersion,
+        cluster,
+      } = filter.application[0];
+      const application = await applicationModel.getApplication(name, namespace, channel, undefined, cluster, apiVersion);
       if (application) {
-        ({ resources, relationships } = await getApplicationElements(application, clusterModel));
+        ({ resources, relationships } = await getApplicationElements(application, clusterModel, cluster));
       }
       return { resources, relationships };
     },
