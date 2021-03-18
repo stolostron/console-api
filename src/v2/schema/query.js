@@ -55,6 +55,9 @@ type Query {
   # FIXME: This must be moved to mutations, query operations should not change any data.
   updateResource(selfLink: String, namespace: String, kind: String, name: String, body: JSON, cluster: String): JSON
 
+  # Resolves if the current application has argocd route
+  argoRoute(namespace: String) : JSON
+
   # Resolves if the current user is authorized to access a given resource.
   userAccess(resource: String, kind: String, action: String!, namespace: String, apiGroup: String, name: String, version: String): JSON
 

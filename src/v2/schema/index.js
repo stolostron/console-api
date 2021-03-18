@@ -13,6 +13,7 @@ import _ from 'lodash';
 import { gql } from 'apollo-server-express';
 
 import * as applications from './application';
+import * as argoRoute from './argo-route';
 import * as channels from './channel';
 import * as subscriptions from './subscription';
 import * as placementrules from './placementrule';
@@ -27,6 +28,7 @@ import * as userAccessAnyNamespaces from './user-access-any-namespaces';
 
 const modules = [
   applications,
+  argoRoute,
   channels,
   subscriptions,
   placementrules,
