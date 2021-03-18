@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@octokit/rest": "^18.0.12",
+    "@open-cluster-management/security-middleware": "^1.0.2",
     "apollo-errors": "^1.9.0",
     "apollo-server-express": "^2.19.0",
     "atob": "^2.1.2",
@@ -58,7 +59,6 @@
     "nocache": "^2.1.0",
     "request": "^2.88.2",
     "requestretry": "^4.1.2",
-    "security-middleware": "github:open-cluster-management/security-middleware",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
