@@ -186,7 +186,7 @@ export const createGenericPackageObject = (
 
 export const removeReleaseGeneratedSuffix = (name) => name.replace(/-[0-9a-zA-Z]{4,5}$/, '');
 
-// use the package name if name is set using alias
+// use alias name if name is set using the package name
 export const removeHelmReleaseName = (name, releaseName, packageName, aliasName) => {
   if (!aliasName) {
     // if no alias name set, the resource name ends with a chart hash, remove that
