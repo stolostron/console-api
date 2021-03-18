@@ -496,10 +496,12 @@ export default class GenericModel extends KubeModel {
 
     debugger;
 
-    // not running starting here
     console.log(`apps:${apps}`)
 
-    const argoNamespaces = getUniqueArgoNamespaces(apps);
+    // not running starting here
+
+    const argoNamespaces = await getUniqueArgoNamespaces(apps);
+    debugger;
     const routes = await this.kubeConnector.getResources(
       (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
       { namespaces: Array.from(argoNamespaces) },
