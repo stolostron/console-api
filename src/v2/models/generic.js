@@ -13,7 +13,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
-import { getUniqueArgoNamespaces, getArgoServerRoutes } from './application'
+import { getArgoServerRoutes } from './application'
 
 const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
 const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
@@ -120,7 +120,10 @@ export default class GenericModel extends KubeModel {
     const routes = await this.kubeConnector.getResources(
       (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
       { namespaces: [namespace] },
-    );
+    ).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
     const argoCDRoute = getArgoServerRoutes(routes)
     return argoCDRoute;
   }

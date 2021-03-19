@@ -46,12 +46,6 @@ export default function createMockHttp() {
           return { body: '204' };
       }
     }
-    if(params.namespace === 'argoCDNamespace') {
-      switch(true) {
-        default: 
-          return state.argoRoute.mockRouteResponse;
-      }
-    }
     if (params.json) {
       switch (true) {
         case _.includes(_.get(params.json, 'kind'), 'SelfSubjectAccessReview'):
@@ -145,6 +139,8 @@ export default function createMockHttp() {
         return state.project;
       case params.url.includes('layne-remote/managedclusteractions'):
         return state.genericResourceList.mockedUpdatePollResponse;
+      case params.url.includes('namespaces/argoCDNamespace/routes'):
+        return state.argoRoute.default;
       default:
         return state.apiList.mockResponse;
     }

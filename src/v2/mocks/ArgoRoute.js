@@ -9,7 +9,7 @@
 // Copyright (c) 2021 Red Hat, Inc.
 // Copyright Contributors to the Open Cluster Management project
 
-export const mockRouteResponse = {
+const mockRouteResponse = {
     body: {
         data: {
           argoRoute: {
@@ -18,3 +18,5 @@ export const mockRouteResponse = {
         }
       }
 }
+
+export default mockRouteResponse;
