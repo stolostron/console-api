@@ -19,7 +19,7 @@ describe('Argo Route Resolver', () => {
       .send({
         query: `
           {
-            argoRoute(namespace:"")
+            argoRoute(namespace: "argoCDNamespace")
           }
       `,
       })

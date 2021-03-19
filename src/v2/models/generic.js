@@ -117,21 +117,12 @@ export default class GenericModel extends KubeModel {
 
   async argoRoute({namespace}){
     // get all argo apps in this namespace
-    const apps = await this.kubeConnector.getResources(
-      (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
+    const routes = await this.kubeConnector.getResources(
+      (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
       { namespaces: [namespace] },
-    )
-    if(apps){
-      const argoNamespaces = getUniqueArgoNamespaces(apps);
-      debugger;
-      const routes = await this.kubeConnector.getResources(
-        (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
-        { namespaces: Array.from(argoNamespaces) },
-      );
-  
-      const argoCDRoute = getArgoServerRoutes(routes);
-      return argoCDRoute;
-    }
+    );
+    const argoCDRoute = getArgoServerRoutes(routes)
+    return argoCDRoute;
   }
 
   async patchResource(args) {

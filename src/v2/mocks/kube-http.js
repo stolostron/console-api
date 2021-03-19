@@ -15,6 +15,7 @@ import _ from 'lodash';
 export default function createMockHttp() {
   const state = {
     apps: require('./AppList'),
+    argoRoute: require('./ArgoRoute').default,
     channels: require('./ChannelList'),
     clustersByName: require('./ManagedClusterByName').default,
     managedClusterInfosByName: require('./ManagedClusterInfosByName.js').default,
@@ -43,6 +44,12 @@ export default function createMockHttp() {
           return { body: { kind: 'Status', code: '401' } };
         default:
           return { body: '204' };
+      }
+    }
+    if(params.namespace === 'argoCDNamespace') {
+      switch(true) {
+        default: 
+          return state.argoRoute.mockRouteResponse;
       }
     }
     if (params.json) {

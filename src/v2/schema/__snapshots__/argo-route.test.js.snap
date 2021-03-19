@@ -3,24 +3,7 @@
 exports[`Argo Route Resolver Correctly Resolves Argo Route Query 1`] = `
 Object {
   "data": Object {
-    "argoRoute": null,
+    "argoRoute": Object {},
   },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-      },
-      "locations": Array [
-        Object {
-          "column": 13,
-          "line": 3,
-        },
-      ],
-      "message": "Cannot read property 'namespace' of undefined",
-      "path": Array [
-        "argoRoute",
-      ],
-    },
-  ],
 }
 `;
