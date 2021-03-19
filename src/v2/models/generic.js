@@ -13,7 +13,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import KubeModel from './kube';
 import logger from '../lib/logger';
-import getUniqueArgoNamespaces from './application'
+import { getUniqueArgoNamespaces, getArgoServerRoutes } from './application'
 
 const routePrefix = '/apis/action.open-cluster-management.io/v1beta1/namespaces';
 const clusterActionApiVersion = 'action.open-cluster-management.io/v1beta1';
@@ -113,6 +113,25 @@ export default class GenericModel extends KubeModel {
       errors,
       result,
     };
+  }
+
+  async argoRoute({namespace}){
+    // get all argo apps in this namespace
+    const apps = await this.kubeConnector.getResources(
+      (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
+      { namespaces: [namespace] },
+    )
+    if(apps){
+      const argoNamespaces = getUniqueArgoNamespaces(apps);
+      debugger;
+      const routes = await this.kubeConnector.getResources(
+        (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
+        { namespaces: Array.from(argoNamespaces) },
+      );
+  
+      const argoCDRoute = getArgoServerRoutes(routes);
+      return argoCDRoute;
+    }
   }
 
   async patchResource(args) {
@@ -484,33 +503,6 @@ export default class GenericModel extends KubeModel {
       throw new Error(`Get User Access Failed [${response.code}] - ${response.message}`);
     }
     return { ...response.status, ...response.spec.resourceAttributes };
-  }
-
-  async argoRoute({namespace}){
-    let argoCDRoute;
-    // get all argo apps in this namespace
-    const apps = await this.kubeConnector.getResources(
-      (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
-      { namespaces: [namespace] },
-    )
-
-    debugger;
-
-    console.log(`apps:${apps}`)
-
-    // not running starting here
-
-    const argoNamespaces = await getUniqueArgoNamespaces(apps);
-    debugger;
-    const routes = await this.kubeConnector.getResources(
-      (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
-      { namespaces: Array.from(argoNamespaces) },
-    );
-
-    argoCDRoute = getArgoServerRoutes(routes);
-    debugger;
-    console.log(`route - ${argoCDRoute}`)
-    return argoCDRoute;
   }
 
   async userAccessAnyNamespaces({
