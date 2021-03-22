@@ -948,18 +948,18 @@ export default class ApplicationModel extends GenericModel {
       }));
   }
 
-  // returns the url to the ARGO CD editor
+  // returns the url for the ARGO CD editor
   async getArgoAppRouteURL(variables) {
-    // find Argo Route on remote cluster
     const args = {
       ...variables,
       kind: 'route',
     };
-    const result = await this.getResource(args);
-    if (!result) {
+    const route = await this.getResource(args);
+    if (!route) {
       return '';
     }
-    const routes = getArgoServerRoutes(result);
-    return routes;
+    const hostName = _.get(route, 'spec.host', 'unknown');
+    const transport = _.get(route, 'spec.tls') ? 'https' : 'http';
+    return `${transport}://${hostName}/applications`;
   }
 }
