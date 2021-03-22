@@ -947,4 +947,23 @@ export default class ApplicationModel extends GenericModel {
         namespace: _.get(secret, 'metadata.name', 'unknown'),
       }));
   }
+
+  // returns the url to the ARGO CD editor
+  async getArgoAppRouteURL(cluster, namespace, name, apiVersion) {
+    // find Argo Route on remote cluster
+    const args = {
+      apiVersion: apiVersion,
+      cluster,
+      kind: 'route',
+      name,
+      namespace,
+    };
+    const result = await this.getResource(args);
+    if (!result) {
+      return '';
+    }
+    const routes = getArgoServerRoutes(result);
+    console.log('ROUTES !!!!!', routes)
+    return routes
+  } 
 }
