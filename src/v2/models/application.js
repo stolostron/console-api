@@ -686,7 +686,7 @@ export default class ApplicationModel extends GenericModel {
       // get subscriptions to channels (pipelines)
       let subscriptionNames = _.get(app, 'metadata.annotations["apps.open-cluster-management.io/subscriptions"]');
       let deployableNames = _.get(app, DEPLOYABLES);
-      if (evaluateSingleAnd(subscriptionNames, subscriptionNames.length > 0)) {
+      if (subscriptionNames && subscriptionNames.length > 0) {
         subscriptionNames = subscriptionNames.split(',');
         // filter local hub subscription
         const filteredSubscriptions = [];
@@ -730,7 +730,7 @@ export default class ApplicationModel extends GenericModel {
         if (includeChannels) {
           await this.getAppChannels(channelsMap);
         }
-      } else if (evaluateSingleAnd(deployableNames, deployableNames.length > 0)) {
+      } else if (deployableNames && deployableNames.length > 0) {
         deployableNames = deployableNames.split(',');
         model.deployables = await this.getApplicationResources(deployableNames, 'deployables', 'Deployable');
         await this.getPlacementRules(model.deployables);
