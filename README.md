@@ -106,3 +106,4 @@ npm run test -- &lt;test_file&gt;
 # for example
 npm run test -- application.test.js
 </pre>
+
