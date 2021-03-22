@@ -307,16 +307,17 @@ export const getArgoServerRoutes = (routes) => {
   return argoServerRoutes;
 };
 
-export const populateApplicationSet = (applicationSet, apps, name, argoServerRoutes) => {
+export const populateApplicationSet = (applicationSet, apps, name, argoServerRoutes, cluster) => {
   // array for grouping similar apps
   const appGroup = [];
   _.set(applicationSet, 'spec.apps', appGroup);
   // this is where we keep all destinations
   const destinations = [];
   _.set(applicationSet, 'spec.destinations', destinations);
-  _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications/${name}`);
+  _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications`);
+  _.set(applicationSet, 'cluster', cluster || 'local-cluster');
 
-  if (apps.length > 0) {
+  if (apps.length > 0) { // TODO remove this since we can't get all apps from here
     // get targets from all apps and put them to the first app
     // this will behave as the application set, containing all info used to build the topology
     // provide application group of apps with the same repo
@@ -631,7 +632,7 @@ export default class ApplicationModel extends GenericModel {
 
         applicationSet = result;
 
-        populateApplicationSet(applicationSet, apps, name, []);
+        populateApplicationSet(applicationSet, apps, name, [], cluster);
       }
 
       // Either !apiVersion or indexof is true but not both
@@ -663,7 +664,7 @@ export default class ApplicationModel extends GenericModel {
 
         const argoServerRoutes = getArgoServerRoutes(routes);
 
-        populateApplicationSet(applicationSet, apps, name, argoServerRoutes);
+        populateApplicationSet(applicationSet, apps, name, argoServerRoutes, cluster);
       }
     } catch (err) {
       logger.error(err);
