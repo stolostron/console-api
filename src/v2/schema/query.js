@@ -18,6 +18,9 @@ type Query {
   # Get application resources.
   application(name: String, namespace: String): Application
 
+  # Get ArgoApp Route URL
+  argoAppRouteURL(cluster: String!, namespace: String!, name: String!, apiVersion: String!): String
+
   # Get all channel resources. Optionally, specify name and namespace to filter results.
   channels(name: String, namespace: String): [Channel]
 
