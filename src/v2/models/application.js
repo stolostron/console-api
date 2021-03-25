@@ -278,66 +278,6 @@ export const evaluateTernaryExpression = (condition, returnVal1, returnVal2) => 
   return returnVal2;
 };
 
-export const getUniqueArgoNamespaces = (apps) => {
-  const namespaces = new Set();
-
-  apps.forEach((app) => {
-    if (!namespaces.has(app.metadata.namespace)) {
-      namespaces.add(app.metadata.namespace);
-    }
-  });
-
-  return namespaces;
-};
-
-export const getArgoServerRoutes = (routes) => {
-  const argoServerRoutes = {};
-
-  routes.forEach((route) => {
-    const toKind = _.get(route, 'spec.to.kind');
-    const toName = _.get(route, 'spec.to.name');
-    if (toKind === 'Service' && toName === 'argocd-server') {
-      const routeNamespace = _.get(route, 'metadata.namespace');
-      const routeHost = _.get(route, 'spec.host');
-      const routeTargetPort = _.get(route, 'spec.port.targetPort');
-      argoServerRoutes[routeNamespace] = `${routeTargetPort}://${routeHost}`;
-    }
-  });
-
-  return argoServerRoutes;
-};
-
-export const populateApplicationSet = (applicationSet, apps, name, argoServerRoutes, cluster) => {
-  // array for grouping similar apps
-  const appGroup = [];
-  _.set(applicationSet, 'spec.apps', appGroup);
-  // this is where we keep all destinations
-  const destinations = [];
-  _.set(applicationSet, 'spec.destinations', destinations);
-  _.set(applicationSet, 'spec.appURL', `${argoServerRoutes[applicationSet.metadata.namespace]}/applications`);
-  _.set(applicationSet, 'cluster', cluster || 'local-cluster');
-
-  if (apps.length > 0) { // TODO remove this since we can't get all apps from here
-    // get targets from all apps and put them to the first app
-    // this will behave as the application set, containing all info used to build the topology
-    // provide application group of apps with the same repo
-    apps.forEach((app) => {
-      _.set(app, 'spec.appURL', `${argoServerRoutes[app.metadata.namespace]}/applications/${app.metadata.name}`);
-      const appDestination = _.get(app, 'spec.destination');
-      if (appDestination) {
-        destinations.push(appDestination);
-      }
-      const appRepo = _.get(app, 'spec.source.repoURL');
-      const appRepoPath = _.get(app, 'spec.source.path');
-      if (evaluateDoubleAnd(app.metadata.name !== name,
-        appRepo === applicationSet.spec.source.repoURL,
-        appRepoPath === applicationSet.spec.source.path)) {
-        appGroup.push(app);
-      }
-    });
-  }
-};
-
 export default class ApplicationModel extends GenericModel {
   // ///////////// CREATE APPLICATION ////////////////
   // ///////////// CREATE APPLICATION ////////////////
@@ -608,16 +548,16 @@ export default class ApplicationModel extends GenericModel {
   // ///////////// GET APPLICATION ////////////////
 
   // for topology and editor pages
-  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiVersion) {
+  async getApplication(name, namespace, selectedChannel, includeChannels, cluster, apiversion) {
     // get application
     let model = null;
     let apps = [];
-    let applicationSet;
+    const apiVersion = apiversion || 'app.k8s.io/v1beta1'; // defaults to ACM app
     try {
       if (cluster) {
         // find Argo app on remote cluster
         const args = {
-          apiVersion: apiVersion || 'argoproj.io/v1alpha1',
+          apiVersion,
           cluster,
           kind: 'application',
           name,
@@ -627,44 +567,13 @@ export default class ApplicationModel extends GenericModel {
         if (!result) {
           return model;
         }
-
         apps.push(result);
-
-        applicationSet = result;
-
-        populateApplicationSet(applicationSet, apps, name, [], cluster);
-      }
-
-      // Either !apiVersion or indexof is true but not both
-      if ((apiVersion ? apiVersion.indexOf('app.k8s.io') > -1 : !apiVersion) && apps.length === 0) {
+      } else {
+        // get app from local hub
         apps = await this.kubeConnector.getResources(
-          (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
+          (ns) => `/apis/${apiVersion}/namespaces/${ns}/applications/${name}`,
           { namespaces: [namespace] },
         );
-      }
-
-      if (apps.length === 0) {
-        // get all argo apps in this namespace
-        apps = await this.kubeConnector.getResources(
-          (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`,
-          { namespaces: [namespace] },
-        );
-
-        applicationSet = apps.find((appItem) => evaluateSingleAnd(appItem.metadata.name === name, appItem.metadata.namespace === namespace));
-
-        if (!applicationSet) {
-          return model;
-        }
-        const argoNamespaces = getUniqueArgoNamespaces(apps);
-
-        const routes = await this.kubeConnector.getResources(
-          (ns) => `/apis/route.openshift.io/v1/namespaces/${ns}/routes`,
-          { namespaces: Array.from(argoNamespaces) },
-        );
-
-        const argoServerRoutes = getArgoServerRoutes(routes);
-
-        populateApplicationSet(applicationSet, apps, name, argoServerRoutes, cluster);
       }
     } catch (err) {
       logger.error(err);
@@ -672,7 +581,7 @@ export default class ApplicationModel extends GenericModel {
     }
 
     if (apps.length > 0) {
-      const app = evaluateTernaryExpression(!applicationSet, apps[0], applicationSet);
+      const app = apps[0];
 
       // get its associated resources
       model = {
