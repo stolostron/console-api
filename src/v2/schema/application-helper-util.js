@@ -206,9 +206,9 @@ export const addClusters = (
 ) => {
   // create element if not already created
   const sortedClusterNames = _.sortBy(clusterNames);
-  const cns = sortedClusterNames.join(', ');
-  // do not use cluster names for the id if this is an argo app, we have one node only
-  let clusterId = subscription ? `member--clusters--${cns}` : 'member--clusters--';
+  // do not use cluster names for the id or name if this is an argo app, we only know about one app here
+  const cns = subscription ? sortedClusterNames.join(', ') : '';
+  let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;
   if (!createdClusterElements.has(clusterId) && !localClusterElement) {
@@ -223,7 +223,7 @@ export const addClusters = (
       id: clusterId,
       uid: clusterId,
       specs: {
-        cluster: filteredClusters.length === 1 ? filteredClusters[0] : undefined,
+        cluster: subscription && filteredClusters.length === 1 ? filteredClusters[0] : undefined,
         clusters: filteredClusters,
         sortedClusterNames,
       },
