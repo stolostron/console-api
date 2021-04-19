@@ -207,7 +207,7 @@ export const addClusters = (
   // create element if not already created
   const sortedClusterNames = _.sortBy(clusterNames);
   // do not use cluster names for the id or name if this is an argo app, we only know about one app here
-  const cns = subscription ? sortedClusterNames.join(', ') : '';
+  const cns = subscription ? sortedClusterNames.join(',') : '';
   let clusterId = `member--clusters--${cns}`;
   const localClusterElement = clusterNames.length === 1 && clusterNames[0] === localClusterName
     ? getLocalClusterElement(createdClusterElements) : undefined;
