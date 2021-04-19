@@ -1,8 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [Contributing guidelines](#contributing-guidelines)
+  - [Commit sign-off](#commit-sign-off)
   - [Contributions](#contributions)
   - [Certificate of Origin](#certificate-of-origin)
   - [Contributing A Patch](#contributing-a-patch)
@@ -10,6 +12,26 @@
   - [Pre-check before submitting a PR](#pre-check-before-submitting-a-pr)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Commit sign-off
+
+To commit your changes, you would need to sign off on your commit:
+
+```
+git commit -s -m ....
+```
+
+To amend a previous commit:
+
+```
+git commit --amend --signoff
+```
+
+You can also mass sign-off a whole pull request with
+
+```
+git rebase --signoff ${BASE_BRANCH_NAME}
+```
 
 # Contributing guidelines
 
