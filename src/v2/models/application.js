@@ -863,7 +863,7 @@ export default class ApplicationModel extends GenericModel {
       throw err;
     });
 
-    return routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]') === "argocd" && _.get(route, 'spec.host'))[0]
+    return routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]') === 'argocd' && _.get(route, 'spec.host'))[0];
   }
 
   // returns the url for the ARGO CD editor
@@ -872,13 +872,13 @@ export default class ApplicationModel extends GenericModel {
       ...variables,
       kind: 'route',
     };
-    let route
+    let route;
     if (variables.cluster === 'local-cluster') {
       route = await this.getLocalArgoRoute(args);
     } else {
       route = await this.getResource(args);
     }
-    
+
     if (!route) {
       return '';
     }
