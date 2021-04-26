@@ -847,20 +847,18 @@ export default class ApplicationModel extends GenericModel {
 
   async getSecrets(labelObject) {
     const { label, value } = labelObject;
-    const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(label)}`, ).catch((err) => {
+    const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(label)}`).catch((err) => {
       logger.error(err);
       throw err;
     });
-    const ansibleSecrets = secrets.items.filter((secret) => secret.metadata && secret.metadata.labels[label] === value)
-    
-    const test = ansibleSecrets.map(secret => ({
+    const ansibleSecrets = secrets.items.filter((secret) => secret.metadata && secret.metadata.labels[label] === value);
+    const test = ansibleSecrets.map((secret) => ({
       metadata: _.get(secret, 'data.metadata', 'unknown'),
       ansibleSecretName: _.get(secret, 'metadata.name', 'unknown'),
-      ansibleSecretNamespace: _.get(secret, 'metadata.namespace', 'unknown')
-    }))
+      ansibleSecretNamespace: _.get(secret, 'metadata.namespace', 'unknown'),
+    }));
     return test;
   }
-
 
   // returns the url for the ARGO CD editor
   async getArgoAppRouteURL(variables) {
