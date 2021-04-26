@@ -852,12 +852,11 @@ export default class ApplicationModel extends GenericModel {
       throw err;
     });
     const ansibleSecrets = secrets.items.filter((secret) => secret.metadata && secret.metadata.labels[label] === value);
-    const test = ansibleSecrets.map((secret) => ({
+    return ansibleSecrets.map((secret) => ({
       metadata: _.get(secret, 'data.metadata', 'unknown'),
       ansibleSecretName: _.get(secret, 'metadata.name', 'unknown'),
       ansibleSecretNamespace: _.get(secret, 'metadata.namespace', 'unknown'),
     }));
-    return test;
   }
 
   // returns the url for the ARGO CD editor
