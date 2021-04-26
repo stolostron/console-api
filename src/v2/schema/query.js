@@ -46,7 +46,7 @@ type Query {
   placementrules (name: String, namespace: String): [PlacementRule]
 
   # Get secrets
-  secrets(namespace: String): [Secret]
+  secrets(label: String, value: String): [Secret]
 
   # Get all subscription resources. Optionally, specify name and namespace to filter results.
   subscriptions(name: String, namespace: String): [Subscription]
