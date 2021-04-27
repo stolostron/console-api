@@ -863,7 +863,14 @@ export default class ApplicationModel extends GenericModel {
       throw err;
     });
 
-    return routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]') === 'argocd' && _.get(route, 'spec.host'))[0];
+    if (routes && routes.length) {
+      // route exists
+      const routeObj = routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]', '') === 'argocd');
+      return routeObj && routeObj.length ? routeObj[0] : '';
+    } else {
+      // route doesn't exist
+      return '';
+    }
   }
 
   // returns the url for the ARGO CD editor
