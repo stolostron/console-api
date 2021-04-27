@@ -857,13 +857,28 @@ export default class ApplicationModel extends GenericModel {
       }));
   }
 
+  async getLocalArgoRoute(args) {
+    const routes = await this.kubeConnector.getResources((ns) => `/apis/${args.apiVersion}/namespaces/${ns}/routes`, { namespaces: [args.namespace], kind: args.kind }).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+
+    return routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]') === 'argocd' && _.get(route, 'spec.host'))[0];
+  }
+
   // returns the url for the ARGO CD editor
   async getArgoAppRouteURL(variables) {
     const args = {
       ...variables,
       kind: 'route',
     };
-    const route = await this.getResource(args);
+    let route;
+    if (variables.cluster === 'local-cluster') {
+      route = await this.getLocalArgoRoute(args);
+    } else {
+      route = await this.getResource(args);
+    }
+
     if (!route) {
       return '';
     }
