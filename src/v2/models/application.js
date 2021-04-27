@@ -866,7 +866,7 @@ export default class ApplicationModel extends GenericModel {
     if (routes && routes.length) {
       // route exists
       const routeObj = routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]', '') === 'argocd');
-      return routeObj && routeObj.length ? routeObj[0] : undefined;
+      return routeObj.length > 0 ? routeObj[0] : undefined;
     }
     // route doesn't exist
     return undefined;
