@@ -350,6 +350,8 @@ export default class ApplicationModel extends GenericModel {
     resources = resources.filter(({ kind, metadata = {} }) => kind !== undefined && (kind !== 'Namespace' || !namespaces.has(metadata.name)));
     namespaces = Array.from(namespaces);
 
+    // create ansible secrets if any are used and not yet available in the app ns
+    await this.createAnsibleSecrets(application);
     // get resource end point for each resource
     const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource)));
     if (requestPaths.length > 0) {
@@ -851,11 +853,62 @@ export default class ApplicationModel extends GenericModel {
       logger.error(err);
       throw err;
     });
-    const ansibleSecrets = secrets.items.filter((secret) => secret.metadata && secret.metadata.labels[label] === value);
+    const ansibleSecrets = _.filter(_.get(secrets, 'items', []), (secret) => _.get(secret, 'metadata.labels', {})[label] === value);
     return ansibleSecrets.map((secret) => ({
       metadata: _.get(secret, 'data.metadata', 'unknown'),
       ansibleSecretName: _.get(secret, 'metadata.name', 'unknown'),
       ansibleSecretNamespace: _.get(secret, 'metadata.namespace', 'unknown'),
+    }));
+  }
+
+  async createAnsibleSecrets(application) {
+    // get all subscriptions using an ansible provider
+    const nsPath = 'metadata.namespace';
+    const namePath = 'metadata.name';
+    const subsUsingAnsible = _.filter(application, (resource) => _.get(resource, 'kind', '') === 'Subscription'
+          && _.get(resource, 'spec.hooksecretref.name'));
+    const ansibleSecretNames = _.uniqBy(_.map(subsUsingAnsible, 'spec.hooksecretref.name'));
+    const applicationResource = _.find(application, (res) => _.get(res, 'kind', '') === 'Application');
+    const namespace = _.get(applicationResource, nsPath, '');
+    const ansibleSelector = {
+      label: 'cluster.open-cluster-management.io/provider',
+      value: 'ans',
+    };
+    await Promise.all(ansibleSecretNames.forEach(async (name) => {
+      // check if a secret with this name already exists in the app ns
+      try {
+        const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(ansibleSelector.label)}`).catch((err) => {
+          logger.error(err);
+          throw err;
+        });
+        const secretInAppNS = _.find(_.get(secrets, 'items', []), (obj) => _.get(obj, namePath, '') === name && _.get(obj, nsPath, '') === namespace);
+        if (!secretInAppNS || secretInAppNS.length === 0) {
+          const ansibleSecrets = _.filter(_.get(secrets, 'items', []), (secret) => _.get(secret, namePath, '') === name && _.get(secret, 'metadata.labels', {})[ansibleSelector.label] === ansibleSelector.value);
+          if (ansibleSecrets.length > 0) {
+            // now create the secret crd in the app ns
+            try {
+              const apiVersion = _.get(ansibleSecrets[0], 'apiVersion', 'v1');
+              const kind = 'Secret';
+              const resource = {
+                apiVersion,
+                kind,
+                metadata: {
+                  name,
+                  namespace,
+                  labels: _.get(ansibleSecrets[0], 'metadata.labels', []),
+                },
+                data: _.get(ansibleSecrets[0], 'data', {}),
+              };
+              const requestPath = await this.getResourceEndPoint(resource);
+              await this.kubeConnector.post(requestPath, resource);
+            } catch (err) {
+              logger.error(err);
+            }
+          }
+        }
+      } catch (err) {
+        logger.error(err);
+      }
     }));
   }
 
