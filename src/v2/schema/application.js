@@ -53,7 +53,6 @@ type Subject {
 type Secret {
   ansibleSecretName: String
   ansibleSecretNamespace: String
-  metadata: String
 }
 
 
