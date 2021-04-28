@@ -855,7 +855,6 @@ export default class ApplicationModel extends GenericModel {
     });
     const ansibleSecrets = _.filter(_.get(secrets, 'items', []), (secret) => _.get(secret, 'metadata.labels', {})[label] === value);
     return ansibleSecrets.map((secret) => ({
-      metadata: _.get(secret, 'data.metadata', 'unknown'),
       ansibleSecretName: _.get(secret, 'metadata.name', 'unknown'),
       ansibleSecretNamespace: _.get(secret, 'metadata.namespace', 'unknown'),
     }));
