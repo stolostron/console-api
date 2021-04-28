@@ -350,8 +350,6 @@ export default class ApplicationModel extends GenericModel {
     resources = resources.filter(({ kind, metadata = {} }) => kind !== undefined && (kind !== 'Namespace' || !namespaces.has(metadata.name)));
     namespaces = Array.from(namespaces);
 
-    // create ansible secrets if any are used and not yet available in the app ns
-    await this.createAnsibleSecrets(application);
     // get resource end point for each resource
     const requestPaths = await Promise.all(resources.map(async (resource) => this.getResourceEndPoint(resource)));
     if (requestPaths.length > 0) {
@@ -472,6 +470,8 @@ export default class ApplicationModel extends GenericModel {
 
     // if everything else created/updated
     if (errors.length === 0) {
+      // create ansible secrets if any are used and not yet available in the app ns
+      await this.createAnsibleSecrets(application);
       // if update
       if (isEdit) {
         // delete any removed resources except placement rules
@@ -873,7 +873,11 @@ export default class ApplicationModel extends GenericModel {
       label: 'cluster.open-cluster-management.io/provider',
       value: 'ans',
     };
-    await Promise.all(ansibleSecretNames.forEach(async (name) => {
+    if (!ansibleSecretNames || ansibleSecretNames.length === 0) {
+      // no secrets to create
+      return;
+    }
+    ansibleSecretNames.forEach(async (name) => {
       // check if a secret with this name already exists in the app ns
       try {
         const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(ansibleSelector.label)}`).catch((err) => {
@@ -908,7 +912,7 @@ export default class ApplicationModel extends GenericModel {
       } catch (err) {
         logger.error(err);
       }
-    }));
+    });
   }
 
   // returns the url for the ARGO CD editor
