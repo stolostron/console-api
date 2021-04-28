@@ -892,4 +892,19 @@ export default class ApplicationModel extends GenericModel {
     const transport = _.get(route, 'spec.tls') ? 'https' : 'http';
     return `${transport}://${hostName}/applications`;
   }
+
+  // returns the url for Route resource
+  async getRouteResourceURL(variables) {
+    const args = {
+      ...variables,
+      kind: 'route',
+    };
+    const route = await this.getResource(args);
+    if (!route) {
+      return '';
+    }
+    const hostName = _.get(route, 'spec.host', 'unknown');
+    const transport = _.get(route, 'spec.tls') ? 'https' : 'http';
+    return `${transport}://${hostName}`;
+  }
 }

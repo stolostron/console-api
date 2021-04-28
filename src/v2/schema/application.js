@@ -65,6 +65,7 @@ export const resolver = {
     applicationNamespaces: (parent, args, { applicationModel }) => applicationModel.getApplicationNamespace(args.namespace),
     secrets: (root, args, { applicationModel }) => applicationModel.getSecrets(args.namespace),
     argoAppRouteURL: (root, args, { applicationModel }) => applicationModel.getArgoAppRouteURL(args),
+    routeResourceURL: (root, args, { applicationModel }) => applicationModel.getRouteResourceURL(args),
   },
   Mutation: {
     createApplication: (root, args, { applicationModel }) => applicationModel.createApplication(args),
