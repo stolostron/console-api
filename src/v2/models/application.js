@@ -398,7 +398,7 @@ export default class ApplicationModel extends GenericModel {
     const namespaceResponses = await Promise.all(namespaces.map((ns) => {
       let namespaceExists = false;
       if (existingNamespaces && existingNamespaces.items) {
-        namespaceExists = existingNamespaces.items.find((existingNamespace) => existingNamespace.metadata.name === ns);
+        namespaceExists = existingNamespaces.items.find((existingNamespace) => _.get(existingNamespace, 'metadata.name', '') === ns);
       }
       return !namespaceExists ? this.createNamespace(ns) : undefined;
     }));
@@ -590,7 +590,7 @@ export default class ApplicationModel extends GenericModel {
         name, namespace, app, metadata: app.metadata,
       };
 
-      if (app.apiVersion.indexOf('argoproj.io') > -1) {
+      if (_.get(app, 'apiVersion', '').indexOf('argoproj.io') > -1) {
         return model;
       }
 

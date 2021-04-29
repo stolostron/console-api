@@ -19,39 +19,13 @@ describe('Application Resolver', () => {
       .send({
         query: `
         {
-          applications {
-            applicationRelationships {
-              metadata {
-                name
-                selfLink
-              }
-            }
-            applicationWorks {
-              metadata {
-                name
-                selfLink
-              }
-            }
-            dashboard
-            deployables {
-              metadata {
-                name
-                selfLink
-              }
-            }
+          application {
             metadata {
               name
               namespace
               creationTimestamp
               labels
               selfLink
-            }
-            placementPolicies {
-              metadata {
-                name
-                selfLink
-              }
-              status
             }
           }
         }
@@ -69,8 +43,7 @@ describe('Application Resolver', () => {
       .send({
         query: `
         {
-          applications(name:"gbapp-gbapp",namespace:"default") {
-            dashboard
+          application(name:"gbapp-gbapp",namespace:"default") {
             metadata {
               annotations
               creationTimestamp
@@ -81,77 +54,6 @@ describe('Application Resolver', () => {
               selfLink
               uid
             }
-            applicationRelationships {
-              destination {
-                kind
-                name
-              }
-              metadata {
-                annotations
-                creationTimestamp
-                labels
-                name
-                namespace
-                resourceVersion
-                selfLink
-                status
-                uid
-              }
-              raw
-              source {
-                kind
-                name
-              }
-              type
-            }
-            applicationWorks {
-              metadata {
-                name
-                namespace
-                creationTimestamp
-                labels
-                selfLink
-              }
-              release
-              status
-              reason
-              cluster
-            }
-            deployables {
-              dependencies {
-                kind
-                name
-              }
-              deployer {
-                chartName
-                namespace
-                repository
-                version
-                chartURL
-              }
-              metadata {
-                name
-                namespace
-                creationTimestamp
-              }
-              raw
-            }
-            placementPolicies {
-              metadata {
-                annotations
-                name
-                namespace
-                creationTimestamp
-                selfLink
-              }
-              clusterLabels
-              clusterReplicas
-              resourceSelector
-              status
-              raw
-            }
-            raw
-            selector
           }
         }
       `,
@@ -162,115 +64,65 @@ describe('Application Resolver', () => {
       });
   }));
 
-  // eslint-disable-next-line jest/no-commented-out-tests
-  // test('Correctly Resolves Deployables Query - MatchNames', (done) => {
-  //   supertest(server)
-  //     .post(GRAPHQL_PATH)
-  //     .send({
-  //       query: `
-  //       {
-  //         deployables(selector:{
-  //           matchNames:[
-  //             {name: "gbapp-gbapp"},
-  //             {name: "gbapp-gbapp-redismaster"},
-  //             {name: "gbapp-gbapp-redisslave"}
-  //           ]
-  //         }) {
-  //           dependencies {
-  //             kind
-  //             name
-  //           }
-  //           deployer {
-  //             chartName
-  //             namespace
-  //             repository
-  //             version
-  //             chartURL
-  //           }
-  //           metadata {
-  //             name
-  //             namespace
-  //             creationTimestamp
-  //           }
-  //           raw
-  //         }
-  //       }
-  //     `,
-  //     })
-  //     .end((err, res) => {
-  //       expect(JSON.parse(res.text)).toMatchSnapshot();
-  //       done();
-  //     });
-  // });
-
-  // eslint-disable-next-line jest/no-commented-out-tests
-  // test('Correctly Resolves Placement Policies Query', (done) => {
-  //   supertest(server)
-  //     .post(GRAPHQL_PATH)
-  //     .send({
-  //       query: `
-  //       {
-  //         placementPolicies(selector:{
-  //            matchNames:[{
-  //             name:"gbapp-gbapp"
-  //           }]
-  //         }) {
-  //           metadata {
-  //             annotations
-  //             name
-  //             namespace
-  //             creationTimestamp
-  //             selfLink
-  //           }
-  //           clusterLabels
-  //           clusterReplicas
-  //           resourceSelector
-  //           status
-  //           raw
-  //         }
-  //       }
-  //     `,
-  //     })
-  //     .end((err, res) => {
-  //       expect(JSON.parse(res.text)).toMatchSnapshot();
-  //       done();
-  //     });
-  // });
-
+  test('Correctly Resolves Application secrets Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          secrets {
+            ansibleSecretName
+            ansibleSecretNamespace
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
   test('Correctly Resolves Create Application Mutation', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({
         query: `
         mutation {
-          createApplication(resources:[{
+          createApplication(application:[{
             apiVersion: "mcm.ibm.com/v1alpha1",
             kind: "Application",
             metadata: {
               name: "testapp",
-              labels: {
-                deployable: "deployable01",
-                hcmapp: "testapp",
-              },
+              namespace: "default",
             },
-            spec: {
-              selector: {
-                matchLabels: {
-                  hcmapp: "testapp",
-                },
-              },
-              componentKinds: [
-                {
-                  group: "mcm.ibm.com/v1alpha1",
-                  kind: "PlacementPolicy",
-                },
-                {
-                  group: "mcm.ibm.com/v1alpha1",
-                  kind: "Deployable",
-                },
-              ],
+          },
+          { deleteLinks: [] },          
+        ])
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
+
+  test('Correctly Resolves Update Application Mutation', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        mutation {
+          updateApplication(application:[{
+            apiVersion: "mcm.ibm.com/v1alpha1",
+            kind: "Application",
+            metadata: {
+              name: "testapp",
+              namespace: "default",
             },
-          }])
+          },
+          { deleteLinks: [] },          
+        ])
         }
       `,
       })
