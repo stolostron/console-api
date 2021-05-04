@@ -21,6 +21,11 @@ type Application implements K8sObject {
   subscriptions: [JSON]
 }
 
+type BasicApplication implements K8sObject {
+  metadata: Metadata
+  raw: JSON
+}
+
 type ApplicationNamespace {
   metadata: Metadata
   raw: JSON
@@ -62,6 +67,7 @@ type Secret {
 export const resolver = {
   Query: {
     application: (root, args, { applicationModel }) => applicationModel.getApplication(args.name, args.namespace, ALL_SUBSCRIPTIONS, true),
+    applications: (root, args, { applicationModel }) => applicationModel.getApplications(),
     applicationNamespaces: (parent, args, { applicationModel }) => applicationModel.getApplicationNamespace(args.namespace),
     secrets: (root, args, { applicationModel }) => applicationModel.getSecrets(args),
     argoAppRouteURL: (root, args, { applicationModel }) => applicationModel.getArgoAppRouteURL(args),
