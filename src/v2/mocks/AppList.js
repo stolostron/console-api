@@ -73,6 +73,87 @@ export const mockAppsResponse = {
   },
 };
 
+export const mockArgoAppsResponse = {
+  body: {
+    apiVersion: 'argoproj.io/v1alpha1',
+    items: [
+      {
+        apiVersion: 'argoproj.io/v1alpha1',
+        kind: 'Application',
+        metadata: {
+          creationTimestamp: '2021-04-27T15:05:27Z',
+          generation: 1586,
+          name: 'kevin-helloworld',
+          namespace: 'default',
+          resourceVersion: '12070872',
+          selfLink: '/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld',
+          uid: '3ca6512f-0a32-46c2-93cb-a7ad52c2bea3',
+        },
+        spec: {
+          destination: {
+            name: 'local-cluster',
+            namespace: 'kevin-helloworld-argo',
+          },
+          project: 'default',
+          source: {
+            path: 'helloworld',
+            repoURL: 'https://github.com/fxiang1/app-samples.git',
+            targetRevision: 'HEAD',
+          },
+          syncPolicy: {
+            automated: {
+              prune: true,
+              selfHeal: true,
+            },
+            syncOptions: [
+              'CreateNamespace=true',
+            ],
+          },
+        },
+      },
+      {
+        apiVersion: 'argoproj.io/v1alpha1',
+        kind: 'Application',
+        metadata: {
+          creationTimestamp: '2021-04-27T15:08:31Z',
+          generation: 1812,
+          name: 'kevin-helloworld-managed',
+          namespace: 'default',
+          resourceVersion: '12072072',
+          selfLink: '/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld-managed',
+          uid: 'c41023fa-14cd-4c4a-81b0-7b1719ec33b9',
+        },
+        spec: {
+          destination: {
+            name: 'ui-remote',
+            namespace: 'kevin-helloworld-argo-managed',
+          },
+          project: 'default',
+          source: {
+            path: 'helloworld',
+            repoURL: 'https://github.com/fxiang1/app-samples.git',
+            targetRevision: 'HEAD',
+          },
+          syncPolicy: {
+            automated: {
+              prune: true,
+              selfHeal: true,
+            },
+            syncOptions: [
+              'CreateNamespace=true',
+            ],
+          },
+        },
+      },
+    ],
+    kind: 'ApplicationList',
+    metadata: {
+      continue: '',
+      selfLink: '/apis/argoproj.io/v1alpha1/namespaces/default/applications',
+    },
+  },
+};
+
 export const mockSingleAppResponse = {
   body: {
     kind: 'Application',

@@ -82,78 +82,94 @@ Object {
       },
       Object {
         "metadata": Object {
-          "annotations": Object {
-            "apps.open-cluster-management.io/applicationrelationships": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
-            "apps.open-cluster-management.io/dashboard": "https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-            "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
-            "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
-            "apps.open-cluster-management.io/subscriptions": "default/gbapp-gbapp-subscription-1",
-            "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-            "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-          },
-          "creationTimestamp": "2018-11-12T18:48:14Z",
-          "labels": Object {
-            "app": "gbapp",
-            "chart": "gbapp-0.1.0",
-            "heritage": "Tiller",
-            "name": "gbapp-gbapp",
-            "release": "gbapp",
-          },
-          "name": "gbapp-gbapp",
+          "annotations": null,
+          "creationTimestamp": "2021-04-27T15:05:27Z",
+          "labels": null,
+          "name": "kevin-helloworld",
           "namespace": "default",
-          "resourceVersion": "281",
-          "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-          "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
+          "resourceVersion": "12070872",
+          "selfLink": "/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld",
+          "uid": "3ca6512f-0a32-46c2-93cb-a7ad52c2bea3",
         },
         "raw": Object {
+          "apiVersion": "argoproj.io/v1alpha1",
+          "kind": "Application",
           "metadata": Object {
-            "annotations": Object {
-              "apps.open-cluster-management.io/applicationrelationships": "gbapp-gbapp-appfrontend,gbapp-gbapp-master,gbapp-gbapp-slave",
-              "apps.open-cluster-management.io/dashboard": "https://9.42.81.137:8443/grafana/dashboard/db/gbapp-gbapp-dashboard-via-federated-prometheus",
-              "apps.open-cluster-management.io/deployables": "gbapp-gbapp,gbapp-gbapp-redismaster,gbapp-gbapp-redisslave",
-              "apps.open-cluster-management.io/placementbindings": "gbapp-gbapp,gbapp-gbapp-redismaster",
-              "apps.open-cluster-management.io/subscriptions": "default/gbapp-gbapp-subscription-1",
-              "mcm.ibm.com/user-group": "c3lzdGVtOnNlcnZpY2VhY2NvdW50cyxzeXN0ZW06c2VydmljZWFjY291bnRzOmt1YmUtc3lzdGVtLHN5c3RlbTphdXRoZW50aWNhdGVk",
-              "mcm.ibm.com/user-identity": "c3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmRlZmF1bHQ=",
-            },
-            "creationTimestamp": "2018-11-12T18:48:14Z",
-            "labels": Object {
-              "app": "gbapp",
-              "chart": "gbapp-0.1.0",
-              "heritage": "Tiller",
-              "name": "gbapp-gbapp",
-              "release": "gbapp",
-            },
-            "name": "gbapp-gbapp",
+            "creationTimestamp": "2021-04-27T15:05:27Z",
+            "generation": 1586,
+            "name": "kevin-helloworld",
             "namespace": "default",
-            "resourceVersion": "281",
-            "selfLink": "/apis/mcm.ibm.com/v1alpha1/namespaces/default/applications/gbapp-gbapp",
-            "uid": "8301b18b-e6ab-11e8-b778-9e17a0ceb481",
+            "resourceVersion": "12070872",
+            "selfLink": "/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld",
+            "uid": "3ca6512f-0a32-46c2-93cb-a7ad52c2bea3",
           },
           "spec": Object {
-            "componentKinds": Array [
-              Object {
-                "group": "core",
-                "kind": "Pods",
+            "destination": Object {
+              "name": "local-cluster",
+              "namespace": "kevin-helloworld-argo",
+            },
+            "project": "default",
+            "source": Object {
+              "path": "helloworld",
+              "repoURL": "https://github.com/fxiang1/app-samples.git",
+              "targetRevision": "HEAD",
+            },
+            "syncPolicy": Object {
+              "automated": Object {
+                "prune": true,
+                "selfHeal": true,
               },
-            ],
-            "descriptor": Object {},
-            "selector": Object {
-              "matchExpressions": Array [
-                Object {
-                  "key": "app",
-                  "operator": "In",
-                  "values": Array [
-                    "gbapp",
-                    "gbf",
-                    "gbrm",
-                    "gbrs",
-                  ],
-                },
+              "syncOptions": Array [
+                "CreateNamespace=true",
               ],
             },
           },
-          "status": Object {},
+        },
+      },
+      Object {
+        "metadata": Object {
+          "annotations": null,
+          "creationTimestamp": "2021-04-27T15:08:31Z",
+          "labels": null,
+          "name": "kevin-helloworld-managed",
+          "namespace": "default",
+          "resourceVersion": "12072072",
+          "selfLink": "/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld-managed",
+          "uid": "c41023fa-14cd-4c4a-81b0-7b1719ec33b9",
+        },
+        "raw": Object {
+          "apiVersion": "argoproj.io/v1alpha1",
+          "kind": "Application",
+          "metadata": Object {
+            "creationTimestamp": "2021-04-27T15:08:31Z",
+            "generation": 1812,
+            "name": "kevin-helloworld-managed",
+            "namespace": "default",
+            "resourceVersion": "12072072",
+            "selfLink": "/apis/argoproj.io/v1alpha1/namespaces/default/applications/kevin-helloworld-managed",
+            "uid": "c41023fa-14cd-4c4a-81b0-7b1719ec33b9",
+          },
+          "spec": Object {
+            "destination": Object {
+              "name": "ui-remote",
+              "namespace": "kevin-helloworld-argo-managed",
+            },
+            "project": "default",
+            "source": Object {
+              "path": "helloworld",
+              "repoURL": "https://github.com/fxiang1/app-samples.git",
+              "targetRevision": "HEAD",
+            },
+            "syncPolicy": Object {
+              "automated": Object {
+                "prune": true,
+                "selfHeal": true,
+              },
+              "syncOptions": Array [
+                "CreateNamespace=true",
+              ],
+            },
+          },
         },
       },
     ],
