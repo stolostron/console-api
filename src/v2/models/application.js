@@ -13,6 +13,7 @@ import _ from 'lodash';
 import { responseHasError } from '../lib/utils';
 import logger from '../lib/logger';
 import GenericModel from './generic';
+import { getStatus } from './cluster';
 
 export const ALL_SUBSCRIPTIONS = '__ALL__/SUBSCRIPTIONS__';
 const EVERYTHING_CHANNEL = '__ALL__/__ALL__//__ALL__/__ALL__';
@@ -565,6 +566,22 @@ export default class ApplicationModel extends GenericModel {
         };
         const result = await this.getResource(args);
         if (!result) {
+          const managedCluster = await this.kubeConnector.get(
+            `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`,
+          );
+
+          const clusterStatus = getStatus(managedCluster);
+          let msgcode;
+
+          if (clusterStatus === 'offline') {
+            msgcode = 'load.app.cluster.offline';
+          }
+          model = {
+            error: {
+              msgcode,
+              args: [cluster],
+            },
+          };
           return model;
         }
         apps.push(result);

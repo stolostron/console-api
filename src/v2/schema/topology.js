@@ -37,6 +37,7 @@ type Relationship {
 type Topology {
   resources: [Resource]
   relationships: [Relationship]
+  error: JSON
 }
 
 type Label {
@@ -65,6 +66,7 @@ export const resolver = {
     topology: async (root, { filter }, { clusterModel, applicationModel }) => {
       let resources = [];
       let relationships = [];
+      let error;
       const {
         name,
         namespace,
@@ -73,10 +75,13 @@ export const resolver = {
         cluster,
       } = filter.application[0];
       const application = await applicationModel.getApplication(name, namespace, channel, undefined, cluster, apiVersion);
-      if (application) {
+      if (application && application.error) {
+        error = application.error;
+      }
+      if (application && !application.error) {
         ({ resources, relationships } = await getApplicationElements(application, clusterModel, cluster));
       }
-      return { resources, relationships };
+      return { resources, relationships, error };
     },
   },
 
