@@ -64,6 +64,34 @@ describe('Application Resolver', () => {
       });
   }));
 
+  test('Correctly Resolves All Applications Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+        {
+          applications {
+            metadata {
+              annotations
+              creationTimestamp
+              labels
+              name
+              namespace
+              resourceVersion
+              selfLink
+              uid
+            }
+            raw
+          }
+        }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
+
   test('Correctly Resolves Application secrets Query', () => new Promise((done) => {
     supertest(server)
       .post(GRAPHQL_PATH)

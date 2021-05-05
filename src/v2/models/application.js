@@ -650,6 +650,20 @@ export default class ApplicationModel extends GenericModel {
     return model;
   }
 
+  async getApplications() {
+    const apps = _.flatten(await Promise.all([
+      this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`),
+      this.kubeConnector.getResources((ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`),
+    ]).catch((err) => {
+      logger.error(err);
+      throw err;
+    }));
+    return _.sortBy(apps.map((app) => ({
+      metadata: app.metadata,
+      raw: app,
+    })), ['metadata.name', 'metadata.namespace']);
+  }
+
   async getAppDeployables(deployableMap) {
     const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
       // get all deployables in this namespace
