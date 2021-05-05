@@ -74,8 +74,10 @@ export default function createMockHttp() {
         return state.apps.mockSingleAppResponse;
       case params.url.includes('applications/testapp'):
         return state.apps.mockDeleteAppResponse;
-      case params.url.includes('default/applications'):
+      case params.url.includes('app.k8s.io/v1beta1/namespaces/default/applications'):
         return state.apps.mockAppsResponse;
+      case params.url.includes('argoproj.io/v1alpha1/namespaces/default/applications'):
+        return state.apps.mockArgoAppsResponse;
       case params.url.includes('default/channels'):
         return state.channels.mockChannelsResponse;
       case params.url.includes('kube-system/channels'):

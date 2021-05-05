@@ -18,8 +18,14 @@ type Query {
   # Get application resources.
   application(name: String, namespace: String): Application
 
+  # Get basic list of all applications (including Argo)
+  applications(name: String, namespace: String): [BasicApplication]
+
   # Get ArgoApp Route URL
   argoAppRouteURL(cluster: String!, namespace: String!, name: String!, apiVersion: String!): String
+
+  # Get Route resource URL
+  routeResourceURL(cluster: String!, namespace: String!, name: String!, apiVersion: String!): String
 
   # Get all channel resources. Optionally, specify name and namespace to filter results.
   channels(name: String, namespace: String): [Channel]
@@ -46,7 +52,7 @@ type Query {
   placementrules (name: String, namespace: String): [PlacementRule]
 
   # Get secrets
-  secrets(namespace: String): [Secret]
+  secrets(label: String, value: String): [Secret]
 
   # Get all subscription resources. Optionally, specify name and namespace to filter results.
   subscriptions(name: String, namespace: String): [Subscription]
