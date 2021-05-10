@@ -928,8 +928,7 @@ export default class ApplicationModel extends GenericModel {
                 kind,
                 metadata: {
                   name,
-                  namespace,
-                  labels: _.get(ansibleSecrets[0], 'metadata.labels', []),
+                  namespace
                 },
                 data: _.get(ansibleSecrets[0], 'data', {}),
               };
