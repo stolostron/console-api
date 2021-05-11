@@ -929,6 +929,10 @@ export default class ApplicationModel extends GenericModel {
                 metadata: {
                   name,
                   namespace,
+                  labels: {
+                    'cluster.open-cluster-management.io/copiedFromNamespace': _.get(ansibleSecrets[0], 'metadata.namespace', ''),
+                    'cluster.open-cluster-management.io/copiedFromSecretName': _.get(ansibleSecrets[0], 'metadata.name', ''),
+                  },
                 },
                 data: _.pick(_.get(ansibleSecrets[0], 'data', {}), ['host', 'token']),
               };
