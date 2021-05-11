@@ -929,9 +929,8 @@ export default class ApplicationModel extends GenericModel {
                 metadata: {
                   name,
                   namespace,
-                  labels: _.get(ansibleSecrets[0], 'metadata.labels', []),
                 },
-                data: _.get(ansibleSecrets[0], 'data', {}),
+                data: _.pick(_.get(ansibleSecrets[0], 'data', {}), ['host', 'token']),
               };
               const requestPath = await this.getResourceEndPoint(resource);
               await this.kubeConnector.post(requestPath, resource);
