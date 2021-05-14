@@ -193,8 +193,8 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       const deployableTypeLower = _.toLower(deployableData[2]);
 
       const isHook = isPrePostHookDeployable(subscription, dName, namespace);
-      // process only helm charts and hooks
-      if (deployableData[0] === 'helmchart' || isHook) {
+      // process only helm charts, object storage resources and hooks
+      if (deployableData[0] === 'helmchart' || deployableData[0] === 'object' || isHook) {
         if (!isHook) {
           dName = removeHelmReleaseName(deployableData[4], deployableData[1], packageName, aliasName);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
