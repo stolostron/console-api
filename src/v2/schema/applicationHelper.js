@@ -561,8 +561,12 @@ async function getApplicationElements(application, clusterModel, cluster) {
 
       // add cluster(s)
       // if no cluster found by the placement, use a default empty cluster name so that the deployables are parsed and shown
-      const clusterShapes = ruleClusterNames.length === 0 ? [['']] : ruleClusterNames.length > 1 ? [ruleClusterNames] 
-        : ruleClusterNames.map((cn) => [cn]);
+      let clusterShapes = [['']];
+      if (ruleClusterNames.length > 1) {
+        clusterShapes = [ruleClusterNames];
+      } else if (ruleClusterNames.length === 1) {
+        clusterShapes = ruleClusterNames.map((cn) => [cn]);
+      }
 
       clusterShapes.forEach((names) => {
         // add cluster element
