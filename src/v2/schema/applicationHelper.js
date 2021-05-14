@@ -559,35 +559,38 @@ async function getApplicationElements(application, clusterModel, cluster) {
         hasPlacementRules = true;
       }
 
-      // add cluster(s) if any
-      if (isRulePlaced) {
-        // add cluster(s) if any or if too many
-        const clusterShapes = ruleClusterNames.length > 1
-          ? [ruleClusterNames] : ruleClusterNames.map((cn) => [cn]);
-        clusterShapes.forEach((names) => {
-          // add cluster element
-          clusterId = addClusters(
-            parentId, createdClusterElements, subscription,
-            names, clusters, links, nodes,
-          );
-
-          if (subscription.deployables) {
-            // add deployables if any
-
-            processDeployables(
-              subscription.deployables,
-              clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription,
-            );
-          }
-
-          if (topoAnnotation) {
-            addSubscriptionCharts(
-              clusterId, subscriptionStatusMap, nodes,
-              links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
-            );
-          }
-        });
+      // add cluster(s)
+      // if no cluster found by the placement, use a default empty cluster name so that the deployables are parsed and shown
+      let clusterShapes = [['']];
+      if (ruleClusterNames.length > 1) {
+        clusterShapes = [ruleClusterNames];
+      } else if (ruleClusterNames.length === 1) {
+        clusterShapes = ruleClusterNames.map((cn) => [cn]);
       }
+
+      clusterShapes.forEach((names) => {
+        // add cluster element
+        clusterId = addClusters(
+          parentId, createdClusterElements, subscription,
+          names, clusters, links, nodes,
+        );
+
+        if (subscription.deployables) {
+          // add deployables if any
+
+          processDeployables(
+            subscription.deployables,
+            clusterId, links, nodes, subscriptionStatusMap, names, namespace, subscription,
+          );
+        }
+
+        if (topoAnnotation) {
+          addSubscriptionCharts(
+            clusterId, subscriptionStatusMap, nodes,
+            links, names, namespace, subscriptionChannel, subscriptionName, topoAnnotation, subscription,
+          );
+        }
+      });
 
       // no deployables was placed on a cluster but there were subscription decisions
       if (!subscription.deployables && !hasPlacementRules && subscribeDecisions) {
