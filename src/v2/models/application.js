@@ -901,7 +901,7 @@ export default class ApplicationModel extends GenericModel {
     const applicationResource = _.find(application, (res) => _.get(res, 'kind', '') === 'Application');
     const namespace = _.get(applicationResource, nsPath, '');
     const ansibleSelector = {
-      label: 'cluster.open-cluster-management.io/provider',
+      label: 'cluster.open-cluster-management.io/type',
       value: 'ans',
     };
     if (!ansibleSecretNames || ansibleSecretNames.length === 0) {
