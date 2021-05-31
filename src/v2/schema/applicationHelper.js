@@ -196,7 +196,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
       // process only helm charts, object storage resources and hooks
       if (deployableData[0] === 'helmchart' || deployableData[0] === 'object' || isHook) {
         if (!isHook) {
-          dName = removeHelmReleaseName(deployableData[4], deployableData[1], packageName, aliasName);
+          dName = deployableData[0] === 'object' ? deployableData[4] : removeHelmReleaseName(deployableData[4], deployableData[1], packageName, aliasName);
           namespace = deployableData[3].length === 0 ? appNamespace : deployableData[3];
           deployableName = `${subscriptionName}-${dName}-${dName}-${deployableTypeLower}`;
         }
