@@ -886,23 +886,23 @@ export default class ApplicationModel extends GenericModel {
       throw err;
     });
     let successImportStatus = true;
-    if(managedCluster.status.conditions){
+    if (managedCluster.status.conditions) {
       // check cluster import condition
-      const managedClusterCondition = _.get(managedCluster, "status.conditions")
-      _.forEach(managedClusterCondition, function(value, key){
-        if(_.has(value, 'status')){
-          const status = _.get(value, 'status')
-          if(status!== 'True'){
-            successImportStatus = false
+      const managedClusterCondition = _.get(managedCluster, 'status.conditions');
+      _.forEach(managedClusterCondition, (value) => {
+        if (_.has(value, 'status')) {
+          const status = _.get(value, 'status');
+          if (status !== 'True') {
+            successImportStatus = false;
           }
-        } 
-      })
+        }
+      });
     } else {
-      successImportStatus = false
+      successImportStatus = false;
     }
     return {
-      successImportStatus : successImportStatus
-    }
+      successImportStatus,
+    };
   }
 
   async getSecrets(labelObject) {
