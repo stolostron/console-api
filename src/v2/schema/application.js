@@ -60,7 +60,9 @@ type Secret {
   ansibleSecretNamespace: String
 }
 
-
+type managedCluster {
+  successImportStatus: Boolean
+}
 `;
 
 /* eslint-disable max-len */
@@ -70,6 +72,7 @@ export const resolver = {
     applications: (root, args, { applicationModel }) => applicationModel.getApplications(),
     applicationNamespaces: (parent, args, { applicationModel }) => applicationModel.getApplicationNamespace(args.namespace),
     secrets: (root, args, { applicationModel }) => applicationModel.getSecrets(args),
+    managedCluster: (root, args, { applicationModel }) => applicationModel.getManagedCluster(args.clusterName),
     argoAppRouteURL: (root, args, { applicationModel }) => applicationModel.getArgoAppRouteURL(args),
     routeResourceURL: (root, args, { applicationModel }) => applicationModel.getRouteResourceURL(args),
   },

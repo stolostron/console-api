@@ -878,6 +878,33 @@ export default class ApplicationModel extends GenericModel {
     return _.filter(namespaces, (ns) => !_.get(ns, 'metadata.name', '').startsWith('openshift') && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management'));
   }
 
+  async getManagedCluster(clusterName) {
+    const managedCluster = await this.kubeConnector.get(
+      `/apis/cluster.open-cluster-management.io/v1/managedclusters/${clusterName}`,
+    ).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+    let successImportStatus = true;
+    if(managedCluster.status.conditions){
+      // check cluster import condition
+      const managedClusterCondition = _.get(managedCluster, "status.conditions")
+      _.forEach(managedClusterCondition, function(value, key){
+        if(_.has(value, 'status')){
+          const status = _.get(value, 'status')
+          if(status!== 'True'){
+            successImportStatus = false
+          }
+        } 
+      })
+    } else {
+      successImportStatus = false
+    }
+    return {
+      successImportStatus : successImportStatus
+    }
+  }
+
   async getSecrets(labelObject) {
     const { label, value } = labelObject;
     const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(label)}`).catch((err) => {
