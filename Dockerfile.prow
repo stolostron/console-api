@@ -5,7 +5,7 @@ USER root
 WORKDIR /opt/app-root/console-api
 COPY . /opt/app-root/console-api/
 RUN yum install git -y
-RUN cd /opt/app-root/console-api/ && npm ci && npm run build:production
+RUN cd /opt/app-root/console-api/ && npm ci && npm run build:production && npm prune --production
 
 FROM registry.access.redhat.com/ubi8/nodejs-14:1
 USER root
