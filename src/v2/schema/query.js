@@ -54,8 +54,8 @@ type Query {
   # Get secrets
   secrets(label: String, value: String): [Secret]
 
-  # Get secrets
-  managedCluster(clusterName: String): managedCluster
+  # Get ManagedClusterConditionAvailable
+  isManagedClusterConditionAvailable(clusterName: String): Boolean
 
   # Get all subscription resources. Optionally, specify name and namespace to filter results.
   subscriptions(name: String, namespace: String): [Subscription]
