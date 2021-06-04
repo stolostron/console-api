@@ -982,7 +982,7 @@ export default class ApplicationModel extends GenericModel {
           && !_.get(route, 'name', '').toLowerCase().includes('prometheus'));
       if (routeObjs.length > 0) {
         // if still more than 1, choose one with “server” in the name if possible
-        const serverRoutes = routeObjs.find((route) => _.get(route, 'name', '').includes('server'));
+        const serverRoutes = routeObjs.find((route) => _.get(route, 'name', '').toLowerCase().includes('server'));
         if (serverRoutes.length > 0) {
           return serverRoutes[0];
         }
