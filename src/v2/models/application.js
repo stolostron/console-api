@@ -875,7 +875,7 @@ export default class ApplicationModel extends GenericModel {
 
   async getApplicationNamespace() {
     const namespaces = await this.kubeConnector.getNamespaceResources({ });
-    return _.filter(namespaces, (ns) => !_.get(ns, 'metadata.name', '').startsWith('openshift') && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management'));
+    return _.filter(namespaces, (ns) => (!_).get(ns, 'metadata.name', '').startsWith('openshift') && !_.get(ns, 'metadata.name', '').startsWith('open-cluster-management'));
   }
 
   async getManagedCluster(clusterName) {
@@ -978,11 +978,11 @@ export default class ApplicationModel extends GenericModel {
       // route exists
       const routeObjs = routes
         .filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]', '') === 'argocd'
-          && !route.name.toLowerCase().includes('grafana')
-          && !route.name.toLowerCase().includes('prometheus'));
+          && !_.get(route, 'name', '').toLowerCase().includes('grafana')
+          && !_.get(route, 'name', '').toLowerCase().includes('prometheus'));
       if (routeObjs.length > 0) {
         // if still more than 1, choose one with “server” in the name if possible
-        const serverRoutes = routeObjs.find((routeObj) => routeObj.name.toLowerCase().includes('server'));
+        const serverRoutes = routeObjs.find((route) => _.get(route, 'name', '').includes('server'));
         if (serverRoutes.length > 0) {
           return serverRoutes[0];
         }
