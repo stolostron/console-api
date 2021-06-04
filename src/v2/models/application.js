@@ -976,8 +976,19 @@ export default class ApplicationModel extends GenericModel {
 
     if (routes && routes.length) {
       // route exists
-      const routeObj = routes.filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]', '') === 'argocd');
-      return routeObj.length > 0 ? routeObj[0] : undefined;
+      const routeObjs = routes
+        .filter((route) => _.get(route, 'metadata.labels["app.kubernetes.io/part-of"]', '') === 'argocd'
+          && !route.name.toLowerCase().includes('grafana')
+          && !route.name.toLowerCase().includes('prometheus'));
+      if (routeObjs.length > 0) {
+        // if still more than 1, choose one with “server” in the name if possible
+        const serverRoutes = routeObjs.find((routeObj) => routeObj.name.toLowerCase().includes('server'));
+        if (serverRoutes.length > 0) {
+          return serverRoutes[0];
+        }
+        return routeObjs[0];
+      }
+      return undefined;
     }
     // route doesn't exist
     return undefined;
