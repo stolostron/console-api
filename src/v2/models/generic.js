@@ -20,7 +20,10 @@ const authApiVersion = 'authorization.k8s.io/v1';
 const selfSubjectAccessReviewLink = '/apis/authorization.k8s.io/v1/selfsubjectaccessreviews';
 
 function getGroupFromApiVersion(apiVersion) {
-  return apiVersion.indexOf('/') >= 0 ? apiVersion.split('/')[0] : '';
+  if (apiVersion.indexOf('/') >= 0) {
+    return { apiGroup: apiVersion.split('/')[0], version: apiVersion.split('/')[1] };
+  }
+  return { apiGroup: '', version: apiVersion };
 }
 
 function getApiGroupFromApiVersionOrPath(apiVersion, path, kind) {
@@ -29,6 +32,7 @@ function getApiGroupFromApiVersionOrPath(apiVersion, path, kind) {
   }
   // TODO - need to pass apigroup from backend to this function so we dont need this hack
   let apiGroup = ''; // api group to differentiate between duplicate resources (ie. endpoints & subscriptions)
+  let version = '';
   const pathData = path.split('/');
   // eslint-disable-next-line
   // When splitting the path, the item at pathData[3] is either the api version (if the resource has an apiGroup namespaced or not),
@@ -37,8 +41,13 @@ function getApiGroupFromApiVersionOrPath(apiVersion, path, kind) {
   if (pathData[3] !== kind && pathData[3] !== 'namespaces') {
     // eslint-disable-next-line prefer-destructuring
     apiGroup = pathData[2];
+    // eslint-disable-next-line prefer-destructuring
+    version = pathData[3];
+  } else {
+    // eslint-disable-next-line prefer-destructuring
+    version = pathData[1];
   }
-  return apiGroup;
+  return { apiGroup, version };
 }
 
 export default class GenericModel extends KubeModel {
@@ -234,10 +243,11 @@ export default class GenericModel extends KubeModel {
       throw err;
     });
     if (resourceResponse.status === 'Failure' || resourceResponse.code >= 400) {
-      const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
+      const { apiGroup, version } = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
       const response = await this.kubeConnector.managedClusterViewQuery(
         cluster,
         apiGroup,
+        version,
         kind,
         name,
         namespace,
@@ -287,7 +297,7 @@ export default class GenericModel extends KubeModel {
       }
       return localResponse;
     }
-    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
+    const { apiGroup, version } = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
     // Else If updating resource on remote cluster use an Action Type Work
     // Limit workName to 63 characters
     let workName = `update-resource-${this.kubeConnector.uid()}`;
@@ -305,12 +315,12 @@ export default class GenericModel extends KubeModel {
         },
         type: 'Action',
         scope: {
-          resourceType: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
+          resourceType: apiGroup ? `${kind.toLowerCase()}.${version}.${apiGroup}` : `${kind.toLowerCase()}`,
           namespace,
         },
         actionType: 'Update',
         kube: {
-          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
+          resource: apiGroup ? `${kind.toLowerCase()}.${version}.${apiGroup}` : `${kind.toLowerCase()}`,
           name,
           namespace,
           template: body,
@@ -339,7 +349,7 @@ export default class GenericModel extends KubeModel {
         const message = _.get(result, 'status.conditions[0].message');
         throw new Error(`Failed to Update ${name}. ${reason}. ${message}.`);
       } else {
-        return _.get(result, 'metadata.name');
+        return _.get(result, 'status.result');
       }
     } catch (e) {
       logger.error('Resource Action Error:', e.message);
@@ -369,7 +379,7 @@ export default class GenericModel extends KubeModel {
       return localResponse;
     }
 
-    const apiGroup = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
+    const { apiGroup, version } = getApiGroupFromApiVersionOrPath(apiVersion, path, kind);
 
     // Else if deleting resource on remote cluster use Action Type Work
     // Limit workName to 63 characters
@@ -388,12 +398,12 @@ export default class GenericModel extends KubeModel {
         },
         type: 'Action',
         scope: {
-          resourceType: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
+          resourceType: apiGroup ? `${kind.toLowerCase()}.${version}.${apiGroup}` : `${kind.toLowerCase()}`,
           namespace,
         },
         actionType: 'Delete',
         kube: {
-          resource: `${kind}${apiGroup ? `.${apiGroup}` : ''}`,
+          resource: apiGroup ? `${kind.toLowerCase()}.${version}.${apiGroup}` : `${kind.toLowerCase()}`,
           name,
           namespace,
         },
