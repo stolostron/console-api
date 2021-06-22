@@ -134,8 +134,6 @@ export default function createMockHttp() {
         return state.genericResourceList.getResourceMock;
       case params.url.includes('/api/v1/namespaces/klusterlet'):
         return state.genericResourceList.updateResourceLocalMock;
-      case params.url.includes('secrets/platform-auth-service'):
-        return state.genericResourceList.mockedUpdatePollResponse;
       case params.url.includes('/apis/project.openshift.io/v1/projects'):
         return state.project;
       case params.url.includes('layne-remote/managedclusteractions'):

@@ -411,7 +411,21 @@ export const mockedUpdateWorkResponse = {
 export const mockedUpdatePollResponse = {
   body: {
     metadata: {
-      name: 'platform-auto-service-update-work-1234',
+      name: 'update-resource-1234',
+    },
+    status: {
+      result: {
+        apiVersion: 'v1',
+        kind: 'Secret',
+        metadata: {
+          creationTimestamp: '2019-04-16T01:40:57Z',
+          name: 'platform-auth-service',
+          namespace: 'kube-system',
+          resourceVersion: '6278503',
+          selfLink: '/api/v1/namespaces/kube-system/secret/platform-auth-service',
+          uid: 'ae97cf94-5fe8-11e9-bfe4-00000a150993',
+        },
+      },
     },
     items: [{
       status: {

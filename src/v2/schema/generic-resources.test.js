@@ -45,7 +45,6 @@ describe('Generic Resources', () => {
   }));
 
   test('Correctly Resolves Update Remote Resource', () => new Promise((done) => {
-    Date.now = jest.fn(() => 1234);
     supertest(server)
       .post(GRAPHQL_PATH)
       .send({

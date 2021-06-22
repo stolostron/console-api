@@ -258,7 +258,7 @@ export default class KubeConnector {
   }
 
   // eslint-disable-next-line max-len
-  async managedClusterViewQuery(managedClusterNamespace, apiGroup, kind, resourceName, namespace, updateInterval, deleteAfterUse) {
+  async managedClusterViewQuery(managedClusterNamespace, apiGroup, version, kind, resourceName, namespace, updateInterval, deleteAfterUse) {
     // name cannot be long than 63 chars in length
     const name = crypto.createHash('sha1').update(`${managedClusterNamespace}-${resourceName}-${kind}`).digest('hex').substr(0, 63);
 
@@ -276,7 +276,7 @@ export default class KubeConnector {
       spec: {
         scope: {
           name: resourceName,
-          resource: `${kind}${apiGroup && `.${apiGroup}`}`,
+          resource: apiGroup ? `${kind.toLowerCase()}.${version}.${apiGroup}` : `${kind.toLowerCase()}`,
         },
       },
     };

@@ -10,3 +10,7 @@
 // Copyright Contributors to the Open Cluster Management project
 
 jest.setTimeout(30000);
+
+jest.mock('uuid', () => ({
+    v4: jest.fn(() => 1234),
+}));
