@@ -233,7 +233,7 @@ export default class GenericModel extends KubeModel {
       });
     }
 
-    if (cluster !== 'local-cluster' && kind === 'secret') {
+    if (cluster !== 'local-cluster' && (kind.toLowerCase() === 'secret' || kind.toLowerCase() === 'secrets')) {
       // We do not allow users to view secrets as this could allow lesser permissioned users to get around RBAC.
       return [{
         message: 'Viewing managed cluster secrets is not allowed for security reasons. To view this secret, you must access it from the specific managed cluster.',
