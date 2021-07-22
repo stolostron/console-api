@@ -6,10 +6,9 @@ WORKDIR /opt/app-root/console-api
 COPY . /opt/app-root/console-api/
 RUN cd /opt/app-root/console-api/ && npm ci && npm run build:production && npm prune --production
 
-FROM registry.access.redhat.com/ubi8/nodejs-14:1
-USER root
-RUN yum -y remove nodejs-nodemon
-RUN yum --nobest -y update
+FROM registry.ci.openshift.org/open-cluster-management/common-nodejs-parent:nodejs-14
+RUN microdnf update
+
 RUN mkdir -p /opt/app-root/console-api
 WORKDIR /opt/app-root/console-api
 ENV BABEL_DISABLE_CACHE=1 \
