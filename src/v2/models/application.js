@@ -897,13 +897,14 @@ export default class ApplicationModel extends GenericModel {
     return successImportStatus;
   }
 
-  async getArgoServerNs(){
-    const gitopsclusters = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/gitopsclusters`);
-    if (gitopsclusters){
-      const argoNamespace=  _.map(gitopsclusters,'spec.argoServer.argoNamespace')
-      const argosNS = Object.assign(...argoNamespace.map(k => ({ 'name': k })))
-      return  {argoServerNS: [argosNS]}
-    }
+  async getArgoServerNs() {
+    const gitopsclusters = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/gitopsclusters`).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+    const argoNamespace = _.map(gitopsclusters, 'spec.argoServer.argoNamespace');
+    const argosNS = Object.assign(...argoNamespace.map((k) => ({ name: k })));
+    return { argoServerNS: [argosNS] };
   }
 
   async getSecrets(labelObject) {
