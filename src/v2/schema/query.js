@@ -54,6 +54,9 @@ type Query {
   # Get secrets
   secrets(label: String, value: String): [Secret]
 
+  # Get argo servrs
+  argoServers: ArgoServer
+
   # Get ManagedClusterConditionAvailable
   isManagedClusterConditionAvailable(clusterName: String): Boolean
 

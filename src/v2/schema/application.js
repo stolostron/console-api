@@ -55,6 +55,10 @@ type Subject {
   name: String
 }
 
+type ArgoServer {
+  argoServerNS: JSON
+}
+
 type Secret {
   ansibleSecretName: String
   ansibleSecretNamespace: String
@@ -68,6 +72,7 @@ export const resolver = {
     applications: (root, args, { applicationModel }) => applicationModel.getApplications(),
     applicationNamespaces: (parent, args, { applicationModel }) => applicationModel.getApplicationNamespace(args.namespace),
     secrets: (root, args, { applicationModel }) => applicationModel.getSecrets(args),
+    argoServers: (root, args, { applicationModel }) => applicationModel.getArgoServerNs(),
     isManagedClusterConditionAvailable: (root, args, { applicationModel }) => applicationModel.getManagedCluster(args.clusterName),
     argoAppRouteURL: (root, args, { applicationModel }) => applicationModel.getArgoAppRouteURL(args),
     routeResourceURL: (root, args, { applicationModel }) => applicationModel.getRouteResourceURL(args),
