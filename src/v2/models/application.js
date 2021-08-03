@@ -328,7 +328,7 @@ export default class ApplicationModel extends GenericModel {
         case 'Application':
         case 'Channel':
         case 'Subscription':
-        case 'ApplicationSet':  
+        case 'ApplicationSet':
           ({ namespace } = metadata);
           if (namespace === null) {
             // namespace has all whitespace characters
