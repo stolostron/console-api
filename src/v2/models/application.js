@@ -328,6 +328,7 @@ export default class ApplicationModel extends GenericModel {
         case 'Application':
         case 'Channel':
         case 'Subscription':
+        case 'ApplicationSet':  
           ({ namespace } = metadata);
           if (namespace === null) {
             // namespace has all whitespace characters
@@ -381,7 +382,7 @@ export default class ApplicationModel extends GenericModel {
     let applicationResource;
     let applicationRequestPath;
     resources = resources.filter((resource, index) => {
-      if (resource.kind === 'Application') {
+      if (resource.kind === 'Application' || resource.kind === 'ApplicationSet') {
         applicationResource = resource;
         ([applicationRequestPath] = requestPaths.splice(index, 1));
         return false;
