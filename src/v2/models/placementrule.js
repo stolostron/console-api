@@ -101,7 +101,6 @@ export default class PlacementRuleModel extends KubeModel {
     }));
   }
 
-
   async getPlacements(namespace) {
     let chs;
     const selectedNs = namespace || 'default';
