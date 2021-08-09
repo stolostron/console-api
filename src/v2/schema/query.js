@@ -51,6 +51,10 @@ type Query {
   # Get placement rules.
   placementrules (name: String, namespace: String): [PlacementRule]
 
+  # Get placements
+  placements (namespace: String): [Placement]
+
+
   # Get secrets
   secrets(label: String, value: String): [Secret]
 

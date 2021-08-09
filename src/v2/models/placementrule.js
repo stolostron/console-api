@@ -100,4 +100,24 @@ export default class PlacementRuleModel extends KubeModel {
       raw: placementrule,
     }));
   }
+
+
+  async getPlacements(namespace) {
+    let chs;
+    const selectedNs = namespace || 'default';
+    if (namespace) {
+      chs = await this.kubeConnector.getResources(
+        (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements`,
+        { namespaces: [selectedNs] },
+      );
+    } else {
+      chs = await this.kubeConnector.getResources((ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements`);
+    }
+    return chs.map(async (placement) => ({
+      metadata: placement.metadata,
+      placementWorkNames: placement.metadata.name || '',
+      namespace: placement.metadata.namespace,
+      raw: placement,
+    }));
+  }
 }
