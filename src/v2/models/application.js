@@ -328,6 +328,7 @@ export default class ApplicationModel extends GenericModel {
         case 'Application':
         case 'Channel':
         case 'Subscription':
+        case 'ApplicationSet':
           ({ namespace } = metadata);
           if (namespace === null) {
             // namespace has all whitespace characters
@@ -381,7 +382,7 @@ export default class ApplicationModel extends GenericModel {
     let applicationResource;
     let applicationRequestPath;
     resources = resources.filter((resource, index) => {
-      if (resource.kind === 'Application') {
+      if (resource.kind === 'Application' || resource.kind === 'ApplicationSet') {
         applicationResource = resource;
         ([applicationRequestPath] = requestPaths.splice(index, 1));
         return false;
@@ -897,12 +898,23 @@ export default class ApplicationModel extends GenericModel {
     return successImportStatus;
   }
 
+  async getArgoServerNs() {
+    const gitopsclusters = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/gitopsclusters`).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+    const argoNamespace = _.map(gitopsclusters, 'spec.argoServer.argoNamespace');
+    const argosNS = Object.assign(...argoNamespace.map((k) => ({ name: k })));
+    return { argoServerNS: [argosNS] };
+  }
+
   async getSecrets(labelObject) {
     const { label, value } = labelObject;
     const secrets = await this.kubeConnector.get(`/api/v1/secrets/?labelSelector=${encodeURIComponent(label)}`).catch((err) => {
       logger.error(err);
       throw err;
     });
+
     const ansibleSecrets = _.filter(_.get(secrets, 'items', []), (secret) => _.get(secret, 'metadata.labels', {})[label] === value);
     return ansibleSecrets.map((secret) => ({
       ansibleSecretName: _.get(secret, 'metadata.name', 'unknown'),

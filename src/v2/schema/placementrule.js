@@ -20,12 +20,20 @@ type PlacementRule implements K8sObject {
   raw: JSON
 }
 
+#Placement
+type Placement implements K8sObject {
+  namespace: String
+  metadata: Metadata
+  raw: JSON
+}
+
 `;
 
 /* eslint-disable max-len */
 export const resolver = {
   Query: {
     placementrules: (root, args, { placementRuleModel }) => placementRuleModel.getPlacementRules(args.name, args.namespace),
+    placements: (root, args, { placementRuleModel }) => placementRuleModel.getPlacements(args.namespace),
   },
   Mutation: {
     createPlacementRule: (root, args, { placementRuleModel }) => placementRuleModel.createPlacementRule(args.resources),
