@@ -534,9 +534,11 @@ export default class ApplicationModel extends GenericModel {
           { namespaces: [namespace] },
         );
       } else {
-        apps = await this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`);
+        apps = _.flatten(await Promise.all([
+          this.kubeConnector.getResource((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`),
+          this.kubeConnector.getResource((ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`),
+        ]))
       }
-      apps = await Promise.all(apps);
     } catch (err) {
       logger.error(err);
       throw err;
