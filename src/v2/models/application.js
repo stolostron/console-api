@@ -594,6 +594,13 @@ export default class ApplicationModel extends GenericModel {
           (ns) => `/apis/${apiVersion}/namespaces/${ns}/applications/${name}`,
           { namespaces: [namespace] },
         );
+        if(apps.length == 0){
+          name = name.replace("-local-cluster", "");
+          apps = await this.kubeConnector.getResources(
+            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets/${name}`,
+            { namespaces: [namespace] },
+          );
+        }
       }
     } catch (err) {
       logger.error(err);
