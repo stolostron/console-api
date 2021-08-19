@@ -525,24 +525,14 @@ export default class ApplicationModel extends GenericModel {
   // ///////////// GET APPLICATION OVERVIEW ////////////////
 
   // for overview page
-  async getApplicationOverview(name, namespace = 'default') {
-    let apps;
-    try {
-      if (name) {
-        apps = await this.kubeConnector.getResources(
-          (ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications/${name}`,
-          { namespaces: [namespace] },
-        );
-      } else {
-        apps = _.flatten(await Promise.all([
-          this.kubeConnector.getResource((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`),
-          this.kubeConnector.getResource((ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`),
-        ]))
-      }
-    } catch (err) {
+  async getApplicationOverview() {
+    const apps = _.flatten(await Promise.all([
+      this.kubeConnector.getResources((ns) => `/apis/app.k8s.io/v1beta1/namespaces/${ns}/applications`),
+      this.kubeConnector.getResources((ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applications`),
+    ]).catch((err) => {
       logger.error(err);
       throw err;
-    }
+    }));
     return apps.filter((app) => app.metadata)
       .map((app) => ({
         metadata: app.metadata,
