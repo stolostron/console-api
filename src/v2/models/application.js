@@ -556,6 +556,8 @@ export default class ApplicationModel extends GenericModel {
     // get application
     let model = null;
     let apps = [];
+    let placement = [];
+    let argoName;
     const apiVersion = apiversion || 'app.k8s.io/v1beta1'; // defaults to ACM app
     try {
       if (cluster) {
@@ -594,12 +596,32 @@ export default class ApplicationModel extends GenericModel {
           (ns) => `/apis/${apiVersion}/namespaces/${ns}/applications/${name}`,
           { namespaces: [namespace] },
         );
-        if(apps.length == 0){
-          name = name.replace("-local-cluster", "");
-          apps = await this.kubeConnector.getResources(
-            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets/${name}`,
+        if (apps.length === 0) {
+          // get all applicationsets
+          const appsets = await this.kubeConnector.getResources(
+            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets`,
             { namespaces: [namespace] },
           );
+          appsets.forEach((appset) => {
+            const appsetName = _.get(appset, 'metadata.name');
+            if (name.includes(appsetName)) {
+              argoName = appsetName;
+            }
+          });
+
+          apps = await this.kubeConnector.getResources(
+            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets/${argoName}`,
+            { namespaces: [namespace] },
+          );
+
+          // build up placement
+          if (apps.length > 0) {
+            const placementName = _.get(apps[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]');
+            placement = await this.kubeConnector.getResources(
+              (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements/${placementName}`,
+              { namespaces: [namespace] },
+            );
+          }
         }
       }
     } catch (err) {
@@ -612,7 +634,7 @@ export default class ApplicationModel extends GenericModel {
 
       // get its associated resources
       model = {
-        name, namespace, app, metadata: app.metadata,
+        name, namespace, app, metadata: app.metadata, placement: placement[0],
       };
 
       if (_.get(app, 'apiVersion', '').indexOf('argoproj.io') > -1) {

@@ -19,6 +19,7 @@ type Application implements K8sObject {
   namespace: String
   app: JSON
   subscriptions: [JSON]
+  placement: JSON
 }
 
 type BasicApplication implements K8sObject {
