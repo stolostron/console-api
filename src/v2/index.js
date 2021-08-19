@@ -98,11 +98,15 @@ const requestLogger = isProd
   })
   : morgan('dev');
 
-graphQLServer.use('*', helmet({
-  frameguard: false,
-  noSniff: false,
-  xssFilter: false,
-}), noCache(), requestLogger, cookieParser());
+const callbacks = isProd
+  ? [helmet({
+    frameguard: false,
+    noSniff: false,
+    xssFilter: false,
+  })]
+  : [];
+callbacks.push(noCache(), requestLogger, cookieParser());
+graphQLServer.use('*', callbacks);
 
 graphQLServer.get('/livenessProbe', (req, res) => {
   res.send(`Testing livenessProbe --> ${new Date().toLocaleString()}`);
