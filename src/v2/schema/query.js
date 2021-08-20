@@ -16,7 +16,7 @@ export const typeDef = gql`
 # Multicloud Manager Queries
 type Query {
   # Get application resources.
-  application(name: String, namespace: String): Application
+  application(name: String, namespace: String, apiversion: String): Application
 
   # Get basic list of all applications (including Argo)
   applications(name: String, namespace: String): [BasicApplication]
