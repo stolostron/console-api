@@ -13,6 +13,22 @@ Object {
           "raw": null,
           "selector": null,
         },
+        Object {
+          "metadata": Object {
+            "name": "kevin-helloworld",
+            "namespace": null,
+          },
+          "raw": null,
+          "selector": null,
+        },
+        Object {
+          "metadata": Object {
+            "name": "kevin-helloworld-managed",
+            "namespace": null,
+          },
+          "raw": null,
+          "selector": null,
+        },
       ],
       "clusters": Array [
         Object {
