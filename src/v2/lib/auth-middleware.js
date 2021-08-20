@@ -65,8 +65,9 @@ export default function createAuthMiddleWare({
   shouldLocalAuth,
 } = {}) {
   return asyncMiddleware(async (req, res, next) => {
+    const tokenFromCookie = req.cookies['acm-access-token-cookie'];
     const idToken = await getKubeToken({
-      authorization: req.headers.authorization || req.headers.Authorization || `Bearer ${req.cookies['acm-access-token-cookie']}`,
+      authorization: req.headers.authorization || req.headers.Authorization || (tokenFromCookie && `Bearer ${tokenFromCookie}`),
       shouldLocalAuth,
     });
     req.kubeToken = idToken;
