@@ -603,7 +603,7 @@ export default class ApplicationModel extends GenericModel {
             { namespaces: [namespace] },
           );
 
-          const placementName = _.get(apps[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]');
+          const placementName = _.get(apps[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]', '');
           placement = placementName ? await this.kubeConnector.getResources(
             (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements/${placementName}`,
             { namespaces: [namespace] },
