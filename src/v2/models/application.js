@@ -548,7 +548,9 @@ export default class ApplicationModel extends GenericModel {
     // get application
     let model = null;
     let apps = [];
+    let placement = [];
     const apiVersion = apiversion || 'app.k8s.io/v1beta1'; // defaults to ACM app
+    const isArgo = apiVersion.indexOf('argoproj.io') > -1;
     try {
       if (cluster) {
         // find Argo app on remote cluster
@@ -586,6 +588,19 @@ export default class ApplicationModel extends GenericModel {
           (ns) => `/apis/${apiVersion}/namespaces/${ns}/applications/${name}`,
           { namespaces: [namespace] },
         );
+        const appsetName = isArgo ? _.get(apps[0], 'metadata.ownerReferences[0].name', '') : '';
+        if (appsetName) {
+          apps = await this.kubeConnector.getResources(
+            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets/${appsetName}`,
+            { namespaces: [namespace] },
+          );
+
+          const placementName = _.get(apps[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]', '');
+          placement = placementName ? await this.kubeConnector.getResources(
+            (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements/${placementName}`,
+            { namespaces: [namespace] },
+          ) : [];
+        }
       }
     } catch (err) {
       logger.error(err);
@@ -597,7 +612,7 @@ export default class ApplicationModel extends GenericModel {
 
       // get its associated resources
       model = {
-        name, namespace, app, metadata: app.metadata,
+        name, namespace, app, metadata: app.metadata, placement: placement[0],
       };
 
       if (_.get(app, 'apiVersion', '').indexOf('argoproj.io') > -1) {
