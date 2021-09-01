@@ -689,6 +689,55 @@ export default class ApplicationModel extends GenericModel {
     })), ['metadata.name', 'metadata.namespace']);
   }
 
+  async getApplicationSetRelatedResources(name, namespace) {
+    const argoServerNS = await this.getArgoServerNs();
+    const namespaces = [];
+
+    argoServerNS.argoServerNS.forEach((ns) => {
+      namespaces.push(ns.name);
+    });
+    const appSets = await this.kubeConnector.getResources(
+      (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets`,
+      { namespaces },
+    ).catch((err) => {
+      logger.error(err);
+      throw err;
+    });
+
+    const placementMap = {};
+    let appSetBeingDeleted;
+    let placement;
+
+    appSets.forEach((appSet) => {
+      const appSetName = _.get(appSet, 'metadata.name', '');
+      const appSetNamespace = _.get(appSet, 'metadata.namespace', '');
+      const appSetGenerators = _.get(appSet, 'spec.generators', []);
+      const appSetPlacement = appSetGenerators
+        ? _.get(appSetGenerators[0], 'clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]', '')
+        : '';
+      if (name === appSetName && namespace === appSetNamespace) {
+        appSetBeingDeleted = appSet;
+        placement = appSetPlacement;
+      } else {
+        const placementEntry = placementMap[appSetPlacement];
+        if (placementEntry) {
+          placementEntry.push(appSetName);
+        } else if (appSetPlacement) {
+          placementMap[appSetPlacement] = [appSetName];
+        }
+      }
+    });
+
+    return {
+      appSetBeingDeleted: {
+        name: appSetBeingDeleted.metadata.name,
+        namespace: appSetBeingDeleted.metadata.namespace,
+      },
+      appSetPlacement: placement,
+      appSetsSharingPlacement: placementMap[placement] || [],
+    };
+  }
+
   async getAppDeployables(deployableMap) {
     const requests = Object.entries(deployableMap).map(async ([namespace, values]) => {
       // get all deployables in this namespace

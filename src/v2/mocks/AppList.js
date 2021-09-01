@@ -1180,3 +1180,136 @@ export const mockDeleteAppResponse = {
     },
   },
 };
+
+export const mockGitopsclusterDefaultResponse = {
+  body: {
+    kind: 'GitopsclusterList',
+    apiVersion: 'apps.open-cluster-management.io/v1alpha1',
+    metadata: {
+      selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/default/gitopsclusters',
+      resourceVersion: '76724277',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'argo-acm-clusters-1',
+          namespace: 'default',
+          selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/default/gitopsclusters/argo-acm-clusters-1',
+          uid: 'f701351d-c2d7-452b-9fae-3263ee28a26f',
+          resourceVersion: '281',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+        },
+        spec: {
+          argoServer: {
+            argoNamespace: 'default',
+            cluster: 'josh',
+          },
+          placementRef: {
+            apiVersion: 'cluster.open-cluster-management.io/v1alpha1',
+            kind: 'Placement',
+            name: 'local-cluster',
+            namespace: 'default',
+          },
+        },
+        status: {},
+      },
+    ],
+  },
+};
+
+export const mockGitopsclusterKubeSystemResponse = {
+  body: {
+    kind: 'GitopsclusterList',
+    apiVersion: 'apps.open-cluster-management.io/v1alpha1',
+    metadata: {
+      selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/kube-system/gitopsclusters',
+      resourceVersion: '76724277',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'argo-acm-clusters-1',
+          namespace: 'kube-system',
+          selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/kube-system/gitopsclusters/argo-acm-clusters-1',
+          uid: 'f701351d-c2d7-452b-9fae-3263ee28a26f',
+          resourceVersion: '281',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+        },
+        spec: {
+          argoServer: {
+            argoNamespace: 'kube-system',
+            cluster: 'josh',
+          },
+          placementRef: {
+            apiVersion: 'cluster.open-cluster-management.io/v1alpha1',
+            kind: 'Placement',
+            name: 'local-cluster',
+            namespace: 'kube-system',
+          },
+        },
+        status: {},
+      },
+    ],
+  },
+};
+
+export const mockAppsetResponse = {
+  body: {
+    kind: 'ApplicationSetList',
+    apiVersion: 'argoproj.io/v1alpha1',
+    metadata: {
+      selfLink: '/apis/argoproj.io/v1alpha1/namespaces/kube-system/applicationsets',
+      resourceVersion: '76724277',
+    },
+    items: [
+      {
+        metadata: {
+          name: 'argo-appset-1',
+          namespace: 'kube-system',
+          selfLink: '/apis/argoproj.io/v1alpha1/namespaces/kube-system/applicationsets/argo-appset-1',
+          uid: 'f701351d-c2d7-452b-9fae-3263ee28a26a',
+          resourceVersion: '282',
+          creationTimestamp: '2018-11-12T18:48:14Z',
+        },
+        spec: {
+          generators: [
+            {
+              clusterDecisionResource: {
+                configMapRef: 'acm-placement',
+                labelSelector: {
+                  matchLabels: {
+                    'cluster.open-cluster-management.io/placement': 'test-placement',
+                  },
+                },
+                requeueAfterSeconds: 180,
+              },
+            },
+          ],
+          template: {
+            metadata: {
+              name: 'argo-appset-1-{{name}}',
+            },
+            spec: {
+              destination: {
+                namespace: 'argo-appset-ns',
+                server: '{{server}}',
+              },
+              project: 'default',
+              source: {
+                path: 'helloworld',
+                repoURL: 'https://github.com/fxiang1/app-samples.git',
+                targetRevision: 'main',
+              },
+              syncPolicy: {
+                syncOptions: [
+                  'CreateNamespace=true',
+                ],
+              },
+            },
+          },
+        },
+        status: {},
+      },
+    ],
+  },
+};

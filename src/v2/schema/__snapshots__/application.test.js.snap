@@ -277,3 +277,18 @@ Object {
   ],
 }
 `;
+
+exports[`Appset related resources Resolver Correctly Resolves Appset related resources Query 1`] = `
+Object {
+  "data": Object {
+    "applicationSetRelatedResources": Object {
+      "appSetBeingDeleted": Object {
+        "name": "argo-appset-1",
+        "namespace": "kube-system",
+      },
+      "appSetPlacement": "test-placement",
+      "appSetsSharingPlacement": Array [],
+    },
+  },
+}
+`;

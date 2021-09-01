@@ -160,3 +160,21 @@ describe('Application Resolver', () => {
       });
   }));
 });
+
+describe('Appset related resources Resolver', () => {
+  test('Correctly Resolves Appset related resources Query', () => new Promise((done) => {
+    supertest(server)
+      .post(GRAPHQL_PATH)
+      .send({
+        query: `
+          {
+            applicationSetRelatedResources(name:"argo-appset-1", namespace:"kube-system")
+          }
+      `,
+      })
+      .end((err, res) => {
+        expect(JSON.parse(res.text)).toMatchSnapshot();
+        done();
+      });
+  }));
+});
