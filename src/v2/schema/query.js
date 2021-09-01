@@ -21,6 +21,9 @@ type Query {
   # Get basic list of all applications (including Argo)
   applications(name: String, namespace: String): [BasicApplication]
 
+  # Get list of applicationsets
+  applicationSetRelatedResources(name: String, namespace: String): JSON
+
   # Get ArgoApp Route URL
   argoAppRouteURL(cluster: String!, namespace: String!, name: String!, apiVersion: String!): String
 

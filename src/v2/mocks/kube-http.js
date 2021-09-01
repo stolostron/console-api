@@ -60,6 +60,12 @@ export default function createMockHttp() {
       }
     }
     switch (true) {
+      case params.url.includes('apps.open-cluster-management.io/v1alpha1/namespaces/kube-system/gitopsclusters'):
+        return state.apps.mockGitopsclusterKubeSystemResponse;
+      case params.url.includes('apps.open-cluster-management.io/v1alpha1/namespaces/default/gitopsclusters'):
+        return state.apps.mockGitopsclusterDefaultResponse;
+      case params.url.includes('argoproj.io/v1alpha1/namespaces/kube-system/applicationsets'):
+        return state.apps.mockAppsetResponse;
       case params.url.endsWith('/api/v1'):
         return state.apiList.apiPath;
       case params.url.endsWith('/apis/cluster.open-cluster-management.io/v1'):
