@@ -513,6 +513,7 @@ async function getApplicationElements(application, clusterModel, cluster) {
       const subscriptionChannel = _.get(subscription, 'spec.channel');
       const subscriptionName = _.get(subscription, metadataName, '');
       const topoAnnotation = _.get(subscription, 'metadata.annotations', {})['apps.open-cluster-management.io/topo'];
+      const isObjectApp = topoAnnotation ? _.startsWith(topoAnnotation, 'object//') : false;
       // get cluster placement if any
       const ruleDecisionMap = {};
       if (subscription.rules) {
@@ -575,7 +576,7 @@ async function getApplicationElements(application, clusterModel, cluster) {
           names, clusters, links, nodes,
         );
 
-        if (subscription.deployables) {
+        if (subscription.deployables && !isObjectApp) {
           // add deployables if any
 
           processDeployables(
