@@ -562,6 +562,12 @@ export default class ApplicationModel extends GenericModel {
           namespace,
         };
         const result = await this.getResource(args);
+        if (isArgo) {
+          const argoName = _.get(result, 'metadata.ownerReferences[0].name', '');
+          if (argoName) {
+            placement = await this.getPlacement(apiVersion, argoName, namespace);
+          }
+        }
         if (!result) {
           const managedCluster = await this.kubeConnector.get(
             `/apis/cluster.open-cluster-management.io/v1/managedclusters/${cluster}`,
@@ -590,16 +596,7 @@ export default class ApplicationModel extends GenericModel {
         );
         const appsetName = isArgo ? _.get(apps[0], 'metadata.ownerReferences[0].name', '') : '';
         if (appsetName) {
-          apps = await this.kubeConnector.getResources(
-            (ns) => `/apis/argoproj.io/v1alpha1/namespaces/${ns}/applicationsets/${appsetName}`,
-            { namespaces: [namespace] },
-          );
-
-          const placementName = _.get(apps[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]', '');
-          placement = placementName ? await this.kubeConnector.getResources(
-            (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements/${placementName}`,
-            { namespaces: [namespace] },
-          ) : [];
+          placement = await this.getPlacement(apiVersion, appsetName, namespace);
         }
       }
     } catch (err) {
@@ -673,6 +670,19 @@ export default class ApplicationModel extends GenericModel {
       }
     }
     return model;
+  }
+
+  async getPlacement(apiVersion, argoName, namespace) {
+    const applicationset = await this.kubeConnector.getResources(
+      (ns) => `/apis/${apiVersion}/namespaces/${ns}/applicationsets/${argoName}`,
+      { namespaces: [namespace] },
+    );
+    const placementName = _.get(applicationset[0], 'spec.generators[0].clusterDecisionResource.labelSelector.matchLabels["cluster.open-cluster-management.io/placement"]', '');
+    const placement = placementName ? await this.kubeConnector.getResources(
+      (ns) => `/apis/cluster.open-cluster-management.io/v1alpha1/namespaces/${ns}/placements/${placementName}`,
+      { namespaces: [namespace] },
+    ) : [];
+    return placement;
   }
 
   async getApplications() {

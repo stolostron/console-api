@@ -399,6 +399,31 @@ export function buildArgoApplication(application, appName, appNamespace, nodes, 
   });
 
   delete application.app.spec.apps;
+
+  // create placement node
+  const placement = _.get(application, 'placement', '');
+  if (placement) {
+    const { metadata: { name, namespace } } = placement;
+    const placementId = `member--placements--${namespace}--${name}`;
+    nodes.push({
+      name,
+      namespace,
+      type: 'placement',
+      id: placementId,
+      uid: placementId,
+      specs: {
+        isDesign: true,
+        raw: placement,
+      },
+    });
+    links.push({
+      from: { uid: appId },
+      to: { uid: placementId },
+      type: '',
+      specs: { isDesign: true },
+    });
+  }
+
   // create cluster node
   const clusterId = addClusters(
     appId, new Set(), null,
