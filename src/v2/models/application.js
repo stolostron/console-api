@@ -487,6 +487,25 @@ export default class ApplicationModel extends GenericModel {
         checkAndCollectError(destroyResponses);
 
         // don't update application--constantly changing
+        // patch applicationset spec
+        const { kind, spec, metadata } = applicationResource;
+        if (kind === 'ApplicationSet') {
+          const requestBody = {
+            body: [
+              {
+                op: 'replace',
+                path: '/spec',
+                value: spec,
+              },
+            ],
+          };
+          const patch = await this.kubeConnector.patch(`${applicationRequestPath}/${metadata.name}`, requestBody)
+            .catch((err) => ({
+              status: 'Failure',
+              message: err.message,
+            }));
+          checkAndCollectError(patch);
+        }
       } else {
         // if create, create the application
         const deployment = await this.kubeConnector.post(applicationRequestPath, applicationResource)
