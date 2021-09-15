@@ -121,7 +121,6 @@ function mapData({
 
   const uniqueClusterNames = new Set([
     ...managedClusterMap.keys(),
-    ...clusterDeploymentMap.keys(),
   ]);
 
   return {
