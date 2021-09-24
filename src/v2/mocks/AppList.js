@@ -1184,9 +1184,9 @@ export const mockDeleteAppResponse = {
 export const mockGitopsclusterDefaultResponse = {
   body: {
     kind: 'GitopsclusterList',
-    apiVersion: 'apps.open-cluster-management.io/v1alpha1',
+    apiVersion: 'apps.open-cluster-management.io/v1beta1',
     metadata: {
-      selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/default/gitopsclusters',
+      selfLink: '/apis/apps.open-cluster-management.io/v1beta1/namespaces/default/gitopsclusters',
       resourceVersion: '76724277',
     },
     items: [
@@ -1194,7 +1194,7 @@ export const mockGitopsclusterDefaultResponse = {
         metadata: {
           name: 'argo-acm-clusters-1',
           namespace: 'default',
-          selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/default/gitopsclusters/argo-acm-clusters-1',
+          selfLink: '/apis/apps.open-cluster-management.io/v1beta1/namespaces/default/gitopsclusters/argo-acm-clusters-1',
           uid: 'f701351d-c2d7-452b-9fae-3263ee28a26f',
           resourceVersion: '281',
           creationTimestamp: '2018-11-12T18:48:14Z',
@@ -1220,9 +1220,9 @@ export const mockGitopsclusterDefaultResponse = {
 export const mockGitopsclusterKubeSystemResponse = {
   body: {
     kind: 'GitopsclusterList',
-    apiVersion: 'apps.open-cluster-management.io/v1alpha1',
+    apiVersion: 'apps.open-cluster-management.io/v1beta1',
     metadata: {
-      selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/kube-system/gitopsclusters',
+      selfLink: '/apis/apps.open-cluster-management.io/v1beta1/namespaces/kube-system/gitopsclusters',
       resourceVersion: '76724277',
     },
     items: [
@@ -1230,7 +1230,7 @@ export const mockGitopsclusterKubeSystemResponse = {
         metadata: {
           name: 'argo-acm-clusters-1',
           namespace: 'kube-system',
-          selfLink: '/apis/apps.open-cluster-management.io/v1alpha1/namespaces/kube-system/gitopsclusters/argo-acm-clusters-1',
+          selfLink: '/apis/apps.open-cluster-management.io/v1beta1/namespaces/kube-system/gitopsclusters/argo-acm-clusters-1',
           uid: 'f701351d-c2d7-452b-9fae-3263ee28a26f',
           resourceVersion: '281',
           creationTimestamp: '2018-11-12T18:48:14Z',
