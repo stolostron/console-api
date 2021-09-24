@@ -994,7 +994,7 @@ export default class ApplicationModel extends GenericModel {
   }
 
   async getArgoServerNs() {
-    const gitopsclusters = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1alpha1/namespaces/${ns}/gitopsclusters`).catch((err) => {
+    const gitopsclusters = await this.kubeConnector.getResources((ns) => `/apis/apps.open-cluster-management.io/v1beta1/namespaces/${ns}/gitopsclusters`).catch((err) => {
       logger.error(err);
       throw err;
     });
