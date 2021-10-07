@@ -1252,7 +1252,7 @@ describe('addSubscriptionCharts', () => {
         uid: 'member--member--deployable--member--clusters--possiblereptile, braveman, sharingpenguin, relievedox--demo-ns-helm-git--guestbook-app-nginx-deployment-nginx-deployment-deployment--deployment--nginx-deployment',
         specs: {
           raw: {
-            apiVersion: 'apps/v1',
+            apiVersion: 'unknown',
             kind: 'Deployment',
             metadata: {
               name: 'nginx-deployment',
@@ -1318,7 +1318,7 @@ describe('getSubscriptionPackageInfo', () => {
         },
         spec: {
           template: {
-            apiVersion: 'apps/v1',
+            apiVersion: 'unknown',
             kind: 'Service',
             metadata: { namespace: 'ns-sub-1', name: 'default-backend' },
             spec: {},
@@ -1335,7 +1335,7 @@ describe('getSubscriptionPackageInfo', () => {
         },
         spec: {
           template: {
-            apiVersion: 'apps/v1',
+            apiVersion: 'unknown',
             kind: 'Deployment',
             metadata: { namespace: 'ns-sub-1', name: 'controller' },
             spec: { replicas: 1 },
@@ -1365,7 +1365,7 @@ describe('getSubscriptionPackageInfo git helm', () => {
         },
         spec: {
           template: {
-            apiVersion: 'apps/v1',
+            apiVersion: 'unknown',
             kind: 'Deployment',
             metadata: { namespace: 'demo-ns-helm-git', name: 'nginx-deployment' },
             spec: { replicas: 2 },

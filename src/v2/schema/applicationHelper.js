@@ -212,7 +212,7 @@ export const getSubscriptionPackageInfo = (topoAnnotation, subscriptionName, app
           },
           spec: {
             template: {
-              apiVersion: 'apps/v1',
+              apiVersion: 'unknown',
               kind: deployableData[2],
               metadata: {
                 namespace,
