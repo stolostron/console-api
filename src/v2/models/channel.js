@@ -12,6 +12,7 @@
 import _ from 'lodash';
 import atob from 'atob';
 import { Octokit } from '@octokit/rest';
+import * as HttpsProxyAgent from 'https-proxy-agent';
 import KubeModel from './kube';
 import logger from '../lib/logger';
 
@@ -137,10 +138,17 @@ export default class ChannelModel extends KubeModel {
   }
 
   async getGitConnection(args) {
+    const envProxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
     return this.getGitChannelCredentials(args)
       .then(({ accessToken }) => {
         const authBaseUrl = 'https://api.github.com';
-        const authOptions = accessToken ? { baseUrl: authBaseUrl, auth: accessToken } : { baseUrl: authBaseUrl, auth: '' };
+        const authOptions = {
+          baseUrl: authBaseUrl,
+          auth: accessToken || '',
+          request: {
+            agent: envProxy ? new HttpsProxyAgent.HttpsProxyAgent(envProxy) : undefined,
+          },
+        };
         return new Octokit(authOptions);
       })
       .catch(this.handleGitError);
