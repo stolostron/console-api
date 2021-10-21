@@ -142,20 +142,13 @@ export default class ChannelModel extends KubeModel {
     return this.getGitChannelCredentials(args)
       .then(({ accessToken }) => {
         const authBaseUrl = 'https://api.github.com';
-        const authOptions = accessToken
-          ? {
-            baseUrl: authBaseUrl,
-            auth: accessToken,
-            request: {
-              agent: envProxy ? new HttpsProxyAgent.HttpsProxyAgent(envProxy) : undefined,
-            },
-          } : {
-            baseUrl: authBaseUrl,
-            auth: '',
-            request: {
-              agent: envProxy ? new HttpsProxyAgent.HttpsProxyAgent(envProxy) : undefined,
-            },
-          };
+        const authOptions = {
+          baseUrl: authBaseUrl,
+          auth: accessToken || '',
+          request: {
+            agent: envProxy ? new HttpsProxyAgent.HttpsProxyAgent(envProxy) : undefined,
+          },
+        };
         return new Octokit(authOptions);
       })
       .catch(this.handleGitError);
