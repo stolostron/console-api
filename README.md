@@ -1,10 +1,10 @@
 # Console API
 
-[![Build Status](https://travis-ci.com/open-cluster-management/console-api.svg?token=APpLzibLo9i2xU1nq9kC&branch=master)](https://travis-ci.com/open-cluster-management/console-api)
+[![Build Status](https://travis-ci.com/stolostron/console-api.svg?token=APpLzibLo9i2xU1nq9kC&branch=release-2.2)](https://travis-ci.com/stolostron/console-api)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=coverage&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=vulnerabilities&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 
-[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Console UI](https://github.com/open-cluster-management/console-ui).
+[Stolostron](https://github.com/stolostron) - Console API for the [Console UI](https://github.com/stolostron/console-ui).
 
 ## Prerequisites
 
