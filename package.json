@@ -1,5 +1,5 @@
 {
-  "name": "@open-cluster-management/console-api",
+  "name": "@stolostron/console-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
