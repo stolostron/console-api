@@ -16,7 +16,7 @@ import helmet from 'helmet';
 import noCache from 'nocache';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import inspect from '@open-cluster-management/security-middleware';
+import inspect from '@stolostron/security-middleware';
 import _ from 'lodash';
 
 import logger from './lib/logger';
