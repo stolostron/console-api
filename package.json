@@ -1,5 +1,5 @@
 {
-  "name": "@open-cluster-management/console-api",
+  "name": "@stolostron/console-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:open-cluster-management/console-api.git"
+    "url": "git@github.com:stolostron/console-api.git"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@octokit/rest": "^18.0.12",
-    "@open-cluster-management/security-middleware": "^1.0.5",
+    "@stolostron/security-middleware": "^1.0.5",
     "apollo-errors": "^1.9.0",
     "apollo-server-express": "^2.19.0",
     "atob": "^2.1.2",

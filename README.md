@@ -1,9 +1,9 @@
 # Console API
-[![Build Status](https://travis-ci.com/open-cluster-management/console-api.svg?token=APpLzibLo9i2xU1nq9kC&branch=main)](https://travis-ci.com/open-cluster-management/console-api)
+[![Build Status](https://travis-ci.com/stolostron/console-api.svg?token=APpLzibLo9i2xU1nq9kC&branch=main)](https://travis-ci.com/stolostron/console-api)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=coverage&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=open-cluster-management_console-api&metric=vulnerabilities&token=25e6ea1bb8964f0c39591ff195f505130db7906f)](https://sonarcloud.io/dashboard?id=open-cluster-management_console-api)
 
-[Open Cluster Management](https://github.com/open-cluster-management) - Console API for the [Application console](https://github.com/open-cluster-management/application-ui). It uses Kubernetes APIs to provide APIs that are used for topology, access checks, and generic resource CRUD.
+[Open Cluster Management](https://github.com/stolostron) - Console API for the [Application console](https://github.com/stolostron/application-ui). It uses Kubernetes APIs to provide APIs that are used for topology, access checks, and generic resource CRUD.
 
 ------
 
@@ -32,7 +32,7 @@ Check the [CONTRIBUTING Doc](CONTRIBUTING.md) for how to contribute to the repo.
 
 ## Getting Started
 
-Console API provides APIs that are used for topology, access checks, and generic resource CRUD in Application console. This is a guide on how to build and run open-cluster-management console-api.
+Console API provides APIs that are used for topology, access checks, and generic resource CRUD in Application console. This is a guide on how to build and run stolostron console-api.
 
 ## Prerequisite Tools
 
@@ -41,7 +41,7 @@ Console API provides APIs that are used for topology, access checks, and generic
 
 ## Building for Development
 <pre>
-git clone https://github.com/open-cluster-management/console-api.git
+git clone https://github.com/stolostron/console-api.git
 cd console-api
 npm install
 npm run build:production
@@ -73,11 +73,11 @@ To run your local `console-api` code against an existing OCM installation:
    npm run start
    </pre>
 
-1. Now you can make GraphQL calls to `http://localhost:4000/hcmuiapi/graphql` or `https://localhost:4000/hcmuiapi/graphql` (depending on whether you are using secure connections) or use it with a local instance of [Application UI](https://github.com/open-cluster-management/application-ui)
+1. Now you can make GraphQL calls to `http://localhost:4000/hcmuiapi/graphql` or `https://localhost:4000/hcmuiapi/graphql` (depending on whether you are using secure connections) or use it with a local instance of [Application UI](https://github.com/stolostron/application-ui)
 
 ## Building a local image
 <pre>
-git clone https://github.com/open-cluster-management/console-api.git
+git clone https://github.com/stolostron/console-api.git
 cd console-api
 export COMPONENT_DOCKER_REPO=&lt;docker_repo&gt;
 export COMPONENT_NAME=console-api
